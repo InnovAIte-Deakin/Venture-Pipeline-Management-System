@@ -40,12 +40,15 @@
 ## 🎯 Platform Overview
 
 ### 🏆 Mission
+
 Transform impact investing through AI-powered venture pipeline management, enabling investors to identify, assess, and support high-impact ventures with comprehensive GEDSI (Gender, Equity, Disability, Social Inclusion) tracking.
 
 ### 🎯 Vision
+
 Become the market leader in venture pipeline management for impact investors, competing directly with Affinity, DealCloud, Workiva, and Watershed while providing superior value through unified platform capabilities.
 
 ### 🚀 Key Value Propositions
+
 - **Unified Platform**: CRM + Program Operations + Impact Measurement in one solution
 - **GEDSI-Native**: Built-in gender, disability, and social inclusion tracking
 - **AI-First**: Advanced AI capabilities across all workflows
@@ -59,14 +62,15 @@ Become the market leader in venture pipeline management for impact investors, co
 
 ### 🏆 Competitive Landscape
 
-| Platform | Strengths | Weaknesses | MIV Advantage |
-|----------|-----------|------------|---------------|
-| **Affinity** | Relationship intelligence, automation | Limited impact/ESG, no program ops | Unified platform with GEDSI focus |
-| **DealCloud** | Enterprise features, configurability | Complex setup, expensive | Simplified enterprise experience |
-| **Workiva** | Compliance, audit trails | Financial focus, expensive | Impact-focused compliance |
-| **Watershed** | Carbon accounting, data connectors | Limited scope, no venture focus | Comprehensive impact platform |
+| Platform      | Strengths                             | Weaknesses                         | MIV Advantage                     |
+| ------------- | ------------------------------------- | ---------------------------------- | --------------------------------- |
+| **Affinity**  | Relationship intelligence, automation | Limited impact/ESG, no program ops | Unified platform with GEDSI focus |
+| **DealCloud** | Enterprise features, configurability  | Complex setup, expensive           | Simplified enterprise experience  |
+| **Workiva**   | Compliance, audit trails              | Financial focus, expensive         | Impact-focused compliance         |
+| **Watershed** | Carbon accounting, data connectors    | Limited scope, no venture focus    | Comprehensive impact platform     |
 
 ### 🎯 MIV Competitive Advantages
+
 1. **Unified Platform**: CRM + Program Ops + Impact Measurement
 2. **GEDSI-Native**: Built-in gender, disability, social inclusion tracking
 3. **AI-First**: Advanced AI capabilities across all workflows
@@ -84,13 +88,13 @@ graph TB
         B --> C[Radix UI + Shadcn/ui]
         C --> D[Real-time Updates]
     end
-    
+
     subgraph "API Gateway Layer"
         E[Kong API Gateway] --> F[Rate Limiting]
         E --> G[Authentication]
         E --> H[Request Routing]
     end
-    
+
     subgraph "Core Services"
         I[Venture Service] --> J[Venture Management]
         K[Relationship Service] --> L[Network Intelligence]
@@ -99,21 +103,21 @@ graph TB
         Q[Document Service] --> R[AI Document Analysis]
         S[Analytics Service] --> T[Real-time Analytics]
     end
-    
+
     subgraph "AI/ML Layer"
         U[AI Gateway] --> V[OpenAI GPT-4]
         U --> W[Anthropic Claude]
         U --> X[Google AI Gemini]
         U --> Y[Custom ML Models]
     end
-    
+
     subgraph "Data Layer"
         Z[PostgreSQL Primary] --> AA[Read Replicas]
         BB[Redis Cache] --> CC[Session Management]
         DD[Elasticsearch] --> EE[Search & Analytics]
         FF[Vector Database] --> GG[AI Embeddings]
     end
-    
+
     A --> E
     E --> I
     E --> K
@@ -140,6 +144,7 @@ graph TB
 ## 🚀 Core Features
 
 ### 🏢 **Venture Management**
+
 - **Intelligent Intake**: AI-powered venture screening and assessment
 - **Pipeline Management**: Multi-stage pipeline with automated workflows
 - **Relationship Intelligence**: Network mapping and warm introduction paths
@@ -147,6 +152,7 @@ graph TB
 - **Activity Tracking**: Comprehensive audit trail and collaboration
 
 ### 📊 **GEDSI & Impact Measurement**
+
 - **IRIS+ Integration**: Native IRIS+ metrics tracking and compliance
 - **GEDSI Analytics**: Gender, disability, social inclusion measurement
 - **Impact Assessment**: AI-powered impact calculation and reporting
@@ -154,6 +160,7 @@ graph TB
 - **Disaggregation**: Detailed demographic and geographic breakdowns
 
 ### 💰 **Capital Facilitation**
+
 - **Investment Pipeline**: End-to-end investment process management
 - **Due Diligence**: Automated due diligence workflows
 - **Portfolio Management**: Comprehensive portfolio tracking and analytics
@@ -161,6 +168,7 @@ graph TB
 - **Fund Management**: Multi-fund support with sophisticated allocation
 
 ### 🤖 **AI-Powered Intelligence**
+
 - **Document Analysis**: AI-powered document processing and insights
 - **Venture Assessment**: Automated readiness and risk assessment
 - **Relationship Mapping**: Intelligent network analysis and suggestions
@@ -168,6 +176,7 @@ graph TB
 - **Smart Recommendations**: AI-driven insights and recommendations
 
 ### 📈 **Advanced Analytics**
+
 - **Real-time Dashboards**: Live analytics and performance metrics
 - **Custom Reporting**: Flexible reporting with export capabilities
 - **Predictive Insights**: AI-powered forecasting and trend analysis
@@ -179,6 +188,7 @@ graph TB
 ## 🤖 AI Capabilities
 
 ### 🧠 **Multi-Model AI Architecture**
+
 - **OpenAI GPT-4**: Advanced text processing and content generation
 - **Anthropic Claude**: Sophisticated reasoning and analysis
 - **Google AI Gemini**: Multi-modal AI capabilities
@@ -186,6 +196,7 @@ graph TB
 - **Vector Embeddings**: Semantic search and similarity matching
 
 ### 🔄 **AI-Powered Workflows**
+
 - **Document Intelligence**: Automated document processing and insights
 - **Venture Screening**: AI-powered venture evaluation and scoring
 - **Risk Assessment**: Automated risk identification and mitigation
@@ -197,6 +208,7 @@ graph TB
 ## 🛠️ Technology Stack
 
 ### **Frontend Stack**
+
 ```typescript
 - Next.js 15 (App Router + Server Components)
 - React 19 (Concurrent Features + Suspense)
@@ -212,6 +224,7 @@ graph TB
 ```
 
 ### **Backend Stack**
+
 ```typescript
 - Node.js 20 (Latest LTS)
 - TypeScript 5.0 (Strict mode)
@@ -226,6 +239,7 @@ graph TB
 ```
 
 ### **AI/ML Stack**
+
 ```python
 - OpenAI GPT-4 (Text processing)
 - Anthropic Claude (Reasoning)
@@ -238,6 +252,7 @@ graph TB
 ```
 
 ### **Infrastructure Stack**
+
 ```yaml
 - Kubernetes (Container orchestration)
 - Docker (Containerization)
@@ -255,6 +270,7 @@ graph TB
 ## 📊 Performance Metrics
 
 ### **Technical Performance**
+
 - **Uptime**: 99.9% availability SLA
 - **Response Time**: < 200ms API response time
 - **Page Load**: < 2s initial page load
@@ -262,6 +278,7 @@ graph TB
 - **Data Processing**: Real-time processing of 1M+ records
 
 ### **Business Metrics**
+
 - **Customer Satisfaction**: 4.8/5 average rating
 - **Time to Value**: 30% faster than competitors
 - **User Adoption**: 95% feature adoption rate
@@ -273,6 +290,7 @@ graph TB
 ## 🔒 Security & Compliance
 
 ### **Enterprise Security**
+
 - **Multi-Layer Security**: Network, application, and data security
 - **Authentication**: Auth0 integration with MFA support
 - **Authorization**: Role-based and attribute-based access control
@@ -280,6 +298,7 @@ graph TB
 - **Audit Logging**: Comprehensive audit trails and monitoring
 
 ### **Compliance Standards**
+
 - **SOC 2 Type II**: Security, availability, and processing integrity
 - **GDPR Compliance**: Data protection and privacy
 - **ISO 27001**: Information security management
@@ -291,7 +310,8 @@ graph TB
 ## 🚀 Getting Started
 
 ### **1. Prerequisites**
-- Node.js 20+ 
+
+- Node.js 20+
 - PostgreSQL 15+
 - Redis 7+
 - Docker & Kubernetes (for production)
@@ -361,6 +381,7 @@ KAFKA_BROKERS="localhost:9092"
 ## 📚 Documentation
 
 ### **Core Documentation**
+
 - 📖 **[Platform Overview](./docs/MIV_PLATFORM_OVERVIEW.md)** - Comprehensive platform guide
 - 📚 **[API Reference](./docs/API_REFERENCE.md)** - Complete API documentation
 - 👥 **[User Manual](./docs/USER_MANUAL.md)** - End-user documentation
@@ -368,12 +389,14 @@ KAFKA_BROKERS="localhost:9092"
 - 🤝 **[Contributing Guidelines](./docs/CONTRIBUTING.md)** - How to contribute
 
 ### **Architecture & Implementation**
+
 - 🏗️ **[Complete Rebuild Plan](./docs/REBUILD_PLAN.md)** - Enterprise architecture plan
 - 🔧 **[Enterprise Architecture](./docs/ENTERPRISE_ARCHITECTURE.md)** - System architecture
 - 📊 **[Current State Assessment](./docs/CURRENT_STATE_ASSESSMENT.md)** - Platform assessment
 - 🔄 **[Migration Strategy](./docs/MIGRATION_STRATEGY.md)** - Migration roadmap
 
 ### **Market & Competitive Analysis**
+
 - 📈 **[Market Analysis](./docs/MIV_FULL_REPORT_COMBINED.md)** - Comprehensive market research
 - 🎯 **[Competitive Intelligence](./docs/MIV_FULL_REPORT_COMBINED.md)** - Competitive analysis
 - 📋 **[Documentation Upgrade Summary](./docs/DOCUMENTATION_UPGRADE_SUMMARY.md)** - Documentation improvements
@@ -385,6 +408,7 @@ KAFKA_BROKERS="localhost:9092"
 We welcome contributions from the community! Please see our [Contributing Guidelines](./docs/CONTRIBUTING.md) for details.
 
 ### **Development Workflow**
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -392,6 +416,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 5. Submit a pull request
 
 ### **Code Standards**
+
 - TypeScript strict mode
 - ESLint + Prettier configuration
 - Comprehensive testing
@@ -403,6 +428,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## 📈 Success Metrics
 
 ### **Technical Excellence**
+
 - **99.9% Uptime**: Enterprise-grade reliability
 - **< 2s Load Time**: Optimized performance
 - **10K+ Concurrent Users**: Scalable architecture
@@ -410,6 +436,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 - **100% Compliance**: Regulatory adherence
 
 ### **Business Impact**
+
 - **50+ Enterprise Customers**: Market penetration
 - **200% Revenue Growth**: Sustainable growth
 - **4.8/5 Customer Rating**: User satisfaction
@@ -421,6 +448,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 ## 🆘 Support
 
 ### **Enterprise Support**
+
 - **24/7 Support**: Round-the-clock assistance
 - **Dedicated Success Manager**: Personalized support
 - **Training & Onboarding**: Comprehensive training programs
@@ -428,6 +456,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 - **API Support**: Technical integration assistance
 
 ### **Community Support**
+
 - [GitHub Issues](https://github.com/your-org/miv-platform/issues) - Bug reports and feature requests
 - [Documentation](./docs/) - Comprehensive guides and tutorials
 - [Discord Community](https://discord.gg/miv-platform) - Community discussions
