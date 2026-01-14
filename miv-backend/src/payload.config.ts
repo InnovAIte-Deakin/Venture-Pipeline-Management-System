@@ -7,6 +7,8 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+console.log("🧪 DB URI at startup:", process.env.DATABASE_URI);
+
 import { Users } from './collections/users'
 import { Media } from './collections/media'
 import { Ventures } from './collections/ventures'
