@@ -301,8 +301,8 @@ export function Sidebar() {
                     </>
                   ) : (
                     <>
-                      <p className="text-sm font-medium text-slate-100 truncate">Not signed in</p>
-                      <p className="text-xs text-slate-400 truncate">Click to sign in</p>
+                      <p className="text-sm font-medium text-slate-100 truncate">Signed In</p>
+                      <p className="text-xs text-slate-400 truncate">Click to sign Out</p>
                     </>
                   )}
                 </div>
