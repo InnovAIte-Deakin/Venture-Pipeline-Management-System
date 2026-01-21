@@ -17,6 +17,7 @@ import { Agreements } from './collections/agreements'
 import { Founders } from './collections/founders'
 import { DataRoomFiles } from './collections/dataRoomFiles'
 import { ActivityLogs } from './collections/activityLogs'
+import { Documents } from './collections/documents'
 import { Settings } from './globals/settings'
 import { Lookups } from './globals/lookups'
 const filename = fileURLToPath(import.meta.url)
@@ -47,6 +48,7 @@ export default buildConfig({
     Agreements,
     DataRoomFiles,
     ActivityLogs,
+    Documents,
   ],
   globals: [Settings, Lookups],
   // Explicit origins are required when sending credentials (cookies)

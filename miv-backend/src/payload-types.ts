@@ -75,6 +75,7 @@ export interface Config {
     agreements: Agreement;
     dataRoomFiles: DataRoomFile;
     activityLogs: ActivityLog;
+    documents: Document;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -89,6 +90,7 @@ export interface Config {
     agreements: AgreementsSelect<false> | AgreementsSelect<true>;
     dataRoomFiles: DataRoomFilesSelect<false> | DataRoomFilesSelect<true>;
     activityLogs: ActivityLogsSelect<false> | ActivityLogsSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -391,6 +393,38 @@ export interface ActivityLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: string;
+  documentType:
+    | 'pitch_deck'
+    | 'financial_statements'
+    | 'legal_documents'
+    | 'gedsi_reports'
+    | 'impact_reports'
+    | 'other';
+  status?: ('pending_review' | 'approved' | 'rejected' | 'needs_revision') | null;
+  version?: number | null;
+  uploadedBy: string | User;
+  venture?: (string | null) | Venture;
+  notes?: string | null;
+  reviewedBy?: (string | null) | User;
+  reviewedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -427,6 +461,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'activityLogs';
         value: string | ActivityLog;
+      } | null)
+    | ({
+        relationTo: 'documents';
+        value: string | Document;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -718,6 +756,31 @@ export interface ActivityLogsSelect<T extends boolean = true> {
   timestamp?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  documentType?: T;
+  status?: T;
+  version?: T;
+  uploadedBy?: T;
+  venture?: T;
+  notes?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
