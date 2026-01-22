@@ -7,6 +7,8 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+console.log("🧪 DB URI at startup:", process.env.DATABASE_URI);
+
 import { Users } from './collections/users'
 import { Media } from './collections/media'
 import { Ventures } from './collections/ventures'
@@ -15,6 +17,7 @@ import { Agreements } from './collections/agreements'
 import { Founders } from './collections/founders'
 import { DataRoomFiles } from './collections/dataRoomFiles'
 import { ActivityLogs } from './collections/activityLogs'
+import { Documents } from './collections/documents'
 import { Settings } from './globals/settings'
 import { Lookups } from './globals/lookups'
 const filename = fileURLToPath(import.meta.url)
@@ -45,6 +48,7 @@ export default buildConfig({
     Agreements,
     DataRoomFiles,
     ActivityLogs,
+    Documents,
   ],
   globals: [Settings, Lookups],
   // Explicit origins are required when sending credentials (cookies)
@@ -83,6 +87,46 @@ export default buildConfig({
         },
       })
       console.log('Seeded default admin user admin@example.com / changeme123')
+    }
+
+    // Ensure a default founder exists (first-run only)
+    const founders = await payload.find({
+      collection: 'users',
+      where: { email: { equals: 'founder@example.com' } },
+      limit: 1,
+    })
+    if (founders.totalDocs === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: 'founder@example.com',
+          password: 'changeme123',
+          first_name: 'Founder',
+          last_name: 'user',
+          role: 'founder',
+        },
+      })
+      console.log('Seeded default founder user founder@example.com / changeme123')
+    }
+
+    // Ensure a default miv_analyst exists (first-run only)
+    const analysts = await payload.find({
+      collection: 'users',
+      where: { email: { equals: 'analyst@example.com' } },
+      limit: 1,
+    })
+    if (analysts.totalDocs === 0) {
+      await payload.create({
+        collection: 'users',
+        data: {
+          email: 'analyst@example.com',
+          password: 'changeme123',
+          first_name: 'Analyst',
+          last_name: 'User',
+          role: 'miv_analyst',
+        },
+      })
+      console.log('Seeded default miv_analyst user analyst@example.com / changeme123')
     }
   },
 })

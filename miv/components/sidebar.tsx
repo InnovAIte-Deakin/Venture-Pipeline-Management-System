@@ -48,6 +48,7 @@ import {
 import { Logo } from "@/components/logo"
 import { useSession, signIn, signOut } from "next-auth/react"
 import { GlobalSearch, useGlobalSearch } from "@/components/global-search"
+import { useAuth } from "@/hooks/useAuth"
 
 interface NavItem {
   title: string
@@ -109,20 +110,21 @@ const navigationItems: NavItem[] = [
     title: "Operations",
     icon: Settings,
     children: [
+      { title: "Impact Documents", href: "/dashboard/impact-documents", icon: FileText },
       { title: "Team Management", href: "/dashboard/team-management", icon: Users },
-      { title: "Document Management", href: "/dashboard/documents", icon: FileText },
       { title: "Notifications", href: "/dashboard/notifications", icon: Bell },
       { title: "Calendar & Events", href: "/dashboard/calendar", icon: Calendar },
       { title: "Test Environment", href: "/dashboard/test-environment", icon: Settings },
       { title: "System Settings", href: "/dashboard/system-settings", icon: Settings },
-      { title: "Workflows", href: "/dashboard/workflows", icon: Activity }
+      { title: "Workflows", href: "/dashboard/workflows", icon: Activity },
+      { title: "Document Management", href: "/dashboard/documents", icon: FileText }
     ]
   }
 ]
 
 export function Sidebar() {
   const pathname = usePathname()
-  const { data: session, status } = useSession()
+  const { user, loading, isAuthenticated, logout } = useAuth()
   const [expandedItems, setExpandedItems] = useState<string[]>([])
   const [isCollapsed, setIsCollapsed] = useState(false)
   const globalSearch = useGlobalSearch()
@@ -310,12 +312,46 @@ export function Sidebar() {
                   <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => signOut({ callbackUrl: '/' })}>
                     <LogOut className="h-3 w-3" />
                   </Button>
+            {/* User Profile */}
+            <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
+              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                {isAuthenticated && user ? (
+                  <span className="text-sm font-bold text-white">
+                    {(user.firstName.charAt(0) + user.lastName.charAt(0)).toUpperCase()}
+                  </span>
+                ) : (
+                  <User className="h-4 w-4 text-white" />
+                )}
+              </div>
+              <div className="flex-1 min-w-0">
+                {loading ? (
+                  <>
+                    <p className="text-sm font-medium text-slate-100 truncate">Loading...</p>
+                    <p className="text-xs text-slate-400 truncate">Please wait</p>
+                  </>
+                ) : isAuthenticated && user ? (
+                  <>
+                    <p className="text-sm font-medium text-slate-100 truncate">
+                      {user.firstName} {user.lastName}
+                    </p>
+                    <p className="text-xs text-slate-400 truncate">{user.email}</p>
+                    <p className="text-[10px] text-slate-500 truncate">ID: {user.id}</p>
+                  </>
                 ) : (
                   <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => signIn()}>
                     <User className="h-3 w-3" />
                   </Button>
                 )}
               </div>
+              {isAuthenticated ? (
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={logout}>
+                  <LogOut className="h-3 w-3" />
+                </Button>
+              ) : (
+                <Button size="sm" variant="ghost" className="h-6 w-6 p-0" onClick={() => window.location.href = '/auth/login'}>
+                  <User className="h-3 w-3" />
+                </Button>
+              )}
             </div>
           )}
 

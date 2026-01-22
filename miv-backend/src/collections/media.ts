@@ -17,17 +17,37 @@ const dirname = path.dirname(filename)
 export const Media: CollectionConfig = {
   slug: 'media',
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: anyone,
-    update: authenticated,
+  create: authenticated,
+
+  read: ({ req, doc }) => {
+    if (!req.user) return false
+
+    const role = req.user.role
+
+    // MIV / ESO users can see all uploads
+    if (role === 'miv_analyst') return true
+
+    // Founders can only see their own uploads
+    return doc?.uploader?.id === req.user.id
   },
+
+  update: ({ req }) => req.user?.role === 'miv_analyst',
+
+  delete: ({ req }) => req.user?.role === 'miv_analyst',
+},
+
+
   fields: [
     {
-      name: 'alt',
-      type: 'text',
-      //required: true,
-    },
+  name: 'uploader',
+  type: 'relationship',
+  relationTo: 'users',
+  admin: {
+    readOnly: true,
+    position: 'sidebar',
+  },
+},
+
     {
       name: 'caption',
       type: 'richText',
@@ -38,43 +58,31 @@ export const Media: CollectionConfig = {
       }),
     },
   ],
+  hooks: {
+  beforeChange: [
+    ({ req, data }) => {
+      if (req.user) {
+        data.uploader = req.user.id
+      }
+      return data
+    },
+  ],
+},
+
   upload: {
-    // Upload to the public/media directory in Next.js making them publicly accessible even outside of Payload
-    staticDir: path.resolve(dirname, '../../public/media'),
-    adminThumbnail: 'thumbnail',
-    focalPoint: true,
-    imageSizes: [
-      {
-        name: 'thumbnail',
-        width: 300,
-      },
-      {
-        name: 'square',
-        width: 500,
-        height: 500,
-      },
-      {
-        name: 'small',
-        width: 600,
-      },
-      {
-        name: 'medium',
-        width: 900,
-      },
-      {
-        name: 'large',
-        width: 1400,
-      },
-      {
-        name: 'xlarge',
-        width: 1920,
-      },
-      {
-        name: 'og',
-        width: 1200,
-        height: 630,
-        crop: 'center',
-      },
-    ],
-  },
+  staticDir: path.resolve(dirname, '../../public/media'),
+  adminThumbnail: 'thumbnail',
+  mimeTypes: ['image/png', 'image/jpeg', 'application/pdf'],
+  focalPoint: true,
+  imageSizes: [
+    { name: 'thumbnail', width: 300 },
+    { name: 'square', width: 500, height: 500 },
+    { name: 'small', width: 600 },
+    { name: 'medium', width: 900 },
+    { name: 'large', width: 1400 },
+    { name: 'xlarge', width: 1920 },
+    { name: 'og', width: 1200, height: 630, crop: 'center' },
+  ],
+},
+
 }

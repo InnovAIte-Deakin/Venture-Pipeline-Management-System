@@ -225,6 +225,51 @@ Mekong Inclusive Ventures | Building Inclusive Futures
     }
   }
 
+  async sendPasswordResetEmail(userEmail: string, resetToken: string) {
+  if (!this.isConfigured()) {
+    console.log("SMTP not configured, cannot send reset email.");
+    console.log("Reset token:", resetToken);
+    return { success: false, message: "Email service not configured" };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const resetLink = `${baseUrl}/auth/reset-password?token=${resetToken}`;
+
+  const subject = "Reset your password";
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+      <h2>Password Reset Request</h2>
+      <p>We received a request to reset your password.</p>
+      <p>Click the button below to reset it:</p>
+      <p>
+        <a href="${resetLink}"
+           style="display:inline-block;padding:10px 16px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;">
+          Reset Password
+        </a>
+      </p>
+      <p style="font-size: 12px; color: #555;">
+        If you did not request this, you can ignore this email.
+      </p>
+    </div>
+  `;
+
+  try {
+    await this.transporter!.sendMail({
+      from: this.fromEmail,
+      to: userEmail,
+      subject,
+      html,
+    });
+
+    console.log("✅ Password reset email sent to:", userEmail);
+    return { success: true, message: "Reset email sent", resetLink };
+  } catch (error) {
+    console.error("❌ Failed to send reset email:", error);
+    return { success: false, message: "Failed to send reset email" };
+  }
+}
+
+
   getConfigurationStatus(): { configured: boolean; missing: string[] } {
     const missing: string[] = []
     
