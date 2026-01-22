@@ -3,21 +3,32 @@ import type { CollectionConfig } from 'payload'
 
 export const Users: CollectionConfig = {
   slug: 'users',
+
+  // 🔐 Admin panel access control (THIS is the correct place)
   access: {
-    admin: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    admin: ({ req }) =>
+      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+
     create: anyone,
-    read: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
-    update: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+
+    read: ({ req }) =>
+      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+
+    update: ({ req }) =>
+      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+
+    delete: ({ req }) =>
+      req.user?.role === 'admin',
   },
+
   admin: {
-    defaultColumns: ['email', 'name', 'role'],
+    defaultColumns: ['email', 'first_name', 'last_name', 'role'],
     useAsTitle: 'email',
   },
+
   auth: true,
+
   fields: [
-    // Email added by default
-    // Add more fields as needed
     {
       name: 'first_name',
       label: 'First Name',
