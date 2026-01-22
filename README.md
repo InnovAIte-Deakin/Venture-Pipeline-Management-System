@@ -465,11 +465,17 @@ npm run dev
 ```
 Username: admin@example.com
 Password: changeme123
+
+Username: founder@example.com
+Password: changeme123
+
+Username: analyst@example.com
+Password: changeme123
 ```
 
 **Admin/CMS Backend:**
 ```
-Username: VentureMgr@123
+Username: venture.manager@miv.org
 Password: VentureMgr@123
 ```
 
