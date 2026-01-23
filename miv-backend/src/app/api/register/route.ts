@@ -2,24 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { getPayload } from "payload";
 import config from "@payload-config";
 import { z } from "zod";
+import type { User } from "@/payload-types";
 
+// Validation schema for registration
 const RegisterSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
-  // password: z.string().min(4, "Password must be at least 4 characters"),
-  password: z.string(),
-
-  ventureName: z.string().optional(),
-  positionInVenture: z.string().optional(),
-  phone: z.string().optional(),
-  countryCode: z.string().optional(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 });
-
-const IMPACT_APPLICANT_ROLE = "USER"; // maps to Prisma enum UserRole.USER
 
 export async function POST(req: NextRequest) {
   try {
+    // Parse JSON body
     const json = await req.json().catch(() => null);
 
     if (!json) {
@@ -27,12 +22,13 @@ export async function POST(req: NextRequest) {
         {
           success: false,
           error: "Bad Request",
-          message: "Request body must be JSON.",
+          message: "Request body must be valid JSON.",
         },
         { status: 400 }
       );
     }
 
+    // Validate input data
     const parsed = RegisterSchema.safeParse(json);
 
     if (!parsed.success) {
@@ -53,19 +49,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      ventureName,
-      positionInVenture,
-      phone,
-      countryCode,
-    } = parsed.data;
+    const { firstName, lastName, email, password } = parsed.data;
 
+    // Get Payload instance
     const payload = await getPayload({ config });
 
+    // Check if user already exists
     const existing = await payload.find({
       collection: "users",
       where: {
@@ -87,35 +76,59 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Create Impact Applicant user
+    // Create new user
     const user = await payload.create({
       collection: "users",
       data: {
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         email: email.toLowerCase(),
         password,
-        role: "user",
-      
-        ventureName,
-        positionInVenture,
-        phone,
-        countryCode,
+        role: "founder", // Default role for new registrations
       },
     });
 
-    // 3. (Optional) Send welcome email, but don't fail the request if this errors
-    // try {
-    //   await emailService.sendWelcomeEmail({
-    //     to: email,
-    //     firstName,
-    //   });
-    // } catch (err) {
-    //   console.error("Failed to send welcome email", err);
-    // }
+    // Send welcome email using the email API
+    try {
+      const emailResponse = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/api/send-email`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: email,
+          toName: `${firstName} ${lastName}`,
+          subject: 'Welcome to MIV Platform!',
+          html: `
+            <h1>Welcome to MIV Platform!</h1>
+            <p>Dear ${firstName},</p>
+            <p>Thank you for registering with the MIV Platform. Your account has been successfully created.</p>
+            <p>You can now log in to access the platform and explore all the features available to you.</p>
+            <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
+            <p>Best regards,<br>The MIV Platform Team</p>
+          `,
+          text: `Welcome to MIV Platform!
 
-    // 4. Log the user in immediately (so dashboard can rely on auth cookie)
-    // Adjust this to match your Payload auth setup if the API differs.
+Dear ${firstName},
+
+Thank you for registering with the MIV Platform. Your account has been successfully created.
+
+You can now log in to access the platform and explore all the features available to you.
+
+If you have any questions or need assistance, please don't hesitate to contact our support team.
+
+Best regards,
+The MIV Platform Team`
+        }),
+      });
+
+      if (!emailResponse.ok) {
+        console.warn('Welcome email failed to send, but registration succeeded');
+      }
+    } catch (emailError) {
+      console.error("Failed to send welcome email:", emailError);
+      // Don't fail the registration if email sending fails
+    }
+
+    // Log the user in immediately
     const auth = await payload.login({
       collection: "users",
       data: {
@@ -128,29 +141,29 @@ export async function POST(req: NextRequest) {
       {
         success: true,
         message: "Account created successfully",
-        // Keep response small; just what the client might need
         user: {
-          id: (user as any).id,
-          email: (user as any).email,
-          firstName: (user as any).firstName,
-          lastName: (user as any).lastName,
-          role: (user as any).role,
+          id: (user as User).id,
+          email: (user as User).email,
+          firstName: (user as User).first_name,
+          lastName: (user as User).last_name,
+          role: (user as User).role,
         },
       },
       { status: 201 }
     );
 
-    // Attach Payload auth token as cookie if available
+    // Set authentication cookie if login was successful
     if (auth?.token) {
       response.cookies.set("payload-token", auth.token, {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        // secure: true in production
+        secure: process.env.NODE_ENV === "production",
       });
     }
 
     return response;
+
   } catch (error) {
     console.error("Registration error:", error);
 
