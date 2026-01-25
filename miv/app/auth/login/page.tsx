@@ -25,64 +25,45 @@ export default function LoginPage() {
 
   
   const SESSION_MARKER_KEY = "miv-session-marker";
-  const AUTH_TOKEN_KEY = "miv-auth-token";
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
 
+  try {
+    const url = "/backend/api/users/login";
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    });
+
+    let data: any = null;
     try {
-      const url = `/backend/api/users/login`; 
-      console.log("[LOGIN] Sending POST to:", url);
+      data = await response.json();
+    } catch {}
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-        credentials: "include",
-      });
-
-      console.log("[LOGIN] Response status:", response.status, "OK:", response.ok);
-
-      if (!response.ok) {
-        console.log("[LOGIN] Login FAILED at backend");
-        throw new Error("Network response was not ok");
-      }
-
-
-      let data: any = {};
-      try {
-        data = await response.json();
-        console.log("[LOGIN] Response body:", data);
-      } catch (jsonErr) {
-        console.warn("[LOGIN] Could not parse JSON response:", jsonErr);
-      }
-
-      const token =
-        data?.token || data?.accessToken || data?.jwt || null;
-
-      if (typeof window !== "undefined") {
-        console.log("[LOGIN] Writing marker to LocalStorage...");
-        localStorage.setItem(SESSION_MARKER_KEY, email);
-
-        if (token) {
-          console.log("[LOGIN] Saving auth token to LocalStorage…");
-          localStorage.setItem(AUTH_TOKEN_KEY, token);
-        } else {
-          console.warn("[LOGIN] No token field found in response");
-        }
-      }
-      window.location.href = "/dashboard";
-    } catch (err) {
-      console.error("[LOGIN] ERROR:", err);
-      setError("Invalid email or password");
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      console.log("[LOGIN] Login FAILED at backend");
+      throw new Error(data?.message || "Invalid email or password");
     }
-  };
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(SESSION_MARKER_KEY, "true");
+    }
+
+    window.location.href = "/dashboard";
+  } catch (err: any) {
+    console.error("[LOGIN] ERROR:", err);
+    setError(err?.message || "Invalid email or password");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 flex items-center justify-center p-4">
