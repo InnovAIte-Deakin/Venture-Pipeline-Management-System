@@ -1,5 +1,4 @@
 import type { CollectionConfig } from 'payload'
-
 import {
   FixedToolbarFeature,
   InlineToolbarFeature,
@@ -15,11 +14,13 @@ export const Media: CollectionConfig = {
   slug: 'media',
 
   access: {
-    // Allow admin UI to build the Create form
-    create: () => true,
+    // Only logged-in users can upload
+    create: ({ req }) => Boolean(req.user),
 
     read: (args) => {
-      const { req, doc } = args as any
+      const { req } = args
+      const doc = (args as any).doc
+
       if (!req.user) return false
 
       const role = req.user.role
@@ -28,7 +29,10 @@ export const Media: CollectionConfig = {
       if (role === 'admin' || role === 'miv_analyst') return true
 
       // Others can only see their own uploads
-      return doc?.uploader?.id === req.user.id
+      const uploader = doc?.uploader
+      const uploaderId = typeof uploader === 'string' ? uploader : uploader?.id
+
+      return String(uploaderId) === String(req.user.id)
     },
 
     // Only admin or MIV analyst can update
@@ -54,19 +58,20 @@ export const Media: CollectionConfig = {
       name: 'caption',
       type: 'richText',
       editor: lexicalEditor({
-        features: ({ rootFeatures }) => {
-          return [...rootFeatures, FixedToolbarFeature(), InlineToolbarFeature()]
-        },
+        features: ({ rootFeatures }) => [
+          ...rootFeatures,
+          FixedToolbarFeature(),
+          InlineToolbarFeature(),
+        ],
       }),
     },
   ],
 
   hooks: {
     beforeChange: [
-      ({ req, data }) => {
-        // Auto-set uploader
-        if (req.user) {
-          data.uploader = req.user.id
+      ({ req, data, operation }) => {
+        if (operation === 'create' && req.user) {
+          return { ...data, uploader: req.user.id }
         }
         return data
       },
