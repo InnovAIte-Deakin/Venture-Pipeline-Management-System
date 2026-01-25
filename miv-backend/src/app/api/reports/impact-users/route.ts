@@ -13,11 +13,8 @@ const ProfileUpdateSchema = z.object({
 // GET /api/users - Get current authenticated user
 export async function GET(request: NextRequest) {
   try {
-    const payload = await getPayload({ config })
-
-    // Get the token from cookies
+    // 1) Check token first
     const token = request.cookies.get('payload-token')?.value
-
     if (!token) {
       return NextResponse.json(
         {
@@ -29,9 +26,11 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Verify the token and get the user
-    const { user } = await payload.auth({ headers: request.headers })
+    // 2) Init payload only after token exists
+    const payload = await getPayload({ config })
 
+    // 3) Verify session and get user
+    const { user } = await payload.auth({ headers: request.headers })
     if (!user) {
       return NextResponse.json(
         {
@@ -43,17 +42,32 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Count total media uploaded by this user
-    const mediaRes = await payload.find({
-      collection: 'media',
-      where: {
-        uploader: { equals: user.id },
-      },
-      limit: 1, // only need count
-      depth: 0,
-    })
+    // 4) Count media uploaded by this user
+    let totalUploads = 0
+    let page = 1
 
-    const totalUploads = mediaRes.totalDocs || 0
+    while (true) {
+      const mediaRes = await payload.find({
+        collection: 'media',
+        limit: 100,
+        page,
+        depth: 0,
+      })
+
+      for (const m of mediaRes.docs as any[]) {
+        const uploader = m?.uploader
+        const uploaderId =
+          typeof uploader === 'string' ? uploader : uploader?.id
+
+        if (String(uploaderId) === String(user.id)) {
+          totalUploads += 1
+        }
+      }
+
+      if (!mediaRes.hasNextPage) break
+      page = mediaRes.nextPage ?? page + 1
+    }
+
     const totalMedia = totalUploads
 
     return NextResponse.json({
@@ -86,11 +100,8 @@ export async function GET(request: NextRequest) {
 // PATCH /api/users - Update current user's profile
 export async function PATCH(request: NextRequest) {
   try {
-    const payload = await getPayload({ config })
-
-    // Get the token from cookies
+    // 1) Check token first
     const token = request.cookies.get('payload-token')?.value
-
     if (!token) {
       return NextResponse.json(
         {
@@ -102,9 +113,11 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    // Verify the token and get the user
-    const { user: authUser } = await payload.auth({ headers: request.headers })
+    // 2) Init payload only after token exists
+    const payload = await getPayload({ config })
 
+    // 3) Verify session and get user
+    const { user: authUser } = await payload.auth({ headers: request.headers })
     if (!authUser) {
       return NextResponse.json(
         {
