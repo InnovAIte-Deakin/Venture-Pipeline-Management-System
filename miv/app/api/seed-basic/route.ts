@@ -11,7 +11,7 @@ export async function POST() {
     const user = await prisma.user.create({
       data: {
         name: 'Test Admin',
-        email: 'admin@test.com',
+        email: 'admin@example.com',
         role: 'ADMIN',
         organization: 'Test Organization',
         emailVerified: new Date(),
