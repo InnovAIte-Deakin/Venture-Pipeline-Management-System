@@ -6,9 +6,9 @@
 
 ## 1. Purpose
 
-This document provides internal developers with clear instructions for setting up, running, and maintaining the Venture Pipeline Management System (VPMS) during the current development phase.
+This guide explains how to set up, run, and maintain the Venture Pipeline Management System (VPMS) for internal development.
 
-The guide reflects the **actual workflow used by the team**, based on project handover and onboarding messages.
+All instructions reflect the **current, official implementation provided by the development team** and are aligned with the project README.
 
 ---
 
@@ -16,90 +16,105 @@ The guide reflects the **actual workflow used by the team**, based on project ha
 
 ```
 /
-├── miv/                 # VPMS frontend application
-├── miv-backend/         # Payload CMS backend
+├── miv/                 # Frontend (Next.js VPMS application)
+├── miv-backend/         # Backend (Payload CMS)
 ├── docs/                # Project documentation
 └── README.md
 ```
 
 ---
 
-## 3. System Components
+## 3. System Overview
 
-### VPMS Application (Frontend)
+VPMS is composed of two services that must run together:
 
-* Built using **Next.js**
-* Provides dashboards and UI for founders and admins
-* Handles navigation and user interaction
-* Uses **NextAuth** for authentication
-* Uses **Prisma ORM** with **PostgreSQL** for application data
+* **Frontend (VPMS App)**
 
-### Payload CMS Backend
+  * Built with Next.js
+  * Provides dashboards and UI for founders and admins
+  * Uses NextAuth for authentication
+  * Uses Prisma with PostgreSQL for application data
 
-* Built using **Payload CMS**
-* Manages document uploads, metadata, and review workflow
-* Enforces role-based access control
-* Uses **MongoDB** as the backing database
+* **Backend (Payload CMS)**
+
+  * Built with Payload CMS
+  * Handles document uploads, metadata, and review workflow
+  * Enforces role-based access control
+  * Uses MongoDB for CMS and document data
+  * Runs using Docker
 
 ---
 
 ## 4. Authentication
 
-Authentication for the VPMS application is implemented using **NextAuth** with the following configuration:
+Authentication is implemented using **NextAuth** with:
 
-* Google OAuth login
-* Credentials-based login (email or user ID and password)
-* Session management using **JWT**
-* Prisma Adapter for persisting authentication-related data in PostgreSQL
+* Google OAuth
+* Credentials-based login (email and password)
+* JWT-based sessions
+* Prisma adapter for persistence in PostgreSQL
 
+### Development Test Accounts
 
+**VPMS Application:**
+
+* Admin: `admin@example.com` / `changeme123`
+* Founder: `founder@example.com` / `changeme123`
+* Analyst: `analyst@example.com` / `changeme123`
+
+**Payload CMS Admin:**
+
+* `venture.manager@miv.org` / `VentureMgr@123`
+
+> These accounts are for development and testing only.
 
 ---
 
 ## 5. Databases
 
-### PostgreSQL
+* **PostgreSQL**
 
-* Stores application users and authentication/session data
-* Managed using Prisma ORM
-* Connection configured via environment variables
+  * Stores users, sessions, and authentication data
+  * Managed via Prisma ORM
 
-### MongoDB
+* **MongoDB**
 
-* Used by Payload CMS
-* Stores document records, metadata, and review workflow states
+  * Used by Payload CMS
+  * Stores documents, metadata, and review states
 
 ---
 
-## 6. Local Development Setup
+## 6. Local Development Setup (Canonical)
+
+VPMS requires **two running services**:
 
 ### Prerequisites
 
 * Node.js (LTS)
 * npm
-* Local access to required databases (as configured for the project)
-
-> Note: Docker configuration exists in the repository but is **not currently used** in the standard development workflow.
+* Docker and Docker Compose
+* Git
 
 ---
 
-### Backend Setup (Payload CMS)
-
-Open a terminal and run:
+### Step 1: Start Backend (Payload CMS)
 
 ```bash
 cd miv-backend
-npm install
-npm run dev
+docker compose up -d
 ```
 
-This starts the Payload CMS backend in development mode.
+This starts Payload CMS and required database services.
+
+To stop backend services:
+
+```bash
+docker compose down -v
+```
 
 ---
 
-### Frontend Setup (VPMS App)
-
-Open a second terminal and run:
+### Step 2: Start Frontend (VPMS Application)
 
 ```bash
 cd miv
@@ -107,33 +122,39 @@ npm install
 npm run dev
 ```
 
-The VPMS application will be available at:
+---
+
+### Step 3: Access Application
+
+Open:
 
 ```
 http://localhost:3000
 ```
 
+> Both backend and frontend must be running for the system to work.
+
 ---
 
 ## 7. Environment Configuration
 
-* Environment variables are defined using `.env` and `.env.example` files
-* Secrets such as database URLs and authentication secrets must not be committed to version control
-* Configuration may differ between development and production environments
+* Environment variables are defined in `.env` and `.env.example`
+* Secrets must not be committed to version control
+* Values may differ between development and production
 
 ---
 
 ## 8. Common Issues
 
-* **Authentication errors**: verify `NEXTAUTH_URL` and `NEXTAUTH_SECRET`
-* **Backend not running**: ensure `npm run dev` is active in `miv-backend`
-* **Document upload issues**: check file type and size restrictions
+* Frontend not loading → ensure `npm run dev` is running in `miv`
+* Backend unavailable → ensure Docker containers are running
+* Login issues → verify NextAuth environment variables
+* Document upload errors → check file size/type restrictions
 
 ---
 
 ## 9. Maintenance Notes
 
-* Payload collections and access rules are defined in configuration files
-* Prisma schema changes require migration updates
-* Documentation should be updated alongside f
-
+* Payload CMS collections and access rules are defined in backend config
+* Prisma schema changes require migrations
+* Update documentation when system behaviour changes
