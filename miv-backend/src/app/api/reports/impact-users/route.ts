@@ -10,12 +10,11 @@ const ProfileUpdateSchema = z.object({
   email: z.string().email('Valid email is required').optional(),
 })
 
-// GET /api/users - Get current authenticated user
+// GET /api/reports/impact-users - Get current authenticated user + counts
 export async function GET(request: NextRequest) {
   try {
     // 1) Check token first (before initialising payload)
     const token = request.cookies.get('payload-token')?.value
-
     if (!token) {
       return NextResponse.json(
         {
@@ -32,7 +31,6 @@ export async function GET(request: NextRequest) {
 
     // 3) Verify session and get user
     const { user } = await payload.auth({ headers: request.headers })
-
     if (!user) {
       return NextResponse.json(
         {
@@ -44,13 +42,13 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 4) Count total media uploaded by this user (fast count using totalDocs)
+    // 4) Fast count media uploaded by this user
     const mediaRes = await payload.find({
       collection: 'media',
       where: {
         uploader: { equals: user.id },
       },
-      limit: 1,
+      limit: 1, // only need count
       depth: 0,
     })
 
@@ -84,12 +82,11 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/users - Update current user's profile
+// PATCH /api/reports/impact-users - Update current user's profile
 export async function PATCH(request: NextRequest) {
   try {
     // 1) Check token first (before initialising payload)
     const token = request.cookies.get('payload-token')?.value
-
     if (!token) {
       return NextResponse.json(
         {
@@ -104,9 +101,8 @@ export async function PATCH(request: NextRequest) {
     // 2) Init payload only after token exists
     const payload = await getPayload({ config })
 
-    // 3) Verify session and get user
+    // 3) Verify session and get auth user
     const { user: authUser } = await payload.auth({ headers: request.headers })
-
     if (!authUser) {
       return NextResponse.json(
         {
@@ -135,8 +131,8 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
-
     const validation = ProfileUpdateSchema.safeParse(body)
+
     if (!validation.success) {
       return NextResponse.json(
         {
@@ -154,6 +150,7 @@ export async function PATCH(request: NextRequest) {
       first_name: firstName ?? user.first_name,
       last_name: lastName ?? user.last_name,
       email: email ? email.toLowerCase() : user.email,
+      // keep role unchanged
       role: user.role,
     }
 
