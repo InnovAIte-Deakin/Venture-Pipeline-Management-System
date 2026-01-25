@@ -23,52 +23,47 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-    setError("");
+  
+  const SESSION_MARKER_KEY = "miv-session-marker";
 
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsLoading(true);
+  setError("");
+
+  try {
+    const url = "/backend/api/users/login";
+
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include",
+    });
+
+    let data: any = null;
     try {
-      const url = `/backend/api/users/login`;
+      data = await response.json();
+    } catch {}
 
-      const response = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email: email,
-          password: password,
-        }),
-        // Allow browser to store Set-Cookie from the backend
-        credentials: "include",
-      });
-
-      // Try to parse JSON body (even on non-2xx to surface server message)
-      const responseBody = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        const msg = responseBody?.message || "Network response was not ok";
-        throw new Error(msg);
-      }
-
-      // Redirect to dashboard on success
-      console.log("login response", responseBody);
-      if (responseBody?.message === "Authentication Passed") {
-        if (responseBody?.user.role === "user") {
-          window.location.href = "/user-dashboard";
-        } else {
-          window.location.href = "/dashboard";
-        }
-      } else {
-        setError(responseBody?.message || "Invalid email or password");
-      }
-    } catch (err) {
-      setError("Invalid email or password");
-    } finally {
-      setIsLoading(false);
+    if (!response.ok) {
+      console.log("[LOGIN] Login FAILED at backend");
+      throw new Error(data?.message || "Invalid email or password");
     }
-  };
+
+    if (typeof window !== "undefined") {
+      localStorage.setItem(SESSION_MARKER_KEY, "true");
+    }
+
+    window.location.href = "/dashboard";
+  } catch (err: any) {
+    console.error("[LOGIN] ERROR:", err);
+    setError(err?.message || "Invalid email or password");
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 flex items-center justify-center p-4">
@@ -90,10 +85,7 @@ export default function LoginPage() {
         <CardContent className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label
-                htmlFor="email"
-                className="text-slate-700 dark:text-slate-300"
-              >
+              <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
                 Email
               </Label>
               <Input
