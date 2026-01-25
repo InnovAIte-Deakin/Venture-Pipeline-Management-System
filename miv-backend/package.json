@@ -38,7 +38,7 @@
     "payload": "3.49.1",
     "postcss": "^8.5.6",
     "react": "19.1.0",
-    "react-dom": "^19.2.0",
+    "react-dom": "19.1.0",
     "sharp": "0.34.2",
     "tailwind-merge": "^3.3.1",
     "tailwindcss": "^4.1.11",
@@ -69,8 +69,9 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "sharp",
+      "@tailwindcss/oxide",
       "esbuild",
+      "sharp",
       "unrs-resolver"
     ]
   },
