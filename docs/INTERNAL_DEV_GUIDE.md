@@ -52,7 +52,7 @@ Authentication for the VPMS application is implemented using **NextAuth** with t
 * Session management using **JWT**
 * Prisma Adapter for persisting authentication-related data in PostgreSQL
 
-> ⚠️ Development Note: A development-only bypass password exists for non-production environments. This must never be enabled or relied upon in production.
+
 
 ---
 
