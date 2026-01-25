@@ -141,7 +141,7 @@ export interface User {
   id: string;
   first_name: string;
   last_name: string;
-  role: 'founder' | 'miv_analyst' | 'admin';
+  role: 'founder' | 'miv_analyst' | 'admin' | 'user';
   updatedAt: string;
   createdAt: string;
   email: string;
