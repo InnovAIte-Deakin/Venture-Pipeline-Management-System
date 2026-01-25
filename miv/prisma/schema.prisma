@@ -59,7 +59,7 @@ model Venture {
   contactPhone         String?
   pitchSummary         String?
   inclusionFocus       String?
-  founderTypes         String
+  founderTypes         String?
   teamSize             Int?
   foundingYear         Int?
   targetMarket         String?
