@@ -166,16 +166,15 @@ Password: VentureMgr@123
 
 All project documentation has been consolidated in the `/docs` directory.
 
-➡️ **Start here:** `docs/DOCUMENTATION_INDEX.md`
+➡️ **Start here:** 
+- 📘 [Documentation Index](./docs/DOCUMENTATION_INDEX.md)
 
-The documentation set includes:
-
-* Project Overview
-* Requirements & SRS
-* System Architecture
-* User Guide
-* Internal Developer Guide
-
+### Core Documents
+- 📄 [Project Overview](./docs/PROJECT_OVERVIEW.md)
+- 📄 [Requirements & Software Requirements Specification (SRS)](./docs/REQUIREMENTS_SRS.md)
+- 📄 [System Architecture](./docs/SYSTEM_ARCHITECTURE.md)
+- 📄 [User Guide](./docs/USER_GUIDE.md)
+- 📄 [Internal Developer Guide](./docs/INTERNAL_DEV_GUIDE.md)
 ---
 
 ## 📄 Project Status
