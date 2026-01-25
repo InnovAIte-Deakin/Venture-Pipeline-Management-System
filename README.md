@@ -524,3 +524,28 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](./docs/CONTRIBUTING.md)
 
 </div>
+
+## 📊 Stream Handover: Diagnostics & Readiness UI
+**Author: Vansh Sajjan**
+
+### **Local Development Setup**
+To run the Diagnostics page and its associated backend services, use this specific port configuration:
+
+1. **Prerequisite**: Ensure **Docker Desktop** is running for MongoDB.
+2. **Backend (Port 3001)**:
+   - Navigate to `/miv-backend`
+   - Run `pnpm dev`
+   - Ensure `.env` contains: `DATABASE_URI="mongodb://127.0.0.1:27017/payload"`
+3. **Frontend (Port 3000)**:
+   - Navigate to `/miv`
+   - Run `pnpm dev`
+   - The Diagnostics page is located at: `http://localhost:3000/dashboard/diagnostics`
+
+### **Admin Access & Testing**
+- **Payload CMS Admin**: `http://localhost:3001/admin`
+- **Username**: `admin@example.com`
+- **Password**: `Changeme123`
+
+### **Key Implementation Files**
+- `miv/src/app/dashboard/diagnostics/page.tsx` (Core Radar Chart UI)
+- `miv-backend/src/collections/Assessments.ts` (Readiness Data Schema)
