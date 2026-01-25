@@ -13,8 +13,9 @@ const ProfileUpdateSchema = z.object({
 // GET /api/users - Get current authenticated user
 export async function GET(request: NextRequest) {
   try {
-    // 1) Check token first
+    // 1) Check token first (before initialising payload)
     const token = request.cookies.get('payload-token')?.value
+
     if (!token) {
       return NextResponse.json(
         {
@@ -31,6 +32,7 @@ export async function GET(request: NextRequest) {
 
     // 3) Verify session and get user
     const { user } = await payload.auth({ headers: request.headers })
+
     if (!user) {
       return NextResponse.json(
         {
@@ -42,32 +44,17 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 4) Count media uploaded by this user
-    let totalUploads = 0
-    let page = 1
+    // 4) Count total media uploaded by this user (fast count using totalDocs)
+    const mediaRes = await payload.find({
+      collection: 'media',
+      where: {
+        uploader: { equals: user.id },
+      },
+      limit: 1,
+      depth: 0,
+    })
 
-    while (true) {
-      const mediaRes = await payload.find({
-        collection: 'media',
-        limit: 100,
-        page,
-        depth: 0,
-      })
-
-      for (const m of mediaRes.docs as any[]) {
-        const uploader = m?.uploader
-        const uploaderId =
-          typeof uploader === 'string' ? uploader : uploader?.id
-
-        if (String(uploaderId) === String(user.id)) {
-          totalUploads += 1
-        }
-      }
-
-      if (!mediaRes.hasNextPage) break
-      page = mediaRes.nextPage ?? page + 1
-    }
-
+    const totalUploads = mediaRes.totalDocs || 0
     const totalMedia = totalUploads
 
     return NextResponse.json({
@@ -100,8 +87,9 @@ export async function GET(request: NextRequest) {
 // PATCH /api/users - Update current user's profile
 export async function PATCH(request: NextRequest) {
   try {
-    // 1) Check token first
+    // 1) Check token first (before initialising payload)
     const token = request.cookies.get('payload-token')?.value
+
     if (!token) {
       return NextResponse.json(
         {
@@ -118,6 +106,7 @@ export async function PATCH(request: NextRequest) {
 
     // 3) Verify session and get user
     const { user: authUser } = await payload.auth({ headers: request.headers })
+
     if (!authUser) {
       return NextResponse.json(
         {
@@ -168,6 +157,7 @@ export async function PATCH(request: NextRequest) {
       role: user.role,
     }
 
+    // If changing email, check uniqueness
     if (email && email.toLowerCase() !== user.email.toLowerCase()) {
       const existingUser = await payload.find({
         collection: 'users',
