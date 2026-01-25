@@ -42,7 +42,7 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // 4) Fast count media uploaded by this user
+    // Count total media uploaded by this user
     const mediaRes = await payload.find({
       collection: 'media',
       where: {
@@ -82,11 +82,14 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// PATCH /api/reports/impact-users - Update current user's profile
+// PATCH /api/users - Update current user's profile
 export async function PATCH(request: NextRequest) {
   try {
-    // 1) Check token first (before initialising payload)
+    const payload = await getPayload({ config })
+
+    // Get the token from cookies
     const token = request.cookies.get('payload-token')?.value
+
     if (!token) {
       return NextResponse.json(
         {
@@ -98,11 +101,9 @@ export async function PATCH(request: NextRequest) {
       )
     }
 
-    // 2) Init payload only after token exists
-    const payload = await getPayload({ config })
-
-    // 3) Verify session and get auth user
+    // Verify the token and get the user
     const { user: authUser } = await payload.auth({ headers: request.headers })
+
     if (!authUser) {
       return NextResponse.json(
         {
@@ -133,6 +134,8 @@ export async function PATCH(request: NextRequest) {
     const body = await request.json()
     const validation = ProfileUpdateSchema.safeParse(body)
 
+
+    const validation = ProfileUpdateSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(
         {

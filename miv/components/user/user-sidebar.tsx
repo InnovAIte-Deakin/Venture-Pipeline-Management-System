@@ -87,17 +87,17 @@ export default function UserSidebar() {
         // { name: "Funding Round Tracker", icon: TrendingUp, href: "/funding" },
       ],
     },
-    {
-      title: "REPORTS",
-      items: [
-        { name: "Impact Reports", icon: FileText, href: "/reports/impact" },
-        {
-          name: "Performance Analytics",
-          icon: PieChart,
-          href: "/reports/analytics",
-        },
-      ],
-    },
+    // {
+    //   title: "REPORTS",
+    //   items: [
+    //     { name: "Impact Reports", icon: FileText, href: "/reports/impact" },
+    //     {
+    //       name: "Performance Analytics",
+    //       icon: PieChart,
+    //       href: "/reports/analytics",
+    //     },
+    //   ],
+    // },
     {
       title: "SETTINGS",
       items: [
