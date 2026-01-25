@@ -375,8 +375,7 @@ export function Sidebar() {
                 </Button>
               </div>
 
-              
-
+              {/* User Profile */}
               <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   {isAuthenticated && user ? (
@@ -442,7 +441,7 @@ export function Sidebar() {
                   </Button>
                 )}
               </div>
-            </div>
+            </>
           )}
 
           {/* Collapse Toggle */}
