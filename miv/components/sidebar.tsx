@@ -43,12 +43,12 @@ import {
   LogOut,
   Menu,
   X,
-  Command,
-} from "lucide-react";
-import { Logo } from "@/components/logo";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { GlobalSearch, useGlobalSearch } from "@/components/global-search";
-import { useAuth } from "@/hooks/useAuth";
+  Command
+} from "lucide-react"
+import { Logo } from "@/components/logo"
+import { signIn, signOut } from "next-auth/react"
+import { GlobalSearch, useGlobalSearch } from "@/components/global-search"
+import { useAuth } from "@/hooks/useAuth"
 
 interface NavItem {
   title: string;
@@ -248,7 +248,7 @@ export function Sidebar() {
               </span>
               <div className="flex items-center gap-1 text-xs">
                 <kbd className="px-1.5 py-0.5 bg-slate-700 border border-slate-600 rounded text-slate-400 font-mono group-hover:bg-slate-600 transition-colors">
-                  {navigator.platform.includes("Mac") ? "⌘" : "Ctrl"}
+                  {typeof navigator !== 'undefined' && navigator.platform.includes('Mac') ? '⌘' : 'Ctrl'}
                 </kbd>
                 <kbd className="px-1.5 py-0.5 bg-slate-700 border border-slate-600 rounded text-slate-400 font-mono group-hover:bg-slate-600 transition-colors">
                   K
@@ -352,9 +352,9 @@ export function Sidebar() {
         </nav>
 
         {/* Footer */}
-        <div className="p-4 border-t border-slate-800">
+        <div className="p-4 border-t border-slate-800 space-y-3">
           {!isCollapsed && (
-            <div className="space-y-3">
+            <>
               {/* Quick Actions */}
               <div className="flex space-x-2">
                 <Button
@@ -375,8 +375,7 @@ export function Sidebar() {
                 </Button>
               </div>
 
-              
-
+              {/* User Profile */}
               <div className="flex items-center space-x-3 p-2 bg-slate-800/50 rounded-lg">
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   {isAuthenticated && user ? (
@@ -442,7 +441,7 @@ export function Sidebar() {
                   </Button>
                 )}
               </div>
-            </div>
+            </>
           )}
 
           {/* Collapse Toggle */}
@@ -450,7 +449,7 @@ export function Sidebar() {
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="w-full mt-2 text-slate-400 hover:text-slate-300"
+            className="w-full text-slate-400 hover:text-slate-300"
           >
             {isCollapsed ? (
               <ChevronRight className="h-4 w-4" />
