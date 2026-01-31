@@ -28,16 +28,24 @@ jobs:
           git remote add upstream https://github.com/InnovAIte-Deakin/Venture-Pipeline-Management-System.git
           git fetch upstream
 
-      - name: Sync main branch
+      - name: Merge main upstream
         if: steps.flag.outputs.sync == 'true'
         run: |
-          # Create or reset local main branch to match upstream/main
-          git checkout -B main upstream/main
-          git push origin main --force
+          git checkout main
+          git merge upstream/main --no-edit
 
-      - name: Sync development branch
+      - name: Push changes
         if: steps.flag.outputs.sync == 'true'
         run: |
-          # Create or reset local development branch to match upstream/development
-          git checkout -B development upstream/development
-          git push origin development --force
+          git push origin main
+
+      - name: Merge development upstream
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git checkout development
+          git merge upstream/development --no-edit
+
+      - name: Push changes
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git push origin development
