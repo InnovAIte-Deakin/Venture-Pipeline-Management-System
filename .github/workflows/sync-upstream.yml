@@ -1,0 +1,51 @@
+name: Sync fork with upstream (bool flag)
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    environment: development
+
+    steps:
+      - name: Check if sync is enabled
+        id: flag
+        run: |
+          echo "sync=${{ vars.SYNC_UPSTREAM }}" >> $GITHUB_OUTPUT
+
+      - name: Checkout fork
+        if: steps.flag.outputs.sync == 'true'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Add upstream & fetch
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git remote add upstream https://github.com/InnovAIte-Deakin/Venture-Pipeline-Management-System.git
+          git fetch upstream
+
+      - name: Merge main upstream
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git checkout main
+          git merge upstream/main --no-edit
+
+      - name: Push changes
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git push origin main
+
+      - name: Merge development upstream
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git checkout development
+          git merge upstream/development --no-edit
+
+      - name: Push changes
+        if: steps.flag.outputs.sync == 'true'
+        run: |
+          git push origin development
