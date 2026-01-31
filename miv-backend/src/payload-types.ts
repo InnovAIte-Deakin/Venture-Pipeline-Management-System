@@ -76,6 +76,8 @@ export interface Config {
     dataRoomFiles: DataRoomFile;
     activityLogs: ActivityLog;
     documents: Document;
+    'system-settings': SystemSetting;
+    'user-settings': UserSetting;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -91,6 +93,8 @@ export interface Config {
     dataRoomFiles: DataRoomFilesSelect<false> | DataRoomFilesSelect<true>;
     activityLogs: ActivityLogsSelect<false> | ActivityLogsSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    'system-settings': SystemSettingsSelect<false> | SystemSettingsSelect<true>;
+    'user-settings': UserSettingsSelect<false> | UserSettingsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -424,6 +428,51 @@ export interface Document {
   focalY?: number | null;
 }
 /**
+ * Global system settings (single record)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "system-settings".
+ */
+export interface SystemSetting {
+  id: string;
+  appName: string;
+  supportEmail: string;
+  defaultLocale: 'en' | 'km';
+  timezone: string;
+  enableSignup: boolean;
+  sessionTimeoutMinutes: number;
+  maxUploadMB: number;
+  allowedMimeTypes?:
+    | {
+        mime: string;
+        id?: string | null;
+      }[]
+    | null;
+  features: {
+    enableImpactDashboard: boolean;
+    enableGedsitracker: boolean;
+    enableDiagnostics: boolean;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-settings".
+ */
+export interface UserSetting {
+  id: string;
+  user: string | User;
+  notifications?: {
+    emailAlerts?: boolean | null;
+    inApp?: boolean | null;
+    push?: boolean | null;
+    frequency?: ('immediate' | 'daily' | 'weekly') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
@@ -465,6 +514,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'documents';
         value: string | Document;
+      } | null)
+    | ({
+        relationTo: 'system-settings';
+        value: string | SystemSetting;
+      } | null)
+    | ({
+        relationTo: 'user-settings';
+        value: string | UserSetting;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -781,6 +838,51 @@ export interface DocumentsSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "system-settings_select".
+ */
+export interface SystemSettingsSelect<T extends boolean = true> {
+  appName?: T;
+  supportEmail?: T;
+  defaultLocale?: T;
+  timezone?: T;
+  enableSignup?: T;
+  sessionTimeoutMinutes?: T;
+  maxUploadMB?: T;
+  allowedMimeTypes?:
+    | T
+    | {
+        mime?: T;
+        id?: T;
+      };
+  features?:
+    | T
+    | {
+        enableImpactDashboard?: T;
+        enableGedsitracker?: T;
+        enableDiagnostics?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-settings_select".
+ */
+export interface UserSettingsSelect<T extends boolean = true> {
+  user?: T;
+  notifications?:
+    | T
+    | {
+        emailAlerts?: T;
+        inApp?: T;
+        push?: T;
+        frequency?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

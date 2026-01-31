@@ -20,6 +20,8 @@ import { ActivityLogs } from './collections/activityLogs'
 import { Documents } from './collections/documents'
 import { Settings } from './globals/settings'
 import { Lookups } from './globals/lookups'
+import { SystemSettings } from './collections/systemsettings'
+import { UserSettings } from './collections/userSettings'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
@@ -49,6 +51,8 @@ export default buildConfig({
     DataRoomFiles,
     ActivityLogs,
     Documents,
+    SystemSettings,
+    UserSettings
   ],
   globals: [Settings, Lookups],
   // Explicit origins are required when sending credentials (cookies)
