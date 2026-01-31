@@ -162,6 +162,19 @@ Password: VentureMgr@123
 
 ---
 
+## 📚 Hosting with Vercel
+
+Vercel.com is the hosting provider that this project uses.
+
+### Development
+- ....
+
+
+### Product (TBA)
+- Devilivered via release branches
+
+---
+
 ## 📚 Documentation
 
 All project documentation has been consolidated in the `/docs` directory.
