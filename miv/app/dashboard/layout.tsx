@@ -64,16 +64,24 @@ export default function DashboardLayout({
 			</div>
 
 			{/* Mobile Navigation */}
-			<div className="lg:hidden fixed top-4 left-4 z-50">
+			{/* <div className="lg:hidden fixed top-4 left-4 z-50">
 				<MobileNav />
-			</div>
+			</div> */}
+			<MobileNav />
 
 			{/* Main Content */}
-			<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+			{/* <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
 				<div className="p-4 lg:p-6">
 					<Breadcrumb />
 					{children}
 				</div>
+			</div> */}
+			{/* Making changes for Phone Layout - Impact User */}
+			<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+			<div className="p-4 pb-24 lg:p-6 lg:pb-6">
+				<Breadcrumb />
+				{children}
+			</div>
 			</div>
 
 			{/* Fixed Notifications */}
