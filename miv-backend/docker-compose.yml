@@ -1,10 +1,10 @@
 version: '3'
 
 services:
-  payload:
+  payload-cms:
     image: node:18-alpine
     ports:
-      - '3000:3000'
+      - '3001:3000'
     volumes:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
@@ -15,6 +15,8 @@ services:
       # - postgres
     env_file:
       - .env
+    environment:
+      - DATABASE_URI=mongodb://mongo:27017/payload
 
   # Ensure your DATABASE_URI uses 'mongo' as the hostname ie. mongodb://mongo/my-db-name
   mongo:
@@ -28,16 +30,32 @@ services:
     logging:
       driver: none
 
+  # MongoDB web admin interface at http://localhost:8081
+  mongo-express:
+    image: mongo-express:latest
+    ports:
+      - '8081:8081'
+    environment:
+      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
+      - ME_CONFIG_BASICAUTH=false
+    depends_on:
+      - mongo
+    restart: unless-stopped
+
   # Uncomment the following to use postgres
-  # postgres:
-  #   restart: always
-  #   image: postgres:latest
-  #   volumes:
-  #     - pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - "5432:5432"
+  postgres:
+    restart: always
+    image: postgres:latest
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: app_miv
+      POSTGRES_PASSWORD: supersecret
+      POSTGRES_DB: app_miv
 
 volumes:
   data:
-  # pgdata:
+  pgdata:
   node_modules:

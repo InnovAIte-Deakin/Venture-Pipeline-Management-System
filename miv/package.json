@@ -48,7 +48,7 @@
     "mongodb": "^6.19.0",
     "next": "15.2.4",
     "next-auth": "^4.24.11",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^7.0.7",
     "openai": "^5.12.0",
     "react": "^19.0.0",
     "react-day-picker": "^9.10.0",
@@ -75,5 +75,6 @@
     "tailwindcss": "^4.1.11",
     "tsx": "^4.20.3",
     "typescript": "^5"
-  }
+  },
+  "packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99447b7c3bf7a73286afaaf6be99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316"
 }

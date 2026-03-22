@@ -408,6 +408,51 @@ export default function TeamManagement() {
         
         const createdMember = await response.json()
         setTeamMembers((prev) => [createdMember, ...prev])
+        
+        // Send welcome email to the new team member
+//         try {
+//           const emailResponse = await fetch('/api/send-email', {
+//             method: 'POST',
+//             headers: { 'Content-Type': 'application/json' },
+//             body: JSON.stringify({
+//               to: newMember.email,
+//               toName: newMember.name,
+//               subject: 'Welcome to the MIV Platform Team!',
+//               html: `
+//                 <h1>Welcome to the MIV Platform Team!</h1>
+//                 <p>Dear ${newMember.name},</p>
+//                 <p>We're excited to welcome you to our team at the MIV Platform. You've been added as a <strong>${newMember.role}</strong>.</p>
+//                 ${newMember.organization ? `<p>Organization: ${newMember.organization}</p>` : ''}
+//                 <p>You can now access the platform and collaborate with your team members on various projects and initiatives.</p>
+//                 <p>If you have any questions or need assistance getting started, please don't hesitate to reach out to your team lead.</p>
+//                 <p>Best regards,<br>The MIV Platform Team</p>
+//               `,
+//               text: `Welcome to the MIV Platform Team!
+
+// Dear ${newMember.name},
+
+// We're excited to welcome you to our team at the MIV Platform. You've been added as a ${newMember.role}.
+// ${newMember.organization ? `Organization: ${newMember.organization}` : ''}
+
+// You can now access the platform and collaborate with your team members on various projects and initiatives.
+
+// If you have any questions or need assistance getting started, please don't hesitate to reach out to your team lead.
+
+// Best regards,
+// The MIV Platform Team`
+//             }),
+//           })
+          
+//           if (emailResponse.ok) {
+//             console.log('Welcome email sent successfully to:', newMember.email)
+//           } else {
+//             console.warn('Failed to send welcome email, but member was created successfully')
+//           }
+//         } catch (emailError) {
+//           console.error('Error sending welcome email:', emailError)
+//           // Don't fail the entire operation if email sending fails
+//         }
+        
         setNewMember({ name: "", role: "USER", email: "", organization: "", image: "" })
         setIsAddMemberDialogOpen(false)
       } catch (error) {
@@ -743,7 +788,7 @@ export default function TeamManagement() {
                               </h5>
                               <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
-                                  <p className="font-medium text-blue-600">{member._count.ledProjects}</p>
+                                  <p className="font-medium text-blue-600">{member._count?.ledProjects}</p>
                                   <p className="text-gray-600">Projects Led</p>
                                 </div>
                                 <div>

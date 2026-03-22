@@ -1,9 +1,9 @@
-import NextAuth from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
-import Credentials from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
-import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
+import Credentials from "next-auth/providers/credentials";
+import bcrypt from "bcryptjs";
+import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { prisma } from "@/lib/prisma";
 
 const handler = NextAuth({
   adapter: PrismaAdapter(prisma),
@@ -13,33 +13,54 @@ const handler = NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
     Credentials({
-      name: 'Credentials',
+      name: "Credentials",
       credentials: {
-        email: { label: 'Email or User ID', type: 'text' },
-        password: { label: 'Password', type: 'password' }
+        email: { label: "Email or User ID", type: "text" },
+        password: { label: "Password", type: "password" },
       },
       async authorize(creds) {
-        if (!creds?.email || !creds?.password) return null
-        const identifier = String(creds.email).trim()
-        const isEmail = identifier.includes('@')
-        const key = isEmail ? { email: identifier.toLowerCase() } : { id: identifier }
-        const user = await prisma.user.findUnique({ where: key as any })
-        if (!user) return null
+        if (!creds?.email || !creds?.password) return null;
+        const identifier = String(creds.email).trim();
+        const isEmail = identifier.includes("@");
+        const key = isEmail
+          ? { email: identifier.toLowerCase() }
+          : { id: identifier };
+        const user = await prisma.user.findUnique({ where: key as any });
+        if (!user) return null;
         // Dev-only bypass: allow a known test password if no hash yet
         if (!user.passwordHash) {
-          if (process.env.NODE_ENV !== 'production' && creds.password === 'admin123') {
-            return { id: user.id, email: user.email, name: user.name || undefined }
+          if (
+            process.env.NODE_ENV !== "production" &&
+            creds.password === "admin123"
+          ) {
+            return {
+              id: user.id,
+              email: user.email,
+              name: user.name,
+              role: user.role || undefined,
+            };
           }
-          return null
+          return null;
         }
-        const ok = await bcrypt.compare(String(creds.password), user.passwordHash)
-        if (!ok && process.env.NODE_ENV !== 'production' && creds.password === 'admin123') {
-          return { id: user.id, email: user.email, name: user.name || undefined }
+        const ok = await bcrypt.compare(
+          String(creds.password),
+          user.passwordHash,
+        );
+        if (
+          !ok &&
+          process.env.NODE_ENV !== "production" &&
+          creds.password === "admin123"
+        ) {
+          return {
+            id: user.id,
+            email: user.email,
+            name: user.name || undefined,
+          };
         }
-        if (!ok) return null
-        return { id: user.id, email: user.email, name: user.name || undefined }
-      }
-    })
+        if (!ok) return null;
+        return { id: user.id, email: user.email, name: user.name || undefined };
+      },
+    }),
   ],
   callbacks: {
     session: async ({ session, token }) => {
@@ -56,12 +77,12 @@ const handler = NextAuth({
     },
   },
   pages: {
-    signIn: '/auth/login',
-    error: '/auth/error',
+    signIn: "/auth/login",
+    error: "/auth/error",
   },
   session: {
     strategy: "jwt",
   },
-})
+});
 
-export { handler as GET, handler as POST } 
+export { handler as GET, handler as POST };

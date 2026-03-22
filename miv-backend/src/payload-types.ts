@@ -75,6 +75,9 @@ export interface Config {
     agreements: Agreement;
     dataRoomFiles: DataRoomFile;
     activityLogs: ActivityLog;
+    documents: Document;
+    'system-settings': SystemSetting;
+    'user-settings': UserSetting;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -89,6 +92,9 @@ export interface Config {
     agreements: AgreementsSelect<false> | AgreementsSelect<true>;
     dataRoomFiles: DataRoomFilesSelect<false> | DataRoomFilesSelect<true>;
     activityLogs: ActivityLogsSelect<false> | ActivityLogsSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    'system-settings': SystemSettingsSelect<false> | SystemSettingsSelect<true>;
+    'user-settings': UserSettingsSelect<false> | UserSettingsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -139,7 +145,7 @@ export interface User {
   id: string;
   first_name: string;
   last_name: string;
-  role: 'founder' | 'miv_analyst' | 'admin';
+  role: 'founder' | 'miv_analyst' | 'admin' | 'user';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -164,7 +170,7 @@ export interface User {
  */
 export interface Media {
   id: string;
-  alt?: string | null;
+  uploader?: (string | null) | User;
   caption?: {
     root: {
       type: string;
@@ -391,6 +397,83 @@ export interface ActivityLog {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: string;
+  documentType:
+    | 'pitch_deck'
+    | 'financial_statements'
+    | 'legal_documents'
+    | 'gedsi_reports'
+    | 'impact_reports'
+    | 'other';
+  status?: ('pending_review' | 'approved' | 'rejected' | 'needs_revision') | null;
+  version?: number | null;
+  uploadedBy: string | User;
+  venture?: (string | null) | Venture;
+  notes?: string | null;
+  reviewedBy?: (string | null) | User;
+  reviewedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+}
+/**
+ * Global system settings (single record)
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "system-settings".
+ */
+export interface SystemSetting {
+  id: string;
+  appName: string;
+  supportEmail: string;
+  defaultLocale: 'en' | 'km';
+  timezone: string;
+  enableSignup: boolean;
+  sessionTimeoutMinutes: number;
+  maxUploadMB: number;
+  allowedMimeTypes?:
+    | {
+        mime: string;
+        id?: string | null;
+      }[]
+    | null;
+  features: {
+    enableImpactDashboard: boolean;
+    enableGedsitracker: boolean;
+    enableDiagnostics: boolean;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-settings".
+ */
+export interface UserSetting {
+  id: string;
+  user: string | User;
+  notifications?: {
+    emailAlerts?: boolean | null;
+    inApp?: boolean | null;
+    push?: boolean | null;
+    frequency?: ('immediate' | 'daily' | 'weekly') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -427,6 +510,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'activityLogs';
         value: string | ActivityLog;
+      } | null)
+    | ({
+        relationTo: 'documents';
+        value: string | Document;
+      } | null)
+    | ({
+        relationTo: 'system-settings';
+        value: string | SystemSetting;
+      } | null)
+    | ({
+        relationTo: 'user-settings';
+        value: string | UserSetting;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -500,7 +595,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
-  alt?: T;
+  uploader?: T;
   caption?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -716,6 +811,76 @@ export interface ActivityLogsSelect<T extends boolean = true> {
   entityId?: T;
   metadata?: T;
   timestamp?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  documentType?: T;
+  status?: T;
+  version?: T;
+  uploadedBy?: T;
+  venture?: T;
+  notes?: T;
+  reviewedBy?: T;
+  reviewedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  url?: T;
+  thumbnailURL?: T;
+  filename?: T;
+  mimeType?: T;
+  filesize?: T;
+  width?: T;
+  height?: T;
+  focalX?: T;
+  focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "system-settings_select".
+ */
+export interface SystemSettingsSelect<T extends boolean = true> {
+  appName?: T;
+  supportEmail?: T;
+  defaultLocale?: T;
+  timezone?: T;
+  enableSignup?: T;
+  sessionTimeoutMinutes?: T;
+  maxUploadMB?: T;
+  allowedMimeTypes?:
+    | T
+    | {
+        mime?: T;
+        id?: T;
+      };
+  features?:
+    | T
+    | {
+        enableImpactDashboard?: T;
+        enableGedsitracker?: T;
+        enableDiagnostics?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-settings_select".
+ */
+export interface UserSettingsSelect<T extends boolean = true> {
+  user?: T;
+  notifications?:
+    | T
+    | {
+        emailAlerts?: T;
+        inApp?: T;
+        push?: T;
+        frequency?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
