@@ -60,7 +60,7 @@ const IntakeSubmissionSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await getPayload({ config })
+    const payload = (await getPayload({ config })) as any
     const body = await request.json()
 
     // Validate the request body
@@ -151,7 +151,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const payload = await getPayload({ config })
+    const payload = (await getPayload({ config })) as any
     const intake = await payload.findByID({
       collection: 'onboardingIntakes',
       id: intakeId,

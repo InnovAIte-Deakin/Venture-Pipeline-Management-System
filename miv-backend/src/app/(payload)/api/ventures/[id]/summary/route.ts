@@ -2,10 +2,10 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const payload = await getPayload({ config })
   try {
-    const id = params.id
+    const { id } = await params
     const venture = await (payload as any).findByID({ collection: 'ventures', id })
     const agreements = await (payload as any).find({ collection: 'agreements', where: { venture: { equals: id } }, limit: 10 })
     const intakeId = venture.latestIntake

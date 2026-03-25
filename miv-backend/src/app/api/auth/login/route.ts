@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload } from 'payload'
+import { getPayload, Payload } from 'payload'
 import config from '@payload-config'
 import { z } from 'zod'
 
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
           { status: 401 },
         )
       }
-    } catch (authError: unknown) {
+    } catch (authError: any) {
       console.error('Authentication error:', authError)
 
       // Check if it's an invalid credentials error

@@ -91,16 +91,16 @@ export async function POST(req: NextRequest) {
     const user = await payload.create({
       collection: "users",
       data: {
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         email: email.toLowerCase(),
         password,
         role: "user",
-      
-        ventureName,
-        positionInVenture,
-        phone,
-        countryCode,
+        
+        // ventureName,
+        // positionInVenture,
+        // phone,
+        // countryCode,
       },
     });
 
