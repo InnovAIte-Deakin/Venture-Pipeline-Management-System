@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 
 const prisma = new PrismaClient()
 
@@ -23,16 +23,18 @@ export async function POST() {
 
     for (const venture of ventures) {
       console.log(`💼 Adding details to ${venture.name}`)
+      const fundingRaised = venture.fundingRaised ?? 1000000
+      const lastValuation = venture.lastValuation ?? fundingRaised * 4
 
       // Create capital activities based on venture stage
-      const capitalActivities = []
+      const capitalActivities: Prisma.CapitalActivityUncheckedCreateInput[] = []
       
       if (venture.stage === 'SEED' || venture.stage === 'SERIES_A' || venture.stage === 'SERIES_B' || venture.stage === 'SERIES_C') {
         capitalActivities.push(
           {
             ventureId: venture.id,
             type: 'EQUITY',
-            amount: venture.fundingRaised || 1000000,
+            amount: fundingRaised,
             currency: 'USD',
             description: `${venture.stage} equity funding round completed`,
             date: new Date(Date.now() - Math.random() * 365 * 24 * 60 * 60 * 1000), // Random date within last year
@@ -44,7 +46,7 @@ export async function POST() {
             terms: {
               investorType: venture.stage === 'SEED' ? 'ANGEL' : venture.stage === 'SERIES_A' ? 'VC' : 'INSTITUTIONAL',
               equityPercentage: venture.stage === 'SEED' ? 15 : venture.stage === 'SERIES_A' ? 20 : 25,
-              valuation: venture.lastValuation || venture.fundingRaised * 4,
+              valuation: lastValuation,
               useOfFunds: ['product development', 'team expansion', 'market expansion']
             }
           }
@@ -56,14 +58,14 @@ export async function POST() {
             {
               ventureId: venture.id,
               type: 'CONVERTIBLE_NOTE',
-              amount: Math.floor(venture.fundingRaised * 0.3),
+              amount: Math.floor(fundingRaised * 0.3),
               currency: 'USD',
               description: 'Convertible note from strategic investors',
               date: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000),
               status: 'COMPLETED',
               investorName: 'Strategic Impact Partners',
               terms: {
-                conversionCap: venture.lastValuation * 1.2,
+                conversionCap: lastValuation * 1.2,
                 discountRate: 20,
                 maturityDate: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toISOString(),
                 investorType: 'STRATEGIC'
@@ -107,7 +109,7 @@ export async function POST() {
       }
 
       // Create documents
-      const documents = [
+      const documents: Prisma.DocumentUncheckedCreateInput[] = [
         {
           ventureId: venture.id,
           name: 'Business Plan 2024',
