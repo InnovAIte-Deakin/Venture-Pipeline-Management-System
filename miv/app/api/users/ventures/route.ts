@@ -18,8 +18,18 @@ interface User {
 export async function GET(request: NextRequest) {
   try {
     // Step 1: Fetch user data from /api/users/me with full URL
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const meResponse = await fetch(`${baseUrl}/api/users/me`);
+    const forwardedProto = request.headers.get("x-forwarded-proto");
+    const forwardedHost = request.headers.get("x-forwarded-host");
+    const host = forwardedHost || request.headers.get("host") || "localhost:3000";
+    const protocol = forwardedProto || (host.includes("localhost") ? "http" : "https");
+    const baseUrl = process.env.NEXTAUTH_URL || `${protocol}://${host}`;
+
+    const meResponse = await fetch(`${baseUrl}/api/users/me`, {
+      headers: {
+        cookie: request.headers.get("cookie") || "",
+      },
+      cache: "no-store",
+    });
 
     if (!meResponse.ok) {
       return NextResponse.json(
