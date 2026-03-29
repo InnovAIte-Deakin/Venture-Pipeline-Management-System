@@ -2,13 +2,10 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { 
-  Upload, 
   File, 
   Search, 
-  Filter, 
   Download, 
-  Trash2, 
-  Eye,
+  Trash2,
   CheckCircle, 
   AlertCircle, 
   Clock, 

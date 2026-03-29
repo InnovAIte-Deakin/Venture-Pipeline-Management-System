@@ -1,15 +1,14 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
   House,
   Building2,
-  Target,
   DollarSign,
   BarChart3,
   TrendingUp,
@@ -20,20 +19,13 @@ import {
   Brain,
   BarChart,
   Calendar,
-  MapPin,
   Globe,
   Shield,
-  Zap,
   Rocket,
-  Star,
   Award,
   Heart,
   Activity,
   PieChart,
-  LineChart,
-  AreaChart,
-  ScatterChart,
-  Gauge,
   ChevronDown,
   ChevronRight,
   Plus,
@@ -41,13 +33,10 @@ import {
   Bell,
   User,
   LogOut,
-  Menu,
-  X,
-  Command,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { GlobalSearch, useGlobalSearch } from "@/components/global-search";
+import { signIn } from "next-auth/react";
+import { useGlobalSearch } from "@/components/global-search";
 import { useAuth } from "@/hooks/useAuth";
 
 interface NavItem {

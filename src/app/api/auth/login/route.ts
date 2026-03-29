@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getPayload, Payload } from 'payload'
+import { getPayload } from 'payload'
 import config from '@payload-config'
 import { z } from 'zod'
 

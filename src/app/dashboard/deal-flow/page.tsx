@@ -11,7 +11,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { 
   Activity, 
   Filter, 
@@ -20,7 +20,6 @@ import {
   Eye, 
   Edit, 
   MoreHorizontal,
-  TrendingUp,
   Clock,
   CheckCircle,
   XCircle,
@@ -32,15 +31,12 @@ import {
   Sparkles,
   Heart,
   Globe,
-  Award,
   FileText,
-  MessageSquare,
   ArrowRight,
   BarChart3,
   Zap,
   Shield,
-  Lightbulb,
-  X
+  Lightbulb
 } from "lucide-react"
 
 interface Deal {

@@ -9,31 +9,21 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   DollarSign,
-  TrendingUp,
   Clock,
   CheckCircle,
   AlertCircle,
   FileText,
   Users,
   Mail,
-  Phone,
   Search,
   Upload,
   MessageSquare,
-  RefreshCw,
   Building2,
   Plus
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogFooter,
-} from "@/components/ui/dialog"
+
+
 
 interface CapitalRequest {
   id: string

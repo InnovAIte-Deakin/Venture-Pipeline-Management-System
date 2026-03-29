@@ -13,7 +13,6 @@ import {
   Eye, 
   Edit, 
   MoreHorizontal,
-  Clock,
   Users,
   MapPin,
   Video,
@@ -24,15 +23,9 @@ import {
   CheckCircle,
   Filter,
   Search,
-  Download,
   Share2,
-  Star,
-  Zap,
-  ArrowUpRight,
-  ArrowDownRight,
   CalendarDays,
-  CalendarRange,
-  CalendarCheck
+  CalendarRange
 } from "lucide-react"
 
 interface Event {

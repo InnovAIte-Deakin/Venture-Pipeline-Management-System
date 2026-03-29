@@ -18,10 +18,7 @@ import {
   Activity,
   TrendingUp,
   AlertTriangle,
-  Calendar,
-  Eye,
-  Download,
-  Filter
+  Eye
 } from "lucide-react"
 
 interface WorkflowRun {

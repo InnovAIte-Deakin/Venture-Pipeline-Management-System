@@ -9,7 +9,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   DollarSign,
-  TrendingUp,
   Clock,
   CheckCircle,
   AlertCircle,
@@ -19,16 +18,12 @@ import {
   Search,
   Upload,
   MessageSquare,
-  RefreshCw,
   Building2,
   Plus,
   BarChart3,
   Target,
-  Calendar,
   Download,
-  Activity,
-  Globe,
-  Award
+  Activity
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 

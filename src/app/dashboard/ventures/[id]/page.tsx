@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import {
   Building2,
   Users,
@@ -21,21 +21,15 @@ import {
   Mail,
   FileText,
   Activity,
-  TrendingUp,
   AlertTriangle,
   CheckCircle,
-  Clock,
   ArrowLeft,
   Edit,
   Download,
   Share2,
   MoreHorizontal,
-  UserCheck,
-  Award,
-  Lightbulb,
-  Heart
+  Award
 } from "lucide-react"
-import Link from "next/link"
 
 interface Venture {
   id: string

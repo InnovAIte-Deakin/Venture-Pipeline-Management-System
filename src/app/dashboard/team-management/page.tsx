@@ -26,7 +26,6 @@ import {
   Calendar,
   MapPin,
   FileText,
-  Lightbulb,
 } from "lucide-react"
 import {
   Dialog,

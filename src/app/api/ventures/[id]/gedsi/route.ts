@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { AIServices } from '@/lib/ai-services';
 import { z } from 'zod';
 
 // Validation schemas

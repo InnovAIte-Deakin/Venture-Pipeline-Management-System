@@ -1,29 +1,43 @@
-"use client"
+'use client'
 
-import React, { useState, useEffect } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { 
-  TrendingUp, 
-  Plus, 
-  Eye, 
-  Edit, 
-  MoreHorizontal,
+import React, { useState, useEffect } from 'react'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog'
+import {
+  TrendingUp,
+  Plus,
+  Eye,
+  Edit,
   DollarSign,
   Users,
-  Calendar,
-  Target,
-  BarChart3,
-  PieChart,
-  LineChart,
   Activity,
   Clock,
   CheckCircle,
@@ -37,17 +51,12 @@ import {
   Zap,
   Heart,
   Globe,
-  Award,
   Shield,
   Lightbulb,
   Sparkles,
   XCircle,
   AlertCircle,
-  FileText,
-  MessageSquare,
-  ArrowRight,
-  X
-} from "lucide-react"
+} from 'lucide-react'
 
 interface InvestmentRound {
   id: string
@@ -57,7 +66,7 @@ interface InvestmentRound {
   targetAmount: string
   raisedAmount: string
   closingDate: string
-  status: "open" | "closing" | "closed" | "cancelled"
+  status: 'open' | 'closing' | 'closed' | 'cancelled'
   leadInvestor: string
   participants: string[]
   valuation: string
@@ -72,7 +81,7 @@ interface InvestmentRound {
   inclusionFocus: string
   sustainabilityGoals: string[]
   aiInsights: {
-    riskLevel: "low" | "medium" | "high"
+    riskLevel: 'low' | 'medium' | 'high'
     recommendation: string
     keyStrengths: string[]
     areasForImprovement: string[]
@@ -118,297 +127,310 @@ interface Venture {
 
 const mockInvestmentRounds: InvestmentRound[] = [
   {
-    id: "ROUND-001",
-    company: "TechFlow Solutions",
-    roundType: "Series B",
-    stage: "Growth",
-    targetAmount: "$5.0M",
-    raisedAmount: "$4.2M",
-    closingDate: "2024-03-31",
-    status: "closing",
-    leadInvestor: "Sequoia Capital",
-    participants: ["MIV Fund", "Andreessen Horowitz", "Accel"],
-    valuation: "$25M",
+    id: 'ROUND-001',
+    company: 'TechFlow Solutions',
+    roundType: 'Series B',
+    stage: 'Growth',
+    targetAmount: '$5.0M',
+    raisedAmount: '$4.2M',
+    closingDate: '2024-03-31',
+    status: 'closing',
+    leadInvestor: 'Sequoia Capital',
+    participants: ['MIV Fund', 'Andreessen Horowitz', 'Accel'],
+    valuation: '$25M',
     ownership: 15.5,
     documents: 12,
-    lastUpdate: "2 hours ago",
-    location: "Bangkok, Thailand",
-    sector: "Technology",
+    lastUpdate: '2 hours ago',
+    location: 'Bangkok, Thailand',
+    sector: 'Technology',
     gedsiScore: 78,
     impactScore: 85,
     sustainabilityScore: 82,
-    founderType: ["women-led", "youth-led"],
-    inclusionFocus: "Digital solutions for underserved communities",
-    sustainabilityGoals: ["Digital Inclusion", "Quality Jobs", "Innovation"],
+    founderType: ['women-led', 'youth-led'],
+    inclusionFocus: 'Digital solutions for underserved communities',
+    sustainabilityGoals: ['Digital Inclusion', 'Quality Jobs', 'Innovation'],
     aiInsights: {
-      riskLevel: "medium",
-      recommendation: "Strong growth trajectory with good GEDSI alignment. Monitor execution closely.",
-      keyStrengths: ["Female leadership", "Proven market traction", "Clear impact metrics"],
-      areasForImprovement: ["Increase disability inclusion", "Expand rural reach"]
+      riskLevel: 'medium',
+      recommendation:
+        'Strong growth trajectory with good GEDSI alignment. Monitor execution closely.',
+      keyStrengths: ['Female leadership', 'Proven market traction', 'Clear impact metrics'],
+      areasForImprovement: ['Increase disability inclusion', 'Expand rural reach'],
     },
     metrics: {
       jobsCreated: 145,
       communitiesServed: 23,
       womenLeadership: 60,
       disabilityInclusive: false,
-      carbonReduction: 12.5
-    }
+      carbonReduction: 12.5,
+    },
   },
   {
-    id: "ROUND-002",
-    company: "GreenEnergy Innovations",
-    roundType: "Series A",
-    stage: "Early",
-    targetAmount: "$2.5M",
-    raisedAmount: "$2.5M",
-    closingDate: "2024-02-15",
-    status: "closed",
-    leadInvestor: "MIV Fund",
-    participants: ["Climate Fund", "Energy Ventures"],
-    valuation: "$12M",
+    id: 'ROUND-002',
+    company: 'GreenEnergy Innovations',
+    roundType: 'Series A',
+    stage: 'Early',
+    targetAmount: '$2.5M',
+    raisedAmount: '$2.5M',
+    closingDate: '2024-02-15',
+    status: 'closed',
+    leadInvestor: 'MIV Fund',
+    participants: ['Climate Fund', 'Energy Ventures'],
+    valuation: '$12M',
     ownership: 20.8,
     documents: 18,
-    lastUpdate: "1 week ago",
-    location: "Manila, Philippines",
-    sector: "CleanTech",
+    lastUpdate: '1 week ago',
+    location: 'Manila, Philippines',
+    sector: 'CleanTech',
     gedsiScore: 92,
     impactScore: 96,
     sustainabilityScore: 94,
-    founderType: ["rural-focus", "indigenous-led"],
-    inclusionFocus: "Clean energy access for rural indigenous communities",
-    sustainabilityGoals: ["Climate Action", "Clean Energy", "Indigenous Rights"],
+    founderType: ['rural-focus', 'indigenous-led'],
+    inclusionFocus: 'Clean energy access for rural indigenous communities',
+    sustainabilityGoals: ['Climate Action', 'Clean Energy', 'Indigenous Rights'],
     aiInsights: {
-      riskLevel: "low",
-      recommendation: "Exceptional GEDSI performance and clear environmental impact. Ideal MIV investment.",
-      keyStrengths: ["Indigenous leadership", "Environmental impact", "Community ownership model"],
-      areasForImprovement: ["Scale operations", "Strengthen supply chain"]
+      riskLevel: 'low',
+      recommendation:
+        'Exceptional GEDSI performance and clear environmental impact. Ideal MIV investment.',
+      keyStrengths: ['Indigenous leadership', 'Environmental impact', 'Community ownership model'],
+      areasForImprovement: ['Scale operations', 'Strengthen supply chain'],
     },
     metrics: {
       jobsCreated: 89,
       communitiesServed: 45,
       womenLeadership: 55,
       disabilityInclusive: true,
-      carbonReduction: 450.2
-    }
+      carbonReduction: 450.2,
+    },
   },
   {
-    id: "ROUND-003",
-    company: "HealthTech Pro",
-    roundType: "Seed",
-    stage: "Seed",
-    targetAmount: "$1.0M",
-    raisedAmount: "$750K",
-    closingDate: "2024-04-30",
-    status: "open",
-    leadInvestor: "Y Combinator",
-    participants: ["MIV Fund", "Angel Investors"],
-    valuation: "$5M",
+    id: 'ROUND-003',
+    company: 'HealthTech Pro',
+    roundType: 'Seed',
+    stage: 'Seed',
+    targetAmount: '$1.0M',
+    raisedAmount: '$750K',
+    closingDate: '2024-04-30',
+    status: 'open',
+    leadInvestor: 'Y Combinator',
+    participants: ['MIV Fund', 'Angel Investors'],
+    valuation: '$5M',
     ownership: 15.0,
     documents: 8,
-    lastUpdate: "3 days ago",
-    location: "Ho Chi Minh City, Vietnam",
-    sector: "Healthcare",
+    lastUpdate: '3 days ago',
+    location: 'Ho Chi Minh City, Vietnam',
+    sector: 'Healthcare',
     gedsiScore: 88,
     impactScore: 91,
     sustainabilityScore: 75,
-    founderType: ["disability-inclusive", "women-led"],
-    inclusionFocus: "Accessible healthcare technology for people with disabilities",
-    sustainabilityGoals: ["Health & Wellbeing", "Disability Rights", "Digital Health"],
+    founderType: ['disability-inclusive', 'women-led'],
+    inclusionFocus: 'Accessible healthcare technology for people with disabilities',
+    sustainabilityGoals: ['Health & Wellbeing', 'Disability Rights', 'Digital Health'],
     aiInsights: {
-      riskLevel: "medium",
-      recommendation: "Strong social impact focus with innovative accessibility features. Need to improve financial sustainability.",
-      keyStrengths: ["Disability inclusion", "Healthcare innovation", "Strong team"],
-      areasForImprovement: ["Revenue model", "Market expansion", "Partnerships"]
+      riskLevel: 'medium',
+      recommendation:
+        'Strong social impact focus with innovative accessibility features. Need to improve financial sustainability.',
+      keyStrengths: ['Disability inclusion', 'Healthcare innovation', 'Strong team'],
+      areasForImprovement: ['Revenue model', 'Market expansion', 'Partnerships'],
     },
     metrics: {
       jobsCreated: 32,
       communitiesServed: 18,
       womenLeadership: 70,
       disabilityInclusive: true,
-      carbonReduction: 5.8
-    }
+      carbonReduction: 5.8,
+    },
   },
   {
-    id: "ROUND-004",
-    company: "FinTech Revolution",
-    roundType: "Series C",
-    stage: "Growth",
-    targetAmount: "$10.0M",
-    raisedAmount: "$8.5M",
-    closingDate: "2024-01-20",
-    status: "closed",
-    leadInvestor: "Tiger Global",
-    participants: ["MIV Fund", "SoftBank", "Insight Partners"],
-    valuation: "$85M",
+    id: 'ROUND-004',
+    company: 'FinTech Revolution',
+    roundType: 'Series C',
+    stage: 'Growth',
+    targetAmount: '$10.0M',
+    raisedAmount: '$8.5M',
+    closingDate: '2024-01-20',
+    status: 'closed',
+    leadInvestor: 'Tiger Global',
+    participants: ['MIV Fund', 'SoftBank', 'Insight Partners'],
+    valuation: '$85M',
     ownership: 10.0,
     documents: 25,
-    lastUpdate: "2 weeks ago",
-    location: "Jakarta, Indonesia",
-    sector: "FinTech",
+    lastUpdate: '2 weeks ago',
+    location: 'Jakarta, Indonesia',
+    sector: 'FinTech',
     gedsiScore: 85,
     impactScore: 89,
     sustainabilityScore: 78,
-    founderType: ["refugee-led", "youth-led"],
-    inclusionFocus: "Financial inclusion for refugees and displaced populations",
-    sustainabilityGoals: ["Financial Inclusion", "Refugee Support", "Economic Growth"],
+    founderType: ['refugee-led', 'youth-led'],
+    inclusionFocus: 'Financial inclusion for refugees and displaced populations',
+    sustainabilityGoals: ['Financial Inclusion', 'Refugee Support', 'Economic Growth'],
     aiInsights: {
-      riskLevel: "low",
-      recommendation: "Excellent financial performance with strong social mission. Continue support for expansion.",
-      keyStrengths: ["Refugee leadership", "Financial inclusion", "Scalable technology"],
-      areasForImprovement: ["Environmental impact", "Rural expansion"]
+      riskLevel: 'low',
+      recommendation:
+        'Excellent financial performance with strong social mission. Continue support for expansion.',
+      keyStrengths: ['Refugee leadership', 'Financial inclusion', 'Scalable technology'],
+      areasForImprovement: ['Environmental impact', 'Rural expansion'],
     },
     metrics: {
       jobsCreated: 267,
       communitiesServed: 156,
       womenLeadership: 45,
       disabilityInclusive: false,
-      carbonReduction: 8.9
-    }
+      carbonReduction: 8.9,
+    },
   },
   {
-    id: "ROUND-005",
-    company: "EduTech Platform",
-    roundType: "Series A",
-    stage: "Early",
-    targetAmount: "$3.0M",
-    raisedAmount: "$0",
-    closingDate: "2024-05-15",
-    status: "open",
-    leadInvestor: "MIV Fund",
-    participants: ["Education Fund"],
-    valuation: "$15M",
+    id: 'ROUND-005',
+    company: 'EduTech Platform',
+    roundType: 'Series A',
+    stage: 'Early',
+    targetAmount: '$3.0M',
+    raisedAmount: '$0',
+    closingDate: '2024-05-15',
+    status: 'open',
+    leadInvestor: 'MIV Fund',
+    participants: ['Education Fund'],
+    valuation: '$15M',
     ownership: 20.0,
     documents: 5,
-    lastUpdate: "1 day ago",
-    location: "Yangon, Myanmar",
-    sector: "EdTech",
+    lastUpdate: '1 day ago',
+    location: 'Yangon, Myanmar',
+    sector: 'EdTech',
     gedsiScore: 94,
     impactScore: 92,
     sustainabilityScore: 86,
-    founderType: ["indigenous-led", "women-led", "rural-focus"],
-    inclusionFocus: "Digital education for marginalized indigenous communities",
-    sustainabilityGoals: ["Quality Education", "Indigenous Rights", "Digital Literacy"],
+    founderType: ['indigenous-led', 'women-led', 'rural-focus'],
+    inclusionFocus: 'Digital education for marginalized indigenous communities',
+    sustainabilityGoals: ['Quality Education', 'Indigenous Rights', 'Digital Literacy'],
     aiInsights: {
-      riskLevel: "medium",
-      recommendation: "Outstanding GEDSI alignment and educational impact. Address funding gaps urgently.",
-      keyStrengths: ["Indigenous leadership", "Educational innovation", "Community engagement"],
-      areasForImprovement: ["Fundraising strategy", "Technology infrastructure", "Teacher training"]
+      riskLevel: 'medium',
+      recommendation:
+        'Outstanding GEDSI alignment and educational impact. Address funding gaps urgently.',
+      keyStrengths: ['Indigenous leadership', 'Educational innovation', 'Community engagement'],
+      areasForImprovement: [
+        'Fundraising strategy',
+        'Technology infrastructure',
+        'Teacher training',
+      ],
     },
     metrics: {
       jobsCreated: 78,
       communitiesServed: 34,
       womenLeadership: 80,
       disabilityInclusive: true,
-      carbonReduction: 15.3
-    }
-  }
+      carbonReduction: 15.3,
+    },
+  },
 ]
 
 // Helper function to transform venture data to investment round data
 const transformVentureToRound = (venture: Venture): InvestmentRound => {
   const founderTypes = venture.founderTypes ? JSON.parse(venture.founderTypes) : []
-  
+
   // Use consistent GEDSI score from AI analysis (standard across platform)
   const getGedsiScore = () => {
     if (venture.aiAnalysis) {
       try {
-        const aiAnalysis = typeof venture.aiAnalysis === 'string' 
-          ? JSON.parse(venture.aiAnalysis) 
-          : venture.aiAnalysis
-        
+        const aiAnalysis =
+          typeof venture.aiAnalysis === 'string'
+            ? JSON.parse(venture.aiAnalysis)
+            : venture.aiAnalysis
+
         // Use the AI-calculated GEDSI score (standard across platform)
         return aiAnalysis.gedsiScore || aiAnalysis.gedsiAlignment || 75
       } catch (error) {
         console.warn('Error parsing AI analysis for', venture.name, error)
       }
     }
-    
+
     // Fallback: Calculate from founder types (consistent with AI service)
     let score = 50 // Base score
     const founderTypes = venture.founderTypes ? JSON.parse(venture.founderTypes) : []
-    
+
     if (founderTypes.includes('women-led')) score += 15
     if (founderTypes.includes('disability-inclusive')) score += 15
     if (founderTypes.includes('rural-focus')) score += 10
     if (founderTypes.includes('indigenous-led')) score += 10
-    
+
     const inclusionFocus = venture.inclusionFocus?.toLowerCase() || ''
     if (inclusionFocus.includes('gender') || inclusionFocus.includes('women')) score += 10
-    if (inclusionFocus.includes('disability') || inclusionFocus.includes('accessibility')) score += 10
+    if (inclusionFocus.includes('disability') || inclusionFocus.includes('accessibility'))
+      score += 10
     if (inclusionFocus.includes('rural') || inclusionFocus.includes('community')) score += 10
-    
+
     return Math.min(score, 100)
   }
-  
+
   const gedsiScore = getGedsiScore()
 
   // Map venture stage to round type
   const stageToRoundType: Record<string, string> = {
-    'INTAKE': 'Pre-Seed',
-    'SCREENING': 'Seed',
-    'DUE_DILIGENCE': 'Seed',
-    'INVESTMENT_READY': 'Series A',
-    'FUNDED': 'Series A',
-    'SEED': 'Seed',
-    'SERIES_A': 'Series A',
-    'SERIES_B': 'Series B',
-    'SERIES_C': 'Series C',
-    'EXITED': 'Series C'
+    INTAKE: 'Pre-Seed',
+    SCREENING: 'Seed',
+    DUE_DILIGENCE: 'Seed',
+    INVESTMENT_READY: 'Series A',
+    FUNDED: 'Series A',
+    SEED: 'Seed',
+    SERIES_A: 'Series A',
+    SERIES_B: 'Series B',
+    SERIES_C: 'Series C',
+    EXITED: 'Series C',
   }
 
   // Map status
-  const statusMap: Record<string, "open" | "closing" | "closed" | "cancelled"> = {
-    'ACTIVE': 'open',
-    'FUNDED': 'closed',
-    'INACTIVE': 'cancelled',
-    'ARCHIVED': 'cancelled'
+  const statusMap: Record<string, 'open' | 'closing' | 'closed' | 'cancelled'> = {
+    ACTIVE: 'open',
+    FUNDED: 'closed',
+    INACTIVE: 'cancelled',
+    ARCHIVED: 'cancelled',
   }
 
   // Generate AI insights based on venture data
-  const getRiskLevel = (): "low" | "medium" | "high" => {
+  const getRiskLevel = (): 'low' | 'medium' | 'high' => {
     if (venture.aiAnalysis?.riskLevel) {
       return venture.aiAnalysis.riskLevel
     }
-    
+
     // Calculate risk based on stage, GEDSI score, and funding
     let riskScore = 0
-    
+
     // Stage risk (lower stages = higher risk)
     if (venture.stage === 'INTAKE' || venture.stage === 'SCREENING') riskScore += 30
     else if (venture.stage === 'DUE_DILIGENCE') riskScore += 20
     else if (venture.stage === 'INVESTMENT_READY') riskScore += 10
     else if (venture.stage === 'FUNDED' || venture.stage.includes('SERIES')) riskScore += 0
-    
+
     // GEDSI score risk (lower scores = higher risk)
     if (gedsiScore < 60) riskScore += 25
     else if (gedsiScore < 80) riskScore += 10
-    
+
     // Funding risk (no funding = higher risk)
     if (!venture.fundingRaised || venture.fundingRaised === 0) riskScore += 15
     else if (venture.fundingRaised < 500000) riskScore += 10
-    
+
     return riskScore > 40 ? 'high' : riskScore > 20 ? 'medium' : 'low'
   }
 
   const aiInsights = {
     riskLevel: getRiskLevel(),
-    recommendation: venture.aiAnalysis?.recommendation || `Venture shows ${gedsiScore > 80 ? 'strong' : 'moderate'} GEDSI alignment. ${venture.stage === 'FUNDED' ? 'Continue monitoring performance.' : 'Proceed with due diligence.'}`,
+    recommendation:
+      venture.aiAnalysis?.recommendation ||
+      `Venture shows ${gedsiScore > 80 ? 'strong' : 'moderate'} GEDSI alignment. ${venture.stage === 'FUNDED' ? 'Continue monitoring performance.' : 'Proceed with due diligence.'}`,
     keyStrengths: venture.aiAnalysis?.keyStrengths || [
       founderTypes.includes('women-led') ? 'Women leadership' : 'Diverse team',
       'Market opportunity',
-      venture.inclusionFocus ? 'Clear social impact' : 'Sector expertise'
+      venture.inclusionFocus ? 'Clear social impact' : 'Sector expertise',
     ],
     areasForImprovement: venture.aiAnalysis?.areasForImprovement || [
       'Financial sustainability',
       'Market expansion',
-      'Impact measurement'
-    ]
+      'Impact measurement',
+    ],
   }
 
   // Calculate realistic target amount based on stage and current funding
   const getTargetAmount = () => {
     const currentFunding = venture.fundingRaised || 0
-    
+
     switch (venture.stage) {
       case 'INTAKE':
       case 'SCREENING':
@@ -429,10 +451,12 @@ const transformVentureToRound = (venture: Venture): InvestmentRound => {
         return Math.max(currentFunding * 2, 1000000)
     }
   }
-  
+
   const targetAmountValue = getTargetAmount()
   const targetAmount = `$${(targetAmountValue / 1000000).toFixed(1)}M`
-  const raisedAmount = venture.fundingRaised ? `$${(venture.fundingRaised / 1000000).toFixed(1)}M` : '$0'
+  const raisedAmount = venture.fundingRaised
+    ? `$${(venture.fundingRaised / 1000000).toFixed(1)}M`
+    : '$0'
 
   return {
     id: venture.id,
@@ -455,9 +479,10 @@ const transformVentureToRound = (venture: Venture): InvestmentRound => {
     impactScore: (() => {
       if (venture.aiAnalysis) {
         try {
-          const aiAnalysis = typeof venture.aiAnalysis === 'string' 
-            ? JSON.parse(venture.aiAnalysis) 
-            : venture.aiAnalysis
+          const aiAnalysis =
+            typeof venture.aiAnalysis === 'string'
+              ? JSON.parse(venture.aiAnalysis)
+              : venture.aiAnalysis
           return aiAnalysis.impactScore || Math.min(gedsiScore + 5, 100)
         } catch (error) {
           console.warn('Error parsing AI analysis impact score for', venture.name)
@@ -468,9 +493,10 @@ const transformVentureToRound = (venture: Venture): InvestmentRound => {
     sustainabilityScore: (() => {
       if (venture.aiAnalysis) {
         try {
-          const aiAnalysis = typeof venture.aiAnalysis === 'string' 
-            ? JSON.parse(venture.aiAnalysis) 
-            : venture.aiAnalysis
+          const aiAnalysis =
+            typeof venture.aiAnalysis === 'string'
+              ? JSON.parse(venture.aiAnalysis)
+              : venture.aiAnalysis
           return aiAnalysis.sustainabilityScore || Math.min(gedsiScore - 5, 100)
         } catch (error) {
           console.warn('Error parsing AI analysis sustainability score for', venture.name)
@@ -485,63 +511,59 @@ const transformVentureToRound = (venture: Venture): InvestmentRound => {
     metrics: {
       jobsCreated: Math.floor(Math.random() * 200) + 50,
       communitiesServed: Math.floor(Math.random() * 50) + 10,
-      womenLeadership: founderTypes.includes('women-led') ? Math.floor(Math.random() * 30) + 60 : Math.floor(Math.random() * 40) + 30,
+      womenLeadership: founderTypes.includes('women-led')
+        ? Math.floor(Math.random() * 30) + 60
+        : Math.floor(Math.random() * 40) + 30,
       disabilityInclusive: founderTypes.includes('disability-inclusive') || Math.random() > 0.7,
-      carbonReduction: Math.floor(Math.random() * 100) + 10
-    }
+      carbonReduction: Math.floor(Math.random() * 100) + 10,
+    },
   }
 }
 
 const roundTypes = [
-  "Pre-Seed",
-  "Seed",
-  "Series A",
-  "Series B",
-  "Series C",
-  "Series D",
-  "Series E+",
-  "Growth",
-  "IPO"
+  'Pre-Seed',
+  'Seed',
+  'Series A',
+  'Series B',
+  'Series C',
+  'Series D',
+  'Series E+',
+  'Growth',
+  'IPO',
 ]
 
-const stages = [
-  "Seed",
-  "Early",
-  "Growth",
-  "Late",
-  "Exit"
-]
+const stages = ['Seed', 'Early', 'Growth', 'Late', 'Exit']
 
 const sectors = [
-  "CleanTech",
-  "Agriculture", 
-  "FinTech",
-  "Healthcare",
-  "EdTech",
-  "E-commerce",
-  "Manufacturing",
-  "Services",
-  "Technology"
+  'CleanTech',
+  'Agriculture',
+  'FinTech',
+  'Healthcare',
+  'EdTech',
+  'E-commerce',
+  'Manufacturing',
+  'Services',
+  'Technology',
 ]
 
 const founderTypes = [
-  "women-led",
-  "youth-led", 
-  "disability-inclusive",
-  "rural-focus",
-  "indigenous-led",
-  "refugee-led",
-  "veteran-led"
+  'women-led',
+  'youth-led',
+  'disability-inclusive',
+  'rural-focus',
+  'indigenous-led',
+  'refugee-led',
+  'veteran-led',
 ]
 
 export default function InvestmentRoundsPage() {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [selectedRoundType, setSelectedRoundType] = useState("all")
-  const [selectedStage, setSelectedStage] = useState("all")
-  const [selectedStatus, setSelectedStatus] = useState("all")
-  const [selectedSector, setSelectedSector] = useState("all")
-  const [selectedFounderType, setSelectedFounderType] = useState("all")
-  const [activeView, setActiveView] = useState("overview")
+  const [searchTerm, setSearchTerm] = useState('')
+  const [selectedRoundType, setSelectedRoundType] = useState('all')
+  const [selectedStage, setSelectedStage] = useState('all')
+  const [selectedStatus, setSelectedStatus] = useState('all')
+  const [selectedSector, setSelectedSector] = useState('all')
+  const [selectedFounderType, setSelectedFounderType] = useState('all')
+  const [activeView, setActiveView] = useState('overview')
   const [selectedRound, setSelectedRound] = useState<InvestmentRound | null>(null)
   const [isViewDialogOpen, setIsViewDialogOpen] = useState(false)
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false)
@@ -560,15 +582,15 @@ export default function InvestmentRoundsPage() {
     try {
       setLoading(true)
       setError(null)
-      
+
       // Fetch ventures from the database
       const response = await fetch('/api/ventures?limit=100')
       if (!response.ok) {
         throw new Error(`Failed to fetch ventures: ${response.status} ${response.statusText}`)
       }
-      
+
       const data = await response.json()
-      
+
       // Transform venture data to investment rounds
       console.log('📊 Transforming', data.ventures.length, 'ventures to investment rounds')
       const transformedRounds = data.ventures.map((venture: Venture, index: number) => {
@@ -580,84 +602,135 @@ export default function InvestmentRoundsPage() {
             calculatedGedsiScore: transformed.gedsiScore,
             targetAmount: transformed.targetAmount,
             raisedAmount: transformed.raisedAmount,
-            riskLevel: transformed.aiInsights.riskLevel
+            riskLevel: transformed.aiInsights.riskLevel,
           })
         }
         return transformed
       })
-      
+
       setRounds(transformedRounds)
       setLoading(false)
     } catch (err) {
       console.error('Error fetching investment rounds:', err)
       setError(err instanceof Error ? err.message : 'Failed to fetch investment rounds')
-      
+
       // Don't fall back to mock data - show error instead
       setRounds([])
       setLoading(false)
     }
   }
 
-  const filteredRounds = rounds.filter(round => {
-    const matchesSearch = round.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         round.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         round.location.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesRoundType = selectedRoundType === "all" || round.roundType === selectedRoundType
-    const matchesStage = selectedStage === "all" || round.stage === selectedStage
-    const matchesStatus = selectedStatus === "all" || round.status === selectedStatus
-    const matchesSector = selectedSector === "all" || round.sector === selectedSector
-    const matchesFounderType = selectedFounderType === "all" || round.founderType.includes(selectedFounderType)
-    
-    return matchesSearch && matchesRoundType && matchesStage && matchesStatus && matchesSector && matchesFounderType
+  const filteredRounds = rounds.filter((round) => {
+    const matchesSearch =
+      round.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      round.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      round.location.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesRoundType = selectedRoundType === 'all' || round.roundType === selectedRoundType
+    const matchesStage = selectedStage === 'all' || round.stage === selectedStage
+    const matchesStatus = selectedStatus === 'all' || round.status === selectedStatus
+    const matchesSector = selectedSector === 'all' || round.sector === selectedSector
+    const matchesFounderType =
+      selectedFounderType === 'all' || round.founderType.includes(selectedFounderType)
+
+    return (
+      matchesSearch &&
+      matchesRoundType &&
+      matchesStage &&
+      matchesStatus &&
+      matchesSector &&
+      matchesFounderType
+    )
   })
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "closed": return <CheckCircle className="h-4 w-4 text-green-500" />
-      case "closing": return <Clock className="h-4 w-4 text-blue-500" />
-      case "open": return <AlertTriangle className="h-4 w-4 text-yellow-500" />
-      case "cancelled": return <XCircle className="h-4 w-4 text-red-500" />
-      default: return <Clock className="h-4 w-4 text-gray-500" />
+      case 'closed':
+        return <CheckCircle className="h-4 w-4 text-green-500" />
+      case 'closing':
+        return <Clock className="h-4 w-4 text-blue-500" />
+      case 'open':
+        return <AlertTriangle className="h-4 w-4 text-yellow-500" />
+      case 'cancelled':
+        return <XCircle className="h-4 w-4 text-red-500" />
+      default:
+        return <Clock className="h-4 w-4 text-gray-500" />
     }
   }
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "closed": return <Badge variant="default" className="bg-green-100 text-green-800">Closed</Badge>
-      case "closing": return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Closing</Badge>
-      case "open": return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Open</Badge>
-      case "cancelled": return <Badge variant="destructive">Cancelled</Badge>
-      default: return <Badge variant="secondary">Unknown</Badge>
+      case 'closed':
+        return (
+          <Badge variant="default" className="bg-green-100 text-green-800">
+            Closed
+          </Badge>
+        )
+      case 'closing':
+        return (
+          <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+            Closing
+          </Badge>
+        )
+      case 'open':
+        return (
+          <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+            Open
+          </Badge>
+        )
+      case 'cancelled':
+        return <Badge variant="destructive">Cancelled</Badge>
+      default:
+        return <Badge variant="secondary">Unknown</Badge>
     }
   }
 
   const getRiskLevelIcon = (riskLevel: string) => {
     switch (riskLevel) {
-      case "low": return <Shield className="h-4 w-4 text-green-500" />
-      case "medium": return <AlertCircle className="h-4 w-4 text-yellow-500" />
-      case "high": return <AlertTriangle className="h-4 w-4 text-red-500" />
-      default: return <Shield className="h-4 w-4 text-gray-500" />
+      case 'low':
+        return <Shield className="h-4 w-4 text-green-500" />
+      case 'medium':
+        return <AlertCircle className="h-4 w-4 text-yellow-500" />
+      case 'high':
+        return <AlertTriangle className="h-4 w-4 text-red-500" />
+      default:
+        return <Shield className="h-4 w-4 text-gray-500" />
     }
   }
 
   const getRiskLevelBadge = (riskLevel: string) => {
     switch (riskLevel) {
-      case "low": return <Badge variant="default" className="bg-green-100 text-green-800">Low Risk</Badge>
-      case "medium": return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Medium Risk</Badge>
-      case "high": return <Badge variant="destructive" className="bg-red-100 text-red-800">High Risk</Badge>
-      default: return <Badge variant="secondary">Unknown</Badge>
+      case 'low':
+        return (
+          <Badge variant="default" className="bg-green-100 text-green-800">
+            Low Risk
+          </Badge>
+        )
+      case 'medium':
+        return (
+          <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">
+            Medium Risk
+          </Badge>
+        )
+      case 'high':
+        return (
+          <Badge variant="destructive" className="bg-red-100 text-red-800">
+            High Risk
+          </Badge>
+        )
+      default:
+        return <Badge variant="secondary">Unknown</Badge>
     }
   }
 
   const getGedsiScoreColor = (score: number) => {
-    if (score >= 90) return "text-green-600"
-    if (score >= 80) return "text-blue-600"
-    if (score >= 70) return "text-yellow-600"
-    return "text-red-600"
+    if (score >= 90) return 'text-green-600'
+    if (score >= 80) return 'text-blue-600'
+    if (score >= 70) return 'text-yellow-600'
+    return 'text-red-600'
   }
 
   const getFounderTypeBadges = (founderTypes: string[]) => {
-    return founderTypes.map(type => (
+    return founderTypes.map((type) => (
       <Badge key={type} variant="outline" className="text-xs">
         {type.replace('-', ' ')}
       </Badge>
@@ -666,8 +739,8 @@ export default function InvestmentRoundsPage() {
 
   // Calculate metrics
   const totalRounds = rounds.length
-  const openRounds = rounds.filter(r => r.status === "open").length
-  const closedRounds = rounds.filter(r => r.status === "closed").length
+  const openRounds = rounds.filter((r) => r.status === 'open').length
+  const closedRounds = rounds.filter((r) => r.status === 'closed').length
   const totalTargetAmount = rounds.reduce((sum, round) => {
     const amount = parseFloat(round.targetAmount.replace(/[^0-9.]/g, ''))
     return sum + amount
@@ -676,15 +749,21 @@ export default function InvestmentRoundsPage() {
     const amount = parseFloat(round.raisedAmount.replace(/[^0-9.]/g, ''))
     return sum + amount
   }, 0)
-  
+
   // GEDSI-specific metrics
-  const avgGedsiScore = rounds.reduce((sum, round) => sum + round.gedsiScore, 0) / rounds.length || 0
-  const avgImpactScore = rounds.reduce((sum, round) => sum + round.impactScore, 0) / rounds.length || 0
-  const avgSustainabilityScore = rounds.reduce((sum, round) => sum + round.sustainabilityScore, 0) / rounds.length || 0
+  const avgGedsiScore =
+    rounds.reduce((sum, round) => sum + round.gedsiScore, 0) / rounds.length || 0
+  const avgImpactScore =
+    rounds.reduce((sum, round) => sum + round.impactScore, 0) / rounds.length || 0
+  const avgSustainabilityScore =
+    rounds.reduce((sum, round) => sum + round.sustainabilityScore, 0) / rounds.length || 0
   const totalJobsCreated = rounds.reduce((sum, round) => sum + round.metrics.jobsCreated, 0)
-  const totalCommunitiesServed = rounds.reduce((sum, round) => sum + round.metrics.communitiesServed, 0)
-  const womenLedRounds = rounds.filter(r => r.founderType.includes("women-led")).length
-  const disabilityInclusiveRounds = rounds.filter(r => r.metrics.disabilityInclusive).length
+  const totalCommunitiesServed = rounds.reduce(
+    (sum, round) => sum + round.metrics.communitiesServed,
+    0,
+  )
+  const womenLedRounds = rounds.filter((r) => r.founderType.includes('women-led')).length
+  const disabilityInclusiveRounds = rounds.filter((r) => r.metrics.disabilityInclusive).length
 
   if (loading) {
     return (
@@ -792,9 +871,7 @@ export default function InvestmentRoundsPage() {
             <div className={`text-2xl font-bold ${getGedsiScoreColor(avgGedsiScore)}`}>
               {avgGedsiScore.toFixed(0)}
             </div>
-            <p className="text-xs text-muted-foreground">
-              Average across all rounds
-            </p>
+            <p className="text-xs text-muted-foreground">Average across all rounds</p>
           </CardContent>
         </Card>
         <Card>
@@ -804,9 +881,7 @@ export default function InvestmentRoundsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-blue-600">{avgImpactScore.toFixed(0)}</div>
-            <p className="text-xs text-muted-foreground">
-              Social impact rating
-            </p>
+            <p className="text-xs text-muted-foreground">Social impact rating</p>
           </CardContent>
         </Card>
         <Card>
@@ -841,7 +916,8 @@ export default function InvestmentRoundsPage() {
           <CardContent>
             <div className="text-2xl font-bold">${totalRaisedAmount.toFixed(1)}M</div>
             <p className="text-xs text-muted-foreground">
-              {((totalRaisedAmount / totalTargetAmount) * 100).toFixed(1)}% of ${totalTargetAmount.toFixed(1)}M target
+              {((totalRaisedAmount / totalTargetAmount) * 100).toFixed(1)}% of $
+              {totalTargetAmount.toFixed(1)}M target
             </p>
           </CardContent>
         </Card>
@@ -859,8 +935,8 @@ export default function InvestmentRoundsPage() {
           <CardContent>
             <div className="space-y-4">
               {founderTypes.slice(0, 5).map((founderType) => {
-                const count = rounds.filter(r => r.founderType.includes(founderType)).length
-                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : "0"
+                const count = rounds.filter((r) => r.founderType.includes(founderType)).length
+                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : '0'
                 return (
                   <div key={founderType} className="flex items-center justify-between">
                     <span className="text-sm capitalize">{founderType.replace('-', ' ')}</span>
@@ -885,8 +961,8 @@ export default function InvestmentRoundsPage() {
           <CardContent>
             <div className="space-y-4">
               {sectors.slice(0, 6).map((sector) => {
-                const count = rounds.filter(r => r.sector === sector).length
-                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : "0"
+                const count = rounds.filter((r) => r.sector === sector).length
+                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : '0'
                 return (
                   <div key={sector} className="flex items-center justify-between">
                     <span className="text-sm">{sector}</span>
@@ -910,9 +986,9 @@ export default function InvestmentRoundsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {["low", "medium", "high"].map((riskLevel) => {
-                const count = rounds.filter(r => r.aiInsights.riskLevel === riskLevel).length
-                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : "0"
+              {['low', 'medium', 'high'].map((riskLevel) => {
+                const count = rounds.filter((r) => r.aiInsights.riskLevel === riskLevel).length
+                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : '0'
                 return (
                   <div key={riskLevel} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -939,9 +1015,9 @@ export default function InvestmentRoundsPage() {
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {["open", "closing", "closed", "cancelled"].map((status) => {
-                const count = rounds.filter(r => r.status === status).length
-                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : "0"
+              {['open', 'closing', 'closed', 'cancelled'].map((status) => {
+                const count = rounds.filter((r) => r.status === status).length
+                const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : '0'
                 return (
                   <div key={status} className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
@@ -1002,8 +1078,10 @@ export default function InvestmentRoundsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All round types</SelectItem>
-                      {roundTypes.map(roundType => (
-                        <SelectItem key={roundType} value={roundType}>{roundType}</SelectItem>
+                      {roundTypes.map((roundType) => (
+                        <SelectItem key={roundType} value={roundType}>
+                          {roundType}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -1016,8 +1094,10 @@ export default function InvestmentRoundsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All stages</SelectItem>
-                      {stages.map(stage => (
-                        <SelectItem key={stage} value={stage}>{stage}</SelectItem>
+                      {stages.map((stage) => (
+                        <SelectItem key={stage} value={stage}>
+                          {stage}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -1030,8 +1110,10 @@ export default function InvestmentRoundsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All sectors</SelectItem>
-                      {sectors.map(sector => (
-                        <SelectItem key={sector} value={sector}>{sector}</SelectItem>
+                      {sectors.map((sector) => (
+                        <SelectItem key={sector} value={sector}>
+                          {sector}
+                        </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
@@ -1044,9 +1126,9 @@ export default function InvestmentRoundsPage() {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="all">All founder types</SelectItem>
-                      {founderTypes.map(founderType => (
+                      {founderTypes.map((founderType) => (
                         <SelectItem key={founderType} value={founderType}>
-                          {founderType.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {founderType.replace('-', ' ').replace(/\b\w/g, (l) => l.toUpperCase())}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -1099,14 +1181,16 @@ export default function InvestmentRoundsPage() {
                     const targetAmount = parseFloat(round.targetAmount.replace(/[^0-9.]/g, ''))
                     const raisedAmount = parseFloat(round.raisedAmount.replace(/[^0-9.]/g, ''))
                     const progress = targetAmount > 0 ? (raisedAmount / targetAmount) * 100 : 0
-                    
+
                     return (
                       <TableRow key={round.id}>
                         <TableCell>
                           <div>
                             <div className="font-medium">{round.company}</div>
                             <div className="text-sm text-muted-foreground">{round.location}</div>
-                            <div className="text-sm text-muted-foreground">{round.sector} • {round.stage}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {round.sector} • {round.stage}
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -1114,7 +1198,9 @@ export default function InvestmentRoundsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className={`text-lg font-bold ${getGedsiScoreColor(round.gedsiScore)}`}>
+                            <div
+                              className={`text-lg font-bold ${getGedsiScoreColor(round.gedsiScore)}`}
+                            >
                               {round.gedsiScore}
                             </div>
                             <div className="text-xs text-muted-foreground">
@@ -1126,7 +1212,9 @@ export default function InvestmentRoundsPage() {
                         <TableCell>
                           <div>
                             <div className="font-medium">{round.targetAmount}</div>
-                            <div className="text-sm text-muted-foreground">{round.raisedAmount} raised</div>
+                            <div className="text-sm text-muted-foreground">
+                              {round.raisedAmount} raised
+                            </div>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -1137,7 +1225,7 @@ export default function InvestmentRoundsPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {round.founderType.slice(0, 2).map(type => (
+                            {round.founderType.slice(0, 2).map((type) => (
                               <Badge key={type} variant="outline" className="text-xs">
                                 {type.replace('-', ' ')}
                               </Badge>
@@ -1163,15 +1251,24 @@ export default function InvestmentRoundsPage() {
                         </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center gap-2">
-                            <Dialog open={isViewDialogOpen && selectedRound?.id === round.id} onOpenChange={setIsViewDialogOpen}>
+                            <Dialog
+                              open={isViewDialogOpen && selectedRound?.id === round.id}
+                              onOpenChange={setIsViewDialogOpen}
+                            >
                               <DialogTrigger asChild>
-                                <Button variant="ghost" size="sm" onClick={() => setSelectedRound(round)}>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => setSelectedRound(round)}
+                                >
                                   <Eye className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
                               <DialogContent className="max-w-4xl">
                                 <DialogHeader>
-                                  <DialogTitle>{round.company} - {round.roundType}</DialogTitle>
+                                  <DialogTitle>
+                                    {round.company} - {round.roundType}
+                                  </DialogTitle>
                                   <DialogDescription>
                                     Investment round details with GEDSI impact analysis
                                   </DialogDescription>
@@ -1193,7 +1290,9 @@ export default function InvestmentRoundsPage() {
                                       <div className="space-y-2">
                                         <div className="flex justify-between">
                                           <span>GEDSI:</span>
-                                          <span className={getGedsiScoreColor(round.gedsiScore)}>{round.gedsiScore}</span>
+                                          <span className={getGedsiScoreColor(round.gedsiScore)}>
+                                            {round.gedsiScore}
+                                          </span>
                                         </div>
                                         <div className="flex justify-between">
                                           <span>Impact:</span>
@@ -1201,7 +1300,9 @@ export default function InvestmentRoundsPage() {
                                         </div>
                                         <div className="flex justify-between">
                                           <span>Sustainability:</span>
-                                          <span className="text-green-600">{round.sustainabilityScore}</span>
+                                          <span className="text-green-600">
+                                            {round.sustainabilityScore}
+                                          </span>
                                         </div>
                                       </div>
                                     </div>
@@ -1211,9 +1312,15 @@ export default function InvestmentRoundsPage() {
                                       <h4 className="font-medium mb-2">Impact Metrics</h4>
                                       <div className="space-y-2 text-sm">
                                         <div>Jobs Created: {round.metrics.jobsCreated}</div>
-                                        <div>Communities Served: {round.metrics.communitiesServed}</div>
-                                        <div>Women Leadership: {round.metrics.womenLeadership}%</div>
-                                        <div>Carbon Reduction: {round.metrics.carbonReduction}t CO2</div>
+                                        <div>
+                                          Communities Served: {round.metrics.communitiesServed}
+                                        </div>
+                                        <div>
+                                          Women Leadership: {round.metrics.womenLeadership}%
+                                        </div>
+                                        <div>
+                                          Carbon Reduction: {round.metrics.carbonReduction}t CO2
+                                        </div>
                                       </div>
                                     </div>
                                     <div>
@@ -1223,7 +1330,9 @@ export default function InvestmentRoundsPage() {
                                           {getRiskLevelIcon(round.aiInsights.riskLevel)}
                                           {getRiskLevelBadge(round.aiInsights.riskLevel)}
                                         </div>
-                                        <p className="text-muted-foreground">{round.aiInsights.recommendation}</p>
+                                        <p className="text-muted-foreground">
+                                          {round.aiInsights.recommendation}
+                                        </p>
                                       </div>
                                     </div>
                                   </div>
@@ -1266,11 +1375,15 @@ export default function InvestmentRoundsPage() {
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Average Impact Score</span>
-                    <span className="font-bold text-lg text-blue-600">{avgImpactScore.toFixed(0)}</span>
+                    <span className="font-bold text-lg text-blue-600">
+                      {avgImpactScore.toFixed(0)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Average Sustainability Score</span>
-                    <span className="font-bold text-lg text-green-600">{avgSustainabilityScore.toFixed(0)}</span>
+                    <span className="font-bold text-lg text-green-600">
+                      {avgSustainabilityScore.toFixed(0)}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Women-Led Rounds</span>
@@ -1281,7 +1394,8 @@ export default function InvestmentRoundsPage() {
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Disability-Inclusive</span>
                     <span className="font-bold text-lg text-indigo-600">
-                      {disabilityInclusiveRounds} ({((disabilityInclusiveRounds / totalRounds) * 100).toFixed(0)}%)
+                      {disabilityInclusiveRounds} (
+                      {((disabilityInclusiveRounds / totalRounds) * 100).toFixed(0)}%)
                     </span>
                   </div>
                 </div>
@@ -1303,18 +1417,25 @@ export default function InvestmentRoundsPage() {
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Communities Served</span>
-                    <span className="font-bold text-lg text-blue-600">{totalCommunitiesServed}</span>
+                    <span className="font-bold text-lg text-blue-600">
+                      {totalCommunitiesServed}
+                    </span>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Carbon Reduction</span>
                     <span className="font-bold text-lg text-green-600">
-                      {rounds.reduce((sum, r) => sum + r.metrics.carbonReduction, 0).toFixed(1)}t CO2
+                      {rounds.reduce((sum, r) => sum + r.metrics.carbonReduction, 0).toFixed(1)}t
+                      CO2
                     </span>
                   </div>
                   <div className="flex items-center justify-between p-3 border rounded-lg">
                     <span>Avg Women Leadership</span>
                     <span className="font-bold text-lg text-purple-600">
-                      {(rounds.reduce((sum, r) => sum + r.metrics.womenLeadership, 0) / rounds.length).toFixed(0)}%
+                      {(
+                        rounds.reduce((sum, r) => sum + r.metrics.womenLeadership, 0) /
+                        rounds.length
+                      ).toFixed(0)}
+                      %
                     </span>
                   </div>
                 </div>
@@ -1331,8 +1452,11 @@ export default function InvestmentRoundsPage() {
                 {rounds
                   .sort((a, b) => b.gedsiScore - a.gedsiScore)
                   .slice(0, 5)
-                  .map(round => (
-                    <div key={round.id} className="flex items-center justify-between p-3 border rounded-lg">
+                  .map((round) => (
+                    <div
+                      key={round.id}
+                      className="flex items-center justify-between p-3 border rounded-lg"
+                    >
                       <div>
                         <div className="font-medium">{round.company}</div>
                         <div className="text-sm text-muted-foreground">
@@ -1343,7 +1467,9 @@ export default function InvestmentRoundsPage() {
                         </div>
                       </div>
                       <div className="text-right">
-                        <div className={`font-bold text-lg ${getGedsiScoreColor(round.gedsiScore)}`}>
+                        <div
+                          className={`font-bold text-lg ${getGedsiScoreColor(round.gedsiScore)}`}
+                        >
                           {round.gedsiScore}
                         </div>
                         <div className="text-sm text-muted-foreground">
@@ -1368,11 +1494,15 @@ export default function InvestmentRoundsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {["low", "medium", "high"].map((riskLevel) => {
-                    const count = rounds.filter(r => r.aiInsights.riskLevel === riskLevel).length
-                    const percentage = totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : "0"
+                  {['low', 'medium', 'high'].map((riskLevel) => {
+                    const count = rounds.filter((r) => r.aiInsights.riskLevel === riskLevel).length
+                    const percentage =
+                      totalRounds > 0 ? ((count / totalRounds) * 100).toFixed(1) : '0'
                     return (
-                      <div key={riskLevel} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={riskLevel}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div className="flex items-center gap-2">
                           {getRiskLevelIcon(riskLevel)}
                           <span className="capitalize">{riskLevel} Risk</span>
@@ -1397,7 +1527,7 @@ export default function InvestmentRoundsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {rounds.slice(0, 3).map(round => (
+                  {rounds.slice(0, 3).map((round) => (
                     <div key={round.id} className="p-3 border rounded-lg">
                       <div className="font-medium text-sm mb-1">{round.company}</div>
                       <p className="text-xs text-muted-foreground">
@@ -1418,9 +1548,9 @@ export default function InvestmentRoundsPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {Array.from(new Set(rounds.flatMap(r => r.aiInsights.keyStrengths)))
+                  {Array.from(new Set(rounds.flatMap((r) => r.aiInsights.keyStrengths)))
                     .slice(0, 8)
-                    .map(strength => (
+                    .map((strength) => (
                       <Badge key={strength} variant="outline" className="text-xs">
                         {strength}
                       </Badge>
@@ -1436,11 +1566,13 @@ export default function InvestmentRoundsPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {rounds.map(round => (
+                {rounds.map((round) => (
                   <div key={round.id} className="border rounded-lg p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div>
-                        <h4 className="font-medium">{round.company} - {round.roundType}</h4>
+                        <h4 className="font-medium">
+                          {round.company} - {round.roundType}
+                        </h4>
                         <p className="text-sm text-muted-foreground">{round.inclusionFocus}</p>
                       </div>
                       <div className="flex items-center gap-2">
@@ -1455,7 +1587,7 @@ export default function InvestmentRoundsPage() {
                           Key Strengths
                         </h5>
                         <div className="space-y-1">
-                          {round.aiInsights.keyStrengths.map(strength => (
+                          {round.aiInsights.keyStrengths.map((strength) => (
                             <Badge key={strength} variant="outline" className="text-xs mr-1">
                               {strength}
                             </Badge>
@@ -1468,7 +1600,7 @@ export default function InvestmentRoundsPage() {
                           Areas for Improvement
                         </h5>
                         <div className="space-y-1">
-                          {round.aiInsights.areasForImprovement.map(area => (
+                          {round.aiInsights.areasForImprovement.map((area) => (
                             <Badge key={area} variant="secondary" className="text-xs mr-1">
                               {area}
                             </Badge>
@@ -1497,7 +1629,9 @@ export default function InvestmentRoundsPage() {
             <CardContent>
               <div className="space-y-6">
                 {rounds
-                  .sort((a, b) => new Date(a.closingDate).getTime() - new Date(b.closingDate).getTime())
+                  .sort(
+                    (a, b) => new Date(a.closingDate).getTime() - new Date(b.closingDate).getTime(),
+                  )
                   .map((round, index) => (
                     <div key={round.id} className="flex items-start gap-4">
                       <div className="flex flex-col items-center">
@@ -1508,19 +1642,30 @@ export default function InvestmentRoundsPage() {
                       </div>
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center justify-between">
-                          <h4 className="font-medium">{round.company} - {round.roundType}</h4>
+                          <h4 className="font-medium">
+                            {round.company} - {round.roundType}
+                          </h4>
                           <div className="flex items-center gap-2">
                             {getStatusBadge(round.status)}
-                            <span className="text-sm text-muted-foreground">{round.closingDate}</span>
+                            <span className="text-sm text-muted-foreground">
+                              {round.closingDate}
+                            </span>
                           </div>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                          Target: {round.targetAmount} | Raised: {round.raisedAmount} | Lead: {round.leadInvestor}
+                          Target: {round.targetAmount} | Raised: {round.raisedAmount} | Lead:{' '}
+                          {round.leadInvestor}
                         </p>
                         <div className="flex items-center gap-4 text-sm">
-                          <span className="text-muted-foreground">Valuation: {round.valuation}</span>
-                          <span className="text-muted-foreground">Ownership: {round.ownership}%</span>
-                          <span className="text-muted-foreground">{round.participants.length} participants</span>
+                          <span className="text-muted-foreground">
+                            Valuation: {round.valuation}
+                          </span>
+                          <span className="text-muted-foreground">
+                            Ownership: {round.ownership}%
+                          </span>
+                          <span className="text-muted-foreground">
+                            {round.participants.length} participants
+                          </span>
                         </div>
                       </div>
                     </div>
@@ -1542,37 +1687,50 @@ export default function InvestmentRoundsPage() {
               <div className="grid gap-4 md:grid-cols-2">
                 <div className="space-y-4">
                   <h4 className="font-medium">Top Lead Investors</h4>
-                  {Array.from(new Set(rounds.map(r => r.leadInvestor)))
-                    .map(investor => {
-                      const investorRounds = rounds.filter(r => r.leadInvestor === investor)
-                      const totalAmount = investorRounds.reduce((sum, r) => {
-                        const amount = parseFloat(r.targetAmount.replace(/[^0-9.]/g, ''))
-                        return sum + amount
-                      }, 0)
-                      return (
-                        <div key={investor} className="flex items-center justify-between p-3 border rounded-lg">
-                          <span className="font-medium">{investor}</span>
-                          <div className="text-right">
-                            <div className="font-medium">${totalAmount.toFixed(1)}M</div>
-                            <div className="text-sm text-muted-foreground">{investorRounds.length} rounds</div>
+                  {Array.from(new Set(rounds.map((r) => r.leadInvestor))).map((investor) => {
+                    const investorRounds = rounds.filter((r) => r.leadInvestor === investor)
+                    const totalAmount = investorRounds.reduce((sum, r) => {
+                      const amount = parseFloat(r.targetAmount.replace(/[^0-9.]/g, ''))
+                      return sum + amount
+                    }, 0)
+                    return (
+                      <div
+                        key={investor}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
+                        <span className="font-medium">{investor}</span>
+                        <div className="text-right">
+                          <div className="font-medium">${totalAmount.toFixed(1)}M</div>
+                          <div className="text-sm text-muted-foreground">
+                            {investorRounds.length} rounds
                           </div>
                         </div>
-                      )
-                    })}
+                      </div>
+                    )
+                  })}
                 </div>
                 <div className="space-y-4">
                   <h4 className="font-medium">Sector Performance</h4>
                   {sectors.slice(0, 5).map((sector) => {
-                    const sectorRounds = rounds.filter(r => r.sector === sector)
-                    const avgGedsi = sectorRounds.length > 0 ? sectorRounds.reduce((sum, r) => sum + r.gedsiScore, 0) / sectorRounds.length : 0
+                    const sectorRounds = rounds.filter((r) => r.sector === sector)
+                    const avgGedsi =
+                      sectorRounds.length > 0
+                        ? sectorRounds.reduce((sum, r) => sum + r.gedsiScore, 0) /
+                          sectorRounds.length
+                        : 0
                     return (
-                      <div key={sector} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={sector}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <span className="font-medium">{sector}</span>
                         <div className="text-right">
                           <div className={`font-medium ${getGedsiScoreColor(avgGedsi)}`}>
                             GEDSI: {avgGedsi.toFixed(0)}
                           </div>
-                          <div className="text-sm text-muted-foreground">{sectorRounds.length} rounds</div>
+                          <div className="text-sm text-muted-foreground">
+                            {sectorRounds.length} rounds
+                          </div>
                         </div>
                       </div>
                     )
@@ -1587,9 +1745,7 @@ export default function InvestmentRoundsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Round Documents</CardTitle>
-              <CardDescription>
-                Manage documents related to investment rounds
-              </CardDescription>
+              <CardDescription>Manage documents related to investment rounds</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -1615,4 +1771,4 @@ export default function InvestmentRoundsPage() {
       </Tabs>
     </div>
   )
-} 
+}

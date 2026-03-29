@@ -22,7 +22,6 @@ import {
   CheckCircle,
   ArrowRight,
   Zap,
-  Timer,
   Globe,
   Target,
   MessageSquare,

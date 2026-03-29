@@ -3,8 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { ChevronLeft, ChevronRight, Play, Pause, Star, TrendingUp, Users, Target } from "lucide-react"
+import { Star, TrendingUp, Users, Target } from "lucide-react"
 
 interface SuccessStory {
   id: number

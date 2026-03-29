@@ -22,14 +22,11 @@ import {
   AlertTriangle,
   Info,
   CheckCircle,
-  Clock,
   Users,
   DollarSign,
   Target,
   Settings,
-  Eye,
-  Archive,
-  Trash2
+  Archive
 } from "lucide-react"
 
 interface Notification {

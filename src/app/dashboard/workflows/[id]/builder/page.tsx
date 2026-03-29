@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef, useCallback } from "react"
 import { useParams } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -26,12 +25,9 @@ import {
   Users, 
   Building2, 
   Target,
-  MessageSquare,
   Calendar,
   Globe,
   Zap,
-  Eye,
-  Code,
   History,
   AlertCircle,
   CheckCircle,

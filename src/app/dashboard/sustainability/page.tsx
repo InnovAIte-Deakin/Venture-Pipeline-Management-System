@@ -6,22 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { 
-  Globe, 
-  TrendingUp,
+import {
   Leaf,
-  Zap,
   Droplets,
   Recycle,
   Target,
   Activity,
-  CheckCircle,
-  Download,
-  Building2,
-  Thermometer,
-  Wind,
   Sun,
-  Users,
   Sparkles,
   Brain,
   Layers,
@@ -32,7 +23,6 @@ import {
   RefreshCw,
   Award,
   Lightbulb,
-  Shield,
   Infinity,
   Eye,
   Plus
