@@ -16,7 +16,6 @@ import {
 import {
   House,
   Building2,
-  Target,
   DollarSign,
   BarChart3,
   TrendingUp,
@@ -28,12 +27,9 @@ import {
   Brain,
   BarChart,
   Calendar,
-  MapPin,
   Globe,
   Shield,
-  Zap,
   Rocket,
-  Star,
   Award,
   Heart,
   Activity,
@@ -46,8 +42,6 @@ import {
   User,
   LogOut,
   Menu,
-  X,
-  Home,
   HelpCircle
 } from "lucide-react"
 import { Logo } from "@/components/logo"

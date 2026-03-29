@@ -7,17 +7,11 @@ import {
   TrendingUp,
   Upload,
   DollarSign,
-  MessageSquare,
   Lightbulb,
-  AlertCircle,
-  CheckCircle,
   Clock,
   Plus,
-  TrendingDown,
   Bell,
-  FileText,
   Rocket,
-  Shield,
 } from "lucide-react";
 
 export default function ImpactDashboard() {

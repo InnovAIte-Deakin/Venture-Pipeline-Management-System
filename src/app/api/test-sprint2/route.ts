@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
 
 // POST /api/test-sprint2 - Test Sprint 2 integration features
 export async function POST(request: NextRequest) {

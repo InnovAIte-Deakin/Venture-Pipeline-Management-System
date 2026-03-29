@@ -5,26 +5,18 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { 
   Heart, 
-  Plus, 
-  Eye, 
-  Edit, 
-  MoreHorizontal,
+  Plus,
   Users,
   Target,
-  BarChart3,
   Activity,
   Clock,
   CheckCircle,
   AlertTriangle,
-  Filter,
   Search,
-  Building2,
   ArrowUpRight,
   ArrowDownRight,
   Globe,
@@ -32,23 +24,14 @@ import {
   Briefcase,
   Leaf,
   RefreshCw,
-  TrendingUp,
   Award,
   Lightbulb,
   Shield,
   Zap,
   MapPin,
-  Calendar,
-  DollarSign,
   UserCheck,
-  Sparkles,
-  LineChart,
-  PieChart,
-  BarChart,
-  ArrowRight,
-  ExternalLink
+  PieChart
 } from "lucide-react"
-import { ResponsiveContainer, LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, AreaChart, Area, PieChart as RechartsPieChart, Cell, BarChart as RechartsBarChart, Bar } from "recharts"
 
 interface SocialImpactMetric {
   id: string

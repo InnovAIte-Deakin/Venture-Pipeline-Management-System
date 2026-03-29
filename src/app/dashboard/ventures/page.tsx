@@ -30,7 +30,6 @@ import {
 import {
   Building2,
   Search,
-  Filter,
   Plus,
   Eye,
   Edit,

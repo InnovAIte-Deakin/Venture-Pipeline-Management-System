@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { AIServices } from '@/lib/ai-services'
-import { IRIS_GEDSI_METRICS } from '@/lib/iris-metrics'
 
 export async function POST(request: NextRequest) {
   try {

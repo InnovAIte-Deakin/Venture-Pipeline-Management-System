@@ -11,7 +11,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { 
   TrendingUp, 
   Plus, 
@@ -22,40 +21,24 @@ import {
   Calendar,
   Target,
   BarChart3,
-  PieChart,
-  Activity,
-  Clock,
   CheckCircle,
-  AlertTriangle,
   Filter,
   Search,
   Building2,
   ArrowUpRight,
   ArrowDownRight,
   Users,
-  FileText,
   Briefcase,
   Calculator,
   LineChart,
   Globe,
   Zap,
   Award,
-  Shield,
-  Bell,
   RefreshCw,
   AlertCircle,
-  XCircle,
   Lightbulb,
   Database,
-  Settings,
-  Download,
-  Share2,
   Star,
-  MapPin,
-  Phone,
-  Mail,
-  ExternalLink,
-  Layers,
   TrendingDown
 } from "lucide-react"
 

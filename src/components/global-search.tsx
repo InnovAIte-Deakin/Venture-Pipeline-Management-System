@@ -16,8 +16,7 @@ import {
   X,
   Loader2,
   Clock,
-  ChevronRight,
-  Command
+  ChevronRight
 } from "lucide-react"
 
 interface SearchResult {

@@ -111,7 +111,11 @@ async function main() {
       nextReviewAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
       documentsMetadata: { pitchDeck: true, termSheet: false, dataRoom: true },
       financials: { runwayMonths: 12, burnRate: 25000, arpu: 18, churnPct: 3.2 },
-      aiAnalysis: { readinessScore: 78, risks: ['supply chain'], recommendations: ['optimize BOM'] },
+      aiAnalysis: {
+        readinessScore: 78,
+        risks: ['supply chain'],
+        recommendations: ['optimize BOM'],
+      },
     },
   })
 
@@ -141,7 +145,11 @@ async function main() {
       nextReviewAt: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
       documentsMetadata: { pitchDeck: true, farmerSurveys: true },
       financials: { runwayMonths: 8, burnRate: 12000, cac: 9, ltv: 140 },
-      aiAnalysis: { readinessScore: 64, risks: ['go-to-market'], recommendations: ['pilot cooperatives'] },
+      aiAnalysis: {
+        readinessScore: 64,
+        risks: ['go-to-market'],
+        recommendations: ['pilot cooperatives'],
+      },
     },
   })
 
@@ -172,7 +180,11 @@ async function main() {
       screeningDate: new Date(Date.now() - 350 * 24 * 60 * 60 * 1000), // ~1 year ago
       dueDiligenceStart: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       financials: { runwayMonths: 18, burnRate: 60000, takeRatePct: 1.2, txVolume: 4200000 },
-      aiAnalysis: { readinessScore: 85, risks: ['regulatory'], recommendations: ['partner with bank'] },
+      aiAnalysis: {
+        readinessScore: 85,
+        risks: ['regulatory'],
+        recommendations: ['partner with bank'],
+      },
     },
   })
 
@@ -204,7 +216,11 @@ async function main() {
       dueDiligenceEnd: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       investmentReadyAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
       financials: { runwayMonths: 10, burnRate: 35000, clinics: 85 },
-      aiAnalysis: { readinessScore: 90, risks: ['interoperability'], recommendations: ['HL7 adapters'] },
+      aiAnalysis: {
+        readinessScore: 90,
+        risks: ['interoperability'],
+        recommendations: ['HL7 adapters'],
+      },
     },
   })
 
@@ -233,7 +249,11 @@ async function main() {
       intakeDate: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000), // 45 days ago
       screeningDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       financials: { runwayMonths: 14, burnRate: 15000, cohorts: 32 },
-      aiAnalysis: { readinessScore: 72, risks: ['scalability'], recommendations: ['train trainers'] },
+      aiAnalysis: {
+        readinessScore: 72,
+        risks: ['scalability'],
+        recommendations: ['train trainers'],
+      },
     },
   })
 
@@ -266,7 +286,11 @@ async function main() {
       investmentReadyAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 3 months ago
       fundedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       financials: { runwayMonths: 24, burnRate: 45000, gmPct: 44 },
-      aiAnalysis: { readinessScore: 88, risks: ['fragmented suppliers'], recommendations: ['collector app'] },
+      aiAnalysis: {
+        readinessScore: 88,
+        risks: ['fragmented suppliers'],
+        recommendations: ['collector app'],
+      },
     },
   })
 
@@ -328,10 +352,13 @@ async function main() {
       investmentReadyAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 3 months ago
       fundedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       financials: { runwayMonths: 16, burnRate: 400000, avgConsultFee: 3.5 },
-      aiAnalysis: { readinessScore: 82, risks: ['connectivity'], recommendations: ['offline mode'] },
+      aiAnalysis: {
+        readinessScore: 82,
+        risks: ['connectivity'],
+        recommendations: ['offline mode'],
+      },
     },
   })
-
 
   // Legacy metrics for backward compatibility
   await prisma.gEDSIMetric.createMany({
@@ -455,7 +482,8 @@ async function main() {
   const ventureI = await prisma.venture.create({
     data: {
       name: 'CleanWater Solutions',
-      description: 'IoT-enabled water purification systems for rural communities, providing clean drinking water and real-time quality monitoring.',
+      description:
+        'IoT-enabled water purification systems for rural communities, providing clean drinking water and real-time quality monitoring.',
       sector: 'Water & Sanitation',
       stage: 'SERIES_A',
       status: 'ACTIVE',
@@ -477,21 +505,26 @@ async function main() {
       dueDiligenceEnd: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 3 months ago
       investmentReadyAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 2 months ago
       fundedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
-      documentsMetadata: { pitchDeck: true, termSheet: true, dataRoom: true, waterQualityReports: true },
-      financials: { 
-        runwayMonths: 18, 
-        burnRate: 85000, 
-        installations: 150, 
+      documentsMetadata: {
+        pitchDeck: true,
+        termSheet: true,
+        dataRoom: true,
+        waterQualityReports: true,
+      },
+      financials: {
+        runwayMonths: 18,
+        burnRate: 85000,
+        installations: 150,
         avgRevenuePerInstallation: 1200,
         customerRetentionRate: 94,
-        waterQualityImprovement: 98.5
+        waterQualityImprovement: 98.5,
       },
-      aiAnalysis: { 
-        readinessScore: 92, 
-        risks: ['maintenance logistics'], 
+      aiAnalysis: {
+        readinessScore: 92,
+        risks: ['maintenance logistics'],
         recommendations: ['predictive maintenance AI', 'local technician training'],
         marketSize: '2.1B',
-        competitiveAdvantage: 'IoT integration'
+        competitiveAdvantage: 'IoT integration',
       },
       founderTypes: 'MIXED',
     },
@@ -500,7 +533,8 @@ async function main() {
   const ventureJ = await prisma.venture.create({
     data: {
       name: 'GreenTransport Hub',
-      description: 'Electric vehicle charging network with renewable energy integration, focusing on last-mile delivery and public transport.',
+      description:
+        'Electric vehicle charging network with renewable energy integration, focusing on last-mile delivery and public transport.',
       sector: 'Transportation',
       stage: 'SEED',
       status: 'ACTIVE',
@@ -520,20 +554,20 @@ async function main() {
       screeningDate: new Date(Date.now() - 160 * 24 * 60 * 60 * 1000), // ~6 months ago
       nextReviewAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
       documentsMetadata: { pitchDeck: true, feasibilityStudy: true, pilotResults: true },
-      financials: { 
-        runwayMonths: 12, 
-        burnRate: 45000, 
-        chargingStations: 25, 
+      financials: {
+        runwayMonths: 12,
+        burnRate: 45000,
+        chargingStations: 25,
         dailyChargingSessions: 180,
-        avgRevenuePerSession: 8.50,
-        carbonOffsetTons: 1250
+        avgRevenuePerSession: 8.5,
+        carbonOffsetTons: 1250,
       },
-      aiAnalysis: { 
-        readinessScore: 76, 
-        risks: ['grid infrastructure'], 
+      aiAnalysis: {
+        readinessScore: 76,
+        risks: ['grid infrastructure'],
         recommendations: ['battery storage systems', 'partnership with utilities'],
         marketSize: '850M',
-        competitiveAdvantage: 'renewable integration'
+        competitiveAdvantage: 'renewable integration',
       },
       founderTypes: 'MIXED',
     },
@@ -542,7 +576,8 @@ async function main() {
   const ventureK = await prisma.venture.create({
     data: {
       name: 'AgriTech Analytics',
-      description: 'AI-powered crop monitoring and yield prediction platform using satellite imagery and IoT sensors for smallholder farmers.',
+      description:
+        'AI-powered crop monitoring and yield prediction platform using satellite imagery and IoT sensors for smallholder farmers.',
       sector: 'Agriculture',
       stage: 'DUE_DILIGENCE',
       status: 'ACTIVE',
@@ -562,21 +597,26 @@ async function main() {
       screeningDate: new Date(Date.now() - 220 * 24 * 60 * 60 * 1000), // ~8 months ago
       dueDiligenceStart: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000), // 45 days ago
       nextReviewAt: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000),
-      documentsMetadata: { pitchDeck: true, technicalSpecs: true, pilotData: true, farmerTestimonials: true },
-      financials: { 
-        runwayMonths: 14, 
-        burnRate: 55000, 
-        activeFarms: 450, 
+      documentsMetadata: {
+        pitchDeck: true,
+        technicalSpecs: true,
+        pilotData: true,
+        farmerTestimonials: true,
+      },
+      financials: {
+        runwayMonths: 14,
+        burnRate: 55000,
+        activeFarms: 450,
         avgYieldIncrease: 23,
         subscriptionRevenue: 180000,
-        farmerSatisfactionScore: 4.6
+        farmerSatisfactionScore: 4.6,
       },
-      aiAnalysis: { 
-        readinessScore: 84, 
-        risks: ['data connectivity'], 
+      aiAnalysis: {
+        readinessScore: 84,
+        risks: ['data connectivity'],
         recommendations: ['offline mode development', 'local data centers'],
         marketSize: '1.8B',
-        competitiveAdvantage: 'satellite + IoT fusion'
+        competitiveAdvantage: 'satellite + IoT fusion',
       },
       founderTypes: 'MIXED',
     },
@@ -585,7 +625,8 @@ async function main() {
   const ventureL = await prisma.venture.create({
     data: {
       name: 'EduTech Platform',
-      description: 'Comprehensive online learning platform with offline capabilities, focusing on STEM education for underserved communities.',
+      description:
+        'Comprehensive online learning platform with offline capabilities, focusing on STEM education for underserved communities.',
       sector: 'Education',
       stage: 'INVESTMENT_READY',
       status: 'ACTIVE',
@@ -607,21 +648,26 @@ async function main() {
       dueDiligenceEnd: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       investmentReadyAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000), // 10 days ago
       nextReviewAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-      documentsMetadata: { pitchDeck: true, curriculum: true, impactReport: true, teacherTraining: true },
-      financials: { 
-        runwayMonths: 20, 
-        burnRate: 75000, 
-        activeStudents: 12500, 
+      documentsMetadata: {
+        pitchDeck: true,
+        curriculum: true,
+        impactReport: true,
+        teacherTraining: true,
+      },
+      financials: {
+        runwayMonths: 20,
+        burnRate: 75000,
+        activeStudents: 12500,
         completionRate: 78,
         avgLearningHours: 45,
-        teacherCertifications: 280
+        teacherCertifications: 280,
       },
-      aiAnalysis: { 
-        readinessScore: 89, 
-        risks: ['content localization'], 
+      aiAnalysis: {
+        readinessScore: 89,
+        risks: ['content localization'],
         recommendations: ['local language support', 'cultural adaptation'],
         marketSize: '3.2B',
-        competitiveAdvantage: 'offline-first design'
+        competitiveAdvantage: 'offline-first design',
       },
       founderTypes: 'MIXED',
     },
@@ -630,7 +676,8 @@ async function main() {
   const ventureM = await prisma.venture.create({
     data: {
       name: 'HealthConnect Mobile',
-      description: 'Telemedicine platform with AI diagnostics, connecting rural patients with urban specialists through mobile technology.',
+      description:
+        'Telemedicine platform with AI diagnostics, connecting rural patients with urban specialists through mobile technology.',
       sector: 'Healthcare',
       stage: 'FUNDED',
       status: 'ACTIVE',
@@ -652,21 +699,26 @@ async function main() {
       dueDiligenceEnd: new Date(Date.now() - 120 * 24 * 60 * 60 * 1000), // 4 months ago
       investmentReadyAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 2 months ago
       fundedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000), // 15 days ago
-      documentsMetadata: { pitchDeck: true, clinicalTrials: true, regulatoryApproval: true, patientData: true },
-      financials: { 
-        runwayMonths: 24, 
-        burnRate: 120000, 
-        activePatients: 8500, 
-        consultationsPerMonth: 2500,
-        avgConsultationFee: 12.50,
-        diagnosticAccuracy: 94.2
+      documentsMetadata: {
+        pitchDeck: true,
+        clinicalTrials: true,
+        regulatoryApproval: true,
+        patientData: true,
       },
-      aiAnalysis: { 
-        readinessScore: 95, 
-        risks: ['regulatory compliance'], 
+      financials: {
+        runwayMonths: 24,
+        burnRate: 120000,
+        activePatients: 8500,
+        consultationsPerMonth: 2500,
+        avgConsultationFee: 12.5,
+        diagnosticAccuracy: 94.2,
+      },
+      aiAnalysis: {
+        readinessScore: 95,
+        risks: ['regulatory compliance'],
         recommendations: ['expand to neighboring countries', 'partner with insurance'],
         marketSize: '4.1B',
-        competitiveAdvantage: 'AI diagnostics integration'
+        competitiveAdvantage: 'AI diagnostics integration',
       },
       founderTypes: 'MIXED',
     },
@@ -675,7 +727,8 @@ async function main() {
   const ventureN = await prisma.venture.create({
     data: {
       name: 'Renewable Energy Grid',
-      description: 'Microgrid solutions combining solar, wind, and battery storage for rural electrification and industrial applications.',
+      description:
+        'Microgrid solutions combining solar, wind, and battery storage for rural electrification and industrial applications.',
       sector: 'Energy',
       stage: 'SCREENING',
       status: 'ACTIVE',
@@ -695,20 +748,20 @@ async function main() {
       screeningDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       nextReviewAt: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000),
       documentsMetadata: { pitchDeck: true, feasibilityStudy: true, pilotResults: true },
-      financials: { 
-        runwayMonths: 8, 
-        burnRate: 35000, 
-        microgridsDeployed: 12, 
+      financials: {
+        runwayMonths: 8,
+        burnRate: 35000,
+        microgridsDeployed: 12,
         householdsConnected: 480,
         avgRevenuePerHousehold: 25,
-        energyReliability: 99.2
+        energyReliability: 99.2,
       },
-      aiAnalysis: { 
-        readinessScore: 71, 
-        risks: ['installation complexity'], 
+      aiAnalysis: {
+        readinessScore: 71,
+        risks: ['installation complexity'],
         recommendations: ['simplify installation process', 'local technician training'],
         marketSize: '2.8B',
-        competitiveAdvantage: 'hybrid energy optimization'
+        competitiveAdvantage: 'hybrid energy optimization',
       },
       founderTypes: 'MIXED',
     },
@@ -717,7 +770,8 @@ async function main() {
   const ventureO = await prisma.venture.create({
     data: {
       name: 'FinTech Inclusion',
-      description: 'Digital banking platform with micro-lending capabilities, focusing on financial inclusion for women entrepreneurs.',
+      description:
+        'Digital banking platform with micro-lending capabilities, focusing on financial inclusion for women entrepreneurs.',
       sector: 'Financial Services',
       stage: 'SERIES_B',
       status: 'ACTIVE',
@@ -739,31 +793,52 @@ async function main() {
       dueDiligenceEnd: new Date(Date.now() - 180 * 24 * 60 * 60 * 1000), // 6 months ago
       investmentReadyAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 3 months ago
       fundedAt: new Date(Date.now() - 45 * 24 * 60 * 60 * 1000), // 45 days ago
-      documentsMetadata: { pitchDeck: true, financialStatements: true, regulatoryCompliance: true, impactMetrics: true },
-      financials: { 
-        runwayMonths: 30, 
-        burnRate: 180000, 
-        activeUsers: 25000, 
+      documentsMetadata: {
+        pitchDeck: true,
+        financialStatements: true,
+        regulatoryCompliance: true,
+        impactMetrics: true,
+      },
+      financials: {
+        runwayMonths: 30,
+        burnRate: 180000,
+        activeUsers: 25000,
         loansDisbursed: 8500,
         avgLoanSize: 450,
-        repaymentRate: 96.8
+        repaymentRate: 96.8,
       },
-      aiAnalysis: { 
-        readinessScore: 93, 
-        risks: ['regulatory changes'], 
+      aiAnalysis: {
+        readinessScore: 93,
+        risks: ['regulatory changes'],
         recommendations: ['expand to regional markets', 'develop insurance products'],
         marketSize: '5.2B',
-        competitiveAdvantage: 'women-focused approach'
+        competitiveAdvantage: 'women-focused approach',
       },
       founderTypes: 'MIXED',
     },
   })
 
-  const allVentures = [ventureA, ventureB, ventureC, ventureD, ventureE, ventureF, ventureG, ventureH, ventureI, ventureJ, ventureK, ventureL, ventureM, ventureN, ventureO]
+  const allVentures = [
+    ventureA,
+    ventureB,
+    ventureC,
+    ventureD,
+    ventureE,
+    ventureF,
+    ventureG,
+    ventureH,
+    ventureI,
+    ventureJ,
+    ventureK,
+    ventureL,
+    ventureM,
+    ventureN,
+    ventureO,
+  ]
 
   // Comprehensive GEDSI metrics for all ventures
   const gedsiMetricsData = []
-  
+
   for (const v of allVentures) {
     // Base metrics for all ventures
     gedsiMetricsData.push(
@@ -844,7 +919,7 @@ async function main() {
         createdById: admin.id,
         verificationDate: new Date(),
         notes: 'Good accessibility features implemented',
-      }
+      },
     )
 
     // Sector-specific metrics
@@ -922,7 +997,7 @@ async function main() {
   }
 
   await prisma.gEDSIMetric.createMany({
-    data: gedsiMetricsData
+    data: gedsiMetricsData,
   })
 
   for (const v of allVentures) {
@@ -958,13 +1033,21 @@ async function main() {
 
   // Enhanced capital activities per venture
   for (const v of allVentures) {
-    const currency = v.location.includes('Kenya') ? 'KES' :
-                    v.location.includes('Nigeria') ? 'NGN' :
-                    v.location.includes('Uganda') ? 'UGX' :
-                    v.location.includes('Ghana') ? 'GHS' :
-                    v.location.includes('Tanzania') ? 'TZS' :
-                    v.location.includes('Ethiopia') ? 'ETB' :
-                    v.location.includes('Rwanda') ? 'RWF' : 'USD'
+    const currency = v.location.includes('Kenya')
+      ? 'KES'
+      : v.location.includes('Nigeria')
+        ? 'NGN'
+        : v.location.includes('Uganda')
+          ? 'UGX'
+          : v.location.includes('Ghana')
+            ? 'GHS'
+            : v.location.includes('Tanzania')
+              ? 'TZS'
+              : v.location.includes('Ethiopia')
+                ? 'ETB'
+                : v.location.includes('Rwanda')
+                  ? 'RWF'
+                  : 'USD'
 
     const baseAmount = v.fundingRaised / 4 // Distribute across 4 activities
     const activities = [
@@ -995,13 +1078,16 @@ async function main() {
         type: 'EQUITY',
         amount: Math.floor(baseAmount * 0.4),
         currency,
-        status: v.stage === 'FUNDED' || v.stage === 'SERIES_A' || v.stage === 'SERIES_B' ? 'COMPLETED' : 'PENDING',
+        status:
+          v.stage === 'FUNDED' || v.stage === 'SERIES_A' || v.stage === 'SERIES_B'
+            ? 'COMPLETED'
+            : 'PENDING',
         description: `${v.stage} round investment`,
         investorName: v.stage === 'SERIES_B' ? 'Growth Capital Fund' : 'Impact Syndicate',
-        terms: { 
+        terms: {
           boardSeat: v.stage === 'SERIES_A' || v.stage === 'SERIES_B',
           liquidationPreference: v.stage === 'SERIES_B' ? 1.5 : 1.0,
-          antiDilution: v.stage === 'SERIES_B'
+          antiDilution: v.stage === 'SERIES_B',
         },
       },
       {
@@ -1215,5 +1301,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect()
   })
-
-

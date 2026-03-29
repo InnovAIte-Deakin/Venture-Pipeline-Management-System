@@ -5,15 +5,14 @@ import { useRouter } from "next/navigation"
 import { AnalyticsDashboard } from "@/components/enterprise/analytics-dashboard"
 import { AdvancedDataTable } from "@/components/enterprise/advanced-data-table"
 import { AdvancedFilters } from "@/components/enterprise/advanced-filters"
-import { NotificationCenter, sampleNotifications } from "@/components/enterprise/notification-center"
+import { sampleNotifications } from "@/components/enterprise/notification-center"
 import { WorkflowDashboardTab } from "@/components/enterprise/workflow-dashboard-tab"
 import { useTheme } from "@/components/theme-provider"
 import { useToast } from "@/components/ui/toast"
-import { calculateGEDSIScore, calculateGEDSIComplianceRate } from "@/lib/gedsi-utils"
+import { calculateGEDSIScore } from "@/lib/gedsi-utils"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import {
   Select,
@@ -22,12 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
+
 import {
   Tabs,
   TabsContent,
@@ -35,46 +30,19 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs"
 import {
-  Search,
-  Bell,
-  Settings,
-  Filter,
-  Download,
   RefreshCw,
   TrendingUp,
-  TrendingDown,
-  MoreHorizontal,
-  Calendar,
-  Users,
   DollarSign,
   Target,
   BarChart3,
   Building2,
   Globe,
-  Zap,
   AlertCircle,
-  CheckCircle,
-  Clock,
-  ArrowUpRight,
-  ArrowDownRight,
   Plus,
-  Eye,
-  Edit,
-  Share,
-  Activity,
-  PieChart,
-  LineChart,
-  Maximize2,
   Grid3X3,
-  List,
-  Map,
-  Database,
   FileText,
   UserCheck,
-  Shield,
   Workflow,
-  Moon,
-  Sun,
   Brain,
   Award,
   Heart

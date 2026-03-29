@@ -5,22 +5,17 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Input } from "@/components/ui/input"
 import {
   TrendingUp,
-  TrendingDown,
   Download,
   Users,
   Clock,
-  Percent,
   LineChart,
   BarChart3,
   PieChart,
   MapPin,
   Lightbulb,
   RefreshCw,
-  Filter,
-  Calendar,
   Target,
   Zap,
   Activity,
@@ -39,9 +34,9 @@ import {
   ArrowDown,
   Plus
 } from "lucide-react"
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, BarChart, Bar, Cell, Pie, PieChart as RCPieChart, LineChart as RCLineChart, Line, Tooltip, Legend } from "recharts"
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Cell, Pie, PieChart as RCPieChart, LineChart as RCLineChart, Line, Tooltip, Legend } from "recharts"
 import { useEffect, useMemo, useState } from "react"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { ChartContainer } from "@/components/ui/chart"
 
 interface AnalyticsData {
   ventures: any[]

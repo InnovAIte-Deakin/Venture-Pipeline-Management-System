@@ -4,12 +4,7 @@ import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Target,
-  DollarSign,
-  BarChart3,
-  Users,
-  TrendingUp,
   FileText,
-  PieChart,
   Settings,
   HelpCircle,
 } from "lucide-react";

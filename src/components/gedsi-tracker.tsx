@@ -1,7 +1,6 @@
 "use client"
 
 import { useState, useEffect, useMemo } from 'react'
-import { calculateGEDSIScore } from "@/lib/gedsi-utils"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -48,12 +47,9 @@ import {
   ResponsiveContainer,
   PieChart,
   Pie,
-  Cell,
-  LineChart,
-  Line
+  Cell
 } from 'recharts'
 import {
-  Target,
   TrendingUp,
   CheckCircle,
   Clock,
@@ -62,16 +58,7 @@ import {
   Filter,
   Download,
   Eye,
-  Edit,
   Sparkles,
-  Users,
-  Building2,
-  Globe,
-  Activity,
-  FileText,
-  Calendar,
-  Award,
-  Zap,
   Shield,
   Info,
   Lightbulb

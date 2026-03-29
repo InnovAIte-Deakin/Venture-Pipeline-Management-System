@@ -1,41 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	CheckCircle,
 	AlertTriangle,
 	Clock,
-	Target,
-	FileText,
-	Lightbulb,
 } from "lucide-react";
-import {
-	ResponsiveContainer,
-	BarChart,
-	Bar,
-	XAxis,
-	YAxis,
-	AreaChart,
-	Area,
-	RadarChart,
-	PolarGrid,
-	PolarAngleAxis,
-	PolarRadiusAxis,
-	Radar, // Declare Radar here
-} from "recharts";
-import {
-	ChartContainer,
-	ChartTooltip,
-	ChartTooltipContent,
-} from "@/components/ui/chart";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+
+
+
+
 import ReadinessTracker from "@/components/readiness-tracker";
 
 interface Recommendation {
