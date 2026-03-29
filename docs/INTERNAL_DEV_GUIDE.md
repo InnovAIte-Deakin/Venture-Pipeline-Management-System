@@ -16,9 +16,14 @@ All instructions reflect the **current, official implementation provided by the 
 
 ```
 /
-├── miv/                 # Frontend (Next.js VPMS application)
-├── miv-backend/         # Backend (Payload CMS)
+├── src/
+│   ├── app/             # Next.js App Router pages and API routes
+│   ├── collections/     # Payload CMS collections
+│   ├── prisma/          # Prisma schema and seed scripts
+│   └── lib/             # Shared services and utilities
 ├── docs/                # Project documentation
+├── docker-compose.yml   # Local MongoDB and PostgreSQL services
+├── package.json         # Application scripts
 └── README.md
 ```
 
@@ -26,22 +31,20 @@ All instructions reflect the **current, official implementation provided by the 
 
 ## 3. System Overview
 
-VPMS is composed of two services that must run together:
+VPMS uses one application codebase with two required data services:
 
-* **Frontend (VPMS App)**
+* **Application (Next.js + Payload)**
 
   * Built with Next.js
   * Provides dashboards and UI for founders and admins
   * Uses NextAuth for authentication
   * Uses Prisma with PostgreSQL for application data
 
-* **Backend (Payload CMS)**
+* **Data Services**
 
-  * Built with Payload CMS
-  * Handles document uploads, metadata, and review workflow
-  * Enforces role-based access control
-  * Uses MongoDB for CMS and document data
-  * Runs using Docker
+  * MongoDB for Payload CMS content and document data
+  * PostgreSQL for Prisma-managed relational data
+  * Both can be started locally via Docker Compose
 
 ---
 
@@ -97,14 +100,13 @@ VPMS requires **two running services**:
 
 ---
 
-### Step 1: Start Backend (Payload CMS)
+### Step 1: Start Local Databases
 
 ```bash
-cd miv-backend
-docker compose up -d
+docker compose up -d mongo postgres
 ```
 
-This starts Payload CMS and required database services.
+This starts the MongoDB and PostgreSQL services used by the application.
 
 To stop backend services:
 
@@ -117,9 +119,11 @@ docker compose down -v
 ### Step 2: Start Frontend (VPMS Application)
 
 ```bash
-cd miv
-npm install
-npm run dev
+pnpm install
+pnpm run db:generate
+$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:push
+$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:seed
+pnpm run dev
 ```
 
 ---
@@ -128,26 +132,37 @@ npm run dev
 
 Open:
 
-```
-http://localhost:3000
-```
+`http://localhost:3000`
 
-> Both backend and frontend must be running for the system to work.
+The Payload admin is available at `http://localhost:3000/admin`.
+
+Both MongoDB and PostgreSQL must be running for the full system to work.
 
 ---
 
 ## 7. Environment Configuration
 
-* Environment variables are defined in `.env` and `.env.example`
+* Environment variables are defined in `.env`, `.env.local`, and `.env.example`
 * Secrets must not be committed to version control
 * Values may differ between development and production
+
+Minimum local variables for current development:
+
+```dotenv
+DATABASE_URI="mongodb://127.0.0.1:27017/payload"
+DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"
+PAYLOAD_SECRET="replace-with-long-random-string"
+NEXT_PUBLIC_SITE_URL=http://localhost:3000
+```
 
 ---
 
 ## 8. Common Issues
 
-* Frontend not loading → ensure `npm run dev` is running in `miv`
-* Backend unavailable → ensure Docker containers are running
+* App not loading → ensure `pnpm run dev` is running from the repository root
+* Prisma commands fail with `Environment variable not found: DATABASE_URL` → define `DATABASE_URL` or export it inline when running Prisma commands
+* Payload or document features fail → ensure MongoDB is running and `DATABASE_URI` is set
+* Prisma commands fail to connect → ensure `docker compose up -d postgres` is running
 * Login issues → verify NextAuth environment variables
 * Document upload errors → check file size/type restrictions
 
@@ -155,6 +170,8 @@ http://localhost:3000
 
 ## 9. Maintenance Notes
 
-* Payload CMS collections and access rules are defined in backend config
-* Prisma schema changes require migrations
+* Payload CMS collections and access rules are defined under `src/collections`
+* Prisma schema is located at `src/prisma/schema.prisma`
+* Prisma scripts in `package.json` use the schema path explicitly
+* The verified local PostgreSQL connection string from `docker-compose.yml` is `postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public`
 * Update documentation when system behaviour changes
