@@ -67,7 +67,7 @@
     "lucide-react": "^0.536.0",
     "mailersend": "^2.6.0",
     "mongodb": "^6.19.0",
-    "next": "15.2.4",
+    "next": "15.2.9",
     "next-auth": "^4.24.11",
     "nodemailer": "^7.0.7",
     "openai": "^5.12.0",
