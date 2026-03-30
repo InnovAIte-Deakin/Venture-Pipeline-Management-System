@@ -37,6 +37,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { UserRole } from "@prisma/client"
 
 // --- Database Types ---
 interface TeamMember {
@@ -129,7 +130,12 @@ interface TeamEvent {
   location?: string
   isAllDay: boolean
   isRecurring: boolean
-  recurrence?: any
+  recurrence?: {
+    frequency?: string
+    interval?: number
+    endDate?: Date | null
+    daysOfWeek?: string[]
+  } | null
   createdAt: Date
   updatedAt: Date
   organizer: {
@@ -352,9 +358,9 @@ export default function TeamManagement() {
 
   // Dialog states for adding new items
   const [isAddMemberDialogOpen, setIsAddMemberDialogOpen] = useState(false)
-  const [newMember, setNewMember] = useState({
+  const [newMember, setNewMember] = useState<{name: string; role: UserRole; email: string; organization: string; image: string}>({
     name: "",
-    role: "USER" as const,
+    role: UserRole.USER,
     email: "",
     organization: "",
     image: "",
@@ -452,7 +458,7 @@ export default function TeamManagement() {
 //           // Don't fail the entire operation if email sending fails
 //         }
         
-        setNewMember({ name: "", role: "USER", email: "", organization: "", image: "" })
+        setNewMember({ name: "", role: UserRole.USER, email: "", organization: "", image: "" })
         setIsAddMemberDialogOpen(false)
       } catch (error) {
         console.error('Error creating member:', error)
@@ -477,7 +483,7 @@ export default function TeamManagement() {
         
         const createdProject = await response.json()
         setProjects((prev) => [createdProject, ...prev])
-        setNewProject({ name: "", description: "", status: "NOT_STARTED", priority: "MEDIUM", dueDate: "", leadId: "", memberIds: [] })
+        setNewProject({ name: "", description: "", status: "NOT_STARTED" as const, priority: "MEDIUM" as const, dueDate: "", leadId: "", memberIds: [] })
         setIsAddProjectDialogOpen(false)
       } catch (error) {
         console.error('Error creating project:', error)
@@ -553,7 +559,7 @@ export default function TeamManagement() {
       project.description?.toLowerCase().includes(projectSearchQuery.toLowerCase()),
   )
 
-  const getMemberNameById = (id: string) => teamMembers.find((m) => m.id === id)?.name || "Unknown"
+  // const getMemberNameById = (id: string) => teamMembers.find((m) => m.id === id)?.name || "Unknown"
   
   // Show loading state
   if (loading) {
@@ -626,7 +632,7 @@ export default function TeamManagement() {
                   <Label htmlFor="memberRole">Role</Label>
                   <Select
                     value={newMember.role}
-                    onValueChange={(value) => setNewMember({ ...newMember, role: value as any })}
+                    onValueChange={(value) => setNewMember({ ...newMember, role: value as UserRole })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select role" />

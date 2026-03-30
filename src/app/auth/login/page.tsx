@@ -1,5 +1,7 @@
 "use client";
 
+export const dynamic = 'force-dynamic';
+
 import { useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -62,7 +64,7 @@ export default function LoginPage() {
       } else {
         setError(responseBody?.message || "Invalid email or password");
       }
-    } catch (err) {
+    } catch (err: unknown) {
       setError("Invalid email or password");
     } finally {
       setIsLoading(false);
@@ -168,7 +170,7 @@ export default function LoginPage() {
             </Link>
 
             <div className="text-sm text-slate-600 dark:text-slate-400">
-              Don't have an account?{" "}
+              Don&apos;t have an account?{" "}
               <Link
                 href="/auth/register"
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium transition-colors"

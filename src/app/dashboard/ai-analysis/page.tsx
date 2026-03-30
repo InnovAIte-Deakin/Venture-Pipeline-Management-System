@@ -97,9 +97,9 @@ export default function AIAnalysisPage() {
       
       // Generate AI analyses based on real venture data
       const generatedAnalyses: AIAnalysis[] = ventures
-        .filter(venture => venture.aiAnalysis || venture.gedsiMetrics?.length > 0)
+        .filter((venture: { aiAnalysis: any; gedsiMetrics: string | any[] }) => venture.aiAnalysis || venture.gedsiMetrics?.length > 0)
         .slice(0, 10) // Limit to 10 most relevant
-        .map((venture, index) => {
+        .map((venture: { gedsiMetrics: any[]; aiAnalysis: any; stage: string; id: any; name: any; createdAt: string | number | Date; updatedAt: string | number | Date }, index: number) => {
           // Calculate scores based on venture data
           const gedsiScore = venture.gedsiMetrics?.length > 0 
             ? venture.gedsiMetrics.reduce((sum: number, metric: any) => sum + (metric.currentValue || 0), 0) / venture.gedsiMetrics.length

@@ -35,7 +35,6 @@ import {
   LogOut,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { signIn } from "next-auth/react";
 import { useGlobalSearch } from "@/components/global-search";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -405,7 +404,7 @@ export function Sidebar() {
                       size="sm"
                       variant="ghost"
                       className="h-6 w-6 p-0"
-                      onClick={() => signIn()}
+                      onClick={() => (window.location.href = "/auth/login")}
                     >
                       <User className="h-3 w-3" />
                     </Button>
