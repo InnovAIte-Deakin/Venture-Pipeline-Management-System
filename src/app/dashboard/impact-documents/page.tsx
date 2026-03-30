@@ -99,7 +99,7 @@ export default function ImpactDocumentsPage() {
           setFilteredDocuments(data.documents);
           
           // Calculate stats
-          const stats = data.documents.reduce((acc: any, doc: Document) => {
+          const stats = data.documents.reduce((acc: { total: number; pending: number; approved: number; rejected: number }, doc: Document) => {
             acc.total++;
             if (doc.status === 'pending_review') acc.pending++;
             else if (doc.status === 'approved') acc.approved++;

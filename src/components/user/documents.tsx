@@ -610,7 +610,7 @@ export default function VentureDocumentsUpload() {
 
             <div className="space-y-4">
               <p className="text-sm text-gray-600">
-                Select all GEDSI goals that align with your venture's impact objectives (Select at
+                Select all GEDSI goals that align with your venture&apos;s impact objectives (Select at
                 least one) *
               </p>
               <div className="grid grid-cols-1 gap-3">
@@ -645,7 +645,7 @@ export default function VentureDocumentsUpload() {
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Ready to Submit?</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Your venture will be analyzed and you'll receive a comprehensive readiness
+                  Your venture will be analyzed and you&apos;ll receive a comprehensive readiness
                   assessment
                 </p>
               </div>

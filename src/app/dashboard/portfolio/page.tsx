@@ -770,7 +770,7 @@ export default function PortfolioPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-blue-500" />
-                Today's Action Items
+                Today&apos;s Action Items
               </CardTitle>
               <CardDescription>
                 Companies requiring immediate attention based on AI analysis

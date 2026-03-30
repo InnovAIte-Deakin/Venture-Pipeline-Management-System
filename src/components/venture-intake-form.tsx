@@ -509,7 +509,7 @@ export function VentureIntakeForm() {
             </Label>
           </div>
           <p className="text-sm text-gray-500 mb-3">
-            Tell us about your venture's mission and value proposition
+            Tell us about your venture&apos;s mission and value proposition
           </p>
           <Textarea
             id="pitchSummary"
@@ -854,7 +854,7 @@ export function VentureIntakeForm() {
             <Label className="font-semibold text-lg">Disability Inclusion Attributes</Label>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Select all that apply to your venture's inclusion practices
+            Select all that apply to your venture&apos;s inclusion practices
           </p>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
@@ -934,7 +934,7 @@ export function VentureIntakeForm() {
             <Label className="font-semibold text-lg">GEDSI Goals *</Label>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            These goals will be used to track your venture's impact and align with IRIS+ metrics
+            These goals will be used to track your venture&apos;s impact and align with IRIS+ metrics
           </p>
           <div className="grid grid-cols-1 gap-3">
             {gedsiGoals.map((goal) => (
@@ -1033,11 +1033,9 @@ export function VentureIntakeForm() {
               ]}
               maxFileSize={10 * 1024 * 1024} // 10MB
               maxFiles={10}
-              onUpload={(files) => {
-                console.log('Supporting documents uploaded:', files)
-                // Handle file upload for all supporting documents
+              onFilesUploaded={() => {
+                 // Handle file upload logic here, e.g., save to state or upload to server 
               }}
-              placeholder="Upload pitch decks, business plans, financial statements, team bios, certificates..."
             />
           </div>
 
@@ -1055,8 +1053,8 @@ export function VentureIntakeForm() {
       <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950">
         <Award className="h-4 w-4 text-emerald-600" />
         <AlertDescription className="text-emerald-800 dark:text-emerald-200">
-          🎉 You're almost done! After submitting, you'll receive a comprehensive readiness
-          assessment and personalized recommendations for your venture's growth.
+          🎉 You&apos;re almost done! After submitting, you&apos;ll receive a comprehensive readiness
+          assessment and personalized recommendations for your venture&apos;s growth.
         </AlertDescription>
       </Alert>
 
