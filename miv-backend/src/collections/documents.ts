@@ -6,6 +6,11 @@ import { authenticated } from '../access/authenticated'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
+const canManageDocumentReviewFields = ({ req }: { req: { user?: { role?: string } } }) => {
+  const role = req.user?.role
+  return role === 'miv_analyst' || role === 'admin'
+}
+
 export const Documents: CollectionConfig = {
   slug: 'documents',
 
@@ -66,6 +71,10 @@ export const Documents: CollectionConfig = {
       label: 'Status',
       type: 'select',
       defaultValue: 'pending_review',
+      access: {
+        create: canManageDocumentReviewFields,
+        update: canManageDocumentReviewFields,
+      },
       options: [
         { label: 'Pending Review', value: 'pending_review' },
         { label: 'Approved', value: 'approved' },
@@ -78,6 +87,10 @@ export const Documents: CollectionConfig = {
       label: 'Version',
       type: 'number',
       defaultValue: 1,
+      access: {
+        create: canManageDocumentReviewFields,
+        update: canManageDocumentReviewFields,
+      },
       admin: {
         readOnly: true,
       },
@@ -88,6 +101,10 @@ export const Documents: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      access: {
+        create: canManageDocumentReviewFields,
+        update: canManageDocumentReviewFields,
+      },
       admin: {
         readOnly: true,
         position: 'sidebar',
@@ -112,6 +129,10 @@ export const Documents: CollectionConfig = {
       label: 'Reviewed By',
       type: 'relationship',
       relationTo: 'users',
+      access: {
+        create: canManageDocumentReviewFields,
+        update: canManageDocumentReviewFields,
+      },
       admin: {
         position: 'sidebar',
       },
@@ -120,6 +141,10 @@ export const Documents: CollectionConfig = {
       name: 'reviewedAt',
       label: 'Reviewed At',
       type: 'date',
+      access: {
+        create: canManageDocumentReviewFields,
+        update: canManageDocumentReviewFields,
+      },
       admin: {
         position: 'sidebar',
       },
@@ -133,6 +158,14 @@ export const Documents: CollectionConfig = {
         if (operation === 'create' && req.user) {
           data.uploadedBy = req.user.id
         }
+
+        if (!canManageDocumentReviewFields({ req })) {
+          data.status = 'pending_review'
+          data.reviewedBy = undefined
+          data.reviewedAt = undefined
+          data.version = operation === 'create' ? 1 : data.version
+        }
+
         return data
       },
     ],
