@@ -12,7 +12,7 @@ $env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schem
 
 Env vars:
 
-- `PAYLOAD_SECRET` and `DATABASE_URI` are required for Payload CMS.
+- `PAYLOAD_SECRET` and `MONGODB_URI` are required for Payload CMS.
 - `DATABASE_URL` is required for Prisma commands and relational seeding.
 - `SLACK_WEBHOOK_URL` optional (mock only).
 - `ESIGN_PROVIDER_API_KEY` optional (mock only).

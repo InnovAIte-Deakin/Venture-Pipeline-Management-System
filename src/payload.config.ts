@@ -7,7 +7,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-console.log("🧪 DB URI at startup:", process.env.DATABASE_URI);
+console.log("🧪 DB URI at startup:", process.env.MONGODB_URI);
 
 import { Users } from './collections/users'
 import { Media } from './collections/media'
@@ -65,7 +65,7 @@ export default buildConfig({
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+    url: process.env.MONGODB_URI || '',
   }),
   sharp,
   plugins: [

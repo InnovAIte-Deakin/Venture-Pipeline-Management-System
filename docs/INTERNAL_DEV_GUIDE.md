@@ -149,7 +149,7 @@ Both MongoDB and PostgreSQL must be running for the full system to work.
 Minimum local variables for current development:
 
 ```dotenv
-DATABASE_URI="mongodb://127.0.0.1:27017/payload"
+MONGODB_URI="mongodb://127.0.0.1:27017/payload"
 DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"
 PAYLOAD_SECRET="replace-with-long-random-string"
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
@@ -161,7 +161,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 * App not loading → ensure `pnpm run dev` is running from the repository root
 * Prisma commands fail with `Environment variable not found: DATABASE_URL` → define `DATABASE_URL` or export it inline when running Prisma commands
-* Payload or document features fail → ensure MongoDB is running and `DATABASE_URI` is set
+* Payload or document features fail → ensure MongoDB is running and `MONGODB_URI` is set
 * Prisma commands fail to connect → ensure `docker compose up -d postgres` is running
 * Login issues → verify NextAuth environment variables
 * Document upload errors → check file size/type restrictions
