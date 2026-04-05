@@ -146,7 +146,7 @@ pnpm run dev
 
 - Next.js UI: [http://localhost:3000](http://localhost:3000)
 - Payload Admin: [http://localhost:3000/admin](http://localhost:3000/admin)
-- MongoDB: `mongodb://127.0.0.1:27017/payload`
+- MONGODB_URI: `mongodb://127.0.0.1:27017/payload`
 - PostgreSQL: `postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public`
 
 ### 2) Local Dev (Node.js)
@@ -200,7 +200,7 @@ Vercel.com is the hosting provider that this project uses.
 
 ```dotenv
 # Payload / MongoDB
-DATABASE_URI="mongodb://127.0.0.1:27017/payload"
+MONGODB_URI="mongodb://127.0.0.1:27017/payload"
 PAYLOAD_SECRET="replace-with-long-random-string"
 
 # Prisma / PostgreSQL
@@ -212,7 +212,7 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 Notes:
 
-- `DATABASE_URI` is used by Payload CMS and points to MongoDB.
+- `MONGODB_URI` is used by Payload CMS and points to MongoDB.
 - `DATABASE_URL` is required by Prisma and points to PostgreSQL.
 - The checked-in `.env.example` currently documents MongoDB-oriented settings only; add `DATABASE_URL` locally before running Prisma commands.
 
