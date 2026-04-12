@@ -4,19 +4,12 @@ import config from "@payload-config";
 import { z } from "zod";
 
 const RegisterSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
+  first_name: z.string().min(1, "First name is required"),
+  last_name: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
-  // password: z.string().min(4, "Password must be at least 4 characters"),
   password: z.string(),
-
-  ventureName: z.string().optional(),
-  positionInVenture: z.string().optional(),
-  phone: z.string().optional(),
-  countryCode: z.string().optional(),
+  confirmPassword: z.string().optional(),
 });
-
-const IMPACT_APPLICANT_ROLE = "USER"; // maps to Prisma enum UserRole.USER
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,7 +19,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          error: "Bad Request",
+          error: "BadRequest",
           message: "Request body must be JSON.",
         },
         { status: 400 }
@@ -38,9 +31,8 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       const fieldErrors = parsed.error.flatten().fieldErrors;
       const message =
-        Object.values(fieldErrors)
-          .flat()
-          .find(Boolean) || "Invalid registration data";
+        Object.values(fieldErrors).flat().find(Boolean) ||
+        "Invalid registration data";
 
       return NextResponse.json(
         {
@@ -53,16 +45,19 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      ventureName,
-      positionInVenture,
-      phone,
-      countryCode,
-    } = parsed.data;
+    const { first_name, last_name, email, password, confirmPassword } =
+      parsed.data;
+
+    if (confirmPassword && password !== confirmPassword) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: "PasswordMismatch",
+          message: "Passwords do not match.",
+        },
+        { status: 400 }
+      );
+    }
 
     const payload = await getPayload({ config });
 
@@ -87,66 +82,45 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 2. Create Impact Applicant user
     const user = await payload.create({
       collection: "users",
       data: {
-        firstName,
-        lastName,
+        first_name,
+        last_name,
         email: email.toLowerCase(),
         password,
         role: "user",
-      
-        ventureName,
-        positionInVenture,
-        phone,
-        countryCode,
-      },
+      } as any,
     });
 
-    // 3. (Optional) Send welcome email, but don't fail the request if this errors
-    // try {
-    //   await emailService.sendWelcomeEmail({
-    //     to: email,
-    //     firstName,
-    //   });
-    // } catch (err) {
-    //   console.error("Failed to send welcome email", err);
-    // }
-
-    // 4. Log the user in immediately (so dashboard can rely on auth cookie)
-    // Adjust this to match your Payload auth setup if the API differs.
     const auth = await payload.login({
       collection: "users",
       data: {
         email: email.toLowerCase(),
         password,
-      },
+      } as any,
     });
 
     const response = NextResponse.json(
       {
         success: true,
         message: "Account created successfully",
-        // Keep response small; just what the client might need
         user: {
           id: (user as any).id,
           email: (user as any).email,
-          firstName: (user as any).firstName,
-          lastName: (user as any).lastName,
+          first_name: (user as any).first_name,
+          last_name: (user as any).last_name,
           role: (user as any).role,
         },
       },
       { status: 201 }
     );
 
-    // Attach Payload auth token as cookie if available
     if (auth?.token) {
       response.cookies.set("payload-token", auth.token, {
         httpOnly: true,
         sameSite: "lax",
         path: "/",
-        // secure: true in production
       });
     }
 
