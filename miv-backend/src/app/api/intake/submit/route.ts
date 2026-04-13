@@ -4,15 +4,12 @@ import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { WSSAnswer } from '@/types/enums'
 
-// Validation schema for intake submission
 const IntakeSubmissionSchema = z.object({
   ventureName_en: z.string().min(1, 'Venture name in English is required'),
   ventureName_km: z.string().optional(),
   country: z.string().min(1, 'Country is required'),
   description_en: z.string().optional(),
   description_km: z.string().optional(),
-  
-  // WSS (Washington Group Short Set) questions
   wss: z.object({
     seeing: WSSAnswer,
     hearing: WSSAnswer,
@@ -21,107 +18,94 @@ const IntakeSubmissionSchema = z.object({
     selfCare: WSSAnswer,
     communication: WSSAnswer,
   }),
-
-  // Registration information
   registration: z.object({
     number: z.string().optional(),
     country: z.string().optional(),
     legalType: z.string().optional(),
     yearEstablished: z.number().min(1900).max(2100).optional(),
   }).optional(),
-
-  // Impact areas
   impactAreas: z.array(z.enum(['agri', 'gender', 'climate'])).optional(),
-
-  // Founders
-  founders: z.array(z.object({
-    fullName: z.string().min(1, 'Founder name is required'),
-    email: z.string().email('Valid email is required'),
-    phone: z.string().optional(),
-  })).min(1, 'At least one founder is required'),
-
-  // Financial information
+  founders: z.array(
+    z.object({
+      fullName: z.string().min(1, 'Founder name is required'),
+      email: z.string().email('Valid email is required'),
+      phone: z.string().optional(),
+    })
+  ).min(1, 'At least one founder is required'),
   financials: z.object({
     currency: z.string().optional(),
     lastFYRevenue: z.number().optional(),
     avgMonthlyRevenue: z.number().optional(),
   }).optional(),
-
-  // GEDSI (Gender, Equality, Disability, Social Inclusion)
   gedsi: z.object({
     hasPolicy: z.boolean().optional(),
     notes: z.string().optional(),
   }).optional(),
-
-  // Triage information
   triageTrack: z.enum(['unassigned', 'fast', 'slow']).default('unassigned'),
   triageRationale: z.string().optional(),
 })
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await getPayload({ config })
-    const body = await request.json()
+    let body
 
-    // Validate the request body
-    const validationResult = IntakeSubmissionSchema.safeParse(body)
-    if (!validationResult.success) {
+    try {
+      body = await request.json()
+    } catch {
       return NextResponse.json(
         {
           success: false,
-          error: 'Validation failed',
-          details: validationResult.error.errors,
+          error: 'BadRequest',
+          message: 'Request body must be valid JSON',
         },
         { status: 400 }
       )
     }
 
-    const data = validationResult.data
+    const validationResult = IntakeSubmissionSchema.safeParse(body)
 
-    // Create the intake record
-    // Note: The afterIntakeCreate hook will automatically:
-    // 1. Create/link a venture record
-    // 2. Create agreement stubs (NDA/MOU)
-    // 3. Send email notifications
-    // 4. Create activity log
-    const intake = await payload.create({
-      collection: 'onboardingIntakes',
-      data: {
-        ventureName_en: data.ventureName_en,
-        ventureName_km: data.ventureName_km,
-        country: data.country,
-        wss: data.wss,
-        registration: data.registration,
-        impactAreas: data.impactAreas,
-        founders: data.founders,
-        financials: data.financials,
-        gedsi: data.gedsi,
-        triageTrack: data.triageTrack,
-        triageRationale: data.triageRationale,
-      },
-    })
-
-    return NextResponse.json({
-      success: true,
-      message: 'Venture application submitted successfully',
-      data: {
-        intakeId: intake.id,
-        ventureName: data.ventureName_en,
-        submissionDate: new Date().toISOString(),
-        status: 'submitted',
-      },
-    })
-
-  } catch (error) {
-    console.error('Failed to submit intake:', error)
-    
-    // Return appropriate error response
-    if (error instanceof Error) {
+    if (!validationResult.success) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Failed to submit application',
-          message: error.message,
+          error: 'ValidationFailed',
+          message: 'Please check the submitted form fields',
+          details: validationResult.error.flatten(),
+        },
+        { status: 400 }
+      )
+    }
+
+    const payload = await getPayload({ config })
+    const data = validationResult.data
+
+    let intake
+
+    try {
+      intake = await payload.create({
+        collection: 'onboardingIntakes',
+        data: {
+          ventureName_en: data.ventureName_en,
+          ventureName_km: data.ventureName_km,
+          country: data.country,
+          wss: data.wss,
+          registration: data.registration,
+          impactAreas: data.impactAreas,
+          founders: data.founders,
+          financials: data.financials,
+          gedsi: data.gedsi,
+          triageTrack: data.triageTrack,
+          triageRationale: data.triageRationale,
+        },
+      })
+    } catch (createError) {
+      console.error('Failed to create onboarding intake:', createError)
+
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'CreateFailed',
+          message: 'Unable to submit venture application right now.',
         },
         { status: 500 }
       )
@@ -129,8 +113,24 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(
       {
+        success: true,
+        message: 'Venture application submitted successfully',
+        data: {
+          intakeId: intake.id,
+          ventureName: data.ventureName_en,
+          submissionDate: new Date().toISOString(),
+          status: 'submitted',
+        },
+      },
+      { status: 201 }
+    )
+  } catch (error) {
+    console.error('Failed to submit intake:', error)
+
+    return NextResponse.json(
+      {
         success: false,
-        error: 'Internal server error',
+        error: 'InternalServerError',
         message: 'An unexpected error occurred while processing your application',
       },
       { status: 500 }
@@ -138,20 +138,24 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to retrieve submission status (optional)
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams
   const intakeId = searchParams.get('id')
 
   if (!intakeId) {
     return NextResponse.json(
-      { error: 'Intake ID is required' },
+      {
+        success: false,
+        error: 'MissingIntakeId',
+        message: 'Intake ID is required',
+      },
       { status: 400 }
     )
   }
 
   try {
     const payload = await getPayload({ config })
+
     const intake = await payload.findByID({
       collection: 'onboardingIntakes',
       id: intakeId,
@@ -171,8 +175,13 @@ export async function GET(request: NextRequest) {
     })
   } catch (error) {
     console.error('Failed to fetch intake:', error)
+
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch intake status' },
+      {
+        success: false,
+        error: 'FetchFailed',
+        message: 'Unable to fetch intake status',
+      },
       { status: 500 }
     )
   }
