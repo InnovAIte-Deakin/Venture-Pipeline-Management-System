@@ -1,8 +1,5 @@
-import type { CollectionConfig, FieldAccess } from 'payload'
-
-const analystOrAdminOnly: FieldAccess = ({ req }) => {
-  return Boolean(req.user && (req.user.role === 'admin' || req.user.role === 'miv_analyst'))
-}
+import type { CollectionConfig } from 'payload'
+import { canReadInternalFields, isAdmin, isLoggedIn } from '@/access/roleAccess'
 
 export const Ventures: CollectionConfig = {
   slug: 'ventures',
@@ -10,10 +7,10 @@ export const Ventures: CollectionConfig = {
     useAsTitle: 'name',
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
+    read: isLoggedIn,
     create: () => true,
-    update: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    update: isAdmin,
+    delete: isAdmin,
   },
   fields: [
     {
@@ -75,23 +72,63 @@ export const Ventures: CollectionConfig = {
     {
       name: 'triageTrack',
       type: 'select',
-      access: {
-        read: analystOrAdminOnly,
-        update: analystOrAdminOnly,
-      },
       options: [
         { label: 'Unassigned', value: 'unassigned' },
         { label: 'Fast', value: 'fast' },
         { label: 'Slow', value: 'slow' },
       ],
       defaultValue: 'unassigned',
+      access: {
+        read: canReadInternalFields,
+        update: isAdmin,
+      },
     },
     {
       name: 'triageRationale',
       type: 'textarea',
       access: {
-        read: analystOrAdminOnly,
-        update: analystOrAdminOnly,
+        read: canReadInternalFields,
+        update: isAdmin,
+      },
+    },
+    {
+      name: 'internalReviewNotes',
+      type: 'textarea',
+      admin: {
+        description: 'Internal notes for admin / analyst review only',
+      },
+      access: {
+        read: canReadInternalFields,
+        update: isAdmin,
+      },
+    },
+    {
+      name: 'analystAssessment',
+      type: 'select',
+      options: [
+        { label: 'Pending', value: 'pending' },
+        { label: 'Promising', value: 'promising' },
+        { label: 'Needs review', value: 'needs_review' },
+        { label: 'Not suitable yet', value: 'not_suitable_yet' },
+      ],
+      defaultValue: 'pending',
+      access: {
+        read: canReadInternalFields,
+        update: isAdmin,
+      },
+    },
+    {
+      name: 'reviewStatus',
+      type: 'select',
+      options: [
+        { label: 'Not started', value: 'not_started' },
+        { label: 'In review', value: 'in_review' },
+        { label: 'Completed', value: 'completed' },
+      ],
+      defaultValue: 'not_started',
+      access: {
+        read: canReadInternalFields,
+        update: isAdmin,
       },
     },
   ],
