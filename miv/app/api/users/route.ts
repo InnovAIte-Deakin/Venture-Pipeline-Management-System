@@ -1,22 +1,33 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { ApiError } from '@/lib/api-error'
+import { successResponse } from '@/lib/api-response'
+import { handleApiError } from '@/lib/handle-api-error'
 
-// GET /api/users - Get all users with optional filtering
 export async function GET(request: NextRequest) {
   try {
-    const { searchParams } = new URL(request.url);
-    const email = searchParams.get('email');
-    const role = searchParams.get('role');
-    const limit = parseInt(searchParams.get('limit') || '10');
-    const page = parseInt(searchParams.get('page') || '1');
-    const skip = (page - 1) * limit;
+    const { searchParams } = new URL(request.url)
+    const email = searchParams.get('email')
+    const role = searchParams.get('role')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const page = parseInt(searchParams.get('page') || '1')
 
-    const where: any = {};
+    if (Number.isNaN(limit) || limit < 1) {
+      throw new ApiError('Limit must be a positive number', 400, 'INVALID_LIMIT')
+    }
+
+    if (Number.isNaN(page) || page < 1) {
+      throw new ApiError('Page must be a positive number', 400, 'INVALID_PAGE')
+    }
+
+    const skip = (page - 1) * limit
+
+    const where: any = {}
     if (email) {
-      where.email = { contains: email };
+      where.email = { contains: email, mode: 'insensitive' }
     }
     if (role) {
-      where.role = role;
+      where.role = role
     }
 
     const [users, total] = await Promise.all([
@@ -30,30 +41,27 @@ export async function GET(request: NextRequest) {
           organization: true,
           emailVerified: true,
           createdAt: true,
-          updatedAt: true
+          updatedAt: true,
         },
         orderBy: { createdAt: 'desc' },
         skip,
-        take: limit
+        take: limit,
       }),
-      prisma.user.count({ where })
-    ]);
+      prisma.user.count({ where }),
+    ])
 
-    return NextResponse.json({
-      users,
-      pagination: {
-        page,
-        limit,
-        total,
-        pages: Math.ceil(total / limit)
-      }
-    });
-
-  } catch (error) {
-    console.error('Error fetching users:', error);
     return NextResponse.json(
-      { error: 'Internal server error', details: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+      successResponse({
+        users,
+        pagination: {
+          page,
+          limit,
+          total,
+          pages: Math.ceil(total / limit),
+        },
+      })
+    )
+  } catch (error) {
+    return handleApiError(error, 'GET /api/users')
   }
 }

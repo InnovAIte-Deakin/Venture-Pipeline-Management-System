@@ -22,7 +22,7 @@ function getDisplayDocumentType(backendType: string): string {
   return typeMap[backendType] || backendType
 }
 
-// GET /api/documents - Get all documents for the current user
+// GET /api/documents - Get all documents with search, filter, and sort support
 export async function GET(request: NextRequest) {
   try {
     const payload = await getPayload({ config })
@@ -55,14 +55,70 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Build query based on user role
+    // Parse query parameters
+    const { searchParams } = new URL(request.url)
+    const search = searchParams.get('search')?.trim() || undefined
+    const status = searchParams.get('status')?.trim() || undefined
+    const uploadedByParam = searchParams.get('uploadedBy')?.trim() || undefined
+    const sortParam = searchParams.get('sort')?.toLowerCase().trim() || 'latest'
+
+    // Validate status parameter
+    const validStatuses = ['pending_review', 'approved', 'rejected', 'needs_revision']
+    if (status && !validStatuses.includes(status)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid status',
+          message: `Status must be one of: ${validStatuses.join(', ')}`,
+        },
+        { status: 400 }
+      )
+    }
+
+    // Validate sort parameter
+    const validSorts = ['latest', 'oldest']
+    if (!validSorts.includes(sortParam)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid sort',
+          message: `Sort must be one of: ${validSorts.join(', ')}`,
+        },
+        { status: 400 }
+      )
+    }
+
+    // Build where clause
     const isAdmin = user.role === 'admin' || user.role === 'miv_analyst'
-    
+    const whereConditions: any = {}
+
+    // Add role-based filtering
+    if (!isAdmin) {
+      // Founders can only see their own documents
+      whereConditions.uploadedBy = { equals: user.id }
+    } else if (uploadedByParam) {
+      // Admins/analysts can filter by uploadedBy parameter
+      whereConditions.uploadedBy = { equals: uploadedByParam }
+    }
+
+    // Add search filter (case-insensitive filename search)
+    if (search) {
+      whereConditions.filename = { contains: search }
+    }
+
+    // Add status filter
+    if (status) {
+      whereConditions.status = { equals: status }
+    }
+
+    // Determine sort order
+    const sortBy = sortParam === 'latest' ? '-createdAt' : 'createdAt'
+
     const documents = await payload.find({
       collection: 'documents',
-      where: isAdmin ? undefined : { uploadedBy: { equals: user.id } },
-      sort: '-createdAt',
-      depth: 1, // Include related user/venture data
+      where: Object.keys(whereConditions).length > 0 ? whereConditions : undefined,
+      sort: sortBy,
+      depth: 1,
     })
 
     return NextResponse.json({
