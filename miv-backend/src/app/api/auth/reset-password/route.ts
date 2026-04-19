@@ -5,12 +5,19 @@ import { hashResetToken } from "@/lib/reset-token";
 
 export async function POST(request: NextRequest) {
   try {
-    const payload = await getPayload({ config });
     const { token, newPassword } = await request.json();
 
+    if (!token || !newPassword) {
+      return NextResponse.json(
+        { success: false, message: "Token and password are required." },
+        { status: 400 }
+      );
+    }
+
+    const payload = await getPayload({ config });
     const hashedToken = hashResetToken(token);
 
-    const result = await payload.find({
+    const { docs } = await payload.find({
       collection: "users",
       where: {
         resetPasswordToken: { equals: hashedToken },
@@ -18,19 +25,16 @@ export async function POST(request: NextRequest) {
       limit: 1,
     });
 
-    if (!result.docs.length) {
+    if (!docs.length) {
       return NextResponse.json(
         { success: false, message: "Invalid or expired token." },
         { status: 400 }
       );
     }
 
-    const user = result.docs[0];
+    const user = docs[0];
 
-    if (
-      user.resetPasswordExpiration &&
-      new Date(user.resetPasswordExpiration).getTime() < Date.now()
-    ) {
+    if (user.resetPasswordExpiration && new Date(user.resetPasswordExpiration).getTime() < Date.now()) {
       return NextResponse.json(
         { success: false, message: "Token expired." },
         { status: 400 }
@@ -49,7 +53,10 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json({ success: false }, { status: 500 });
+    console.error("Password reset error:", err);
+    return NextResponse.json(
+      { success: false, message: "Failed to reset password." },
+      { status: 500 }
+    );
   }
 }
