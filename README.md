@@ -172,6 +172,7 @@ $env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schem
 # start Next.js + Payload app
 pnpm run dev
 ```
+<<<<<<< HEAD
 
 ---
 
@@ -193,6 +194,12 @@ Vercel.com is the hosting provider that this project uses.
 =======
 ## Configuration
 >>>>>>> ab0c625 (Major refactor for Vercel Hosting)
+=======
+
+---
+
+## Configuration
+>>>>>>> d24480863a2dddc17adbdc135b26a6bbc0f95e6b
 
 ### .env example
 
