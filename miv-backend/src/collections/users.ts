@@ -42,6 +42,17 @@ export const Users: CollectionConfig = {
       required: true,
     },
     {
+      name: 'googleId',
+      label: 'Google ID',
+      type: 'text',
+      admin: {
+        readOnly: true,
+        position: 'sidebar',
+        description: 'Google account sub — set automatically on first Google SSO sign-in.',
+      },
+      index: true,
+    },
+    {
       name: 'role',
       label: 'Role',
       type: 'select',
