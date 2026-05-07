@@ -1,37 +1,23 @@
 import type { CollectionConfig } from 'payload'
-import path from 'path'
-import { fileURLToPath } from 'url'
-
-const filename = fileURLToPath(import.meta.url)
-const dirname = path.dirname(filename)
 
 export const DataRoomFiles: CollectionConfig = {
   slug: 'dataRoomFiles',
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
-  },
-  upload: {
-    staticDir: path.resolve(dirname, '../../uploads/dataroom'),
-    mimeTypes: ['application/pdf'],
+    read: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'admin' || user.role === 'miv_analyst') return true
+      return { 'ownerEmail': { equals: user.email } }
+    },
+    create: ({ req }) => !!req.user,
+    update: ({ req: { user } }) => {
+      if (!user) return false
+      if (user.role === 'admin' || user.role === 'miv_analyst') return true
+      return { 'ownerEmail': { equals: user.email } }
+    },
+    delete: ({ req }) => req.user?.role === 'admin',
   },
   fields: [
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    { name: 'venture', type: 'relationship', relationTo: 'ventures' as any },
-    {
-      name: 'category',
-      type: 'select',
-      required: true,
-      options: [
-        { label: 'Pitch', value: 'pitch' },
-        { label: 'Financials', value: 'financials' },
-        { label: 'Policies', value: 'policies' },
-        { label: 'Registration', value: 'registration' },
-        { label: 'Other', value: 'other' },
-      ],
-    },
-    { name: 'notes', type: 'text' },
+    { name: 'category', type: 'select', options: [{ label: 'Pitch', value: 'pitch' }] },
+    { name: 'ownerEmail', type: 'email', defaultValue: ({ user }) => user?.email },
   ],
 }
