@@ -27,15 +27,23 @@ export function useAuth() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/backend/api/users', {
+      const response = await fetch('/api/users/me', {
         credentials: 'include',
       })
 
       if (response.ok) {
         const data = await response.json()
-        if (data.success && data.user) {
+        if (data.id && data.email) {
+          // Parse name field into firstName and lastName
+          const [firstName = '', lastName = ''] = (data.name || '').split(' ')
           setAuthState({
-            user: data.user,
+            user: {
+              id: data.id,
+              email: data.email,
+              firstName,
+              lastName,
+              role: data.role || '',
+            },
             loading: false,
             isAuthenticated: true,
           })
@@ -55,8 +63,8 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await fetch('/backend/api/auth/login', {
-        method: 'DELETE',
+      await fetch('/api/auth/logout', {
+        method: 'POST',
         credentials: 'include',
       })
     } catch (error) {

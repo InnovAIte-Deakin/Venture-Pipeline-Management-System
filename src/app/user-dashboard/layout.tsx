@@ -33,15 +33,16 @@ export default function UserDashboardLayout({
     // Fetch user data
     async function fetchUserData() {
       try {
-        const res = await fetch('/backend/api/users', {
+        const res = await fetch('/api/users/me', {
           credentials: 'include',
         });
         const body = await res.json().catch(() => null);
-        if (res.ok && body?.success && body?.user) {
+        if (res.ok && body?.id && body?.email) {
+          const [firstName = '', lastName = ''] = (body.name || '').split(' ')
           setUserData({
-            firstName: body.user.firstName || '',
-            lastName: body.user.lastName || '',
-            email: body.user.email || '',
+            firstName: firstName || '',
+            lastName: lastName || '',
+            email: body.email || '',
           });
         }
       } catch (err) {

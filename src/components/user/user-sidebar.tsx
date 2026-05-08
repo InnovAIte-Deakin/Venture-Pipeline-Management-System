@@ -26,15 +26,16 @@ export default function UserSidebar() {
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const res = await fetch('/backend/api/users', {
+        const res = await fetch('/api/users/me', {
           credentials: 'include',
         });
         const body = await res.json().catch(() => null);
-        if (res.ok && body?.success && body?.user) {
+        if (res.ok && body?.id && body?.email) {
+          const [firstName = '', lastName = ''] = (body.name || '').split(' ')
           setUserData({
-            firstName: body.user.firstName || '',
-            lastName: body.user.lastName || '',
-            email: body.user.email || '',
+            firstName: firstName || '',
+            lastName: lastName || '',
+            email: body.email || '',
           });
         }
       } catch (err) {
@@ -47,8 +48,8 @@ export default function UserSidebar() {
   async function handleLogout() {
     try {
       setIsLoggingOut(true);
-      const res = await fetch('/backend/api/auth/login', {
-        method: 'DELETE',
+      const res = await fetch('/api/auth/logout', {
+        method: 'POST',
         credentials: 'include',
       })
 

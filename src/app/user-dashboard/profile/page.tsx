@@ -29,16 +29,17 @@ export default function SystemSettings() {
   useEffect(() => {
     async function fetchUser() {
       try {
-        const res = await fetch("/backend/api/users", {
+        const res = await fetch("/api/users/me", {
           credentials: "include",
         });
         const data = await res.json();
-        if (data.success && data.user) {
+        if (data.id && data.email) {
+          const [firstName = '', lastName = ''] = (data.name || '').split(' ')
           setFormData((prev) => ({
             ...prev,
-            firstName: data.user.firstName || "",
-            lastName: data.user.lastName || "",
-            email: data.user.email || "",
+            firstName: firstName || "",
+            lastName: lastName || "",
+            email: data.email || "",
           }));
         }
       } catch (err) {
@@ -61,27 +62,26 @@ export default function SystemSettings() {
     setSaving(true);
     setMessage(null);
     try {
-      const res = await fetch("/backend/api/users", {
-        method: "PATCH",
+      const res = await fetch("/api/users/me", {
+        method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          email: formData.email,
+          name: `${formData.firstName} ${formData.lastName}`,
+          organization: "",
         }),
       });
       const data = await res.json();
       console.log(data);
-      if (data.success) {
+      if (data.ok) {
         setMessage({
           type: "success",
-          text: data.message || "Profile updated successfully",
+          text: "Profile updated successfully",
         });
       } else {
         setMessage({
           type: "error",
-          text: data.message || "Failed to update profile",
+          text: data.error || "Failed to update profile",
         });
       }
     } catch (err) {
@@ -102,7 +102,7 @@ export default function SystemSettings() {
     }
 
     try {
-      const res = await fetch("/backend/api/users/change-password", {
+      const res = await fetch("/api/users/change-password", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
