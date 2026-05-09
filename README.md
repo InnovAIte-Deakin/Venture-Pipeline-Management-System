@@ -34,6 +34,7 @@
 - [Getting Started](#getting-started)
 - [Documentation](#documentation)
 - [Contributing](#contributing)
+- [Running Locally](#running-locally)
 
 ---
 
@@ -397,6 +398,80 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 - Comprehensive testing
 - Accessibility compliance
 - Performance optimization
+
+---
+
+## 🤖 Running Locally
+
+The MIV Platform consists of two main components that need to be running for local development. Follow these steps to get your local environment up and running.
+
+### 🧱 **miv-backend** | Auth, Storage, and CMS
+
+The backend service provides authentication, database storage, and content management system capabilities using Docker.
+
+```bash
+# Navigate to backend directory
+cd ./miv-backend
+
+# Start backend services (PostgreSQL, Redis, Auth services)
+docker compose up -d
+
+# Stop and remove services with data cleanup (when needed)
+docker compose down -v
+```
+
+### 🧱 **miv** | Frontend Application
+
+The main frontend application built with Next.js. Make sure the backend is running before starting the frontend.
+
+```bash
+# Navigate to frontend directory
+cd ./miv
+
+# Install dependencies
+npm i
+
+# Generate Prisma client (if you made schema changes)
+npm run db:generate
+
+#Push database schema changes
+npm run db:push
+
+# Seed database with initial data and test users
+npm run db:seed
+
+# Start development server
+npm run dev
+```
+
+🎉 **Your application should now be running at [http://localhost:3000](http://localhost:3000)**
+
+### 🌐 **Application URLs**
+
+**Frontend:**
+- Main Application: [http://localhost:3000](http://localhost:3000)
+- Dashboard: [http://localhost:3000/dashboard](http://localhost:3000/dashboard)
+
+**Backend:**
+- API Server: [http://localhost:3001](http://localhost:3001)
+- Admin/CMS Panel: [http://localhost:3001/admin](http://localhost:3001/admin)
+
+**Database Management:**
+- MongoDB UI (mongo-express): [http://localhost:8081](http://localhost:8081)
+
+### 🔐 **Default Credentials**
+
+**Frontend & Backend:**
+```
+Username: admin@example.com
+Password: changeme123
+```
+
+**Admin/CMS Backend:**
+```
+Username: VentureMgr@123
+Password: VentureMgr@123
+```
 
 ---
 

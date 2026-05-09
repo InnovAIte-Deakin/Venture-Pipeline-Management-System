@@ -1,0 +1,19 @@
+# Enviornment Files
+.env 
+.env.local
+.env.producion
+
+# Backend env
+miv-backend/.env
+
+# Frontend env
+miv/.env.local
+
+# Dependencies
+node_modules/
+
+# Next.js build
+.next/
+
+# Logs
+*.log

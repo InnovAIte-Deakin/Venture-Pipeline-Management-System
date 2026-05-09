@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
       orderBy.uploadedAt = sortOrder;
     }
 
-    const [documents, total] = await Promise.all([
+    const [documents, total] =  await Promise.all([
       prisma.document.findMany({
         where,
         include: {
