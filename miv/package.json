@@ -12,7 +12,8 @@
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
-    "db:seed:test": "tsx prisma/seed-test.ts"
+    "db:seed:test": "tsx prisma/seed-test.ts",
+    "postinstall": "node scripts/install-lightningcss.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.58.0",
@@ -70,6 +71,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
+    "lightningcss-linux-x64-gnu": "^1.32.0",
     "prisma": "^6.13.0",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.20.3",
