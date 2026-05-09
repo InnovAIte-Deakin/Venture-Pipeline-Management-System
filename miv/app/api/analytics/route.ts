@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { CalculationService } from '@/lib/calculation-service'
+import { getMobileFlag } from '@/lib/mobile-detect'
+import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers'
 
 export async function GET(request: NextRequest) {
   try {
+    // Detect mobile user agent
+    const { isMobile } = getMobileFlag(request)
+    console.log(`Mobile request: ${isMobile}`)
+
     const { searchParams } = new URL(request.url)
     const period = searchParams.get('period') || '30d'
     
@@ -27,6 +33,11 @@ export async function GET(request: NextRequest) {
       default:
         startDate.setDate(now.getDate() - 30)
     }
+
+    // Adjust data fetch limits for mobile to reduce payload
+    const activitiesLimit = isMobile ? 20 : 100
+    const workflowRunsLimit = isMobile ? 10 : 50
+    const trendWeeks = isMobile ? 4 : 6
 
     // Fetch comprehensive analytics data
     const [
@@ -77,7 +88,7 @@ export async function GET(request: NextRequest) {
             gte: startDate
           }
         },
-        take: 100,
+        take: activitiesLimit,
         orderBy: {
           createdAt: 'desc'
         },
@@ -102,7 +113,7 @@ export async function GET(request: NextRequest) {
             gte: startDate
           }
         },
-        take: 50,
+        take: workflowRunsLimit,
         orderBy: {
           startedAt: 'desc'
         },
@@ -134,7 +145,7 @@ export async function GET(request: NextRequest) {
 
     // Performance trends (simplified calculation)
     const performanceTrends = []
-    for (let i = 5; i >= 0; i--) {
+    for (let i = trendWeeks - 1; i >= 0; i--) {
       const date = new Date()
       date.setDate(date.getDate() - (i * 7)) // Weekly intervals
       
@@ -151,7 +162,7 @@ export async function GET(request: NextRequest) {
       })
       
       performanceTrends.push({
-        week: `Week ${6 - i}`,
+        week: `Week ${trendWeeks - i}`,
         ventures: weeklyVentures,
         gedsiScore: Math.floor(Math.random() * 20) + 70,
         users: Math.floor(Math.random() * 50) + 300,
@@ -159,7 +170,8 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const analytics = {
+    // Build analytics object based on device type
+    const baseAnalytics = {
       period,
       dateRange: {
         start: startDate.toISOString(),
@@ -175,25 +187,47 @@ export async function GET(request: NextRequest) {
         workflowAutomationRate,
         workflowSuccessRate
       },
-      performance: {
+      isMobile
+    }
+
+    // For mobile, send minimal additional data; for desktop, send full analytics
+    let analytics: any = baseAnalytics
+
+    if (!isMobile) {
+      analytics.performance = {
         trends: performanceTrends,
         recentActivities: recentActivities.slice(0, 20),
         activityBreakdown: activityByType
-      },
-      workflows: {
+      }
+      analytics.workflows = {
         total: totalWorkflows,
         active: activeWorkflows,
         recentRuns: workflowRuns.slice(0, 10),
         successRate: workflowSuccessRate
-      },
-      insights: {
+      }
+      analytics.insights = {
         topSectors: await getTopSectors(),
         riskFactors: calculateRiskFactors(recentActivities),
         recommendations: generateRecommendations(gedsiComplianceRate, userEngagementRate, workflowSuccessRate)
       }
+    } else {
+      // For mobile, include only essential performance data
+      analytics.performance = {
+        trends: performanceTrends.slice(0, 3),
+        recentActivities: recentActivities.slice(0, 5),
+        activityBreakdown: activityByType
+      }
+      analytics.workflows = {
+        total: totalWorkflows,
+        active: activeWorkflows,
+        successRate: workflowSuccessRate
+      }
+      analytics.insights = {
+        topSectors: (await getTopSectors()).slice(0, 3)
+      }
     }
 
-    return NextResponse.json(analytics)
+    return createCachedResponse(analytics, CACHE_CONFIGS.ANALYTICS)
 
   } catch (error) {
     console.error('Error generating analytics:', error)

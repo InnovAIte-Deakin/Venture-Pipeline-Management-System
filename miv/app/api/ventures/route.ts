@@ -4,6 +4,8 @@ import { prisma } from '@/lib/prisma';
 import { AIServices } from '@/lib/ai-services';
 import { triggerVentureRecalculation } from '@/lib/calculation-service';
 import { z } from 'zod';
+import { getMobileFlag } from '@/lib/mobile-detect';
+import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers';
 
 // Validation schemas
 const createVentureSchema = z.object({
@@ -51,6 +53,10 @@ const updateVentureSchema = createVentureSchema.partial();
 // GET /api/ventures - List ventures with filtering
 export async function GET(request: NextRequest) {
   try {
+    // Detect mobile user agent
+    const { isMobile } = getMobileFlag(request);
+    console.log(`Mobile request: ${isMobile}`);
+
     // Disable authentication for development
     // const session = await getServerSession();
     // if (!session?.user) {
@@ -59,7 +65,13 @@ export async function GET(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '10');
+    let limit = parseInt(searchParams.get('limit') || '10');
+    
+    // Reduce limit for mobile clients
+    if (isMobile && limit > 5) {
+      limit = 5;
+    }
+    
     const search = searchParams.get('search') || '';
     const sector = searchParams.get('sector') || '';
     const stage = searchParams.get('stage') || '';
@@ -80,41 +92,48 @@ export async function GET(request: NextRequest) {
     if (stage) where.stage = stage;
     if (status) where.status = status;
 
+    // Optimize includes based on device type
+    const includeConfig: any = {
+      createdBy: {
+        select: { name: true, email: true }
+      },
+      assignedTo: {
+        select: { name: true, email: true }
+      },
+      _count: {
+        select: {
+          documents: true,
+          activities: true,
+          capitalActivities: true,
+        }
+      }
+    };
+
+    // For desktop, include full details; for mobile, minimize data
+    if (!isMobile) {
+      includeConfig.gedsiMetrics = true;
+      includeConfig.documents = {
+        orderBy: { uploadedAt: 'desc' },
+        take: 5
+      };
+      includeConfig.activities = {
+        include: {
+          user: {
+            select: { name: true, email: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' },
+        take: 10
+      };
+      includeConfig.capitalActivities = {
+        orderBy: { createdAt: 'desc' }
+      };
+    }
+
     const [ventures, total] = await Promise.all([
       prisma.venture.findMany({
         where,
-        include: {
-          createdBy: {
-            select: { name: true, email: true }
-          },
-          assignedTo: {
-            select: { name: true, email: true }
-          },
-          gedsiMetrics: true,
-          documents: {
-            orderBy: { uploadedAt: 'desc' },
-            take: 5
-          },
-          activities: {
-            include: {
-              user: {
-                select: { name: true, email: true }
-              }
-            },
-            orderBy: { createdAt: 'desc' },
-            take: 10
-          },
-          capitalActivities: {
-            orderBy: { createdAt: 'desc' }
-          },
-          _count: {
-            select: {
-              documents: true,
-              activities: true,
-              capitalActivities: true,
-            }
-          }
-        },
+        include: includeConfig,
         orderBy: { createdAt: 'desc' },
         skip,
         take: limit,
@@ -122,15 +141,18 @@ export async function GET(request: NextRequest) {
       prisma.venture.count({ where })
     ]);
 
-    return NextResponse.json({
+    const responseData = {
       ventures,
       pagination: {
         page,
         limit,
         total,
         pages: Math.ceil(total / limit)
-      }
-    });
+      },
+      isMobile
+    };
+
+    return createCachedResponse(responseData, CACHE_CONFIGS.ANALYTICS);
   } catch (error) {
     console.error('Error fetching ventures:', error);
     return NextResponse.json(
