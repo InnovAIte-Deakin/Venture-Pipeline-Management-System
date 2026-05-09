@@ -73,64 +73,62 @@ export default buildConfig({
     // storage-adapter-placeholder
   ],
   onInit: async (payload) => {
-    // Ensure a default admin exists (first-run only)
-    const users = await payload.find({
-      collection: 'users',
-      where: { email: { equals: 'admin@example.com' } },
-      limit: 1,
-    })
-    if (users.totalDocs === 0) {
-      await payload.create({
+    const adminEmail = process.env.SEED_ADMIN_EMAIL
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD
+    const founderEmail = process.env.SEED_FOUNDER_EMAIL
+    const founderPassword = process.env.SEED_FOUNDER_PASSWORD
+    const analystEmail = process.env.SEED_ANALYST_EMAIL
+    const analystPassword = process.env.SEED_ANALYST_PASSWORD
+
+    if (!adminEmail || !adminPassword) {
+      console.warn('SEED_ADMIN_EMAIL or SEED_ADMIN_PASSWORD not set — skipping admin seed')
+    } else {
+      const users = await payload.find({
         collection: 'users',
-        data: {
-          email: 'admin@example.com',
-          password: 'changeme123',
-          first_name: 'Admin',
-          last_name: 'User',
-          role: 'admin',
-        },
+        where: { email: { equals: adminEmail } },
+        limit: 1,
       })
-      console.log('Seeded default admin user admin@example.com / changeme123')
+      if (users.totalDocs === 0) {
+        await payload.create({
+          collection: 'users',
+          data: { email: adminEmail, password: adminPassword, first_name: 'Admin', last_name: 'User', role: 'admin' },
+        })
+        console.log(`Seeded default admin user: ${adminEmail}`)
+      }
     }
 
-    // Ensure a default founder exists (first-run only)
-    const founders = await payload.find({
-      collection: 'users',
-      where: { email: { equals: 'founder@example.com' } },
-      limit: 1,
-    })
-    if (founders.totalDocs === 0) {
-      await payload.create({
+    if (!founderEmail || !founderPassword) {
+      console.warn('SEED_FOUNDER_EMAIL or SEED_FOUNDER_PASSWORD not set — skipping founder seed')
+    } else {
+      const founders = await payload.find({
         collection: 'users',
-        data: {
-          email: 'founder@example.com',
-          password: 'changeme123',
-          first_name: 'Founder',
-          last_name: 'user',
-          role: 'founder',
-        },
+        where: { email: { equals: founderEmail } },
+        limit: 1,
       })
-      console.log('Seeded default founder user founder@example.com / changeme123')
+      if (founders.totalDocs === 0) {
+        await payload.create({
+          collection: 'users',
+          data: { email: founderEmail, password: founderPassword, first_name: 'Founder', last_name: 'User', role: 'founder' },
+        })
+        console.log(`Seeded default founder user: ${founderEmail}`)
+      }
     }
 
-    // Ensure a default miv_analyst exists (first-run only)
-    const analysts = await payload.find({
-      collection: 'users',
-      where: { email: { equals: 'analyst@example.com' } },
-      limit: 1,
-    })
-    if (analysts.totalDocs === 0) {
-      await payload.create({
+    if (!analystEmail || !analystPassword) {
+      console.warn('SEED_ANALYST_EMAIL or SEED_ANALYST_PASSWORD not set — skipping analyst seed')
+    } else {
+      const analysts = await payload.find({
         collection: 'users',
-        data: {
-          email: 'analyst@example.com',
-          password: 'changeme123',
-          first_name: 'Analyst',
-          last_name: 'User',
-          role: 'miv_analyst',
-        },
+        where: { email: { equals: analystEmail } },
+        limit: 1,
       })
-      console.log('Seeded default miv_analyst user analyst@example.com / changeme123')
+      if (analysts.totalDocs === 0) {
+        await payload.create({
+          collection: 'users',
+          data: { email: analystEmail, password: analystPassword, first_name: 'Analyst', last_name: 'User', role: 'miv_analyst' },
+        })
+        console.log(`Seeded default analyst user: ${analystEmail}`)
+      }
     }
   },
 })
