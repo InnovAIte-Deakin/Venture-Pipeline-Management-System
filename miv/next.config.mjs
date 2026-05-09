@@ -1,8 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-	experimental: {
-		allowedDevOrigins: ["http://192.168.1.103:3000"],
-	},
+	allowedDevOrigins: ["http://192.168.1.103:3000"],
 	async rewrites() {
 		const backend =
 			process.env.NEXT_PUBLIC_BACKEND_URL ||
