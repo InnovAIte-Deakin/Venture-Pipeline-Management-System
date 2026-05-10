@@ -148,8 +148,12 @@ const gedsiGoals = [
 export function VentureIntakeForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
   const [aiAnalysis, setAiAnalysis] = useState<any>(null)
   const [showAiInsights, setShowAiInsights] = useState(false)
+  const [aiPreview, setAiPreview] = useState<any>(null)
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false)
+  const [previewError, setPreviewError] = useState<string | null>(null)
 
   const {
     register,
@@ -178,38 +182,76 @@ export function VentureIntakeForm() {
     }
   }
 
+  const handleAiPreview = async () => {
+    setIsLoadingPreview(true)
+    setPreviewError(null)
+    setAiPreview(null)
+    try {
+      const v = watchedValues
+      const res = await fetch('/api/ai/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: v.name || '',
+          sector: v.sector || '',
+          location: v.location || '',
+          founderTypes: v.founderTypes || [],
+          pitchSummary: v.pitchSummary || '',
+          inclusionFocus: v.inclusionFocus || '',
+          targetMarket: v.targetMarket || '',
+          revenueModel: v.revenueModel || '',
+          challenges: v.challenges || '',
+          supportNeeded: v.supportNeeded || '',
+          operationalReadiness: v.operationalReadiness || {},
+          capitalReadiness: v.capitalReadiness || {},
+          gedsiGoals: v.gedsiGoals || [],
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to generate preview')
+      setAiPreview(await res.json())
+    } catch (err) {
+      setPreviewError(err instanceof Error ? err.message : 'Preview unavailable')
+    } finally {
+      setIsLoadingPreview(false)
+    }
+  }
+
   const onSubmit = async (data: VentureIntakeFormData) => {
     setIsSubmitting(true)
+    setSubmitError(null)
     try {
-      // Submit venture data
       const response = await fetch('/api/ventures', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
 
-      if (response.ok) {
-        const result = await response.json()
-        
-        // Trigger AI analysis
-        const aiResponse = await fetch('/api/ai/analyze-venture', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ventureId: result.id }),
-        })
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        throw new Error(body?.message || `Submission failed (${response.status})`)
+      }
 
-        if (aiResponse.ok) {
-          const aiResult = await aiResponse.json()
-          setAiAnalysis(aiResult)
-          setShowAiInsights(true)
-        }
+      const result = await response.json()
+
+      // Trigger AI analysis — venture is already saved at this point
+      const aiResponse = await fetch('/api/ai/analyze-venture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ventureId: result.id }),
+      })
+
+      if (aiResponse.ok) {
+        const aiResult = await aiResponse.json()
+        setAiAnalysis(aiResult)
+        setShowAiInsights(true)
+      } else {
+        // Venture saved, but AI analysis failed — show partial success
+        setSubmitError('Your venture was submitted successfully, but AI analysis could not be completed. You can retry from the venture dashboard.')
+        setShowAiInsights(false)
       }
     } catch (error) {
       console.error('Error submitting venture:', error)
+      setSubmitError(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
@@ -877,18 +919,98 @@ export function VentureIntakeForm() {
         </div>
       </Card>
 
-      {/* AI Analysis Info */}
+      {/* AI Preview */}
       <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
-        <div className="flex items-start space-x-3">
-          <div className="p-2 bg-blue-500 rounded-full">
-            <Sparkles className="h-4 w-4 text-white" />
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <div className="p-2 bg-blue-500 rounded-full">
+                <Sparkles className="h-4 w-4 text-white" />
+              </div>
+              <div>
+                <h4 className="font-semibold text-blue-900 dark:text-blue-100">AI-Powered Impact Analysis</h4>
+                <p className="text-xs text-blue-600 dark:text-blue-300">Powered by Google Gemini</p>
+              </div>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleAiPreview}
+              disabled={isLoadingPreview}
+              className="border-blue-300 text-blue-700 hover:bg-blue-100 dark:border-blue-600 dark:text-blue-300"
+            >
+              {isLoadingPreview ? (
+                <><Loader2 className="h-3 w-3 mr-1 animate-spin" />Analysing...</>
+              ) : (
+                <><Sparkles className="h-3 w-3 mr-1" />Preview AI Analysis</>
+              )}
+            </Button>
           </div>
-          <div className="flex-1">
-            <h4 className="font-semibold text-blue-900 dark:text-blue-100">AI-Powered Impact Analysis</h4>
-            <p className="text-sm text-blue-700 dark:text-blue-200 mt-1">
-              After submitting your form, our AI system will analyze your venture and suggest additional relevant IRIS+ metrics based on your sector, business model, and GEDSI goals.
+
+          {previewError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{previewError}</AlertDescription>
+            </Alert>
+          )}
+
+          {aiPreview && (
+            <div className="space-y-4 pt-2 border-t border-blue-200 dark:border-blue-800">
+              <p className="text-sm text-blue-800 dark:text-blue-200 italic">{aiPreview.summary}</p>
+
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-white dark:bg-blue-950 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">Readiness Score</p>
+                  <p className="text-2xl font-bold text-green-600">{aiPreview.readinessScore}%</p>
+                </div>
+                <div className="bg-white dark:bg-blue-950 rounded-lg p-3 text-center">
+                  <p className="text-xs text-gray-500 dark:text-gray-400">GEDSI Alignment</p>
+                  <p className="text-2xl font-bold text-blue-600">{aiPreview.gedsiAlignment}%</p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-green-700 dark:text-green-400 uppercase tracking-wide">Strengths</p>
+                  {aiPreview.topStrengths?.map((s: string, i: number) => (
+                    <div key={i} className="flex items-start space-x-1">
+                      <CheckCircle className="h-3 w-3 text-green-500 mt-0.5 shrink-0" />
+                      <p className="text-xs text-gray-700 dark:text-gray-300">{s}</p>
+                    </div>
+                  ))}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 uppercase tracking-wide">Gaps to address</p>
+                  {aiPreview.topGaps?.map((g: string, i: number) => (
+                    <div key={i} className="flex items-start space-x-1">
+                      <AlertCircle className="h-3 w-3 text-amber-500 mt-0.5 shrink-0" />
+                      <p className="text-xs text-gray-700 dark:text-gray-300">{g}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {aiPreview.suggestedMetrics?.length > 0 && (
+                <div className="space-y-1">
+                  <p className="text-xs font-semibold text-purple-700 dark:text-purple-400 uppercase tracking-wide">Suggested IRIS+ Metrics</p>
+                  <div className="flex flex-wrap gap-2">
+                    {aiPreview.suggestedMetrics.map((m: any, i: number) => (
+                      <Badge key={i} variant="outline" className="text-xs border-purple-300 text-purple-700 dark:border-purple-600 dark:text-purple-300">
+                        {m.code}: {m.name}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+
+          {!aiPreview && !isLoadingPreview && !previewError && (
+            <p className="text-sm text-blue-700 dark:text-blue-200">
+              Click <strong>Preview AI Analysis</strong> to get an instant Gemini-powered assessment before you submit.
             </p>
-          </div>
+          )}
         </div>
       </Card>
 
@@ -1064,6 +1186,13 @@ export function VentureIntakeForm() {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {renderStep()}
 
+            {submitError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{submitError}</AlertDescription>
+              </Alert>
+            )}
+
             {/* Navigation */}
             <div className="flex justify-between pt-6">
               <Button
@@ -1080,7 +1209,6 @@ export function VentureIntakeForm() {
                 <Button
                   type="button"
                   onClick={nextStep}
-                  disabled={isValid}
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-2" />

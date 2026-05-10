@@ -92,16 +92,23 @@ export async function POST(request: NextRequest) {
       }
     })
 
-    // Create activity log
-    await prisma.activity.create({
-      data: {
-        type: 'VENTURE_CREATED',
-        title: 'AI Analysis Completed',
-        description: `AI analysis completed for ${venture.name} with ${analysisResult.readinessScore}% readiness score`,
-        ventureId: ventureId,
-        userId: session.user.email as string,
-      }
+    // Resolve actual user ID from session email
+    const sessionUser = await prisma.user.findUnique({
+      where: { email: session.user.email as string },
+      select: { id: true },
     })
+
+    if (sessionUser) {
+      await prisma.activity.create({
+        data: {
+          type: 'VENTURE_CREATED',
+          title: 'AI Analysis Completed',
+          description: `AI analysis completed for ${venture.name} with ${analysisResult.readinessScore}% readiness score`,
+          ventureId: ventureId,
+          userId: sessionUser.id,
+        },
+      })
+    }
 
     return NextResponse.json(analysisResult)
 
