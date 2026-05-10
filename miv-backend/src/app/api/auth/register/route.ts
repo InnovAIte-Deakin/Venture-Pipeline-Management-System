@@ -1,166 +1,109 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getPayload } from "payload";
-import config from "@payload-config";
-import { z } from "zod";
+import { NextRequest, NextResponse } from 'next/server'
+import { getPayload } from 'payload'
+import config from '@payload-config'
+import { z } from 'zod'
+import type { User } from '@/payload-types'
+
+const AUTH_COOKIE_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 
 const RegisterSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Valid email is required"),
-  // password: z.string().min(4, "Password must be at least 4 characters"),
-  password: z.string(),
+  firstName: z.string().min(1, 'First name is required').max(100),
+  lastName: z.string().min(1, 'Last name is required').max(100),
+  email: z.string().email('Valid email is required'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+})
 
-  ventureName: z.string().optional(),
-  positionInVenture: z.string().optional(),
-  phone: z.string().optional(),
-  countryCode: z.string().optional(),
-});
-
-const IMPACT_APPLICANT_ROLE = "USER"; // maps to Prisma enum UserRole.USER
+// ─── POST /api/auth/register ──────────────────────────────────────────────────
 
 export async function POST(req: NextRequest) {
   try {
-    const json = await req.json().catch(() => null);
-
-    if (!json) {
+    const rawBody = await req.json().catch(() => null)
+    if (!rawBody) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "Bad Request",
-          message: "Request body must be JSON.",
-        },
-        { status: 400 }
-      );
+        { success: false, message: 'Request body must be valid JSON.' },
+        { status: 400 },
+      )
     }
 
-    const parsed = RegisterSchema.safeParse(json);
-
+    const parsed = RegisterSchema.safeParse(rawBody)
     if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors;
       const message =
-        Object.values(fieldErrors)
-          .flat()
-          .find(Boolean) || "Invalid registration data";
-
+        parsed.error.errors[0]?.message ?? 'Invalid registration data.'
       return NextResponse.json(
-        {
-          success: false,
-          error: "ValidationError",
-          message,
-          details: fieldErrors,
-        },
-        { status: 400 }
-      );
+        { success: false, message },
+        { status: 400 },
+      )
     }
 
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      ventureName,
-      positionInVenture,
-      phone,
-      countryCode,
-    } = parsed.data;
+    const { firstName, lastName, email, password } = parsed.data
+    const normalizedEmail = email.toLowerCase()
 
-    const payload = await getPayload({ config });
+    const payload = await getPayload({ config })
 
+    // Duplicate email check
     const existing = await payload.find({
-      collection: "users",
-      where: {
-        email: {
-          equals: email.toLowerCase(),
-        },
-      },
+      collection: 'users',
+      where: { email: { equals: normalizedEmail } },
       limit: 1,
-    });
-
+    })
     if (existing.totalDocs > 0) {
       return NextResponse.json(
-        {
-          success: false,
-          error: "UserExists",
-          message: "An account with that email already exists.",
-        },
-        { status: 409 }
-      );
+        { success: false, message: 'An account with that email already exists.' },
+        { status: 409 },
+      )
     }
 
-    // 2. Create Impact Applicant user
-    const user = await payload.create({
-      collection: "users",
+    // Create user — role defaults to 'founder' for new self-registrations
+    const user = (await payload.create({
+      collection: 'users',
       data: {
-        firstName,
-        lastName,
-        email: email.toLowerCase(),
+        first_name: firstName,
+        last_name: lastName,
+        email: normalizedEmail,
         password,
-        role: "user",
-      
-        ventureName,
-        positionInVenture,
-        phone,
-        countryCode,
+        role: 'founder',
       },
-    });
+    })) as User
 
-    // 3. (Optional) Send welcome email, but don't fail the request if this errors
-    // try {
-    //   await emailService.sendWelcomeEmail({
-    //     to: email,
-    //     firstName,
-    //   });
-    // } catch (err) {
-    //   console.error("Failed to send welcome email", err);
-    // }
-
-    // 4. Log the user in immediately (so dashboard can rely on auth cookie)
-    // Adjust this to match your Payload auth setup if the API differs.
+    // Immediately log the user in to obtain an auth token
     const auth = await payload.login({
-      collection: "users",
-      data: {
-        email: email.toLowerCase(),
-        password,
-      },
-    });
+      collection: 'users',
+      data: { email: normalizedEmail, password },
+    })
+
+    const isProduction = process.env.NODE_ENV === 'production'
 
     const response = NextResponse.json(
       {
         success: true,
-        message: "Account created successfully",
-        // Keep response small; just what the client might need
+        message: 'Account created successfully.',
         user: {
-          id: (user as any).id,
-          email: (user as any).email,
-          firstName: (user as any).firstName,
-          lastName: (user as any).lastName,
-          role: (user as any).role,
+          id: user.id,
+          email: user.email,
+          firstName: user.first_name,
+          lastName: user.last_name,
+          role: user.role,
         },
       },
-      { status: 201 }
-    );
+      { status: 201 },
+    )
 
-    // Attach Payload auth token as cookie if available
     if (auth?.token) {
-      response.cookies.set("payload-token", auth.token, {
+      response.cookies.set('payload-token', auth.token, {
         httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        // secure: true in production
-      });
+        sameSite: 'lax',
+        secure: isProduction,
+        maxAge: AUTH_COOKIE_MAX_AGE,
+        path: '/',
+      })
     }
 
-    return response;
-  } catch (error) {
-    console.error("Registration error:", error);
-
+    return response
+  } catch (error: unknown) {
+    console.error('[Register] Unhandled error:', error)
     return NextResponse.json(
-      {
-        success: false,
-        error: "RegistrationFailed",
-        message: "Failed to create account. Please try again.",
-      },
-      { status: 500 }
-    );
+      { success: false, message: 'Failed to create account. Please try again.' },
+      { status: 500 },
+    )
   }
 }

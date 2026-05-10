@@ -1,61 +1,76 @@
-version: '3'
+version: '3.9'
+
+# ─── Quick-start commands ──────────────────────────────────────────────────────
+#
+#   Start only MongoDB (for local pnpm dev):
+#     docker compose up -d mongo
+#
+#   Start MongoDB + admin UI (Mongo Express at http://localhost:8081):
+#     docker compose up -d mongo mongo-express
+#
+#   Start everything in Docker (backend + MongoDB):
+#     docker compose up
+#
+# ──────────────────────────────────────────────────────────────────────────────
 
 services:
-  payload-cms:
-    image: node:18-alpine
-    ports:
-      - '3001:3000'
-    volumes:
-    - .:/home/node/app:z
-    - node_modules:/home/node/app/node_modules
-    working_dir: /home/node/app/
-    command: sh -c "corepack enable && corepack prepare pnpm@latest --activate && pnpm install && pnpm dev"
-    depends_on:
-      - mongo
-      - postgres
-    env_file:
-      - .env
-    environment:
-      - DATABASE_URI=mongodb://mongo:27017/payload
 
-  # Ensure your DATABASE_URI uses 'mongo' as the hostname ie. mongodb://mongo/my-db-name
+  # ── MongoDB ────────────────────────────────────────────────────────────────
   mongo:
-    image: mongo:latest
+    image: mongo:7
+    container_name: miv_mongodb
+    restart: unless-stopped
     ports:
       - '27017:27017'
-    command:
-      - --storageEngine=wiredTiger
+    command: --storageEngine=wiredTiger
     volumes:
-      - data:/data/db
-    logging:
-      driver: none
+      - mongodb_data:/data/db
+    environment:
+      MONGO_INITDB_DATABASE: payload
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # MongoDB web admin interface at http://localhost:8081
+  # ── Mongo Express (optional web admin UI) ─────────────────────────────────
   mongo-express:
     image: mongo-express:latest
+    container_name: miv_mongo_express
+    restart: unless-stopped
     ports:
       - '8081:8081'
     environment:
-      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/
-      - ME_CONFIG_BASICAUTH=false
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      ME_CONFIG_BASICAUTH: 'false'
     depends_on:
-      - mongo
-    restart: unless-stopped
+      mongo:
+        condition: service_healthy
+    profiles:
+      - admin
 
-  # Uncomment the following to use postgres
-  postgres:
-    restart: always
-    image: postgres:latest
-    volumes:
-      - pgdata:/var/lib/postgresql
+  # ── Backend (optional — use pnpm dev locally instead) ─────────────────────
+  backend:
+    image: node:20-alpine
+    container_name: miv_backend
+    restart: unless-stopped
     ports:
-      - "5432:5432"
+      - '3001:3000'
+    working_dir: /app
+    volumes:
+      - .:/app
+      - backend_node_modules:/app/node_modules
+    command: sh -c "corepack enable && pnpm install && pnpm dev"
+    depends_on:
+      mongo:
+        condition: service_healthy
     environment:
-      POSTGRES_USER: app_miv
-      POSTGRES_PASSWORD: supersecret
-      POSTGRES_DB: app_miv
+      DATABASE_URI: mongodb://mongo:27017/payload
+    env_file:
+      - .env
+    profiles:
+      - full
 
 volumes:
-  data:
-  pgdata:
-  node_modules:
+  mongodb_data:
+  backend_node_modules:

@@ -145,6 +145,10 @@ export interface User {
   id: string;
   first_name: string;
   last_name: string;
+  /**
+   * Google account sub — set automatically on first Google SSO sign-in.
+   */
+  googleId?: string | null;
   role: 'founder' | 'miv_analyst' | 'admin' | 'user';
   updatedAt: string;
   createdAt: string;
@@ -572,6 +576,7 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   first_name?: T;
   last_name?: T;
+  googleId?: T;
   role?: T;
   updatedAt?: T;
   createdAt?: T;

@@ -7,6 +7,9 @@
   "scripts": {
     "build": "cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
+    "dev:db": "docker compose up -d mongo",
+    "dev:db:stop": "docker compose stop mongo",
+    "dev:db:logs": "docker compose logs -f mongo",
     "devsafe": "rm -rf .next && cross-env NODE_OPTIONS=--no-deprecation next dev",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
@@ -32,6 +35,7 @@
     "clsx": "^2.1.1",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
+    "jose": "^5.9.6",
     "graphql": "^16.8.1",
     "lucide-react": "^0.536.0",
     "mailersend": "^2.6.0",
