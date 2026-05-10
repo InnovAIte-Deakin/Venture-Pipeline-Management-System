@@ -1,0 +1,546 @@
+import nodemailer from 'nodemailer'
+<<<<<<< HEAD:miv/lib/email-service.ts
+import { prisma } from '@/lib/prisma'
+import { EmailStatus } from '@prisma/client'
+
+const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER || 'nodemailer'
+
+let emailTransporter: nodemailer.Transporter | null = null
+
+/**
+ * Get or create email transporter for nodemailer
+ */
+function getEmailTransporter() {
+  if (emailTransporter) return emailTransporter
+
+  if (EMAIL_PROVIDER === 'mailersend') {
+    return null // MailerSend doesn't need a transporter
+  }
+
+  // Default to nodemailer with environment variables
+  emailTransporter = nodemailer.createTransport({
+    host: process.env.EMAIL_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.EMAIL_PORT || '587'),
+    secure: process.env.EMAIL_SECURE === 'true', // true for 465, false for 587
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASSWORD,
+    },
+  })
+
+  return emailTransporter
+}
+
+interface SendEmailOptions {
+  to: string | string[]
+  subject: string
+  html: string
+  text?: string
+  from?: string
+  template?: string
+  metadata?: Record<string, any>
+}
+
+/**
+ * Send email using configured provider
+ */
+export async function sendEmail({
+  to,
+  subject,
+  html,
+  text,
+  from = process.env.EMAIL_FROM || 'noreply@venturepipeline.com',
+  template,
+  metadata,
+}: SendEmailOptions) {
+  const toArray = Array.isArray(to) ? to : [to]
+
+  try {
+    if (EMAIL_PROVIDER === 'mailersend') {
+      const { MailerSend, Recipient } = await import('mailersend')
+      const mailerSend = new MailerSend({
+        apiKey: process.env.MAILERSEND_API_KEY!,
+      })
+
+      await mailerSend.email.send({
+        from: { email: from },
+        to: toArray.map(email => ({ email })),
+        subject,
+        html,
+        text,
+      })
+    } else {
+      // Use nodemailer
+      const transporter = getEmailTransporter()
+      if (!transporter) {
+        throw new Error('Email transporter not configured')
+      }
+
+      await transporter.sendMail({
+        from,
+        to: toArray.join(', '),
+        subject,
+        html,
+        text,
+      })
+    }
+
+    // Log successful email
+    await logEmailStatus({
+      to: toArray[0],
+      subject,
+      template,
+      status: 'SENT',
+      metadata,
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Email sending failed:', error)
+
+    // Log failed email
+    await logEmailStatus({
+      to: toArray[0],
+      subject,
+      template,
+      status: 'FAILED',
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      metadata,
+    })
+
+    throw error
+  }
+}
+
+/**
+ * Log email status to database
+ */
+async function logEmailStatus({
+  to,
+  subject,
+  template,
+  status,
+  errorMessage,
+  metadata,
+}: {
+  to: string
+  subject: string
+  template?: string
+  status: EmailStatus
+  errorMessage?: string
+  metadata?: Record<string, any>
+}) {
+  try {
+    await prisma.emailLog.create({
+      data: {
+        to,
+        subject,
+        template,
+        status,
+        errorMessage,
+        metadata,
+        sentAt: status === 'SENT' ? new Date() : undefined,
+      },
+    })
+  } catch (error) {
+    console.error('Failed to log email status:', error)
+  }
+}
+
+/**
+ * Send email and create notification
+ */
+export async function sendEmailNotification({
+  userId,
+  email,
+  subject,
+  html,
+  text,
+  notificationType,
+  notificationTitle,
+  notificationMessage,
+  metadata,
+  template,
+}: {
+  userId: string
+  email: string
+  subject: string
+  html: string
+  text?: string
+  notificationType: string
+  notificationTitle: string
+  notificationMessage: string
+  metadata?: Record<string, any>
+  template?: string
+}) {
+  try {
+    // Send email
+    await sendEmail({
+      to: email,
+      subject,
+      html,
+      text,
+      template,
+      metadata,
+    })
+
+    // Create notification record
+    await prisma.notification.create({
+      data: {
+        userId,
+        type: notificationType as any,
+        title: notificationTitle,
+        message: notificationMessage,
+        metadata,
+      },
+    })
+
+    return { success: true }
+  } catch (error) {
+    console.error('Failed to send email notification:', error)
+    throw error
+  }
+}
+
+/**
+ * Get email statistics
+ */
+export async function getEmailStats(days: number = 7) {
+  const sinceDate = new Date()
+  sinceDate.setDate(sinceDate.getDate() - days)
+
+  const stats = await prisma.emailLog.groupBy({
+    by: ['status'],
+    where: {
+      createdAt: {
+        gte: sinceDate,
+      },
+    },
+    _count: true,
+  })
+
+  return stats
+}
+
+/**
+ * Retry failed emails
+ */
+export async function retryFailedEmails() {
+  const failedEmails = await prisma.emailLog.findMany({
+    where: {
+      status: 'FAILED',
+      sentAt: null,
+    },
+    take: 10, // Retry up to 10 at a time
+  })
+
+  let successCount = 0
+
+  for (const emailLog of failedEmails) {
+    try {
+      await sendEmail({
+        to: emailLog.to,
+        subject: emailLog.subject,
+        html: emailLog.metadata?.html || '',
+        template: emailLog.template,
+      })
+      successCount++
+    } catch (error) {
+      console.error(`Failed to retry email to ${emailLog.to}:`, error)
+    }
+  }
+
+  return { totalRetried: failedEmails.length, successCount }
+}
+=======
+import type { Transporter } from 'nodemailer'
+
+interface WelcomeEmailData {
+  userEmail: string
+  firstName: string
+  lastName: string
+  ventureName?: string
+  position?: string
+}
+
+interface TestEmailData {
+  userEmail: string
+  userName: string
+  ventureName: string
+}
+
+class EmailService {
+  private transporter: Transporter | null = null
+  private fromEmail: string
+  private fromName: string
+
+  constructor() {
+    this.fromEmail = process.env.SMTP_FROM_EMAIL || process.env.EMAILJS_REPLY_TO || 'noreply@miv-ventures.com'
+    this.fromName = 'Mekong Inclusive Ventures'
+    this.initializeTransporter()
+  }
+
+  private initializeTransporter() {
+    const smtpHost = process.env.SMTP_HOST
+    const smtpPort = parseInt(process.env.SMTP_PORT || '587')
+    const smtpUser = process.env.SMTP_USER
+    const smtpPass = process.env.SMTP_PASS
+
+    if (!smtpHost || !smtpUser || !smtpPass) {
+      console.warn('SMTP configuration missing. Email sending will be disabled.')
+      console.log('Required environment variables:')
+      console.log('- SMTP_HOST:', smtpHost ? 'SET' : 'MISSING')
+      console.log('- SMTP_USER:', smtpUser ? 'SET' : 'MISSING')
+      console.log('- SMTP_PASS:', smtpPass ? 'SET' : 'MISSING')
+      return
+    }
+
+    try {
+      this.transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465, // true for 465, false for other ports
+        auth: {
+          user: smtpUser,
+          pass: smtpPass,
+        },
+      })
+
+      console.log('Email service initialized successfully')
+      console.log('- SMTP Host:', smtpHost)
+      console.log('- SMTP Port:', smtpPort)
+      console.log('- From Email:', this.fromEmail)
+    } catch (error) {
+      console.error('Failed to initialize email service:', error)
+    }
+  }
+
+  private isConfigured(): boolean {
+    return this.transporter !== null
+  }
+
+  private generateWelcomeEmailHTML(data: WelcomeEmailData): string {
+    const { firstName, lastName, ventureName, position } = data
+    const loginUrl = process.env.NEXT_PUBLIC_SITE_URL 
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/login`
+      : 'http://localhost:3000/login'
+
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Welcome to Mekong Inclusive Ventures</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #0ea5e9, #10b981); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 0 20px; }
+        .button { display: inline-block; background: #0ea5e9; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold; margin: 20px 0; }
+        .button:hover { background: #0284c7; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 8px 8px; margin: 20px -20px -20px -20px; }
+        .highlight { background: #f0f9ff; padding: 15px; border-left: 4px solid #0ea5e9; margin: 20px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>Welcome to Mekong Inclusive Ventures!</h1>
+        </div>
+        
+        <div class="content">
+          <h2>Hi ${firstName}! 👋</h2>
+          
+          <p>Welcome to <strong>Mekong Inclusive Ventures</strong>! We're thrilled to have you join our community of changemakers who are building a more inclusive future for Southeast Asia.</p>
+          
+          ${ventureName ? `
+          <div class="highlight">
+            <p><strong>Your Venture:</strong> ${ventureName}</p>
+            ${position ? `<p><strong>Your Role:</strong> ${position}</p>` : ''}
+          </div>
+          ` : ''}
+          
+          <h3>What's Next?</h3>
+          <ul>
+            <li>🔑 <strong>Login to your account</strong> using the button below</li>
+            <li>📋 <strong>Complete your venture profile</strong> if you haven't already</li>
+            <li>🤝 <strong>Connect with our team</strong> and other founders</li>
+            <li>🚀 <strong>Access resources</strong> to help grow your venture</li>
+          </ul>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${loginUrl}" class="button">Login to Your Account</a>
+          </div>
+          
+          <p>If you have any questions or need assistance, don't hesitate to reach out to our team. We're here to support you every step of the way!</p>
+          
+          <p>Best regards,<br>
+          <strong>The Mekong Inclusive Ventures Team</strong></p>
+        </div>
+        
+        <div class="footer">
+          <p>This email was sent to ${data.userEmail}</p>
+          <p>Mekong Inclusive Ventures | Building Inclusive Futures</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `
+  }
+
+  private generateWelcomeEmailText(data: WelcomeEmailData): string {
+    const { firstName, ventureName, position } = data
+    const loginUrl = process.env.NEXT_PUBLIC_SITE_URL 
+      ? `${process.env.NEXT_PUBLIC_SITE_URL}/login`
+      : 'http://localhost:3000/login'
+
+    return `
+Hi ${firstName}!
+
+Welcome to Mekong Inclusive Ventures! We're thrilled to have you join our community of changemakers who are building a more inclusive future for Southeast Asia.
+
+${ventureName ? `Your Venture: ${ventureName}` : ''}
+${position ? `Your Role: ${position}` : ''}
+
+What's Next?
+• Login to your account: ${loginUrl}
+• Complete your venture profile if you haven't already
+• Connect with our team and other founders
+• Access resources to help grow your venture
+
+If you have any questions or need assistance, don't hesitate to reach out to our team. We're here to support you every step of the way!
+
+Best regards,
+The Mekong Inclusive Ventures Team
+
+---
+This email was sent to ${data.userEmail}
+Mekong Inclusive Ventures | Building Inclusive Futures
+    `.trim()
+  }
+
+  async sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
+    if (!this.isConfigured()) {
+      console.warn('Email service not configured - skipping welcome email')
+      return false
+    }
+
+    try {
+      console.log(`Sending welcome email to ${data.userEmail}`)
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: data.userEmail,
+        subject: `Welcome to Mekong Inclusive Ventures, ${data.firstName}!`,
+        text: this.generateWelcomeEmailText(data),
+        html: this.generateWelcomeEmailHTML(data),
+      }
+
+      const result = await this.transporter!.sendMail(mailOptions)
+      console.log('Welcome email sent successfully:', result.messageId)
+      return true
+    } catch (error) {
+      console.error('Failed to send welcome email:', error)
+      return false
+    }
+  }
+
+  async sendTestEmail(data: TestEmailData): Promise<boolean> {
+    if (!this.isConfigured()) {
+      console.warn('Email service not configured - skipping test email')
+      return false
+    }
+
+    try {
+      console.log(`Sending test email to ${data.userEmail}`)
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: data.userEmail,
+        subject: 'Test Email from Mekong Inclusive Ventures',
+        text: `Hi ${data.userName}!\n\nThis is a test email from Mekong Inclusive Ventures.\n\nVenture: ${data.ventureName}\n\nIf you received this email, the email service is working correctly!\n\nBest regards,\nMekong Inclusive Ventures Team`,
+        html: `
+          <h2>Hi ${data.userName}!</h2>
+          <p>This is a test email from <strong>Mekong Inclusive Ventures</strong>.</p>
+          <p><strong>Venture:</strong> ${data.ventureName}</p>
+          <p>If you received this email, the email service is working correctly! ✅</p>
+          <p>Best regards,<br><strong>Mekong Inclusive Ventures Team</strong></p>
+        `,
+      }
+
+      const result = await this.transporter!.sendMail(mailOptions)
+      console.log('Test email sent successfully:', result.messageId)
+      return true
+    } catch (error) {
+      console.error('Failed to send test email:', error)
+      return false
+    }
+  }
+
+  async sendPasswordResetEmail(userEmail: string, resetToken: string) {
+  if (!this.isConfigured()) {
+    console.log("SMTP not configured, cannot send reset email.");
+    console.log("Reset token:", resetToken);
+    return { success: false, message: "Email service not configured" };
+  }
+
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const resetLink = `${baseUrl}/auth/reset-password?token=${resetToken}`;
+
+  const subject = "Reset your password";
+  const html = `
+    <div style="font-family: Arial, sans-serif; line-height: 1.5;">
+      <h2>Password Reset Request</h2>
+      <p>We received a request to reset your password.</p>
+      <p>Click the button below to reset it:</p>
+      <p>
+        <a href="${resetLink}"
+           style="display:inline-block;padding:10px 16px;background:#2563eb;color:#fff;text-decoration:none;border-radius:6px;">
+          Reset Password
+        </a>
+      </p>
+      <p style="font-size: 12px; color: #555;">
+        If you did not request this, you can ignore this email.
+      </p>
+    </div>
+  `;
+
+  try {
+    await this.transporter!.sendMail({
+      from: this.fromEmail,
+      to: userEmail,
+      subject,
+      html,
+    });
+
+    console.log("✅ Password reset email sent to:", userEmail);
+    return { success: true, message: "Reset email sent", resetLink };
+  } catch (error) {
+    console.error("❌ Failed to send reset email:", error);
+    return { success: false, message: "Failed to send reset email" };
+  }
+}
+
+
+  getConfigurationStatus(): { configured: boolean; missing: string[] } {
+    const missing: string[] = []
+    
+    if (!process.env.SMTP_HOST) missing.push('SMTP_HOST')
+    if (!process.env.SMTP_USER) missing.push('SMTP_USER')
+    if (!process.env.SMTP_PASS) missing.push('SMTP_PASS')
+
+    return {
+      configured: missing.length === 0,
+      missing
+    }
+  }
+}
+
+// Export singleton instance
+export const emailService = new EmailService()
+
+// Export types
+export type { WelcomeEmailData, TestEmailData }
+>>>>>>> origin/development:src/lib/email-service.ts
