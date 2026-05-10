@@ -108,98 +108,162 @@ Tags: Document, Analysis, Review, Professional`;
     }
   }
 
-  // Content Generation using fallback responses (no API calls)
-  static async generateContent(prompt: string) {
-    try {
-      // Analyze the prompt to provide contextual responses
-      const isVentureAnalysis = prompt.toLowerCase().includes('venture') || prompt.toLowerCase().includes('readiness');
-      const isGEDSIAnalysis = prompt.toLowerCase().includes('gedsi') || prompt.toLowerCase().includes('impact');
-      const isRiskAssessment = prompt.toLowerCase().includes('risk') || prompt.toLowerCase().includes('assessment');
-      
-      if (isVentureAnalysis) {
-        return JSON.stringify({
-          readinessScore: Math.floor(Math.random() * 30) + 60, // 60-90
-          gedsiAlignment: Math.floor(Math.random() * 25) + 70, // 70-95
-          recommendations: [
-            "Complete comprehensive financial projections with 3-year forecasts",
-            "Develop detailed business plan with market analysis and competitive landscape",
-            "Strengthen team composition with key leadership roles defined",
-            "Conduct thorough market research with customer validation",
-            "Prepare investor-ready materials including pitch deck and financial model",
-            "Establish clear governance structure and legal framework",
-            "Develop operational processes and scalability roadmap"
-          ],
-          suggestedMetrics: [
-            { code: "OI.1", name: "Women-led ventures", reason: "Relevant for gender inclusion and empowerment" },
-            { code: "OI.2", name: "Disability inclusion", reason: "Important for accessibility and inclusive design" },
-            { code: "OI.3", name: "Rural communities served", reason: "Addresses social inclusion and geographic diversity" },
-            { code: "OI.4", name: "Youth employment", reason: "Supports economic inclusion and skill development" },
-            { code: "OI.5", name: "Environmental impact", reason: "Tracks sustainability and climate action" }
-          ],
-          riskAssessment: {
-            level: "Medium",
-            risks: [
-              "Market competition and differentiation challenges",
-              "Funding timeline and capital requirements",
-              "Regulatory compliance and legal framework",
-              "Team scaling and talent acquisition",
-              "Technology adoption and infrastructure needs"
-            ],
-            mitigations: [
-              "Develop unique value proposition and competitive moats",
-              "Diversify funding sources and maintain strong investor relations",
-              "Engage legal counsel early and stay updated on regulations",
-              "Build strong employer brand and retention strategies",
-              "Invest in scalable technology and infrastructure planning"
-            ]
-          }
-        });
-      } else if (isGEDSIAnalysis) {
-        return JSON.stringify({
-          trendAnalysis: "Strong positive trends in gender inclusion and rural community impact. Areas for improvement include disability inclusion and youth engagement.",
-          recommendations: [
-            "Increase focus on disability-inclusive design and accessibility",
-            "Expand youth employment and skill development programs",
-            "Strengthen measurement of social inclusion outcomes",
-            "Develop partnerships with disability organizations",
-            "Implement inclusive hiring practices and workplace accommodations"
-          ],
-          riskAlerts: "Monitor rural outreach effectiveness and ensure equitable access to resources across all communities."
-        });
-      } else if (isRiskAssessment) {
-        return JSON.stringify({
-          riskLevel: "Medium",
-          keyRisks: [
-            "Market volatility and economic uncertainty",
-            "Regulatory changes affecting impact measurement",
-            "Resource constraints and funding limitations",
-            "Stakeholder alignment and communication challenges"
-          ],
-          mitigationStrategies: [
-            "Diversify portfolio and maintain strong cash reserves",
-            "Stay updated on regulatory changes and compliance requirements",
-            "Build strong relationships with funders and partners",
-            "Implement robust stakeholder engagement and communication plans"
-          ]
-        });
-      } else {
-        // Generic response for other prompts
-        return JSON.stringify({
-          analysis: "AI analysis completed successfully",
-          insights: "Key insights and recommendations generated",
-          nextSteps: "Review recommendations and implement priority actions",
-          confidence: "High confidence in analysis results"
-        });
+  // Generate content — tries Gemini first, falls back to deterministic response
+  static async generateContent(prompt: string): Promise<string> {
+    if (googleAI) {
+      try {
+        const model = googleAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const result = await model.generateContent(prompt)
+        return result.response.text()
+      } catch (error) {
+        console.error('Gemini API error, using fallback:', error)
       }
-    } catch (error) {
-      console.error('Error in fallback content generation:', error);
+    }
+
+    // Deterministic fallback when no API key is configured
+    const isVentureAnalysis = prompt.toLowerCase().includes('venture') || prompt.toLowerCase().includes('readiness')
+    const isGEDSI = prompt.toLowerCase().includes('gedsi') || prompt.toLowerCase().includes('impact')
+
+    if (isVentureAnalysis) {
       return JSON.stringify({
-        readinessScore: 75,
-        gedsiAlignment: 80,
-        recommendations: ["Complete due diligence", "Strengthen team", "Prepare documentation"],
-        suggestedMetrics: [{ code: "OI.1", name: "Women-led ventures", reason: "Standard inclusion metric" }],
-        riskAssessment: { level: "Medium", risks: ["Standard risks"], mitigations: ["Standard mitigations"] }
-      });
+        readinessScore: 72,
+        gedsiAlignment: 78,
+        recommendations: [
+          'Complete comprehensive financial projections with 3-year forecasts',
+          'Develop a detailed business plan with market analysis',
+          'Strengthen team composition with key leadership roles defined',
+          'Conduct thorough market research with customer validation',
+          'Prepare investor-ready materials including pitch deck',
+        ],
+        suggestedMetrics: [
+          { code: 'OI.1', name: 'Women-led ventures supported', reason: 'Relevant for gender inclusion' },
+          { code: 'OI.2', name: 'Ventures with disability inclusion', reason: 'Promotes accessibility' },
+          { code: 'OI.3', name: 'Rural communities served', reason: 'Addresses geographic inclusion' },
+          { code: 'OI.4', name: 'Youth employment created', reason: 'Supports economic inclusion' },
+        ],
+        riskAssessment: {
+          level: 'Medium',
+          risks: ['Market competition', 'Funding timeline', 'Team scaling', 'Regulatory compliance'],
+          mitigations: ['Unique value proposition', 'Diversify funding sources', 'Build advisory board', 'Engage legal counsel early'],
+        },
+      })
+    }
+
+    if (isGEDSI) {
+      return JSON.stringify({
+        trendAnalysis: 'Positive trends in gender inclusion and community impact. Disability inclusion needs strengthening.',
+        recommendations: [
+          'Increase disability-inclusive design and accessibility',
+          'Expand youth employment programs',
+          'Strengthen social inclusion outcome measurement',
+        ],
+        riskAlerts: 'Monitor rural outreach effectiveness and equitable resource access.',
+      })
+    }
+
+    return JSON.stringify({
+      analysis: 'Analysis completed',
+      insights: 'Review recommendations and implement priority actions',
+    })
+  }
+
+  // Structured AI summary for pre-submit preview — uses Gemini, no DB writes
+  static async summarizeVenture(data: {
+    name: string
+    sector: string
+    location: string
+    founderTypes: string[]
+    pitchSummary: string
+    inclusionFocus: string
+    targetMarket: string
+    revenueModel: string
+    challenges: string
+    supportNeeded: string
+    operationalReadiness: Record<string, boolean>
+    capitalReadiness: Record<string, boolean>
+    gedsiGoals: string[]
+  }): Promise<{
+    summary: string
+    readinessScore: number
+    gedsiAlignment: number
+    topStrengths: string[]
+    topGaps: string[]
+    suggestedMetrics: { code: string; name: string; reason: string }[]
+  }> {
+    const operationalChecked = Object.values(data.operationalReadiness || {}).filter(Boolean).length
+    const operationalTotal = Object.keys(data.operationalReadiness || {}).length || 5
+    const capitalChecked = Object.values(data.capitalReadiness || {}).filter(Boolean).length
+    const capitalTotal = Object.keys(data.capitalReadiness || {}).length || 5
+
+    const prompt = `You are an impact investment analyst. Analyze this venture and respond with valid JSON only — no markdown, no explanation outside the JSON.
+
+Venture: ${data.name}
+Sector: ${data.sector}
+Location: ${data.location}
+Founder types: ${(data.founderTypes || []).join(', ')}
+Pitch: ${data.pitchSummary}
+Inclusion focus: ${data.inclusionFocus}
+Target market: ${data.targetMarket}
+Revenue model: ${data.revenueModel}
+Challenges: ${data.challenges}
+Support needed: ${data.supportNeeded}
+Operational readiness: ${operationalChecked}/${operationalTotal} items completed
+Capital readiness: ${capitalChecked}/${capitalTotal} items completed
+GEDSI goals: ${(data.gedsiGoals || []).join(', ')}
+
+Respond with this exact JSON structure:
+{
+  "summary": "2-3 sentence venture overview",
+  "readinessScore": <integer 0-100>,
+  "gedsiAlignment": <integer 0-100>,
+  "topStrengths": ["strength 1", "strength 2", "strength 3"],
+  "topGaps": ["gap 1", "gap 2", "gap 3"],
+  "suggestedMetrics": [
+    { "code": "OI.x", "name": "metric name", "reason": "why relevant" }
+  ]
+}`
+
+    if (googleAI) {
+      try {
+        const model = googleAI.getGenerativeModel({ model: 'gemini-1.5-flash' })
+        const result = await model.generateContent(prompt)
+        const text = result.response.text().trim()
+        // Strip markdown code fences if Gemini wraps the JSON
+        const clean = text.replace(/^```(?:json)?\n?/i, '').replace(/\n?```$/i, '').trim()
+        return JSON.parse(clean)
+      } catch (error) {
+        console.error('Gemini summarize error, using fallback:', error)
+      }
+    }
+
+    // Deterministic fallback
+    const readinessScore = Math.round(((operationalChecked / operationalTotal) + (capitalChecked / capitalTotal)) / 2 * 100)
+    const gedsiAlignment = Math.min(
+      50 +
+      (data.founderTypes || []).filter(t => ['women-led', 'disability-inclusive', 'indigenous-led', 'rural-focus'].includes(t)).length * 10 +
+      ((data.inclusionFocus || '').length > 20 ? 10 : 0),
+      100
+    )
+
+    return {
+      summary: `${data.name} is a ${data.sector} venture based in ${data.location}, focused on ${data.inclusionFocus || 'inclusive impact'}. The venture targets ${data.targetMarket || 'underserved communities'} using a ${data.revenueModel || 'sustainable'} revenue model.`,
+      readinessScore,
+      gedsiAlignment,
+      topStrengths: [
+        data.founderTypes.length > 0 ? `Diverse founding team: ${data.founderTypes.slice(0, 2).join(', ')}` : 'Defined founding team',
+        data.gedsiGoals.length > 0 ? `${data.gedsiGoals.length} GEDSI goals aligned` : 'Impact-oriented mission',
+        operationalChecked >= 3 ? 'Strong operational foundation' : 'Clear market focus',
+      ],
+      topGaps: [
+        operationalChecked < operationalTotal ? `Operational readiness: ${operationalTotal - operationalChecked} items pending` : null,
+        capitalChecked < capitalTotal ? `Capital readiness: ${capitalTotal - capitalChecked} items pending` : null,
+        !data.pitchSummary ? 'Pitch summary needs development' : null,
+      ].filter((g): g is string => g !== null).slice(0, 3),
+      suggestedMetrics: (data.gedsiGoals || []).slice(0, 3).map(g => ({
+        code: g.split(' - ')[0],
+        name: g.split(' - ')[1] || g,
+        reason: `Directly aligned with selected GEDSI goal`,
+      })),
     }
   }
 

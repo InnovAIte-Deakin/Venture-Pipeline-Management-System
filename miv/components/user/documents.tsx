@@ -7,9 +7,23 @@ import {
   CheckCircle, AlertCircle, Upload, Eye, Ear, Activity,
   Brain, Sparkles, Loader2
 } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export default function VentureDocumentsUpload() {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [aiPreview, setAiPreview] = useState<{
+    summary: string;
+    readinessScore: number;
+    gedsiAlignment: number;
+    topStrengths: string[];
+    topGaps: string[];
+    suggestedMetrics: { code: string; name: string; reason: string }[];
+  } | null>(null);
+  const [isLoadingPreview, setIsLoadingPreview] = useState(false);
+  const [previewError, setPreviewError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     sector: '',
@@ -86,15 +100,98 @@ export default function VentureDocumentsUpload() {
   ];
 
   const handleSubmit = async () => {
+    setSubmitError(null);
+    setSubmitSuccess(false);
+
+    // Required field validation
+    const errors: string[] = [];
+    if (!formData.name.trim()) errors.push('Venture name is required');
+    if (!formData.sector) errors.push('Industry sector is required');
+    if (!formData.location.trim()) errors.push('Location is required');
+    if (!formData.contactEmail.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) errors.push('A valid contact email is required');
+    if (formData.founderTypes.length === 0) errors.push('Select at least one founder type');
+    if (!formData.teamSize) errors.push('Team size is required');
+    if (!formData.foundingYear.trim()) errors.push('Founding year is required');
+    if (!formData.pitchSummary.trim()) errors.push('Pitch summary is required');
+    if (!formData.inclusionFocus.trim()) errors.push('Inclusion focus is required');
+    if (!formData.targetMarket.trim()) errors.push('Target market is required');
+    if (!formData.revenueModel) errors.push('Revenue model is required');
+    if (!formData.challenges.trim()) errors.push('Key challenges are required');
+    if (!formData.supportNeeded.trim()) errors.push('Support needed is required');
+    if (!formData.timeline.trim()) errors.push('Timeline is required');
+    if (formData.gedsiGoals.length === 0) errors.push('Select at least one GEDSI goal');
+
+    if (errors.length > 0) {
+      setValidationErrors(errors);
+      return;
+    }
+    setValidationErrors([]);
+
     setIsSubmitting(true);
-    
     try {
-      console.log('Form submitted:', formData);
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const response = await fetch('/api/ventures', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+
+      if (!response.ok) {
+        const body = await response.json().catch(() => null);
+        throw new Error(body?.message || `Submission failed (${response.status})`);
+      }
+
+      const result = await response.json();
+
+      const aiResponse = await fetch('/api/ai/analyze-venture', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ventureId: result.id }),
+      });
+
+      if (!aiResponse.ok) {
+        setSubmitSuccess(true);
+        setSubmitError('Venture submitted, but AI analysis could not be started. You can retry from your dashboard.');
+      } else {
+        setSubmitSuccess(true);
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
+      setSubmitError(error instanceof Error ? error.message : 'An unexpected error occurred. Please try again.');
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAiPreview = async () => {
+    setIsLoadingPreview(true);
+    setPreviewError(null);
+    setAiPreview(null);
+    try {
+      const res = await fetch('/api/ai/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          sector: formData.sector,
+          location: formData.location,
+          founderTypes: formData.founderTypes,
+          pitchSummary: formData.pitchSummary,
+          inclusionFocus: formData.inclusionFocus,
+          targetMarket: formData.targetMarket,
+          revenueModel: formData.revenueModel,
+          challenges: formData.challenges,
+          supportNeeded: formData.supportNeeded,
+          operationalReadiness: formData.operationalReadiness,
+          capitalReadiness: formData.capitalReadiness,
+          gedsiGoals: formData.gedsiGoals,
+        }),
+      });
+      if (!res.ok) throw new Error('Failed to generate AI summary');
+      setAiPreview(await res.json());
+    } catch (err) {
+      setPreviewError(err instanceof Error ? err.message : 'Preview unavailable. Please try again.');
+    } finally {
+      setIsLoadingPreview(false);
     }
   };
 
@@ -556,30 +653,144 @@ export default function VentureDocumentsUpload() {
             </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          {/* AI Summary & Analyze Panel */}
+          <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl shadow-sm border border-blue-200 p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-blue-500 rounded-full">
+                  <Sparkles className="w-4 h-4 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-blue-900">AI Summary & Analysis</h3>
+                  <p className="text-xs text-blue-600">Powered by Google Gemini</p>
+                </div>
+              </div>
+              <button
+                onClick={handleAiPreview}
+                disabled={isLoadingPreview || !formData.name || !formData.sector}
+                className="px-4 py-2 bg-white border border-blue-300 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-50 transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoadingPreview ? (
+                  <><Loader2 className="w-4 h-4 animate-spin" />Analysing...</>
+                ) : (
+                  <><Sparkles className="w-4 h-4" />Preview AI Analysis</>
+                )}
+              </button>
+            </div>
+
+            {!aiPreview && !isLoadingPreview && !previewError && (
+              <p className="text-sm text-blue-700">
+                Fill in the form above then click <strong>Preview AI Analysis</strong> to get an instant Gemini-powered assessment before submitting.
+              </p>
+            )}
+
+            {previewError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{previewError}</AlertDescription>
+              </Alert>
+            )}
+
+            {aiPreview && (
+              <div className="space-y-4 pt-3 border-t border-blue-200">
+                <p className="text-sm text-blue-800 italic">{aiPreview.summary}</p>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                    <p className="text-xs text-gray-500 mb-1">Readiness Score</p>
+                    <p className="text-2xl font-bold text-green-600">{aiPreview.readinessScore}%</p>
+                  </div>
+                  <div className="bg-white rounded-lg p-3 text-center shadow-sm">
+                    <p className="text-xs text-gray-500 mb-1">GEDSI Alignment</p>
+                    <p className="text-2xl font-bold text-blue-600">{aiPreview.gedsiAlignment}%</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-green-700 uppercase tracking-wide">Strengths</p>
+                    {aiPreview.topStrengths.map((s, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <CheckCircle className="w-3 h-3 text-green-500 mt-0.5 shrink-0" />
+                        <p className="text-xs text-gray-700">{s}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-amber-700 uppercase tracking-wide">Gaps to Address</p>
+                    {aiPreview.topGaps.map((g, i) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <AlertCircle className="w-3 h-3 text-amber-500 mt-0.5 shrink-0" />
+                        <p className="text-xs text-gray-700">{g}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {aiPreview.suggestedMetrics.length > 0 && (
+                  <div className="space-y-2">
+                    <p className="text-xs font-semibold text-purple-700 uppercase tracking-wide">Suggested IRIS+ Metrics</p>
+                    <div className="flex flex-wrap gap-2">
+                      {aiPreview.suggestedMetrics.map((m, i) => (
+                        <span key={i} className="px-2 py-1 text-xs border border-purple-300 text-purple-700 rounded-full bg-white">
+                          {m.code}: {m.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Submit Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 space-y-4">
+            {validationErrors.length > 0 && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  <p className="font-medium mb-1">Please fix the following before submitting:</p>
+                  <ul className="list-disc list-inside space-y-0.5">
+                    {validationErrors.map((err, i) => (
+                      <li key={i} className="text-sm">{err}</li>
+                    ))}
+                  </ul>
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {submitError && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{submitError}</AlertDescription>
+              </Alert>
+            )}
+
+            {submitSuccess && !submitError && (
+              <Alert className="border-green-200 bg-green-50">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800">
+                  Your venture has been submitted and is being analyzed. You'll receive results in your dashboard shortly.
+                </AlertDescription>
+              </Alert>
+            )}
+
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">Ready to Submit?</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Your venture will be analyzed and you'll receive a comprehensive readiness assessment
+                  Your venture will be saved and a full AI analysis will run automatically
                 </p>
               </div>
               <button
                 onClick={handleSubmit}
-                disabled={isSubmitting}
+                disabled={isSubmitting || submitSuccess}
                 className="px-8 py-4 bg-gradient-to-r from-teal-600 to-blue-600 hover:from-teal-700 hover:to-blue-700 text-white font-semibold rounded-lg transition-all flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Submitting...
-                  </>
+                  <><Loader2 className="w-5 h-5 animate-spin" />Submitting...</>
                 ) : (
-                  <>
-                    <Sparkles className="w-5 h-5" />
-                    Submit & Analyze
-                  </>
+                  <><Sparkles className="w-5 h-5" />Submit & Analyze</>
                 )}
               </button>
             </div>
