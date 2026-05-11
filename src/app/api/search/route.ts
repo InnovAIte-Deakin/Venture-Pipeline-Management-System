@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { detectMobileUserAgent, getMobileFlag } from '@/lib/mobile-detect'
+import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers'
 
 interface SearchResult {
   id: string
@@ -16,30 +18,33 @@ interface SearchResult {
   }
 }
 
-// Separate search functions for better organization
-async function searchVentures(searchTerm: string): Promise<SearchResult[]> {
+// Database-level search functions with WHERE clauses
+// Filtering now happens at the database level for better performance
+
+async function searchVentures(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const ventures = await prisma.venture.findMany({
-      take: 10,
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+          { sector: { contains: searchTerm, mode: 'insensitive' } },
+          { location: { contains: searchTerm, mode: 'insensitive' } },
+          { contactEmail: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = ventures.filter(v => 
-      v.name?.toLowerCase().includes(searchLower) ||
-      v.description?.toLowerCase().includes(searchLower) ||
-      v.sector?.toLowerCase().includes(searchLower) ||
-      v.location?.toLowerCase().includes(searchLower) ||
-      v.contactEmail?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching ventures`)
+    console.log(`Found ${ventures.length} matching ventures`)
 
-    return filtered.map(venture => ({
+    return ventures.map(venture => ({
       id: venture.id,
       title: venture.name,
       subtitle: venture.sector,
-      description: venture.description || undefined,
+      description: isMobile ? undefined : venture.description || undefined, // Skip description on mobile
       type: 'venture',
       url: `/dashboard/ventures/${venture.id}`,
       metadata: {
@@ -53,23 +58,24 @@ async function searchVentures(searchTerm: string): Promise<SearchResult[]> {
   }
 }
 
-async function searchUsers(searchTerm: string): Promise<SearchResult[]> {
+async function searchUsers(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const users = await prisma.user.findMany({
-      take: 10,
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { email: { contains: searchTerm, mode: 'insensitive' } },
+          { organization: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = users.filter(u =>
-      u.name?.toLowerCase().includes(searchLower) ||
-      u.email?.toLowerCase().includes(searchLower) ||
-      u.organization?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching users`)
+    console.log(`Found ${users.length} matching users`)
 
-    return filtered.map(user => ({
+    return users.map(user => ({
       id: user.id,
       title: user.name || user.email,
       subtitle: user.organization || user.email,
@@ -86,28 +92,28 @@ async function searchUsers(searchTerm: string): Promise<SearchResult[]> {
   }
 }
 
-async function searchDocuments(searchTerm: string): Promise<SearchResult[]> {
+async function searchDocuments(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const documents = await prisma.document.findMany({
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { type: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
       include: {
         venture: {
           select: { name: true }
         }
       },
-      take: 10,
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { uploadedAt: 'desc' }
     })
-    
-    const filtered = documents.filter(d =>
-      d.name?.toLowerCase().includes(searchLower) ||
-      d.type?.toLowerCase().includes(searchLower) ||
-      d.venture?.name?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching documents`)
+    console.log(`Found ${documents.length} matching documents`)
 
-    return filtered.map(doc => ({
+    return documents.map(doc => ({
       id: doc.id,
       title: doc.name,
       subtitle: doc.venture.name,
@@ -125,23 +131,24 @@ async function searchDocuments(searchTerm: string): Promise<SearchResult[]> {
   }
 }
 
-async function searchFunds(searchTerm: string): Promise<SearchResult[]> {
+async function searchFunds(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const funds = await prisma.fund.findMany({
-      take: 10,
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { vintage: { contains: searchTerm, mode: 'insensitive' } },
+          { fundType: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = funds.filter(f =>
-      f.name?.toLowerCase().includes(searchLower) ||
-      f.vintage?.toLowerCase().includes(searchLower) ||
-      f.fundType?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching funds`)
+    console.log(`Found ${funds.length} matching funds`)
 
-    return filtered.map(fund => ({
+    return funds.map(fund => ({
       id: fund.id,
       title: fund.name,
       subtitle: `${fund.vintage} • ${fund.fundType}`,
@@ -159,32 +166,32 @@ async function searchFunds(searchTerm: string): Promise<SearchResult[]> {
   }
 }
 
-async function searchProjects(searchTerm: string): Promise<SearchResult[]> {
+async function searchProjects(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const projects = await prisma.project.findMany({
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
       include: {
         venture: {
           select: { name: true }
         }
       },
-      take: 10,
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = projects.filter(p =>
-      p.name?.toLowerCase().includes(searchLower) ||
-      p.description?.toLowerCase().includes(searchLower) ||
-      p.venture?.name?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching projects`)
+    console.log(`Found ${projects.length} matching projects`)
 
-    return filtered.map(project => ({
+    return projects.map(project => ({
       id: project.id,
       title: project.name,
       subtitle: project.venture?.name || 'No venture',
-      description: project.description || undefined,
+      description: isMobile ? undefined : project.description || undefined, // Skip description on mobile
       type: 'project',
       url: `/dashboard/projects/${project.id}`,
       metadata: {
@@ -198,29 +205,29 @@ async function searchProjects(searchTerm: string): Promise<SearchResult[]> {
   }
 }
 
-async function searchGEDSIMetrics(searchTerm: string): Promise<SearchResult[]> {
+async function searchGEDSIMetrics(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const gedsiMetrics = await prisma.gEDSIMetric.findMany({
+      where: {
+        OR: [
+          { metricName: { contains: searchTerm, mode: 'insensitive' } },
+          { metricCode: { contains: searchTerm, mode: 'insensitive' } },
+          { category: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
       include: {
         venture: {
           select: { name: true }
         }
       },
-      take: 10,
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = gedsiMetrics.filter(m =>
-      m.metricName?.toLowerCase().includes(searchLower) ||
-      m.metricCode?.toLowerCase().includes(searchLower) ||
-      m.category?.toLowerCase().includes(searchLower) ||
-      m.venture?.name?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching GEDSI metrics`)
+    console.log(`Found ${gedsiMetrics.length} matching GEDSI metrics`)
 
-    return filtered.map(metric => ({
+    return gedsiMetrics.map(metric => ({
       id: metric.id,
       title: metric.metricName,
       subtitle: metric.venture.name,
@@ -237,33 +244,33 @@ async function searchGEDSIMetrics(searchTerm: string): Promise<SearchResult[]> {
   }
 }
 
-async function searchCapitalActivities(searchTerm: string): Promise<SearchResult[]> {
+async function searchCapitalActivities(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const capitalActivities = await prisma.capitalActivity.findMany({
+      where: {
+        OR: [
+          { type: { contains: searchTerm, mode: 'insensitive' } },
+          { investorName: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
       include: {
         venture: {
           select: { name: true }
         }
       },
-      take: 10,
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = capitalActivities.filter(c =>
-      c.type?.toLowerCase().includes(searchLower) ||
-      c.investorName?.toLowerCase().includes(searchLower) ||
-      c.description?.toLowerCase().includes(searchLower) ||
-      c.venture?.name?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching capital activities`)
+    console.log(`Found ${capitalActivities.length} matching capital activities`)
 
-    return filtered.map(activity => ({
+    return capitalActivities.map(activity => ({
       id: activity.id,
       title: `${activity.type} - ${activity.venture.name}`,
       subtitle: activity.investorName || 'Unknown investor',
-      description: activity.description || undefined,
+      description: isMobile ? undefined : activity.description || undefined, // Skip description on mobile
       type: 'capital',
       url: `/dashboard/capital-facilitation?activity=${activity.id}`,
       metadata: {
@@ -278,32 +285,32 @@ async function searchCapitalActivities(searchTerm: string): Promise<SearchResult
   }
 }
 
-async function searchTasks(searchTerm: string): Promise<SearchResult[]> {
+async function searchTasks(searchTerm: string, isMobile: boolean): Promise<SearchResult[]> {
   try {
-    const searchLower = searchTerm.toLowerCase()
+    // Database-level filtering using WHERE clause
     const tasks = await prisma.task.findMany({
+      where: {
+        OR: [
+          { name: { contains: searchTerm, mode: 'insensitive' } },
+          { description: { contains: searchTerm, mode: 'insensitive' } },
+        ]
+      },
       include: {
         project: {
           select: { name: true }
         }
       },
-      take: 10,
+      take: isMobile ? 5 : 10, // Limit to 5 results on mobile
       orderBy: { createdAt: 'desc' }
     })
-    
-    const filtered = tasks.filter(t =>
-      t.name?.toLowerCase().includes(searchLower) ||
-      t.description?.toLowerCase().includes(searchLower) ||
-      t.project?.name?.toLowerCase().includes(searchLower)
-    )
 
-    console.log(`Found ${filtered.length} matching tasks`)
+    console.log(`Found ${tasks.length} matching tasks`)
 
-    return filtered.map(task => ({
+    return tasks.map(task => ({
       id: task.id,
       title: task.name,
       subtitle: task.project.name,
-      description: task.description || undefined,
+      description: isMobile ? undefined : task.description || undefined, // Skip description on mobile
       type: 'task',
       url: `/dashboard/projects/${task.projectId}?task=${task.id}`,
       metadata: {
@@ -319,16 +326,27 @@ async function searchTasks(searchTerm: string): Promise<SearchResult[]> {
 
 export async function GET(request: NextRequest) {
   try {
+    // Detect mobile user agent
+    const { isMobile } = getMobileFlag(request)
+    console.log(`Mobile request: ${isMobile}`)
+
     // Get search query
     const searchParams = request.nextUrl.searchParams
     const query = searchParams.get('q')
 
     if (!query || query.trim().length < 1) {
-      return NextResponse.json({ 
+      const response = NextResponse.json({ 
         results: [], 
         total: 0, 
-        query: query || '' 
+        query: query || '',
+        isMobile
       })
+      return createCachedResponse({ 
+        results: [], 
+        total: 0, 
+        query: query || '',
+        isMobile
+      }, CACHE_CONFIGS.SEARCH)
     }
 
     const searchTerm = query.trim()
@@ -345,17 +363,16 @@ export async function GET(request: NextRequest) {
       capitalActivities,
       tasks
     ] = await Promise.all([
-      searchVentures(searchTerm),
-      searchUsers(searchTerm),
-      searchDocuments(searchTerm),
-      searchFunds(searchTerm),
-      searchProjects(searchTerm),
-      searchGEDSIMetrics(searchTerm),
-      searchCapitalActivities(searchTerm),
-      searchTasks(searchTerm)
+      searchVentures(searchTerm, isMobile),
+      searchUsers(searchTerm, isMobile),
+      searchDocuments(searchTerm, isMobile),
+      searchFunds(searchTerm, isMobile),
+      searchProjects(searchTerm, isMobile),
+      searchGEDSIMetrics(searchTerm, isMobile),
+      searchCapitalActivities(searchTerm, isMobile),
+      searchTasks(searchTerm, isMobile)
     ])
 
-    
     const results: SearchResult[] = [
       ...ventures,
       ...users,
@@ -367,14 +384,16 @@ export async function GET(request: NextRequest) {
       ...tasks
     ]
 
-    // Limit to 50 results total
-    const limitedResults = results.slice(0, 50)
+    // Limit to 30 results on mobile, 50 on desktop
+    const maxResults = isMobile ? 30 : 50
+    const limitedResults = results.slice(0, maxResults)
 
-    return NextResponse.json({
+    return createCachedResponse({
       results: limitedResults,
       total: limitedResults.length,
-      query: searchTerm
-    })
+      query: searchTerm,
+      isMobile
+    }, CACHE_CONFIGS.SEARCH)
 
   } catch (error) {
     console.error('Search error:', error)
