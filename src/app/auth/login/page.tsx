@@ -30,7 +30,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const url = `/backend/api/users/login`;
+      const url = `/api/auth/login`;
 
       const response = await fetch(url, {
         method: "POST",

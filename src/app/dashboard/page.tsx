@@ -829,7 +829,7 @@ export default function EnterpriseDashboard() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('/backend/api/users/logout', {
+      const res = await fetch('/api/auth/logout', {
         method: 'POST',
         credentials: 'include',
       })
