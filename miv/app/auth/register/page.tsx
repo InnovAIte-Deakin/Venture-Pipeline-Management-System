@@ -34,8 +34,49 @@ export default function RegisterPage() {
     setIsLoading(true);
     setError("");
 
+    // Confirm password check
     if (formData.password !== formData.confirmPassword) {
       setError("Passwords do not match");
+      setIsLoading(false);
+      return;
+    }
+
+    // First Name validation
+    if (!formData.first_name.match(/^[A-Za-z]+$/)) {
+      setError("First name should contain only letters");
+      setIsLoading(false);
+      return;
+    }
+
+    // Last Name validation
+    if (!formData.last_name.match(/^[A-Za-z]+$/)) {
+      setError("Last name should contain only letters");
+      setIsLoading(false);
+      return;
+    }
+
+    // Email validation (basic)
+    if (
+      !formData.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/) ||
+      formData.email.endsWith(".") ||
+      formData.email.endsWith("@")
+    ) {
+      setError("Invalid email format");
+      setIsLoading(false);
+      return;
+    }
+
+    // Password strength validation
+    if (
+      formData.password.length < 8 ||
+      !/[A-Z]/.test(formData.password) ||
+      !/[a-z]/.test(formData.password) ||
+      !/[0-9]/.test(formData.password) ||
+      !/[^A-Za-z0-9]/.test(formData.password)
+    ) {
+      setError(
+        "Password must be 8+ chars with uppercase, lowercase, number & special character"
+      );
       setIsLoading(false);
       return;
     }
@@ -58,8 +99,13 @@ export default function RegisterPage() {
         }),
       });
 
+      // if (!response.ok) {
+      //   throw new Error("Network response was not ok");
+      // }
+
+      const data = await response.json();
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error(data.message || "Something went wrong");
       }
 
       // Redirect to intake on success
@@ -198,6 +244,10 @@ export default function RegisterPage() {
                   className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 pr-10"
                   required
                 />
+                <span className="text-xs text-gray-500">
+                  Min 8, upper, lower, number, symbol
+                </span>
+
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
