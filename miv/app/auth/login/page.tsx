@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { GoogleLogin } from "@react-oauth/google";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,13 +15,13 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { PUBLIC_BACKEND_URL } from "@/lib/constants";
 
 export default function LoginPage() {
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 	const [isLoading, setIsLoading] = useState(false);
+	const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 	const [error, setError] = useState("");
 
 	const handleSubmit = async (e: React.FormEvent) => {
@@ -40,7 +41,6 @@ export default function LoginPage() {
 					email: email,
 					password: password,
 				}),
-				// Allow browser to store Set-Cookie from the backend
 				credentials: "include",
 			});
 
@@ -48,13 +48,56 @@ export default function LoginPage() {
 				throw new Error("Network response was not ok");
 			}
 
-			// Redirect to dashboard on success
 			window.location.href = "/dashboard";
 		} catch (err) {
 			setError("Invalid email or password");
 		} finally {
 			setIsLoading(false);
 		}
+	};
+
+	const handleGoogleSuccess = async (credentialResponse: any) => {
+		setIsGoogleLoading(true);
+		setError("");
+
+		try {
+			const response = await fetch("/api/auth/google/callback", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					token: credentialResponse.credential,
+				}),
+			});
+
+			const text = await response.text();
+			let data;
+
+			try {
+				data = JSON.parse(text);
+			} catch {
+				throw new Error(text || "Google sign-in failed");
+			}
+
+			if (!response.ok || !data.success) {
+				throw new Error(data.message || data.error || "Google sign-in failed");
+			}
+
+			if (data?.user?.role === "user" || data?.user?.role === "founder") {
+				window.location.href = "/user-dashboard";
+			} else {
+				window.location.href = "/dashboard";
+			}
+		} catch (err: any) {
+			setError(err.message || "Google sign-in failed");
+		} finally {
+			setIsGoogleLoading(false);
+		}
+	};
+
+	const handleGoogleError = () => {
+		setError("Google sign-in failed");
 	};
 
 	return (
@@ -77,10 +120,7 @@ export default function LoginPage() {
 				<CardContent className="space-y-6">
 					<form onSubmit={handleSubmit} className="space-y-4">
 						<div className="space-y-2">
-							<Label
-								htmlFor="email"
-								className="text-slate-700 dark:text-slate-300"
-							>
+							<Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
 								Email
 							</Label>
 							<Input
@@ -95,10 +135,7 @@ export default function LoginPage() {
 						</div>
 
 						<div className="space-y-2">
-							<Label
-								htmlFor="password"
-								className="text-slate-700 dark:text-slate-300"
-							>
+							<Label htmlFor="password" className="text-slate-700 dark:text-slate-300">
 								Password
 							</Label>
 							<div className="relative">
@@ -106,18 +143,14 @@ export default function LoginPage() {
 									id="password"
 									type={showPassword ? "text" : "password"}
 									value={password}
-									onChange={(e) =>
-										setPassword(e.target.value)
-									}
+									onChange={(e) => setPassword(e.target.value)}
 									placeholder="Enter your password"
 									className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 pr-10"
 									required
 								/>
 								<button
 									type="button"
-									onClick={() =>
-										setShowPassword(!showPassword)
-									}
+									onClick={() => setShowPassword(!showPassword)}
 									className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
 								>
 									{showPassword ? (
@@ -138,7 +171,7 @@ export default function LoginPage() {
 						<Button
 							type="submit"
 							className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3"
-							disabled={isLoading}
+							disabled={isLoading || isGoogleLoading}
 						>
 							{isLoading ? (
 								<>
@@ -150,6 +183,32 @@ export default function LoginPage() {
 							)}
 						</Button>
 					</form>
+
+					<div className="relative">
+						<div className="absolute inset-0 flex items-center">
+							<span className="w-full border-t border-slate-300 dark:border-slate-600" />
+						</div>
+
+						<div className="relative flex justify-center text-xs uppercase">
+							<span className="bg-white dark:bg-slate-800 px-2 text-slate-500">
+								Or continue with
+							</span>
+						</div>
+					</div>
+
+					<div className="flex justify-center">
+						{isGoogleLoading ? (
+							<Button className="w-full" disabled>
+								<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+								Signing in with Google...
+							</Button>
+						) : (
+							<GoogleLogin
+								onSuccess={handleGoogleSuccess}
+								onError={handleGoogleError}
+							/>
+						)}
+					</div>
 
 					<div className="text-center space-y-4">
 						<Link
