@@ -27,36 +27,9 @@ const handler = NextAuth({
           : { id: identifier };
         const user = await prisma.user.findUnique({ where: key as any });
         if (!user) return null;
-        // Dev-only bypass: allow a known test password if no hash yet
-        if (!user.passwordHash) {
-          if (
-            process.env.NODE_ENV !== "production" &&
-            creds.password === "admin123"
-          ) {
-            return {
-              id: user.id,
-              email: user.email,
-              name: user.name,
-              role: user.role || undefined,
-            };
-          }
-          return null;
-        }
-        const ok = await bcrypt.compare(
-          String(creds.password),
-          user.passwordHash,
-        );
-        if (
-          !ok &&
-          process.env.NODE_ENV !== "production" &&
-          creds.password === "admin123"
-        ) {
-          return {
-            id: user.id,
-            email: user.email,
-            name: user.name || undefined,
-          };
-        }
+        // Users without a password hash cannot log in via credentials
+        if (!user.passwordHash) return null;
+        const ok = await bcrypt.compare(String(creds.password), user.passwordHash);
         if (!ok) return null;
         return { id: user.id, email: user.email, name: user.name || undefined };
       },

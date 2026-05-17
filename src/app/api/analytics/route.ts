@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-<<<<<<< HEAD:miv/app/api/analytics/route.ts
-import { CalculationService } from '@/lib/calculation-service'
 import { getMobileFlag } from '@/lib/mobile-detect'
 import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers'
-=======
->>>>>>> origin/development:src/app/api/analytics/route.ts
 
 export async function GET(request: NextRequest) {
   try {
     // Detect mobile user agent
     const { isMobile } = getMobileFlag(request)
-    console.log(`Mobile request: ${isMobile}`)
 
     const { searchParams } = new URL(request.url)
     const period = searchParams.get('period') || '30d'
@@ -194,7 +189,8 @@ export async function GET(request: NextRequest) {
     }
 
     // For mobile, send minimal additional data; for desktop, send full analytics
-    let analytics: any = baseAnalytics
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const analytics: Record<string, any> = baseAnalytics
 
     if (!isMobile) {
       analytics.performance = {

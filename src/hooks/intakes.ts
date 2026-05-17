@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CollectionBeforeChangeHook, CollectionAfterChangeHook } from 'payload'
-// EmailJS service removed - intake notifications temporarily disabled
+import { emailService } from '@/lib/email-service'
 
 export const setDisabilityFlag: CollectionBeforeChangeHook = async ({ data }: any) => {
   if (data?.wss) {
@@ -41,8 +41,30 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
     action: 'intake.created', entity: 'onboardingIntakes', entityId: String((doc as any).id), timestamp: new Date().toISOString(),
   } })
 
-  // TODO: Implement intake notification emails using the new Nodemailer email service
-  // Email notifications for intake submissions have been temporarily disabled
-  // during the migration from EmailJS to Nodemailer
-  console.log('Intake created successfully. Email notifications currently disabled.')
+  // Send notification emails — errors are caught so intake creation is never blocked
+  const ventureName = (doc as any).ventureName_en || (doc as any).ventureName_km || 'New Venture'
+  const founderName = [(doc as any).primaryContactFirstName, (doc as any).primaryContactLastName]
+    .filter(Boolean).join(' ') || undefined
+  const founderEmail: string | undefined = (doc as any).primaryContactEmail
+
+  try {
+    if (founderEmail) {
+      await emailService.sendIntakeConfirmationToFounder(founderEmail, {
+        ventureName,
+        founderName,
+        submittedAt: new Date(),
+      })
+    }
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL
+    if (adminEmail) {
+      await emailService.sendIntakeNotificationToAdmin(adminEmail, {
+        ventureName,
+        founderName,
+        submittedAt: new Date(),
+      })
+    }
+  } catch (emailError) {
+    // Non-fatal: log the failure but never throw — intake must succeed regardless
+    console.error('[intakes] Email notification failed (non-fatal):', emailError)
+  }
 }

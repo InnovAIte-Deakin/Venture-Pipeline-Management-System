@@ -18,6 +18,7 @@ Built with **Next.js** (app UI), **Payload CMS** (secure headless backend), **Mo
   - [Getting Started](#getting-started)
     - [1) Quick Start with Docker](#1-quick-start-with-docker)
     - [2) Local Dev (Node.js)](#2-local-dev-nodejs)
+  - [Hosting with Vercel](#hosting-with-vercel)
   - [Configuration](#configuration)
     - [.env example](#env-example)
       - [Root `.env`](#root-env)
@@ -131,27 +132,31 @@ docker compose up -d mongo postgres
 # 2) Install dependencies
 pnpm install
 
-# 3) Generate Prisma client
-pnpm run db:generate
+# 3) Copy environment file and fill in values
+cp .env.example .env.local
 
-# 4) Push schema to PostgreSQL
-$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:push
+# 4) Generate Prisma client and push schema
+pnpm run db:generate
+pnpm run db:push
 
 # 5) Seed relational data
-$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:seed
+pnpm run db:seed
 
 # 6) Start the app
 pnpm run dev
 ```
 
+> **Windows (PowerShell):** If `db:push` or `db:seed` can't find `DATABASE_URL`, prefix the command:
+> `$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:push`
+
 - Next.js UI: [http://localhost:3000](http://localhost:3000)
 - Payload Admin: [http://localhost:3000/admin](http://localhost:3000/admin)
-- MONGODB_URI: `mongodb://127.0.0.1:27017/payload`
-- PostgreSQL: `postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public`
+
+See [vercel-cheatsheet.md](./vercel-cheatsheet.md) for a complete local development guide.
 
 ### 2) Local Dev (Node.js)
 
-Prereqs: Node 18+ and pnpm.
+Prereqs: Node.js `^18.20.2 || >=20.9.0` and pnpm `^9 || ^10`.
 
 ```bash
 # install deps
@@ -160,46 +165,41 @@ pnpm install
 # start required databases
 docker compose up -d mongo postgres
 
-# generate Prisma client
-pnpm run db:generate
+# copy env file and configure
+cp .env.example .env.local
+# edit .env.local with your MONGODB_URI, DATABASE_URL, etc.
 
-# sync schema to local PostgreSQL
-$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:push
+# generate Prisma client and push schema
+pnpm run db:generate
+pnpm run db:push
 
 # optional: seed development data
-$env:DATABASE_URL="postgresql://app_miv:supersecret@localhost:5432/app_miv?schema=public"; pnpm run db:seed
+pnpm run db:seed
 
 # start Next.js + Payload app
 pnpm run dev
 ```
-<<<<<<< HEAD
 
 ---
 
-<<<<<<< HEAD
-## 📚 Hosting with Vercel
+## Hosting with Vercel
 
-Vercel.com is the hosting provider that this project uses.
+<!-- TODO: Replace [ORG] and [REPO] with the actual GitHub org/repo slug before merging -->
 
-### Development
-- ....
+Deploy this project to Vercel in one click — Vercel will prompt you for all required environment variables automatically:
 
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2F[ORG]%2F[REPO]&env=MONGODB_URI,DATABASE_URL,PAYLOAD_SECRET,NEXTAUTH_SECRET,NEXTAUTH_URL,NEXT_PUBLIC_SITE_URL,SEED_ADMIN_EMAIL,SEED_ADMIN_PASSWORD,SMTP_HOST,SMTP_PORT,SMTP_USER,SMTP_PASS,SMTP_FROM_EMAIL,ADMIN_NOTIFICATION_EMAIL&envDescription=See%20.env.example%20for%20descriptions%20of%20each%20variable&project-name=venture-pipeline&repository-name=venture-pipeline)
 
-### Product (TBA)
-- Devilivered via release branches
+**Prerequisites before clicking deploy:**
+- A [MongoDB Atlas](https://www.mongodb.com/cloud/atlas) cluster (free M0 tier works)
+- A PostgreSQL host — [Neon](https://neon.tech) or [Supabase](https://supabase.com) both offer a free tier
+- SMTP credentials for outbound email (e.g. Gmail App Password, Resend, or Mailgun)
 
----
-
-## 📚 Documentation
-=======
-## Configuration
->>>>>>> ab0c625 (Major refactor for Vercel Hosting)
-=======
+See [vercel-cheatsheet.md](./vercel-cheatsheet.md) for the complete setup guide including CLI workflow and local development instructions.
 
 ---
 
 ## Configuration
->>>>>>> d24480863a2dddc17adbdc135b26a6bbc0f95e6b
 
 ### .env example
 
@@ -315,21 +315,27 @@ Common npm scripts (root or workspace):
 
 ```
 .
-├── apps/
-│   ├── api/            # Payload CMS config, collections, hooks, endpoints
-│   │   ├── src/
-│   │   │   ├── collections/
-│   │   │   ├── endpoints/
-│   │   │   ├── hooks/
-│   │   │   └── payload.config.ts
-│   └── web/            # Next.js app (founder portal, analyst dashboards)
-│       ├── app/
-│       ├── components/
-│       ├── lib/
-│       └── e2e/        # Playwright specs
-├── db/                 # migrations, seed scripts
-├── docker/             # optional docker entrypoints
-├── docker-compose.yml
+├── src/
+│   ├── app/                  # Next.js App Router — UI pages and API routes
+│   │   ├── (frontend)/       # Founder-facing portal
+│   │   ├── (payload)/        # Payload CMS admin panel
+│   │   ├── api/              # Custom API endpoints
+│   │   ├── auth/             # Auth pages (login, register)
+│   │   ├── dashboard/        # Analyst / admin dashboards
+│   │   └── venture-intake/   # Founder intake flows
+│   ├── collections/          # Payload CMS collection definitions
+│   ├── components/           # Shared React components
+│   ├── hooks/                # Payload hooks (afterChange, afterRead, etc.)
+│   ├── lib/                  # Utility functions, email service, helpers
+│   ├── prisma/               # Prisma schema and seed scripts
+│   ├── access/               # Role-based access control helpers
+│   ├── types/                # Shared TypeScript types
+│   └── payload.config.ts     # Payload CMS configuration
+├── public/                   # Static assets
+├── docs/                     # Project documentation
+├── docker-compose.yml        # Local database services (MongoDB + PostgreSQL)
+├── vercel.json               # Vercel deployment configuration
+├── vercel-cheatsheet.md      # Developer guide for Vercel and local setup
 ├── package.json
 └── README.md
 ```

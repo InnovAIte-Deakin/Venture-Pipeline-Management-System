@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
 import React, { useState, useEffect } from "react"
@@ -305,15 +306,6 @@ export default function DealFlowPage() {
       const data = await response.json()
       const ventures = data.ventures || []
       
-      console.log(`📊 Found ${ventures.length} ventures for deal flow`)
-      
-      // Debug: Log venture stages
-      const stageBreakdown = ventures.reduce((acc: any, venture: any) => {
-        acc[venture.stage || 'UNDEFINED'] = (acc[venture.stage || 'UNDEFINED'] || 0) + 1
-        return acc
-      }, {})
-      console.log('🎭 Venture stages in database:', stageBreakdown)
-      
       // Transform ventures into deals
       const transformedDeals: Deal[] = ventures.map((venture: any) => {
         // Calculate deal-specific metrics using proper GEDSI calculation
@@ -383,16 +375,8 @@ export default function DealFlowPage() {
       })
       
       setDeals(transformedDeals)
-      
-      // Debug: Log transformed deal stages
-      const dealStageBreakdown = transformedDeals.reduce((acc: any, deal: any) => {
-        acc[deal.stage || 'UNDEFINED'] = (acc[deal.stage || 'UNDEFINED'] || 0) + 1
-        return acc
-      }, {})
-      console.log('🎯 Deal stages after transformation:', dealStageBreakdown)
-      console.log(`✅ Successfully loaded ${transformedDeals.length} deals from database`)
     } catch (err) {
-      console.error('❌ Error fetching deals:', err)
+      console.error('[deal-flow] Error fetching deals:', err)
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
       setError(`Failed to load deals: ${errorMessage}`)
     } finally {
@@ -551,26 +535,6 @@ export default function DealFlowPage() {
     )?.[1] || sectorMultipliers.default
     
     score = Math.round(score * multiplier)
-    
-    // Debug logging for impact score calculation
-    if (venture.name?.includes('Inclusive Learning Technologies')) {
-      console.log('🎯 Impact Score Debug for', venture.name, {
-        leadershipScore,
-        socialImpactScore,
-        metricsScore,
-        sdgScore,
-        evidenceScore,
-        totalScore: score,
-        multiplier,
-        finalScore: Math.max(15, Math.min(score, maxScore)),
-        venture: {
-          founderTypes: venture.founderTypes,
-          inclusionFocus: venture.inclusionFocus,
-          gedsiMetrics: venture.gedsiMetrics?.length || 0,
-          sector: venture.sector
-        }
-      })
-    }
     
     // Ensure score is within bounds and provide minimum viable score
     return Math.max(15, Math.min(score, maxScore))

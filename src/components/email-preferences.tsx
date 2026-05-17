@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 /**
  * Email Preferences Component
  * Allows users to control which email notifications they receive

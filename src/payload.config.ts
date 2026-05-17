@@ -7,7 +7,6 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-console.log("🧪 DB URI at startup:", process.env.MONGODB_URI);
 
 import { Users } from './collections/users'
 import { Media } from './collections/media'
@@ -73,64 +72,89 @@ export default buildConfig({
     // storage-adapter-placeholder
   ],
   onInit: async (payload) => {
+    // Read seed credentials from environment variables.
+    // In production these MUST be set — the app will refuse to start without them.
+    // In development, if they are unset we skip seeding and log a warning instead.
+    const seedAdminEmail = process.env.SEED_ADMIN_EMAIL
+    const seedPassword = process.env.SEED_ADMIN_PASSWORD
+
+    if (!seedAdminEmail || !seedPassword) {
+      if (process.env.NODE_ENV === 'production') {
+        throw new Error(
+          '[payload] SEED_ADMIN_EMAIL and SEED_ADMIN_PASSWORD must be set in production. ' +
+          'Add them to your Vercel environment variables or .env file.'
+        )
+      }
+      console.warn(
+        '[payload] SEED_ADMIN_EMAIL or SEED_ADMIN_PASSWORD not set — ' +
+        'skipping default user seeding in development. ' +
+        'Copy .env.example to .env.local and fill in the seed vars to enable seeding.'
+      )
+      return
+    }
+
+    // Derive role-specific emails using optional overrides or + aliases
+    const seedFounderEmail = process.env.SEED_FOUNDER_EMAIL || seedAdminEmail.replace('@', '+founder@')
+    const seedAnalystEmail = process.env.SEED_ANALYST_EMAIL || seedAdminEmail.replace('@', '+analyst@')
+
     // Ensure a default admin exists (first-run only)
     const users = await payload.find({
       collection: 'users',
-      where: { email: { equals: 'admin@example.com' } },
+      where: { email: { equals: seedAdminEmail } },
       limit: 1,
     })
     if (users.totalDocs === 0) {
       await payload.create({
         collection: 'users',
         data: {
-          email: 'admin@example.com',
-          password: 'changeme123',
+          email: seedAdminEmail,
+          password: seedPassword,
           first_name: 'Admin',
           last_name: 'User',
           role: 'admin',
         },
       })
-      console.log('Seeded default admin user admin@example.com / changeme123')
+      console.log(`[payload] Seeded default admin user: ${seedAdminEmail}`)
     }
 
     // Ensure a default founder exists (first-run only)
     const founders = await payload.find({
       collection: 'users',
-      where: { email: { equals: 'founder@example.com' } },
+      where: { email: { equals: seedFounderEmail } },
       limit: 1,
     })
     if (founders.totalDocs === 0) {
       await payload.create({
         collection: 'users',
         data: {
-          email: 'founder@example.com',
-          password: 'changeme123',
+          email: seedFounderEmail,
+          password: seedPassword,
           first_name: 'Founder',
-          last_name: 'user',
+          last_name: 'User',
           role: 'founder',
         },
       })
-      console.log('Seeded default founder user founder@example.com / changeme123')
+      console.log(`[payload] Seeded default founder user: ${seedFounderEmail}`)
     }
 
-    // Ensure a default miv_analyst exists (first-run only)
+    // Ensure a default analyst exists (first-run only)
     const analysts = await payload.find({
       collection: 'users',
-      where: { email: { equals: 'analyst@example.com' } },
+      where: { email: { equals: seedAnalystEmail } },
       limit: 1,
     })
     if (analysts.totalDocs === 0) {
       await payload.create({
         collection: 'users',
         data: {
-          email: 'analyst@example.com',
-          password: 'changeme123',
+          email: seedAnalystEmail,
+          password: seedPassword,
           first_name: 'Analyst',
           last_name: 'User',
           role: 'miv_analyst',
         },
       })
-      console.log('Seeded default miv_analyst user analyst@example.com / changeme123')
+      console.log(`[payload] Seeded default analyst user: ${seedAnalystEmail}`)
     }
   },
 })
