@@ -2,5 +2,63 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "nextjs",
   "installCommand": "pnpm install",
-  "buildCommand": "prisma migrate deploy --schema=./src/prisma/schema.prisma && pnpm run build"
+  "buildCommand": "prisma migrate deploy --schema=./src/prisma/schema.prisma && pnpm run build",
+  "env": [
+    {
+      "key": "MONGODB_URI",
+      "description": "MongoDB connection string used by Payload CMS (e.g. mongodb+srv://... from MongoDB Atlas)"
+    },
+    {
+      "key": "PAYLOAD_SECRET",
+      "description": "Payload CMS signing secret — generate with: openssl rand -hex 32"
+    },
+    {
+      "key": "DATABASE_URL",
+      "description": "PostgreSQL connection string for Prisma. For serverless append: ?pgbouncer=true&connection_limit=1"
+    },
+    {
+      "key": "NEXTAUTH_SECRET",
+      "description": "NextAuth JWT signing secret — generate with: openssl rand -hex 32"
+    },
+    {
+      "key": "NEXTAUTH_URL",
+      "description": "Full production URL of your deployment (e.g. https://your-app.vercel.app)"
+    },
+    {
+      "key": "NEXT_PUBLIC_SITE_URL",
+      "description": "Same as NEXTAUTH_URL — this value is exposed to the browser"
+    },
+    {
+      "key": "SEED_ADMIN_EMAIL",
+      "description": "Email address for the initial Payload CMS admin user (created on first startup)"
+    },
+    {
+      "key": "SEED_ADMIN_PASSWORD",
+      "description": "Password for the initial Payload CMS admin user — use a strong password"
+    },
+    {
+      "key": "SMTP_HOST",
+      "description": "SMTP server hostname for outbound email (e.g. smtp.gmail.com)"
+    },
+    {
+      "key": "SMTP_PORT",
+      "description": "SMTP server port — typically 587 (STARTTLS) or 465 (SSL)"
+    },
+    {
+      "key": "SMTP_USER",
+      "description": "SMTP username / sender email address"
+    },
+    {
+      "key": "SMTP_PASS",
+      "description": "SMTP password or app-specific password"
+    },
+    {
+      "key": "SMTP_FROM_EMAIL",
+      "description": "From address used on all outbound emails"
+    },
+    {
+      "key": "ADMIN_NOTIFICATION_EMAIL",
+      "description": "Email address where new intake submission notifications are sent"
+    }
+  ]
 }

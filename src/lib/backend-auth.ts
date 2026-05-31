@@ -19,7 +19,21 @@ function base64urlDecode(input: string): string {
 }
 
 function getTokenSecret(): string {
-  return process.env.NEXTAUTH_SECRET || process.env.PAYLOAD_SECRET || 'dev-insecure-change-me'
+  const secret = process.env.NEXTAUTH_SECRET || process.env.PAYLOAD_SECRET
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error(
+        '[backend-auth] Neither NEXTAUTH_SECRET nor PAYLOAD_SECRET is set. ' +
+        'Set at least one of these environment variables before running in production.'
+      )
+    }
+    console.warn(
+      '[backend-auth] WARNING: Neither NEXTAUTH_SECRET nor PAYLOAD_SECRET is set. ' +
+      'Using insecure fallback — set these vars in .env.local for local development.'
+    )
+    return 'dev-insecure-change-me'
+  }
+  return secret
 }
 
 function signValue(value: string): string {

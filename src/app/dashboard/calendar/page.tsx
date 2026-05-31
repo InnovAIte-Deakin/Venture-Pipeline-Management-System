@@ -1,3 +1,4 @@
+/* eslint-disable react/no-unescaped-entities */
 "use client"
 
 import React, { useMemo, useState, useEffect } from "react"
