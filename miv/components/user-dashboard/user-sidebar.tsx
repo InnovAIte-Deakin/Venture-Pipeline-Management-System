@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Target,
@@ -15,57 +15,19 @@ import {
 } from "lucide-react";
 import Logo from "../logo";
 import { useRouter } from "next/navigation";
-
-interface UserData {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
+import { useAuth } from "@/hooks/useAuth";
+import { getDisplayEmail, getDisplayName, getInitials } from "@/lib/auth-display";
 
 export default function UserSidebar() {
   const router = useRouter();
   const [activeItem, setActiveItem] = useState("Dashboard");
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-
-  useEffect(() => {
-    async function fetchUserData() {
-      try {
-        const res = await fetch('/backend/api/users', {
-          credentials: 'include',
-        });
-        const body = await res.json().catch(() => null);
-        if (res.ok && body?.success && body?.user) {
-          setUserData({
-            firstName: body.user.firstName || '',
-            lastName: body.user.lastName || '',
-            email: body.user.email || '',
-          });
-        }
-      } catch (err) {
-        console.error('Failed to fetch user data:', err);
-      }
-    }
-    fetchUserData();
-  }, []);
+  const { user, logout } = useAuth();
 
   async function handleLogout() {
     try {
       setIsLoggingOut(true);
-      const res = await fetch('/backend/api/auth/login', {
-        method: 'DELETE',
-        credentials: 'include',
-      })
-
-      const body = await res.json().catch(() => null)
-
-      if (res.ok && body?.success) {
-        // navigate to login page
-        router.push('/auth/login')
-      } else {
-        console.error('Logout failed', body)
-        router.push('/auth/login')
-      }
+      await logout()
     } catch (err) {
       console.error('Logout error', err)
       router.push('/auth/login')
@@ -164,13 +126,13 @@ export default function UserSidebar() {
       <div className="p-4 border-t border-slate-700">
         <div className="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800/50">
           <div className="w-10 h-10 bg-gradient-to-br from-teal-400 to-teal-600 rounded-full flex items-center justify-center text-sm font-bold">
-            {userData ? (userData.firstName.charAt(0) + userData.lastName.charAt(0)).toUpperCase() : 'U'}
+            {getInitials(user)}
           </div>
           <div className="flex-1 min-w-0" id="userdata">
             <p className="text-sm font-medium text-white truncate">
-              {userData ? `${userData.firstName} ${userData.lastName}` : 'User Portal'}
+              {getDisplayName(user)}
             </p>
-            <p className="text-xs text-slate-400 truncate">{userData?.email || 'portal@mekong.vc'}</p>
+            <p className="text-xs text-slate-400 truncate">{getDisplayEmail(user)}</p>
           </div>
         </div>
         <button

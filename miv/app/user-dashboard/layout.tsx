@@ -1,56 +1,24 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import Link from "next/link";
 import { MobileNav } from "@/components/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { Search, Bell, Moon, HelpCircle, Download, User } from "lucide-react";
 import UserSidebar from "@/components/user-dashboard/user-sidebar";
-
-interface UserData {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
+import { usePathname } from "next/navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { getInitials } from "@/lib/auth-display";
+import { canAccessRoute } from "@/lib/rbac";
+import { AccessDenied } from "@/components/role-guard";
 
 export default function UserDashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState<UserData | null>(null);
-
-  useEffect(() => {
-    // Development authentication bypass
-    // In production, this would check for proper authentication
-    if (typeof window !== "undefined") {
-      // For development, always authenticate
-      setIsAuthenticated(true);
-    }
-    setLoading(false);
-
-    // Fetch user data
-    async function fetchUserData() {
-      try {
-        const res = await fetch('/backend/api/users', {
-          credentials: 'include',
-        });
-        const body = await res.json().catch(() => null);
-        if (res.ok && body?.success && body?.user) {
-          setUserData({
-            firstName: body.user.firstName || '',
-            lastName: body.user.lastName || '',
-            email: body.user.email || '',
-          });
-        }
-      } catch (err) {
-        console.error('Failed to fetch user data:', err);
-      }
-    }
-    fetchUserData();
-  }, []);
+  const pathname = usePathname();
+  const { user, loading, isAuthenticated } = useAuth();
 
   if (loading) {
     return (
@@ -58,6 +26,22 @@ export default function UserDashboardLayout({
         <div className="flex items-center space-x-2">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
           <span className="text-gray-600">Loading...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (isAuthenticated && !canAccessRoute(user, pathname)) {
+    return (
+      <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 transition-colors duration-300">
+        <div>
+          <UserSidebar />
+        </div>
+        <div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+          <div className="p-4 lg:p-6">
+            <Breadcrumb />
+            <AccessDenied />
+          </div>
         </div>
       </div>
     );
@@ -130,7 +114,7 @@ export default function UserDashboardLayout({
                 </button>
                 {/* User Avatar */}
                 <Link href="/user-dashboard/profile" className="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold hover:shadow-lg transition-shadow">
-                  {userData ? (userData.firstName.charAt(0) + userData.lastName.charAt(0)).toUpperCase() : ''}
+                  {getInitials(user)}
                 </Link>
               </div>
             </div>

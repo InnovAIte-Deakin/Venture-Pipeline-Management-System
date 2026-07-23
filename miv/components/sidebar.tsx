@@ -23,6 +23,9 @@ import {
   dashboardDesktopNavigationItems,
   isDashboardRouteActive,
 } from "@/lib/dashboard-navigation";
+import { getDisplayEmail, getDisplayName, getInitials } from "@/lib/auth-display";
+import { filterNavItems, getRoleLabel } from "@/lib/rbac";
+import { RoleGuard } from "@/components/role-guard";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -30,6 +33,7 @@ export function Sidebar() {
   const [expandedItems, setExpandedItems] = useState<string[]>([]);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const globalSearch = useGlobalSearch();
+  const visibleNavigationItems = filterNavItems(dashboardDesktopNavigationItems, user);
 
   const toggleExpanded = (title: string) => {
     setExpandedItems((prev) =>
@@ -90,7 +94,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-6 space-y-6 overflow-y-auto">
-          {dashboardDesktopNavigationItems.map((item) => (
+          {visibleNavigationItems.map((item) => (
             <div key={item.title}>
               {/* Main Navigation Item */}
               <div className="space-y-1">
@@ -194,22 +198,26 @@ export function Sidebar() {
             <div className="space-y-3">
               {/* Quick Actions */}
               <div className="flex space-x-2">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 text-xs text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900"
-                >
-                  <Plus className="h-3 w-3 mr-1" />
-                  New Venture
-                </Button>
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 text-xs text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900"
-                >
-                  <BarChart className="h-3 w-3 mr-1" />
-                  Report
-                </Button>
+                <RoleGuard user={user} permissions={["ventures:create"]}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 text-xs text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    New Venture
+                  </Button>
+                </RoleGuard>
+                <RoleGuard user={user} permissions={["analytics:view"]}>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 text-xs text-slate-700 border-slate-300 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    <BarChart className="h-3 w-3 mr-1" />
+                    Report
+                  </Button>
+                </RoleGuard>
               </div>
 
               
@@ -218,9 +226,7 @@ export function Sidebar() {
                 <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
                   {isAuthenticated && user ? (
                     <span className="text-sm font-bold text-white">
-                      {(
-                        user.firstName.charAt(0) + user.lastName.charAt(0)
-                      ).toUpperCase()}
+                      {getInitials(user)}
                     </span>
                   ) : (
                     <User className="h-4 w-4 text-white" />
@@ -239,13 +245,13 @@ export function Sidebar() {
                   ) : isAuthenticated && user ? (
                     <>
                       <p className="text-sm font-medium text-slate-100 truncate">
-                        {user.firstName} {user.lastName}
+                        {getDisplayName(user)}
                       </p>
                       <p className="text-xs text-slate-400 truncate">
-                        {user.email}
+                        {getDisplayEmail(user)}
                       </p>
                       <p className="text-[10px] text-slate-500 truncate">
-                        ID: {user.id}
+                        {getRoleLabel(user.role)}
                       </p>
                     </>
                   ) : (

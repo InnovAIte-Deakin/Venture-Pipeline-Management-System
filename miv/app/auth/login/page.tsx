@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { ROLES, normalizeRole } from "@/lib/rbac";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -54,10 +55,7 @@ export default function LoginPage() {
       // Redirect to dashboard on success
       console.log("login response", responseBody);
       if (responseBody?.success && responseBody?.user) {
-        if (
-          responseBody.user.role === "user" ||
-          responseBody.user.role === "founder"
-        ) {
+        if (normalizeRole(responseBody?.user.role) === ROLES.FOUNDER) {
           window.location.href = "/user-dashboard";
         } else {
           window.location.href = "/dashboard";

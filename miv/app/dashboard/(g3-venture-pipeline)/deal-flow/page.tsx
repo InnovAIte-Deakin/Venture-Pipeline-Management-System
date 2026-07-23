@@ -2425,7 +2425,7 @@ export default function DealFlowPage() {
                   <label className="text-sm font-medium">Team Members</label>
                   <Input placeholder="Enter team member names (comma separated)" />
                   <p className="text-xs text-muted-foreground">
-                    Enter names separated by commas, e.g., "John Doe, Jane Smith, Alex Johnson"
+                    Enter names separated by commas, e.g., "Name One, Name Two"
                   </p>
                 </div>
               </CardContent>

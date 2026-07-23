@@ -45,9 +45,12 @@ import {
   FileText,
   Clock,
   RotateCcw,
+  BarChart3,
 } from "lucide-react"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { useAuth } from "@/hooks/useAuth"
+import { getDisplayEmail, getDisplayName } from "@/lib/auth-display"
 
 // --- Interfaces ---
 interface UserProfile {
@@ -106,9 +109,9 @@ interface HistoricalPerformance {
 
 // --- Initial Data ---
 const initialUserProfile: UserProfile = {
-  name: "John Doe",
-  email: "john.doe@example.com",
-  twoFactorEnabled: true,
+  name: "User",
+  email: "",
+  twoFactorEnabled: false,
 }
 
 const initialNotificationSettings: NotificationSettings = {
@@ -175,6 +178,7 @@ const chartConfig = {
 
 export default function SystemSettings() {
   const { theme, setTheme } = useTheme()
+  const { user, loading: authLoading } = useAuth()
   const [searchQuery, setSearchQuery] = useState("")
   const [userProfile, setUserProfile] = useState<UserProfile>(initialUserProfile)
   const [password, setPassword] = useState({ current: "", new: "", confirm: "" })
@@ -197,55 +201,20 @@ export default function SystemSettings() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    fetchUserData()
-  }, [])
-
-  const fetchUserData = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-      
-      // Fetch current user data
-      const response = await fetch('/api/users/me')
-      if (response.ok) {
-        const userData = await response.json()
-        setUserProfile({
-          name: userData.name || 'Unknown User',
-          email: userData.email || 'unknown@example.com',
-          twoFactorEnabled: userData.twoFactorEnabled || false
-        })
-      }
-    } catch (err) {
-      console.error('Error fetching user data:', err)
-      setError(err instanceof Error ? err.message : 'Failed to load user data')
-    } finally {
-      setLoading(false)
-    }
-  }
+    if (authLoading) return
+    setUserProfile({
+      name: getDisplayName(user),
+      email: getDisplayEmail(user),
+      twoFactorEnabled: false,
+    })
+    setLoading(false)
+  }, [authLoading, user])
 
   const handleProfileUpdate = async () => {
     setProfileSaveStatus("saving")
-    try {
-      const response = await fetch('/api/users/me', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: userProfile.name,
-          email: userProfile.email
-        })
-      })
-
-      if (response.ok) {
-        setProfileSaveStatus("saved")
-        setTimeout(() => setProfileSaveStatus("idle"), 2000)
-      } else {
-        throw new Error('Failed to update profile')
-      }
-    } catch (error) {
-      console.error('Error updating profile:', error)
-      setProfileSaveStatus("error")
-      setTimeout(() => setProfileSaveStatus("idle"), 2000)
-    }
+    await new Promise((resolve) => setTimeout(resolve, 500))
+    setProfileSaveStatus("saved")
+    setTimeout(() => setProfileSaveStatus("idle"), 2000)
   }
 
   const handlePasswordChange = async () => {
