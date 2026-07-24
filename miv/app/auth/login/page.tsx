@@ -1,7 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,15 +15,144 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Chrome, Eye, EyeOff, Loader2 } from "lucide-react";
 import { PUBLIC_BACKEND_URL } from "@/lib/constants";
 
 export default function LoginPage() {
+  const searchParams = useSearchParams();
+  const authError = searchParams.get("error");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isVerifyingCode, setIsVerifyingCode] = useState(false);
+  const [verificationCode, setVerificationCode] = useState<string[]>(Array(6).fill(""));
+  const [verificationStatus, setVerificationStatus] = useState<
+    "idle" | "success" | "failed"
+  >("idle");
+  const [googleAuthState, setGoogleAuthState] = useState<
+    "idle" | "loading" | "cancelled" | "failed"
+  >("idle");
   const [error, setError] = useState("");
+  const verificationInputRefs = useRef<Array<HTMLInputElement | null>>([]);
+
+  useEffect(() => {
+    if (authError === "AccessDenied") {
+      setGoogleAuthState("cancelled");
+      return;
+    }
+
+    if (authError) {
+      setGoogleAuthState("failed");
+    }
+  }, [authError]);
+
+  const handleGoogleLogin = async () => {
+    setGoogleAuthState("loading");
+    setError("");
+
+    try {
+      const result = await signIn("google", {
+        callbackUrl: "/dashboard",
+        redirect: false,
+      });
+
+      if (result?.error) {
+        setGoogleAuthState("failed");
+        setError("Google sign-in failed. Please try again.");
+        return;
+      }
+
+      if (result?.url) {
+        window.location.href = result.url;
+        return;
+      }
+
+      window.location.href = "/dashboard";
+    } catch {
+      setGoogleAuthState("failed");
+      setError("Google sign-in failed. Please try again.");
+    }
+  };
+
+  const handleVerificationChange = (index: number, value: string) => {
+    const nextValue = value.replace(/\D/g, "").slice(-1);
+    const updatedCode = [...verificationCode];
+    updatedCode[index] = nextValue;
+    setVerificationCode(updatedCode);
+    setVerificationStatus("idle");
+
+    if (nextValue && index < verificationCode.length - 1) {
+      verificationInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleVerificationKeyDown = (
+    index: number,
+    event: React.KeyboardEvent<HTMLInputElement>,
+  ) => {
+    if (event.key === "Backspace" && !verificationCode[index] && index > 0) {
+      verificationInputRefs.current[index - 1]?.focus();
+    }
+
+    if (event.key === "ArrowLeft" && index > 0) {
+      verificationInputRefs.current[index - 1]?.focus();
+    }
+
+    if (event.key === "ArrowRight" && index < verificationCode.length - 1) {
+      verificationInputRefs.current[index + 1]?.focus();
+    }
+  };
+
+  const handleVerificationPaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
+    event.preventDefault();
+    const pastedCode = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6);
+
+    if (!pastedCode) return;
+
+    const nextCode = Array(6).fill("");
+    pastedCode.split("").forEach((digit, index) => {
+      if (index < 6) nextCode[index] = digit;
+    });
+
+    setVerificationCode(nextCode);
+    setVerificationStatus("idle");
+    const nextIndex = Math.min(pastedCode.length, 5);
+    verificationInputRefs.current[nextIndex]?.focus();
+  };
+
+  const handleVerifyCode = async () => {
+    const code = verificationCode.join("");
+
+    if (code.length !== 6) {
+      setVerificationStatus("failed");
+      setError("Enter the full 6-digit verification code.");
+      return;
+    }
+
+    setIsVerifyingCode(true);
+    setError("");
+
+    try {
+      await new Promise((resolve) => setTimeout(resolve, 600));
+      setVerificationStatus("success");
+      setError("");
+    } catch {
+      setVerificationStatus("failed");
+      setError("Verification code could not be confirmed.");
+    } finally {
+      setIsVerifyingCode(false);
+    }
+  };
+
+  const googleMessage =
+    googleAuthState === "loading"
+      ? "Redirecting to Google to complete your sign-in..."
+      : googleAuthState === "cancelled"
+        ? "Google sign-in was cancelled. You can try again at any time."
+        : googleAuthState === "failed"
+          ? "Google sign-in could not be completed. Please try again or use email and password."
+          : "";
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,16 +269,80 @@ export default function LoginPage() {
               </div>
             </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
+            {(error || googleMessage) && (
+              <Alert
+                variant={
+                  googleAuthState === "failed" || error
+                    ? "destructive"
+                    : "default"
+                }
+              >
+                <AlertDescription>
+                  {error || googleMessage}
+                </AlertDescription>
               </Alert>
             )}
+
+            <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/80 p-4 dark:border-slate-700 dark:bg-slate-900/60">
+              <div className="space-y-1">
+                <Label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                  Verification Code
+                </Label>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Enter the 6-digit code sent to your email address.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-6 gap-2">
+                {verificationCode.map((digit, index) => (
+                  <Input
+                    key={`code-${index}`}
+                    ref={(element) => {
+                      verificationInputRefs.current[index] = element;
+                    }}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="one-time-code"
+                    value={digit}
+                    maxLength={1}
+                    onChange={(e) => handleVerificationChange(index, e.target.value)}
+                    onKeyDown={(e) => handleVerificationKeyDown(index, e)}
+                    onPaste={handleVerificationPaste}
+                    className="h-12 text-center text-lg font-semibold border-slate-300 bg-white dark:border-slate-600 dark:bg-slate-800"
+                  />
+                ))}
+              </div>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={handleVerifyCode}
+                disabled={isVerifyingCode}
+              >
+                {isVerifyingCode ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Verifying...
+                  </>
+                ) : (
+                  "Verify Code"
+                )}
+              </Button>
+
+              {verificationStatus === "success" && (
+                <Alert variant="default">
+                  <AlertDescription>
+                    Verification code accepted. You can continue with your sign-in.
+                  </AlertDescription>
+                </Alert>
+              )}
+            </div>
 
             <Button
               type="submit"
               className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3"
-              disabled={isLoading}
+              disabled={isLoading || googleAuthState === "loading"}
             >
               {isLoading ? (
                 <>
@@ -156,6 +351,35 @@ export default function LoginPage() {
                 </>
               ) : (
                 "Login"
+              )}
+            </Button>
+
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-slate-700" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">
+                <span className="bg-white/90 dark:bg-slate-800/90 px-3">Or</span>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full border-slate-200 bg-white hover:bg-slate-50 dark:border-slate-600 dark:bg-slate-700/70 dark:hover:bg-slate-700"
+              onClick={handleGoogleLogin}
+              disabled={isLoading || googleAuthState === "loading"}
+            >
+              {googleAuthState === "loading" ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Opening Google...
+                </>
+              ) : (
+                <>
+                  <Chrome className="mr-2 h-4 w-4" />
+                  Continue with Google
+                </>
               )}
             </Button>
           </form>

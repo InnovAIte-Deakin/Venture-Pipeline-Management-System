@@ -25,7 +25,7 @@ export async function POST() {
       console.log(`💼 Adding details to ${venture.name}`)
 
       // Create capital activities based on venture stage
-      const capitalActivities = []
+      const capitalActivities: any[] = []
       
       if (venture.stage === 'SEED' || venture.stage === 'SERIES_A' || venture.stage === 'SERIES_B' || venture.stage === 'SERIES_C') {
         capitalActivities.push(
@@ -44,7 +44,7 @@ export async function POST() {
             terms: {
               investorType: venture.stage === 'SEED' ? 'ANGEL' : venture.stage === 'SERIES_A' ? 'VC' : 'INSTITUTIONAL',
               equityPercentage: venture.stage === 'SEED' ? 15 : venture.stage === 'SERIES_A' ? 20 : 25,
-              valuation: venture.lastValuation || venture.fundingRaised * 4,
+              valuation: venture.lastValuation ?? (venture.fundingRaised || 0) * 4,
               useOfFunds: ['product development', 'team expansion', 'market expansion']
             }
           }
@@ -56,14 +56,14 @@ export async function POST() {
             {
               ventureId: venture.id,
               type: 'CONVERTIBLE_NOTE',
-              amount: Math.floor(venture.fundingRaised * 0.3),
+              amount: Math.floor((venture.fundingRaised || 0) * 0.3),
               currency: 'USD',
               description: 'Convertible note from strategic investors',
               date: new Date(Date.now() - Math.random() * 180 * 24 * 60 * 60 * 1000),
               status: 'COMPLETED',
               investorName: 'Strategic Impact Partners',
               terms: {
-                conversionCap: venture.lastValuation * 1.2,
+                conversionCap: (venture.lastValuation ?? 0) * 1.2,
                 discountRate: 20,
                 maturityDate: new Date(Date.now() + 2 * 365 * 24 * 60 * 60 * 1000).toISOString(),
                 investorType: 'STRATEGIC'
@@ -107,7 +107,7 @@ export async function POST() {
       }
 
       // Create documents
-      const documents = [
+      const documents: any[] = [
         {
           ventureId: venture.id,
           name: 'Business Plan 2024',
