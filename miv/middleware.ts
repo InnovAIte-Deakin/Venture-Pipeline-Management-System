@@ -29,6 +29,16 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next()
   }
 
+  // Local Android emulator browsers can fail to persist localhost/IP cookies.
+  // The dashboard layouts already bypass auth in development, so keep middleware
+  // consistent and avoid redirect loops while testing locally.
+  if (
+    process.env.NODE_ENV !== 'production' &&
+    (pathname.startsWith('/dashboard') || pathname.startsWith('/user-dashboard'))
+  ) {
+    return NextResponse.next()
+  }
+
   // Simple cookie presence check
   const token = req.cookies.get('payload-token')?.value
   if (token) {

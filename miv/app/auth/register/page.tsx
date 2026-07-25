@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { PUBLIC_BACKEND_URL } from "@/lib/constants";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -56,6 +55,7 @@ export default function RegisterPage() {
           email: formData.email,
           password: formData.password,
         }),
+        credentials: "include",
       });
 
       if (!response.ok) {

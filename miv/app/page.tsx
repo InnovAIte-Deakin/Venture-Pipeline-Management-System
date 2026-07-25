@@ -205,17 +205,36 @@ export default function HomePage() {
 							</Link>
 						</div>
 
-						{/* Mobile Menu Button */}
-						<button
-							className="md:hidden"
-							onClick={() => setIsMenuOpen(!isMenuOpen)}
-						>
-							{isMenuOpen ? (
-								<X className="h-6 w-6" />
-							) : (
-								<Menu className="h-6 w-6" />
-							)}
-						</button>
+						{/* Mobile Actions */}
+						<div className="flex items-center gap-2 md:hidden">
+							<Button
+								asChild
+								variant="ghost"
+								size="sm"
+								className="sign-in-btn"
+							>
+								<Link href="/auth/login">
+									<LogIn className="h-4 w-4 mr-1" />
+									Sign In
+								</Link>
+							</Button>
+							<button
+								className="p-2 text-gray-700 hover:text-gray-900"
+								onClick={() => setIsMenuOpen(!isMenuOpen)}
+								aria-label={
+									isMenuOpen
+										? "Close navigation menu"
+										: "Open navigation menu"
+								}
+								aria-expanded={isMenuOpen}
+							>
+								{isMenuOpen ? (
+									<X className="h-6 w-6" />
+								) : (
+									<Menu className="h-6 w-6" />
+								)}
+							</button>
+						</div>
 					</div>
 				</div>
 
@@ -279,19 +298,31 @@ export default function HomePage() {
 							</button>
 							<div className="pt-4 space-y-2">
 								<Button
+									asChild
 									variant="ghost"
 									size="sm"
 									className="w-full sign-in-btn"
 								>
-									<LogIn className="h-4 w-4 mr-2" />
-									Sign In
+									<Link
+										href="/auth/login"
+										onClick={() => setIsMenuOpen(false)}
+									>
+										<LogIn className="h-4 w-4 mr-2" />
+										Sign In
+									</Link>
 								</Button>
 								<Button
+									asChild
 									size="sm"
 									className="w-full get-started-btn"
 								>
-									<UserPlus className="h-4 w-4 mr-2" />
-									Get Started
+									<Link
+										href="/auth/register"
+										onClick={() => setIsMenuOpen(false)}
+									>
+										<UserPlus className="h-4 w-4 mr-2" />
+										Get Started
+									</Link>
 								</Button>
 							</div>
 						</div>
