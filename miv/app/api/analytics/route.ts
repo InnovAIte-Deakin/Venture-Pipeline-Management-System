@@ -191,7 +191,7 @@ export async function GET(request: NextRequest) {
     }
 
     // For mobile, send minimal additional data; for desktop, send full analytics
-    let analytics: any = baseAnalytics
+    const analytics: any = baseAnalytics
 
     if (!isMobile) {
       analytics.performance = {

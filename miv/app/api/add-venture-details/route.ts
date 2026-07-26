@@ -203,13 +203,13 @@ export async function POST() {
         documentsAdded: totalDocuments,
         averageCapitalActivitiesPerVenture: Math.round((totalCapitalActivities / ventures.length) * 10) / 10,
         averageDocumentsPerVenture: Math.round((totalDocuments / ventures.length) * 10) / 10,
-        totalFundingTracked: ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0),
+        totalFundingTracked: ventures.reduce((sum: number, v: { fundingRaised?: number | null }) => sum + (v.fundingRaised || 0), 0),
         documentTypes: {
           businessPlans: ventures.length,
           financialStatements: ventures.length,
           pitchDecks: ventures.length,
           impactReports: ventures.length,
-          sectorSpecific: ventures.filter(v => ['HealthTech', 'FinTech', 'CleanTech'].includes(v.sector)).length
+          sectorSpecific: ventures.filter((v: { sector?: string | null }) => ['HealthTech', 'FinTech', 'CleanTech'].includes(v.sector || '')).length
         }
       }
     })

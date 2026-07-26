@@ -68,23 +68,20 @@ if (!pkg) {
 console.log(`[install-lightningcss] Installing ${pkg} for ${process.platform}/${process.arch}…`);
 
 try {
-  // Detect package manager
-  let installCmd;
-  try {
-    execSync("pnpm --version", { stdio: "ignore" });
+  // Use the same package manager that launched the lifecycle script. Falling
+  // back to "first tool found" mixes package-manager metadata in node_modules.
+  const userAgent = process.env.npm_config_user_agent || "";
+  let installCmd = `npm install ${pkg} --no-save --ignore-scripts`;
+
+  if (userAgent.startsWith("pnpm/")) {
     installCmd = `pnpm add -D ${pkg} --ignore-scripts`;
-  } catch {
-    try {
-      execSync("yarn --version", { stdio: "ignore" });
-      installCmd = `yarn add -D ${pkg} --ignore-scripts`;
-    } catch {
-      installCmd = `npm install --save-dev ${pkg} --ignore-scripts`;
-    }
+  } else if (userAgent.startsWith("yarn/")) {
+    installCmd = `yarn add -D ${pkg} --ignore-scripts`;
   }
 
   execSync(installCmd, { stdio: "inherit" });
 
-  // Every one of the install commands above writes the platform-specific package
+  // Some package managers write the platform-specific package
   // into package.json's devDependencies — that's normal for a one-off install, but
   // this script runs on every teammate's machine on every OS. If that write ever gets
   // committed, it hardcodes today's platform the same way the old Linux-only pin did,
