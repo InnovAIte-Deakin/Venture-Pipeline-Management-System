@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@eslint/eslintrc':
+        specifier: ^3.2.0
+        version: 3.3.1
       '@payloadcms/db-mongodb':
         specifier: 3.49.1
         version: 3.49.1(@aws-sdk/credential-providers@3.883.0)(payload@3.49.1(graphql@16.11.0)(typescript@5.7.3))
