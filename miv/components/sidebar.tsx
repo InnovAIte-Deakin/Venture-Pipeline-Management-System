@@ -211,7 +211,7 @@ export function Sidebar() {
     <>
       <aside
         className={cn(
-          "fixed left-0 top-0 w-64 h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900/95 backdrop-blur-md text-slate-100 shadow-2xl border-r border-slate-800 flex flex-col z-50 transition-all duration-300",
+          "fixed left-0 top-0 w-64 h-screen bg-linear-to-b from-slate-900 via-slate-800 to-slate-900/95 backdrop-blur-md text-slate-100 shadow-2xl border-r border-slate-800 flex flex-col z-50 transition-all duration-300",
           isCollapsed && "w-16",
         )}
       >
@@ -237,7 +237,7 @@ export function Sidebar() {
               onClick={globalSearch.open}
               className="w-full flex items-center gap-3 px-4 py-2.5 bg-slate-800/50 border border-slate-700 rounded-lg text-slate-400 hover:bg-slate-800 hover:border-slate-600 hover:text-slate-300 transition-all group"
             >
-              <Search className="h-4 w-4 flex-shrink-0" />
+              <Search className="h-4 w-4 shrink-0" />
               <span className="flex-1 text-left text-sm">
                 Search everything...
               </span>
@@ -310,7 +310,7 @@ export function Sidebar() {
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleExpanded(item.title)}
-                      className="h-6 w-6 p-0 text-slate-400 hover:text-slate-300 ml-1 flex-shrink-0"
+                      className="h-6 w-6 p-0 text-slate-400 hover:text-slate-300 ml-1 shrink-0"
                     >
                       {isExpanded(item.title) ? (
                         <ChevronDown className="h-4 w-4" />
