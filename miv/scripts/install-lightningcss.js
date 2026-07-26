@@ -83,6 +83,26 @@ try {
   }
 
   execSync(installCmd, { stdio: "inherit" });
+
+  // Every one of the install commands above writes the platform-specific package
+  // into package.json's devDependencies — that's normal for a one-off install, but
+  // this script runs on every teammate's machine on every OS. If that write ever gets
+  // committed, it hardcodes today's platform the same way the old Linux-only pin did,
+  // and the next person on a different OS hits the exact same install failure in reverse.
+  // Strip it back out immediately so package.json returns to its committed, platform-neutral
+  // state — the binary is still installed in node_modules for this run either way.
+  // `npm pkg delete` is used here (not the detected package manager) because it's a plain
+  // JSON editor bundled with npm, so it works the same regardless of which tool did the install.
+  const pkgName = pkg.split("@")[0];
+  try {
+    execSync(`npm pkg delete devDependencies.${pkgName}`, { stdio: "inherit" });
+  } catch (cleanupErr) {
+    console.warn(
+      `[install-lightningcss] Could not auto-clean package.json — please manually remove "${pkgName}" from devDependencies before committing.`,
+      cleanupErr.message
+    );
+  }
+
   console.log(`[install-lightningcss] Done.`);
 } catch (err) {
   console.error(`[install-lightningcss] Installation failed:`, err.message);
