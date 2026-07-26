@@ -4,7 +4,7 @@ import typescriptEslint from "typescript-eslint";
 
 const eslintConfig = [
   {
-    ignores: [".next/**", "out/**", "build/**", "next-env.d.ts"],
+    ignores: [".next/**", "out/**", "build/**", "archive/**", "next-env.d.ts"],
   },
   ...typescriptEslint.configs.recommended,
   {

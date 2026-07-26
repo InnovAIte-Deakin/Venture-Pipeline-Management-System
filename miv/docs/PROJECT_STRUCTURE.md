@@ -27,7 +27,6 @@ miv/
 │   │   ├── 📁 venture-intake/       # Venture Intake
 │   │   ├── layout.tsx               # Dashboard Layout
 │   │   └── page.tsx                 # Dashboard Home
-│   ├── 📁 venture-intake/           # Standalone Venture Intake
 │   ├── favicon.ico                  # App Icon
 │   ├── globals.css                  # Global Styles
 │   ├── layout.tsx                   # Root Layout

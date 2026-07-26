@@ -341,7 +341,7 @@ Route map:
 | `app/dashboard/system-settings/page.tsx` | `/dashboard/system-settings` |
 | `app/dashboard/team-management/page.tsx` | `/dashboard/team-management` |
 | `app/dashboard/test-environment/page.tsx` | `/dashboard/test-environment` |
-| `app/dashboard/venture-intake/page.tsx` | `/dashboard/venture-intake` |
+| `app/dashboard/(g2-founder-submission)/venture-intake/page.tsx` | `/dashboard/venture-intake` |
 | `app/dashboard/ventures/page.tsx` | `/dashboard/ventures` |
 | `app/dashboard/ventures/[id]/page.tsx` | `/dashboard/ventures/:id` |
 | `app/dashboard/workflows/page.tsx` | `/dashboard/workflows` |
@@ -355,7 +355,6 @@ Route map:
 | `app/user-dashboard/documents/page.tsx` | `/user-dashboard/documents` |
 | `app/user-dashboard/profile/page.tsx` | `/user-dashboard/profile` |
 | `app/user-dashboard/support/page.tsx` | `/user-dashboard/support` |
-| `app/venture-intake/page.tsx` | `/venture-intake` redirect page |
 
 Nested layout inheritance:
 
@@ -400,7 +399,7 @@ All tracked `page.tsx` files are client components in current source. They use l
 | `app/dashboard/system-settings/page.tsx` | `/dashboard/system-settings` | Admin/user settings. | Fetches `/api/users/me`; PUT updates profile; theme provider; multiple settings states. | `users/me` falls back to first user without session, a serious auth issue. |
 | `app/dashboard/team-management/page.tsx` | `/dashboard/team-management` | Team members, projects, announcements, events management. | Fetches `/api/team/members`, projects, announcements, events; POST creation dialogs. | Maps to User/Project/Announcement/TeamEvent. API lacks visible auth. |
 | `app/dashboard/test-environment/page.tsx` | `/dashboard/test-environment` | Internal test/seed control panel. | Buttons call seed/test endpoints. | High risk if available outside local/dev. |
-| `app/dashboard/venture-intake/page.tsx` | `/dashboard/venture-intake` | Admin intake page. | Renders `VentureIntakeForm` with explanatory cards/alerts. | Form posts to `/api/ventures` and upload helpers. |
+| `app/dashboard/(g2-founder-submission)/venture-intake/page.tsx` | `/dashboard/venture-intake` | Admin intake page. | Renders `VentureIntakeForm` with explanatory cards/alerts. | Form posts to `/api/ventures` and upload helpers. |
 | `app/dashboard/ventures/page.tsx` | `/dashboard/ventures` | Venture list/search/filter. | Fetches `/api/ventures`; router navigation; filters status/stage/sector. | Internal list; API auth disabled. |
 | `app/dashboard/ventures/[id]/page.tsx` | `/dashboard/ventures/:id` | Venture detail tabs: overview, GEDSI, activities, docs, team. | Fetches `/api/ventures/:id`; normalizes nullable response; uses GEDSI score helper; tabs, badges, progress, avatars. | Handles loading/error/not-found locally. Risk: mojibake characters in separators/bullets, edit/share buttons appear nonfunctional. |
 | `app/dashboard/workflows/page.tsx` | `/dashboard/workflows` | Workflow list and run trigger. | Fetches `/api/workflows`; POST `/api/workflows/run`; links to wizard/builder/monitor. | Workflow execution side effects create runs/notifications. No auth guard. |
@@ -414,7 +413,6 @@ All tracked `page.tsx` files are client components in current source. They use l
 | `app/user-dashboard/documents/page.tsx` | `/user-dashboard/documents` | Founder document upload/download/delete. | Uses drag/drop state, file input ref, `/backend/api/documents` GET/POST/DELETE/download. | Does not use local Next document API; depends on external backend rewrite/cookies. |
 | `app/user-dashboard/profile/page.tsx` | `/user-dashboard/profile` | Founder profile/password settings. | Fetches `/backend/api/users`, PUT profile, `/backend/api/users/change-password`. | External backend auth path; not NextAuth. |
 | `app/user-dashboard/support/page.tsx` | `/user-dashboard/support` | Founder support/FAQ/contact page. | Local FAQ accordion state and icons. | Static content. |
-| `app/venture-intake/page.tsx` | `/venture-intake` | Redirect page. | `useRouter`, `useEffect` redirects to `/dashboard/venture-intake`. | Public URL redirects into dashboard path. |
 
 Related loading/empty/success/error behavior:
 

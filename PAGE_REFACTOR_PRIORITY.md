@@ -14,9 +14,8 @@ The inventory was taken on 2026-07-25. Archived files, backups, alternate
 implementations, test routes, and files outside the requested paths were not
 counted. In particular, this excludes the archived/test material under
 `miv/archive`, the removed `dashboard/test-environment` route, the removed
-`app/test-*` routes, the archived capital-facilitation variants, the removed
-dashboard backup, and `miv/app/venture-intake/page.tsx` because that last route
-is outside the requested path set.
+`app/test-*` routes, the archived capital-facilitation variants, and the
+removed dashboard backup.
 
 No conclusion in this report authorizes Prompt 8 or a source-code change.
 
@@ -90,7 +89,7 @@ No conclusion in this report authorizes Prompt 8 or a source-code change.
 | `/dashboard/sustainability` | `miv/app/dashboard/sustainability/page.tsx` | 919 | 5 | 1 | 1 | 0 | 0 | 4 | 5 | Yes | UI primitives only | No | Large analytics page deriving environmental, social, carbon-credit, and nature-project data and rendering four charts plus a digital-twin mode. |
 | `/dashboard/system-settings` | `miv/app/dashboard/system-settings/page.tsx` | 1,141 | 18 | 1 | 2 | 0 | 0 | 1 | 0 | Yes | UI primitives only | No | Six settings domains, profile/password requests, independent save statuses, import/export handlers, theme/accessibility state, and a performance chart share one page. |
 | `/dashboard/team-management` | `miv/app/dashboard/team-management/page.tsx` | 1,536 | 16 | 3 | 8 | 6 | 0 | 0 | 11 | Yes | UI primitives only | No | Four resources each have request/mutation logic; member/project search, cards, detail views, and six dialog definitions make mobile interaction risk high. |
-| `/dashboard/venture-intake` | `miv/app/dashboard/venture-intake/page.tsx` | 303 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | No | Strong: `VentureIntakeForm` | Mostly | The interactive form is already extracted; the route page mainly supplies guidance, tips, support, and privacy content. |
+| `/dashboard/venture-intake` | `miv/app/dashboard/(g2-founder-submission)/venture-intake/page.tsx` | 303 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | No | Strong: `VentureIntakeForm` | Mostly | The interactive form is already extracted; the route page mainly supplies guidance, tips, support, and privacy content. |
 | `/dashboard/ventures` | `miv/app/dashboard/ventures/page.tsx` | 438 | 7 | 1 | 0 | 0 | 1 | 0 | 2 | Moderate | UI primitives plus shared API client | No | Maintainable venture index with client-based loading, search and three filters, summary reductions, routing, and one wide table. |
 | `/dashboard/ventures/[id]` | `miv/app/dashboard/ventures/[id]/page.tsx` | 931 | 3 | 1 | 1 | 0 | 0 | 0 | 12 | Yes | UI primitives only | No | Low state count masks a very large detail renderer with formatting and GEDSI calculations, many tab sections, activity lists, financials, and nested data maps. |
 | `/dashboard/workflows` | `miv/app/dashboard/workflows/page.tsx` | 137 | 2 | 1 | 2 | 0 | 0 | 0 | 1 | Light | UI primitives only | No | Compact workflow list with load and run actions; the two direct requests do not create a large page-level maintenance burden. |

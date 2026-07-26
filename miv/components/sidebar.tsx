@@ -175,11 +175,6 @@ const navigationItems: NavItem[] = [
         icon: Calendar,
       },
       {
-        title: "Test Environment",
-        href: "/dashboard/test-environment",
-        icon: Settings,
-      },
-      {
         title: "System Settings",
         href: "/dashboard/system-settings",
         icon: Settings,
