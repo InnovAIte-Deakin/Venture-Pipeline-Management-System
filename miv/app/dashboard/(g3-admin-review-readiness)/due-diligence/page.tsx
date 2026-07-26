@@ -1961,7 +1961,7 @@ Contact: market@miv.org
                     <Table>
                       <TableHeader>
                         <TableRow className="bg-muted/50">
-                          <TableHead className="w-[50px]">
+                          <TableHead className="w-12.5">
                             <Checkbox
                               checked={selectedItems.length === paginatedItems.length && paginatedItems.length > 0}
                               onCheckedChange={(checked) => {
@@ -1973,15 +1973,15 @@ Contact: market@miv.org
                               }}
                             />
                           </TableHead>
-                          <TableHead className="w-[200px]">Company</TableHead>
+                          <TableHead className="w-50">Company</TableHead>
                           <TableHead>Stage</TableHead>
                           <TableHead>Category</TableHead>
                           <TableHead>Assigned To</TableHead>
-                          <TableHead className="w-[140px]">Progress</TableHead>
+                          <TableHead className="w-35">Progress</TableHead>
                           <TableHead>Priority</TableHead>
                           <TableHead>Status</TableHead>
                           <TableHead>Due Date</TableHead>
-                          <TableHead className="w-[120px]">Actions</TableHead>
+                          <TableHead className="w-30">Actions</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
@@ -2057,7 +2057,7 @@ Contact: market@miv.org
                                         '[&>div]:bg-red-500'
                                       }`}
                                     />
-                                    <span className="text-sm font-medium min-w-[35px]">{item.completion}%</span>
+                                    <span className="text-sm font-medium min-w-8.75">{item.completion}%</span>
                                   </div>
                                 </div>
                               </TableCell>

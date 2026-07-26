@@ -49,17 +49,24 @@ import Link from "next/link"
 interface Venture {
   id: string
   name: string
-  description: string
-  sector: string
-  location: string
-  stage: string
-  status: string
-  fundingAmount: number
-  teamSize: number
-  foundedYear: number
-  gedsiScore: number
+  description?: string | null
+  pitchSummary?: string | null
+  sector?: string | null
+  location?: string | null
+  stage?: string | null
+  status?: string | null
+  fundingAmount?: number | null
+  fundingRaised?: number | null
+  teamSize?: number | string | null
+  foundedYear?: number | null
+  foundingYear?: number | null
+  gedsiScore?: number | null
   createdAt: string
   updatedAt: string
+}
+
+interface VenturesApiResponse {
+  ventures?: Venture[]
 }
 
 export default function VenturesPage() {
@@ -78,8 +85,8 @@ export default function VenturesPage() {
         setLoading(true)
         const response = await fetch('/api/ventures')
         if (response.ok) {
-          const data = await response.json()
-          setVentures(data)
+          const data: Venture[] | VenturesApiResponse = await response.json()
+          setVentures(Array.isArray(data) ? data : data.ventures ?? [])
         } else {
           // Handle API error
           setError('Failed to fetch ventures from database')
@@ -134,15 +141,38 @@ export default function VenturesPage() {
     router.push(`/dashboard/ventures/${ventureId}`)
   }
 
+  const asText = (value: string | null | undefined, fallback = "Not specified") =>
+    value?.trim() || fallback
+
+  const getVentureDescription = (venture: Venture) =>
+    asText(venture.description || venture.pitchSummary, "")
+
+  const getFundingAmount = (venture: Venture) =>
+    Number(venture.fundingAmount ?? venture.fundingRaised ?? 0)
+
+  const getTeamSize = (venture: Venture) => Number(venture.teamSize ?? 0)
+
+  const getFoundedYear = (venture: Venture) =>
+    venture.foundedYear ?? venture.foundingYear ?? "N/A"
+
+  const getGedsiScore = (venture: Venture) =>
+    Math.max(0, Math.min(100, Number(venture.gedsiScore ?? 0)))
+
   // Filter ventures based on search and filters
   const filteredVentures = ventures.filter(venture => {
-    const matchesSearch = venture.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         venture.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         venture.sector.toLowerCase().includes(searchQuery.toLowerCase())
+    const normalizedSearch = searchQuery.toLowerCase()
+    const name = asText(venture.name, "").toLowerCase()
+    const description = getVentureDescription(venture).toLowerCase()
+    const sector = asText(venture.sector, "").toLowerCase()
+    const status = asText(venture.status, "")
+    const stage = asText(venture.stage, "")
+    const matchesSearch = name.includes(normalizedSearch) ||
+                         description.includes(normalizedSearch) ||
+                         sector.includes(normalizedSearch)
     
-    const matchesStatus = statusFilter === "all" || venture.status === statusFilter
-    const matchesStage = stageFilter === "all" || venture.stage === stageFilter
-    const matchesSector = sectorFilter === "all" || venture.sector.toLowerCase() === sectorFilter.toLowerCase()
+    const matchesStatus = statusFilter === "all" || status === statusFilter
+    const matchesStage = stageFilter === "all" || stage === stageFilter
+    const matchesSector = sectorFilter === "all" || sector === sectorFilter.toLowerCase()
     
     return matchesSearch && matchesStatus && matchesStage && matchesSector
   })
@@ -237,7 +267,7 @@ export default function VenturesPage() {
                 <div>
                   <p className="text-sm text-gray-600">Total Funding</p>
                   <p className="text-2xl font-bold">
-                    {formatCurrency(ventures.reduce((sum, v) => sum + (v.fundingAmount || 0), 0))}
+                    {formatCurrency(ventures.reduce((sum, v) => sum + getFundingAmount(v), 0))}
                   </p>
                 </div>
               </div>
@@ -250,7 +280,7 @@ export default function VenturesPage() {
                 <div>
                   <p className="text-sm text-gray-600">Total Team Members</p>
                   <p className="text-2xl font-bold">
-                    {ventures.reduce((sum, v) => sum + (v.teamSize || 0), 0)}
+                    {ventures.reduce((sum, v) => sum + getTeamSize(v), 0)}
                   </p>
                 </div>
               </div>
@@ -263,7 +293,7 @@ export default function VenturesPage() {
                 <div>
                   <p className="text-sm text-gray-600">Avg GEDSI Score</p>
                   <p className="text-2xl font-bold">
-                    {ventures.length > 0 ? Math.round(ventures.reduce((sum, v) => sum + (v.gedsiScore || 0), 0) / ventures.length) : 0}%
+                    {ventures.length > 0 ? Math.round(ventures.reduce((sum, v) => sum + getGedsiScore(v), 0) / ventures.length) : 0}%
                   </p>
                 </div>
               </div>
@@ -353,92 +383,98 @@ export default function VenturesPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredVentures.map((venture) => (
-                  <TableRow 
-                    key={venture.id} 
-                    className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => handleViewVenture(venture.id)}
-                  >
-                    <TableCell>
-                      <div className="flex items-center space-x-3">
-                        <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                          <Building2 className="h-5 w-5 text-blue-600" />
+                {filteredVentures.map((venture) => {
+                  const stage = asText(venture.stage, "UNKNOWN")
+                  const status = asText(venture.status, "UNKNOWN")
+                  const gedsiScore = getGedsiScore(venture)
+
+                  return (
+                    <TableRow
+                      key={venture.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleViewVenture(venture.id)}
+                    >
+                      <TableCell>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                            <Building2 className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <p className="font-medium text-gray-900">{venture.name}</p>
+                            <p className="text-sm text-gray-500">{asText(venture.sector)}</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="font-medium text-gray-900">{venture.name}</p>
-                          <p className="text-sm text-gray-500">{venture.sector}</p>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStageColor(stage)}>
+                          {stage.replaceAll('_', ' ')}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <Badge className={getStatusColor(status)}>
+                          {status}
+                        </Badge>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1">
+                          <MapPin className="h-3 w-3 text-gray-400" />
+                          <span className="text-sm">{asText(venture.location)}</span>
                         </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStageColor(venture.stage)}>
-                        {venture.stage.replace('_', ' ')}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusColor(venture.status)}>
-                        {venture.status}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <MapPin className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm">{venture.location}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="font-medium">
-                      {formatCurrency(venture.fundingAmount)}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-2">
-                        <div className="w-16 bg-gray-200 rounded-full h-2">
-                          <div 
-                            className={`h-2 rounded-full ${
-                              venture.gedsiScore >= 80 ? 'bg-green-500' : 
-                              venture.gedsiScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                            }`}
-                            style={{ width: `${venture.gedsiScore}%` }}
-                          ></div>
+                      </TableCell>
+                      <TableCell className="font-medium">
+                        {formatCurrency(getFundingAmount(venture))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-2">
+                          <div className="w-16 bg-gray-200 rounded-full h-2">
+                            <div
+                              className={`h-2 rounded-full ${
+                                gedsiScore >= 80 ? 'bg-green-500' :
+                                gedsiScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
+                              }`}
+                              style={{ width: `${gedsiScore}%` }}
+                            ></div>
+                          </div>
+                          <span className="text-sm font-medium">{gedsiScore}%</span>
                         </div>
-                        <span className="text-sm font-medium">{venture.gedsiScore}%</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <Users className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm">{venture.teamSize}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-3 w-3 text-gray-400" />
-                        <span className="text-sm">{venture.foundedYear}</span>
-                      </div>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={(e) => {
-                            e.stopPropagation()
-                            handleViewVenture(venture.id)
-                          }}>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Details
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Venture
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
-                  </TableRow>
-                ))}
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1">
+                          <Users className="h-3 w-3 text-gray-400" />
+                          <span className="text-sm">{getTeamSize(venture)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex items-center space-x-1">
+                          <Calendar className="h-3 w-3 text-gray-400" />
+                          <span className="text-sm">{getFoundedYear(venture)}</span>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem onClick={(e) => {
+                              e.stopPropagation()
+                              handleViewVenture(venture.id)
+                            }}>
+                              <Eye className="h-4 w-4 mr-2" />
+                              View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
+                              <Edit className="h-4 w-4 mr-2" />
+                              Edit Venture
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </TableCell>
+                    </TableRow>
+                  )
+                })}
               </TableBody>
             </Table>
           </div>

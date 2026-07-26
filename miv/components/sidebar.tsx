@@ -1,193 +1,28 @@
 "use client";
 
-import React, { useState, useMemo, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  House,
-  Building2,
-  Target,
-  DollarSign,
-  BarChart3,
-  TrendingUp,
-  ChartPie,
-  Users,
-  Settings,
-  FileText,
-  Brain,
   BarChart,
-  Calendar,
-  MapPin,
-  Globe,
-  Shield,
-  Zap,
-  Rocket,
-  Star,
-  Award,
-  Heart,
-  Activity,
-  PieChart,
-  LineChart,
-  AreaChart,
-  ScatterChart,
-  Gauge,
   ChevronDown,
   ChevronRight,
   Plus,
   Search,
-  Bell,
   User,
   LogOut,
-  Menu,
-  X,
-  Command,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
-import { useSession, signIn, signOut } from "next-auth/react";
-import { GlobalSearch, useGlobalSearch } from "@/components/global-search";
+import { signIn } from "next-auth/react";
+import { useGlobalSearch } from "@/components/global-search";
 import { useAuth } from "@/hooks/useAuth";
-
-interface NavItem {
-  title: string;
-  href?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  badge?: string;
-  children?: NavItem[];
-}
-
-const navigationItems: NavItem[] = [
-  {
-    title: "Dashboard",
-    href: "/dashboard",
-    icon: House,
-    badge: "New",
-  },
-  {
-    title: "Pipeline Management",
-    icon: Building2,
-    children: [
-      {
-        title: "Venture Intake",
-        href: "/dashboard/venture-intake",
-        icon: Plus,
-      },
-      { title: "Deal Flow", href: "/dashboard/deal-flow", icon: Activity },
-      {
-        title: "Due Diligence",
-        href: "/dashboard/due-diligence",
-        icon: Shield,
-      },
-      { title: "Portfolio", href: "/dashboard/portfolio", icon: Building2 },
-    ],
-  },
-  {
-    title: "Analytics & Insights",
-    icon: BarChart3,
-    children: [
-      {
-        title: "Performance Analytics",
-        href: "/dashboard/performance-analytics",
-        icon: TrendingUp,
-      },
-      { title: "AI Analysis", href: "/dashboard/ai-analysis", icon: Brain },
-      {
-        title: "Advanced Reports",
-        href: "/dashboard/advanced-reports",
-        icon: FileText,
-      },
-      {
-        title: "Custom Dashboards",
-        href: "/dashboard/custom-dashboards",
-        icon: BarChart,
-      },
-    ],
-  },
-  {
-    title: "Capital Management",
-    icon: DollarSign,
-    children: [
-      {
-        title: "Capital Facilitation",
-        href: "/dashboard/capital-facilitation",
-        icon: DollarSign,
-      },
-      {
-        title: "Investment Rounds",
-        href: "/dashboard/investment-rounds",
-        icon: TrendingUp,
-      },
-      {
-        title: "Fund Management",
-        href: "/dashboard/fund-management",
-        icon: ChartPie,
-      },
-      {
-        title: "Exit Strategy",
-        href: "/dashboard/exit-strategy",
-        icon: Rocket,
-      },
-    ],
-  },
-  {
-    title: "Impact & GEDSI",
-    icon: Heart,
-    children: [
-      { title: "GEDSI Tracker", href: "/dashboard/gedsi-tracker", icon: Users },
-      {
-        title: "Impact Reports",
-        href: "/dashboard/impact-reports",
-        icon: Award,
-      },
-      {
-        title: "Sustainability Metrics",
-        href: "/dashboard/sustainability",
-        icon: Globe,
-      },
-      { title: "Social Impact", href: "/dashboard/social-impact", icon: Heart },
-      {
-        title: "IRIS Metrics",
-        href: "/dashboard/iris-metrics",
-        icon: PieChart,
-      },
-    ],
-  },
-  {
-    title: "Operations",
-    icon: Settings,
-    children: [
-      {
-        title: "Impact Documents",
-        href: "/dashboard/impact-documents",
-        icon: FileText,
-      },
-      {
-        title: "Team Management",
-        href: "/dashboard/team-management",
-        icon: Users,
-      },
-      { title: "Notifications", href: "/dashboard/notifications", icon: Bell },
-      {
-        title: "Calendar & Events",
-        href: "/dashboard/calendar",
-        icon: Calendar,
-      },
-      {
-        title: "System Settings",
-        href: "/dashboard/system-settings",
-        icon: Settings,
-      },
-      { title: "Workflows", href: "/dashboard/workflows", icon: Activity },
-      {
-        title: "Document Management",
-        href: "/dashboard/documents",
-        icon: FileText,
-      },
-    ],
-  },
-];
+import {
+  dashboardDesktopNavigationItems,
+  isDashboardRouteActive,
+} from "@/lib/dashboard-navigation";
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -204,7 +39,7 @@ export function Sidebar() {
     );
   };
 
-  const isActive = (href: string) => pathname === href;
+  const isActive = (href: string) => isDashboardRouteActive(pathname, href);
   const isExpanded = (title: string) => expandedItems.includes(title);
 
   return (
@@ -255,7 +90,7 @@ export function Sidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 px-3 py-6 space-y-6 overflow-y-auto">
-          {navigationItems.map((item) => (
+          {dashboardDesktopNavigationItems.map((item) => (
             <div key={item.title}>
               {/* Main Navigation Item */}
               <div className="space-y-1">
@@ -263,6 +98,7 @@ export function Sidebar() {
                   {item.href ? (
                     <Link
                       href={item.href}
+                      aria-current={isActive(item.href) ? "page" : undefined}
                       className={cn(
                         "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 w-full",
                         isActive(item.href)
@@ -283,12 +119,14 @@ export function Sidebar() {
                       )}
                     </Link>
                   ) : (
-                    <div
+                    <button
+                      type="button"
                       onClick={() => toggleExpanded(item.title)}
                       className={cn(
-                        "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer w-full",
+                        "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 cursor-pointer w-full text-left",
                         "text-slate-300 hover:bg-slate-800/80 hover:text-white hover:border-l-4 hover:border-slate-600",
                       )}
+                      aria-expanded={isExpanded(item.title)}
                     >
                       <item.icon className="mr-3 h-5 w-5 transition-colors text-slate-400 group-hover:text-slate-300" />
                       {!isCollapsed && (
@@ -301,7 +139,7 @@ export function Sidebar() {
                           )}
                         </>
                       )}
-                    </div>
+                    </button>
                   )}
 
                   {/* Expand/Collapse Button */}
@@ -310,6 +148,7 @@ export function Sidebar() {
                       variant="ghost"
                       size="sm"
                       onClick={() => toggleExpanded(item.title)}
+                      aria-label={`${isExpanded(item.title) ? "Collapse" : "Expand"} ${item.title}`}
                       className="h-6 w-6 p-0 text-slate-400 hover:text-slate-300 ml-1 shrink-0"
                     >
                       {isExpanded(item.title) ? (
@@ -328,6 +167,9 @@ export function Sidebar() {
                       <Link
                         key={child.href || child.title}
                         href={child.href || "#"}
+                        aria-current={
+                          child.href && isActive(child.href) ? "page" : undefined
+                        }
                         className={cn(
                           "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900",
                           child.href && isActive(child.href)
@@ -412,6 +254,7 @@ export function Sidebar() {
                       variant="ghost"
                       className="h-6 w-6 p-0"
                       onClick={() => signIn()}
+                      aria-label="Sign in"
                     >
                       <User className="h-3 w-3" />
                     </Button>
@@ -423,6 +266,7 @@ export function Sidebar() {
                     variant="ghost"
                     className="h-6 w-6 p-0"
                     onClick={logout}
+                    aria-label="Sign out"
                   >
                     <LogOut className="h-3 w-3" />
                   </Button>
@@ -432,6 +276,7 @@ export function Sidebar() {
                     variant="ghost"
                     className="h-6 w-6 p-0"
                     onClick={() => (window.location.href = "/auth/login")}
+                    aria-label="Sign in"
                   >
                     <User className="h-3 w-3" />
                   </Button>
@@ -445,6 +290,7 @@ export function Sidebar() {
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
+            aria-label={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
             className="w-full mt-2 text-slate-400 hover:text-slate-300"
           >
             {isCollapsed ? (

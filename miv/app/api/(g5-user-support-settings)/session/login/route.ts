@@ -56,3 +56,17 @@ export async function POST(request: NextRequest) {
 		);
 	}
 }
+
+export async function DELETE() {
+	const response = NextResponse.json({ success: true });
+
+	response.cookies.set("payload-token", "", {
+		httpOnly: true,
+		secure: process.env.NODE_ENV === "production",
+		sameSite: "lax",
+		maxAge: 0,
+		path: "/",
+	});
+
+	return response;
+}

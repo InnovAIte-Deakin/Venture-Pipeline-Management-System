@@ -64,13 +64,13 @@ export default function DashboardLayout({
 			</div>
 
 			{/* Mobile Navigation */}
-			<div className="lg:hidden fixed top-4 left-4 z-50">
+			<div className="lg:hidden">
 				<MobileNav />
 			</div>
 
 			{/* Main Content */}
 			<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
-				<div className="p-4 lg:p-6">
+				<div className="p-4 pt-20 pb-20 lg:p-6 lg:pt-6 lg:pb-0">
 					<Breadcrumb />
 					{children}
 				</div>
