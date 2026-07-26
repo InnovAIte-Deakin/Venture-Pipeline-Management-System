@@ -135,7 +135,7 @@ export default function HomePage() {
 	};
 
 	return (
-		<div className="min-h-screen bg-gradient-to-b from-grey-300 via-[#f4f4f4] to-white text-gray-900">
+		<div className="min-h-screen bg-linear-to-b from-grey-300 via-[#f4f4f4] to-white text-gray-900">
 			{/* Navigation */}
 			<nav className="sticky top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -385,7 +385,7 @@ export default function HomePage() {
 											A-
 										</span>
 									</button>
-									<span className="text-sm text-gray-600 min-w-[60px] text-center">
+									<span className="text-sm text-gray-600 min-w-15 text-center">
 										{fontSize}px
 									</span>
 									<button
@@ -477,14 +477,14 @@ export default function HomePage() {
 			{/* Hero Section */}
 			<section
 				id="hero"
-				className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900"
+				className="relative min-h-screen flex items-center justify-center overflow-hidden bg-linear-to-br from-slate-900 via-slate-800 to-slate-900"
 			>
 				{/* Animated Background Elements */}
 				<div className="absolute inset-0">
 					{/* Geometric Shapes */}
-					<div className="absolute top-20 left-20 w-64 h-64 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
-					<div className="absolute bottom-20 right-20 w-80 h-80 bg-gradient-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-					<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-gradient-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
+					<div className="absolute top-20 left-20 w-64 h-64 bg-linear-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl animate-pulse"></div>
+					<div className="absolute bottom-20 right-20 w-80 h-80 bg-linear-to-br from-purple-500/10 to-pink-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+					<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-200 h-200 bg-linear-to-r from-blue-500/5 to-purple-500/5 rounded-full blur-3xl animate-pulse delay-500"></div>
 
 					{/* Floating Particles */}
 					<div className="absolute top-1/4 left-1/4 w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
@@ -505,7 +505,7 @@ export default function HomePage() {
 
 					{/* Main Headline */}
 					<h1 className="text-4xl md:text-6xl lg:text-7xl font-bold text-white mb-6 mt-16 leading-relaxed text-center hero-title">
-						<span className="block bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent py-2">
+						<span className="block bg-linear-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent py-2">
 							Mekong Inclusive Ventures
 						</span>
 					</h1>
@@ -539,7 +539,7 @@ export default function HomePage() {
 					{/* Key Features Grid */}
 					<div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
 						<div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-							<div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+							<div className="w-12 h-12 bg-linear-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
 								<Brain className="h-6 w-6 text-white" />
 							</div>
 							<h3 className="text-white font-semibold mb-2">
@@ -551,7 +551,7 @@ export default function HomePage() {
 						</div>
 
 						<div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-							<div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+							<div className="w-12 h-12 bg-linear-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
 								<Target className="h-6 w-6 text-white" />
 							</div>
 							<h3 className="text-white font-semibold mb-2">
@@ -563,7 +563,7 @@ export default function HomePage() {
 						</div>
 
 						<div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:bg-white/10 transition-all duration-300">
-							<div className="w-12 h-12 bg-gradient-to-br from-pink-500 to-blue-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
+							<div className="w-12 h-12 bg-linear-to-br from-pink-500 to-blue-500 rounded-xl flex items-center justify-center mb-4 mx-auto">
 								<Heart className="h-6 w-6 text-white" />
 							</div>
 							<h3 className="text-white font-semibold mb-2">
@@ -723,22 +723,22 @@ export default function HomePage() {
 								</h3>
 								<ul className="space-y-4">
 									<li className="flex items-start">
-										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
 										<span>
 											Deal sourcing and pipeline
 											management
 										</span>
 									</li>
 									<li className="flex items-start">
-										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
 										<span>Due diligence automation</span>
 									</li>
 									<li className="flex items-start">
-										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
 										<span>Portfolio company tracking</span>
 									</li>
 									<li className="flex items-start">
-										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 flex-shrink-0" />
+										<CheckCircle className="h-5 w-5 text-green-500 mr-3 mt-0.5 shrink-0" />
 										<span>
 											Impact measurement and reporting
 										</span>

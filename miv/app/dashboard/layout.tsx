@@ -57,7 +57,7 @@ export default function DashboardLayout({
 	}
 
 	return (
-		<div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 transition-colors duration-300">
+		<div className="flex min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 transition-colors duration-300">
 			{/* Desktop Sidebar */}
 			<div className="hidden lg:block">
 				<Sidebar />

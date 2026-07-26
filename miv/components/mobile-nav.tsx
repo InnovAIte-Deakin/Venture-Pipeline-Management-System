@@ -185,7 +185,7 @@ export function MobileNav() {
                   {item.href ? (
                     <Link
                       href={item.href}
-                      onClick={() => handleNavClick(item.href)}
+                      onClick={() => handleNavClick(item.href ?? "")}
                       className={cn(
                         "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 flex-1",
                         isActive(item.href)
@@ -239,22 +239,28 @@ export function MobileNav() {
                 {/* Sub-navigation Items */}
                 {item.children && isExpanded(item.title) && (
                   <div className="ml-6 space-y-1">
-                    {item.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        onClick={() => handleNavClick(child.href)}
-                        className={cn(
-                          "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900",
-                          isActive(child.href)
-                            ? "bg-blue-600/20 text-blue-100 border-l-2 border-blue-500"
-                            : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 hover:border-l-2 hover:border-slate-600"
-                        )}
-                      >
-                        <child.icon className="mr-3 h-4 w-4 transition-colors" />
-                        <span>{child.title}</span>
-                      </Link>
-                    ))}
+                    {item.children.map((child) => {
+                      if (!child.href) return null
+
+                      const childHref = child.href
+
+                      return (
+                        <Link
+                          key={childHref}
+                          href={childHref}
+                          onClick={() => handleNavClick(childHref)}
+                          className={cn(
+                            "group flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900",
+                            isActive(childHref)
+                              ? "bg-blue-600/20 text-blue-100 border-l-2 border-blue-500"
+                              : "text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 hover:border-l-2 hover:border-slate-600"
+                          )}
+                        >
+                          <child.icon className="mr-3 h-4 w-4 transition-colors" />
+                          <span>{child.title}</span>
+                        </Link>
+                      )
+                    })}
                   </div>
                 )}
               </div>

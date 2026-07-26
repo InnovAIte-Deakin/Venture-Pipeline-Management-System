@@ -70,6 +70,14 @@ interface ChartWidget {
   data: Record<string, unknown>[]
   height?: number
   span?: number
+  options?: Record<string, unknown>
+}
+
+interface RecentActivity {
+  type: 'assessment' | 'funding' | 'milestone' | 'team'
+  title: string
+  message: string
+  time: string
 }
 
 // Generate real alerts from venture data
@@ -129,7 +137,7 @@ function generateRealAlerts(ventures: any[]) {
 
 // Generate real recent activities from venture data
 function generateRecentActivities(ventures: any[]) {
-  const activities = []
+  const activities: RecentActivity[] = []
   
   // Recent assessments (ventures with GEDSI scores)
   const recentAssessments = ventures.filter(v => v.gedsiScore && v.updatedAt)
@@ -330,7 +338,11 @@ export function AnalyticsDashboard({
     const barMaxWidth = typeof mergedOptions.barMaxWidth === 'number' ? mergedOptions.barMaxWidth : 36
 
     // Stacked or single-series rendering - moved outside switch to avoid conditional hook
-    const stackedKeys: string[] = Array.isArray(mergedOptions.stackedKeys) ? mergedOptions.stackedKeys : []
+    const mergedStackedKeys = mergedOptions.stackedKeys
+    const stackedKeys: string[] = useMemo(
+      () => Array.isArray(mergedStackedKeys) ? mergedStackedKeys : [],
+      [mergedStackedKeys]
+    )
     const stackedAsPercent = !!mergedOptions.stackedAsPercent
 
     // Optional percentage transform for stacked data
@@ -604,7 +616,7 @@ export function AnalyticsDashboard({
             </CardHeader>
             <CardContent>
               <div className="bg-white rounded-lg">
-                <ChartRenderer chart={{...chart, options: { ...(chart as any).options, ...(chartOptionsMap[chart.id] || {}) }}} />
+                <ChartRenderer chart={{...chart, options: { ...chart.options, ...(chartOptionsMap[chart.id] || {}) }}} />
                 
                 
                 {isCustomizing && (
