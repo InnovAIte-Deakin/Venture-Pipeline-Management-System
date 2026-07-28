@@ -243,7 +243,7 @@ export function FileUpload({
             {files.map((file) => (
               <Card key={file.id} className="p-4">
                 <div className="flex items-center space-x-3">
-                  <div className="flex-shrink-0">
+                  <div className="shrink-0">
                     {file.status === 'uploading' ? (
                       <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
                     ) : file.status === 'success' ? (
