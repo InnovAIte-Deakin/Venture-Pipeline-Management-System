@@ -1,0 +1,65 @@
+{
+  "$comment": "CANONICAL ROLE LIST — single source of truth for both apps (miv frontend + miv-backend Payload). Any role name used in code MUST match a `value` in this file. Draft pending review with June + PO (see RBAC_MATRIX.md).",
+  "version": "0.1.0-draft",
+  "namingConvention": "snake_case",
+  "releaseOrder": ["founder", "admin", "miv_analyst"],
+  "roles": [
+    {
+      "value": "founder",
+      "label": "Founder",
+      "status": "active",
+      "description": "Venture founder. Sees/edits only their own venture's data. First role to release.",
+      "currentBackendValue": "founder",
+      "currentFrontendValue": null
+    },
+    {
+      "value": "admin",
+      "label": "Admin",
+      "status": "active",
+      "description": "Full system access, including destructive operations and system settings. Second release.",
+      "currentBackendValue": "admin",
+      "currentFrontendValue": "ADMIN"
+    },
+    {
+      "value": "miv_analyst",
+      "label": "MIV Analyst",
+      "status": "active",
+      "description": "MIV staff. Read/write across ventures, documents, and media; no destructive system operations. Third release.",
+      "currentBackendValue": "miv_analyst",
+      "currentFrontendValue": "ANALYST"
+    },
+    {
+      "value": "mentor",
+      "label": "Mentor",
+      "status": "DEFERRED",
+      "description": "DO NOT BUILD. No dashboards, no access rules, no UI until a permissions matrix for this role is formally documented and approved.",
+      "currentBackendValue": null,
+      "currentFrontendValue": null
+    },
+    {
+      "value": "investor",
+      "label": "Investor",
+      "status": "DEFERRED",
+      "description": "DO NOT BUILD. No dashboards, no access rules, no UI until a permissions matrix for this role is formally documented and approved.",
+      "currentBackendValue": null,
+      "currentFrontendValue": null
+    }
+  ],
+  "unresolvedLegacyRoles": {
+    "$comment": "Roles that exist in code today but have no canonical mapping. DECISION REQUIRED at June/PO review: map each to a canonical role or delete it (with a data migration for any users holding it).",
+    "backend (Payload users.role select)": ["user"],
+    "frontend (Prisma UserRole enum)": [
+      "MANAGER",
+      "USER",
+      "VENTURE_MANAGER",
+      "GEDSI_ANALYST",
+      "CAPITAL_FACILITATOR",
+      "EXTERNAL_STAKEHOLDER"
+    ]
+  },
+  "adoption": {
+    "backend": "Generate the `role` select options in miv-backend/src/collections/users.ts from this file (import JSON, map roles where status === 'active').",
+    "frontend": "Migrate prisma UserRole enum values to the snake_case canonical values via a Prisma migration + data migration for seeded users; regenerate client.",
+    "ci": "Add a check in each app that fails the build if a role string literal is used that is not present in this file."
+  }
+}
