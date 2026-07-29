@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Lock, LogOut, Menu, MoreHorizontal, Phone, Search, Settings } from "lucide-react";
+import { Lock, LogOut, Menu, Phone, Search, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/logo";
+import { GlobalSearch, useGlobalSearch } from "@/components/global-search";
 import {
   dashboardDesktopNavigationItems,
   dashboardMobileBottomItems,
@@ -38,31 +39,12 @@ function findNavItem(title: string) {
   );
 }
 
-function getScreenTitle(pathname: string) {
-  const activeItem = flattenNavItems([
-    ...dashboardMobileBottomItems,
-    ...dashboardDesktopNavigationItems,
-  ])
-    .filter((item) => item.href && isDashboardRouteActive(pathname, item.href))
-    .sort((a, b) => (b.href?.length ?? 0) - (a.href?.length ?? 0))[0];
-
-  return activeItem?.title ?? "Dashboard";
-}
-
 export function MobileNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const screenTitle = getScreenTitle(pathname);
-  const isMoreActive = dashboardDesktopNavigationItems.some((item) => {
-    if (item.href && isDashboardRouteActive(pathname, item.href)) {
-      return true;
-    }
-
-    return item.children?.some(
-      (child) => child.href && isDashboardRouteActive(pathname, child.href),
-    );
-  });
+  const [language, setLanguage] = useState<"EN" | "KH">("EN");
+  const globalSearch = useGlobalSearch();
   const quickItems = useMemo(
     () =>
       [
@@ -82,7 +64,7 @@ export function MobileNav() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-40 h-14 border-b border-slate-200 bg-white/95 px-4 backdrop-blur lg:hidden">
-        <div className="flex h-full items-center justify-between">
+        <div className="flex h-full items-center gap-3">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
@@ -103,22 +85,47 @@ export function MobileNav() {
               onNavigate={() => setIsOpen(false)}
             />
           </Sheet>
-          <div className="min-w-0 flex-1 px-4 text-center">
-            <h1 className="truncate text-base font-semibold text-slate-900">
-              {screenTitle}
-            </h1>
+          <Link
+            href="/dashboard"
+            aria-label="Go to dashboard home"
+            className="flex shrink-0 items-center"
+          >
+            <Logo size="sm" className="h-9 w-9" />
+          </Link>
+          <div
+            className="ml-auto flex h-8 overflow-hidden rounded-md border border-slate-300 bg-slate-100 text-xs font-semibold text-slate-600"
+            aria-label="Language selector"
+          >
+            {(["EN", "KH"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setLanguage(option)}
+                aria-pressed={language === option}
+                className={cn(
+                  "min-w-9 px-2 transition-colors",
+                  language === option
+                    ? "bg-slate-900 text-white"
+                    : "hover:bg-white hover:text-slate-900",
+                )}
+              >
+                {option}
+              </button>
+            ))}
           </div>
           <Button
             type="button"
             variant="ghost"
             size="sm"
             aria-label="Search dashboard"
+            onClick={globalSearch.open}
             className="h-9 w-9 p-0 text-slate-700"
           >
             <Search className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
       </header>
+      <GlobalSearch isOpen={globalSearch.isOpen} onClose={globalSearch.close} />
 
       <nav
         className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur lg:hidden"
@@ -147,22 +154,6 @@ export function MobileNav() {
               </Link>
             );
           })}
-
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            aria-label="Open more dashboard navigation"
-            aria-current={isMoreActive ? "page" : undefined}
-            className={cn(
-              "flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-1 text-[11px] font-medium transition-colors",
-              isMoreActive
-                ? "bg-blue-50 text-blue-700"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-            )}
-          >
-            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
-            <span>More</span>
-          </button>
         </div>
       </nav>
     </>
