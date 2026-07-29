@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Lock, LogOut, Menu, MoreHorizontal, Phone, Search, Settings } from "lucide-react";
+import { Lock, LogOut, Menu, Phone, Search, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Logo } from "@/components/logo";
+import { GlobalSearch, useGlobalSearch } from "@/components/global-search";
 import {
   dashboardDesktopNavigationItems,
   dashboardMobileBottomItems,
@@ -38,31 +39,12 @@ function findNavItem(title: string) {
   );
 }
 
-function getScreenTitle(pathname: string) {
-  const activeItem = flattenNavItems([
-    ...dashboardMobileBottomItems,
-    ...dashboardDesktopNavigationItems,
-  ])
-    .filter((item) => item.href && isDashboardRouteActive(pathname, item.href))
-    .sort((a, b) => (b.href?.length ?? 0) - (a.href?.length ?? 0))[0];
-
-  return activeItem?.title ?? "Dashboard";
-}
-
 export function MobileNav() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const screenTitle = getScreenTitle(pathname);
-  const isMoreActive = dashboardDesktopNavigationItems.some((item) => {
-    if (item.href && isDashboardRouteActive(pathname, item.href)) {
-      return true;
-    }
-
-    return item.children?.some(
-      (child) => child.href && isDashboardRouteActive(pathname, child.href),
-    );
-  });
+  const [language, setLanguage] = useState<"EN" | "KH">("EN");
+  const globalSearch = useGlobalSearch();
   const quickItems = useMemo(
     () =>
       [
@@ -82,7 +64,7 @@ export function MobileNav() {
   return (
     <>
       <header className="fixed inset-x-0 top-0 z-40 h-14 border-b border-slate-200 bg-white/95 px-4 backdrop-blur lg:hidden">
-        <div className="flex h-full items-center justify-between">
+        <div className="flex h-full items-center gap-3">
           <Sheet open={isOpen} onOpenChange={setIsOpen}>
             <SheetTrigger asChild>
               <Button
@@ -100,24 +82,50 @@ export function MobileNav() {
               quickItems={quickItems}
               showMore={showMore}
               onShowMoreChange={setShowMore}
+              onNavigate={() => setIsOpen(false)}
             />
           </Sheet>
-          <div className="min-w-0 flex-1 px-4 text-center">
-            <h1 className="truncate text-base font-semibold text-slate-900">
-              {screenTitle}
-            </h1>
+          <Link
+            href="/dashboard"
+            aria-label="Go to dashboard home"
+            className="flex shrink-0 items-center"
+          >
+            <Logo size="sm" className="h-9 w-9" />
+          </Link>
+          <div
+            className="ml-auto flex h-8 overflow-hidden rounded-md border border-slate-300 bg-slate-100 text-xs font-semibold text-slate-600"
+            aria-label="Language selector"
+          >
+            {(["EN", "KH"] as const).map((option) => (
+              <button
+                key={option}
+                type="button"
+                onClick={() => setLanguage(option)}
+                aria-pressed={language === option}
+                className={cn(
+                  "min-w-9 px-2 transition-colors",
+                  language === option
+                    ? "bg-slate-900 text-white"
+                    : "hover:bg-white hover:text-slate-900",
+                )}
+              >
+                {option}
+              </button>
+            ))}
           </div>
           <Button
             type="button"
             variant="ghost"
             size="sm"
             aria-label="Search dashboard"
+            onClick={globalSearch.open}
             className="h-9 w-9 p-0 text-slate-700"
           >
             <Search className="h-5 w-5" aria-hidden="true" />
           </Button>
         </div>
       </header>
+      <GlobalSearch isOpen={globalSearch.isOpen} onClose={globalSearch.close} />
 
       <nav
         className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/95 px-2 pb-[calc(env(safe-area-inset-bottom)+0.5rem)] pt-2 backdrop-blur lg:hidden"
@@ -146,22 +154,6 @@ export function MobileNav() {
               </Link>
             );
           })}
-
-          <button
-            type="button"
-            onClick={() => setIsOpen(true)}
-            aria-label="Open more dashboard navigation"
-            aria-current={isMoreActive ? "page" : undefined}
-            className={cn(
-              "flex min-h-14 flex-col items-center justify-center gap-1 rounded-md px-1 text-[11px] font-medium transition-colors",
-              isMoreActive
-                ? "bg-blue-50 text-blue-700"
-                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900",
-            )}
-          >
-            <MoreHorizontal className="h-5 w-5" aria-hidden="true" />
-            <span>More</span>
-          </button>
         </div>
       </nav>
     </>
@@ -173,11 +165,13 @@ function MobileSidebar({
   quickItems,
   showMore,
   onShowMoreChange,
+  onNavigate,
 }: {
   pathname: string;
   quickItems: { label: string; item: DashboardNavItem }[];
   showMore: boolean;
   onShowMoreChange: (value: boolean) => void;
+  onNavigate: () => void;
 }) {
   return (
     <SheetContent
@@ -196,7 +190,12 @@ function MobileSidebar({
         <nav className="px-3" aria-label="Mobile dashboard sidebar">
           <div className="grid grid-cols-2 gap-3">
             {quickItems.map(({ label, item }) => (
-              <MobileNavTile key={label} label={label} item={item} />
+              <MobileNavTile
+                key={label}
+                label={label}
+                item={item}
+                onNavigate={onNavigate}
+              />
             ))}
           </div>
 
@@ -213,7 +212,12 @@ function MobileSidebar({
           {showMore && (
             <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
               {dashboardDesktopNavigationItems.map((item) => (
-                <MobileNavGroup key={item.title} item={item} pathname={pathname} />
+                <MobileNavGroup
+                  key={item.title}
+                  item={item}
+                  pathname={pathname}
+                  onNavigate={onNavigate}
+                />
               ))}
             </div>
           )}
@@ -265,16 +269,29 @@ function MobileSidebar({
 function MobileNavTile({
   label,
   item,
+  onNavigate,
 }: {
   label: string;
   item: DashboardNavItem;
+  onNavigate: () => void;
 }) {
   const Icon = item.icon;
+  const className =
+    "flex min-h-20 flex-col items-start justify-between rounded-md border-2 border-slate-400 bg-white p-3 text-left text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500";
+
+  if (item.href) {
+    return (
+      <Link href={item.href} onClick={onNavigate} className={className}>
+        <Icon className="h-8 w-8 text-slate-950" aria-hidden="true" />
+        <span>{label}</span>
+      </Link>
+    );
+  }
 
   return (
     <button
       type="button"
-      className="flex min-h-20 flex-col items-start justify-between rounded-md border-2 border-slate-400 bg-white p-3 text-left text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      className={className}
     >
       <Icon className="h-8 w-8 text-slate-950" aria-hidden="true" />
       <span>{label}</span>
@@ -285,15 +302,23 @@ function MobileNavTile({
 function MobileNavGroup({
   item,
   pathname,
+  onNavigate,
 }: {
   item: DashboardNavItem;
   pathname: string;
+  onNavigate: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const Icon = item.icon;
 
   if (!item.children) {
-    return <MobileNavRow item={item} pathname={pathname} />;
+    return (
+      <MobileNavRow
+        item={item}
+        pathname={pathname}
+        onNavigate={onNavigate}
+      />
+    );
   }
 
   return (
@@ -311,7 +336,12 @@ function MobileNavGroup({
       {expanded && (
         <div className="mt-1 space-y-1 pl-5">
           {item.children.map((child) => (
-            <MobileNavRow key={child.title} item={child} pathname={pathname} />
+            <MobileNavRow
+              key={child.title}
+              item={child}
+              pathname={pathname}
+              onNavigate={onNavigate}
+            />
           ))}
         </div>
       )}
@@ -322,23 +352,40 @@ function MobileNavGroup({
 function MobileNavRow({
   item,
   pathname,
+  onNavigate,
 }: {
   item: DashboardNavItem;
   pathname: string;
+  onNavigate: () => void;
 }) {
   const Icon = item.icon;
   const active = item.href ? isDashboardRouteActive(pathname, item.href) : false;
+  const className = cn(
+    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+    active
+      ? "bg-blue-50 text-blue-700"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+  );
+
+  if (item.href) {
+    return (
+      <Link
+        href={item.href}
+        onClick={onNavigate}
+        aria-current={active ? "page" : undefined}
+        className={className}
+      >
+        <Icon className="h-4 w-4" aria-hidden="true" />
+        <span>{item.title}</span>
+      </Link>
+    );
+  }
 
   return (
     <button
       type="button"
       aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
-        active
-          ? "bg-blue-50 text-blue-700"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
-      )}
+      className={className}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
       <span>{item.title}</span>

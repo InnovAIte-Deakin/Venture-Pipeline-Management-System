@@ -20,6 +20,7 @@ import {
   Settings,
   Shield,
   TrendingUp,
+  User,
   Users,
 } from "lucide-react";
 
@@ -194,9 +195,33 @@ export const dashboardDesktopNavigationItems = dashboardNavigationItems.filter(
   (item) => !item.desktopHidden,
 );
 
-export const dashboardMobileBottomItems = dashboardNavigationItems.filter(
-  (item) => item.mobileBottom && item.href,
-);
+export const dashboardMobileBottomItems: DashboardNavItem[] = [
+  {
+    title: "Home",
+    href: "/dashboard",
+    icon: House,
+  },
+  {
+    title: "Ventures",
+    href: "/dashboard/ventures",
+    icon: Building2,
+  },
+  {
+    title: "Reports",
+    href: "/dashboard/advanced-reports",
+    icon: FileText,
+  },
+  {
+    title: "Notification",
+    href: "/dashboard/notifications",
+    icon: Bell,
+  },
+  {
+    title: "Account",
+    href: "/dashboard/team-management",
+    icon: User,
+  },
+];
 
 export const dashboardMobileDrawerItems = dashboardNavigationItems.filter(
   (item) => !item.mobileBottom,
