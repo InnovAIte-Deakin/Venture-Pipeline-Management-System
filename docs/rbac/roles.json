@@ -1,6 +1,7 @@
 {
   "$comment": "CANONICAL ROLE LIST — single source of truth for both apps (miv frontend + miv-backend Payload). Any role name used in code MUST match a `value` in this file. Draft pending review with June + PO (see RBAC_MATRIX.md).",
-  "version": "0.1.0-draft",
+  "version": "0.2.0-draft",
+  "auditedAgainst": "origin/main @ f3297d1 (#57)",
   "namingConvention": "snake_case",
   "releaseOrder": ["founder", "admin", "miv_analyst"],
   "roles": [
@@ -10,7 +11,8 @@
       "status": "active",
       "description": "Venture founder. Sees/edits only their own venture's data. First role to release.",
       "currentBackendValue": "founder",
-      "currentFrontendValue": null
+      "currentFrontendValue": null,
+      "blocker": "MIGRATION REQUIRED — the Prisma UserRole enum has no `founder` value (miv/prisma/schema.prisma). Because founder is release #1, this is a scheduled schema migration + data migration, NOT adoption wiring. Cannot ship founder in the frontend until the enum carries it."
     },
     {
       "value": "admin",
@@ -46,20 +48,34 @@
     }
   ],
   "unresolvedLegacyRoles": {
-    "$comment": "Roles that exist in code today but have no canonical mapping. DECISION REQUIRED at June/PO review: map each to a canonical role or delete it (with a data migration for any users holding it).",
-    "backend (Payload users.role select)": ["user"],
-    "frontend (Prisma UserRole enum)": [
+    "$comment": "Roles that exist in code today but have no canonical mapping. DECISION REQUIRED at June/PO review. These are NOT decorative — migrating or deleting them is a BEHAVIOUR CHANGE, not a cleanup. See load-bearing usages below.",
+    "backend_payload_users_role_select": ["user"],
+    "frontend_prisma_UserRole_enum": [
       "MANAGER",
       "USER",
       "VENTURE_MANAGER",
       "GEDSI_ANALYST",
       "CAPITAL_FACILITATOR",
       "EXTERNAL_STAKEHOLDER"
-    ]
+    ],
+    "loadBearingUsages": {
+      "user_cannot_be_deleted": "miv/app/auth/login/page.tsx branches on `role === 'user'` to pick the landing page. #57 fixed the target (user + founder both go to /user-dashboard) but the branch still reads the value, so deleting `user` breaks login routing.",
+      "enum_drives_email_content": "VENTURE_MANAGER / GEDSI_ANALYST / CAPITAL_FACILITATOR gate email body content across ~10 conditionals in miv/app/api/(g2-founder-documents)/emails/stg-reminder and weekly-update.",
+      "enum_drives_team_management": "miv/app/api/(g5-platform-operations)/team/members/route.ts hardcodes all 8 enum values in a Zod enum and writes the selected role; miv/app/dashboard/(g5-platform-operations)/team-management/page.tsx is the assignment UI. Renaming to snake_case changes behaviour in these routes."
+    }
   },
   "adoption": {
-    "backend": "Generate the `role` select options in miv-backend/src/collections/users.ts from this file (import JSON, map roles where status === 'active').",
-    "frontend": "Migrate prisma UserRole enum values to the snake_case canonical values via a Prisma migration + data migration for seeded users; regenerate client.",
-    "ci": "Add a check in each app that fails the build if a role string literal is used that is not present in this file."
+    "$warning": "Collection access blocks do NOT enforce app behaviour. All miv-backend routes reach Payload via the Local API, which defaults overrideAccess:true (overrideAccess appears nowhere in miv-backend/src). Declared collection/global access governs only the admin panel and the generated REST API. Role enforcement for app traffic must be added in the route handlers.",
+    "$note_json_import": "resolveJsonModule is already true in both tsconfigs, so importing this file compiles in both apps.",
+    "orderedSequence": [
+      "1. DATA MIGRATION FIRST — remap existing user records off legacy values (Prisma seeds still mint MANAGER and VENTURE_MANAGER; Payload records still hold `user`). Do this before anything reads the new list, or in-flight users are orphaned.",
+      "2. Settle the login redirect rule (see redirectRule) as part of the `user` mapping decision — #57 routes both `user` and `founder` to /user-dashboard, so the mapping changes routing for real users.",
+      "3. CODEGEN SECOND — only after (1): generate the backend `role` select from status==='active' roles, and migrate the Prisma UserRole enum to snake_case. Dropping `user`/legacy values before the data moves will break login routing, seeds, and the team-management + email routes that read them.",
+      "4. Re-introduce a frontend route-protection gate — #57 deleted miv/middleware.ts; there is now NO middleware in miv, so nothing checks cookie/role before a dashboard renders.",
+      "5. Add route-handler role enforcement — the Local API bypass (see $warning) means the collection matrix does not protect app traffic."
+    ],
+    "backend_helpers": "Access helpers already exist in miv-backend/src/access/roles.ts (adminOrAnalyst, selfOrAdminAccess, founderOfVenture) but are imported by NOTHING, and founderOfVenture is currently broken (see RBAC_MATRIX §6 / anomaly A4). Do not assume wiring them in is sufficient.",
+    "redirectRule": "TBD at review — the `user` mapping decision determines where mapped users land (#57: user + founder → /user-dashboard, staff → /dashboard). Settle the redirect rule and the mapping together.",
+    "ci": "HOLD — do NOT add a role-lint CI check yet. .github/workflows currently holds only sync-upstream.yml (cron); the actual pipeline is #56 (Akshit) and is red. There is nothing to attach the check to. Revisit once #56 is green."
   }
 }
