@@ -9,6 +9,14 @@ interface WelcomeEmailData {
   position?: string
 }
 
+// This interface defines the structure of the data required for a IntakeNotificationEmailData
+interface IntakeNotificationEmailData {
+  founderEmail: string
+  founderName: string
+  ventureName: string 
+  country?: string
+}
+
 interface TestEmailData {
   userEmail: string
   userName: string
