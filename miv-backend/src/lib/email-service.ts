@@ -276,6 +276,34 @@ Mekong Inclusive Ventures | Building Inclusive Futures
     }
   }
 
+  // Intake notification email sending method
+
+  async sendIntakeNotificationEmail(data: IntakeNotificationEmailData): Promise<boolean> {
+    if (!this.isConfigured()) {
+      console.warn('Email service not configured...skipping intake notification email')
+      return false
+    }
+
+    try {
+      console.log(`Sending intake notification email to ${data.founderEmail}`)
+
+      const mailOptions = {
+        from: `"{this.fromName}" <${this.fromEmail}>`,
+        to: data.founderEmail,
+        subject: `Successful Submission, ${data.founderName}!`,
+        text: this.generateIntakeNotificationEmailText(data),
+        html: this.generateIntakeNotificationEmailHTML(data),
+      }
+
+      const result = await this.transporter!.sendMail(mailOptions)
+      console.log('Intake notification email sent successfully:', result.messageId)
+      return true
+    } catch (error) {
+      console.error('Failed to send intake notification email:', error)
+      return false
+    }
+  }
+
   async sendTestEmail(data: TestEmailData): Promise<boolean> {
     if (!this.isConfigured()) {
       console.warn('Email service not configured - skipping test email')
@@ -371,4 +399,4 @@ Mekong Inclusive Ventures | Building Inclusive Futures
 export const emailService = new EmailService()
 
 // Export types
-export type { WelcomeEmailData, TestEmailData }
+export type { WelcomeEmailData, IntakeNotificationEmailData, TestEmailData }
