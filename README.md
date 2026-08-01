@@ -161,6 +161,14 @@ Password: VentureMgr@123
 ```
 
 ---
+## 🧪 Integration Tests
+
+### miv
+
+From the `miv` folder, create a local test environment file:
+
+```powershell
+Copy-Item .env.test.example .env.test
 
 ## 📚 Documentation
 
