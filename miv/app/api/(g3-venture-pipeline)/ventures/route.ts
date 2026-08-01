@@ -6,6 +6,8 @@ import { triggerVentureRecalculation } from '@/lib/calculation-service';
 import { z } from 'zod';
 import { getMobileFlag } from '@/lib/mobile-detect';
 import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers';
+import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route';
+import { mapRole } from '@/lib/utils';
 
 // Validation schemas
 const createVentureSchema = z.object({
@@ -57,11 +59,14 @@ export async function GET(request: NextRequest) {
     const { isMobile } = getMobileFlag(request);
     console.log(`Mobile request: ${isMobile}`);
 
-    // Disable authentication for development
-    // const session = await getServerSession();
-    // if (!session?.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    // Enforce authentication
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    const role = mapRole(session.user.role);
+    const isStaff = ['admin', 'miv_analyst'].includes(role);
 
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get('page') || '1');
@@ -91,6 +96,11 @@ export async function GET(request: NextRequest) {
     if (sector) where.sector = sector;
     if (stage) where.stage = stage;
     if (status) where.status = status;
+
+    // Non-staff can ONLY see their own ventures
+    if (!isStaff) {
+      where.createdById = session.user.id;
+    }
 
     // Optimize includes based on device type
     const includeConfig: any = {
@@ -165,26 +175,21 @@ export async function GET(request: NextRequest) {
 // POST /api/ventures - Create new venture
 export async function POST(request: NextRequest) {
   try {
-    // Disable authentication for development
-    // const session = await getServerSession();
-    // if (!session?.user) {
-    //   return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    // }
+    // Enforce authentication
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
 
     const body = await request.json();
     const validatedData = createVentureSchema.parse(body);
 
-    // Get user ID from session
-    // For development, use a default user or create one
-    let user = await prisma.user.findFirst();
+    // Get user from database using session email
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email! }
+    });
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          name: 'Development User',
-          email: 'dev@miv.com',
-          role: 'ADMIN'
-        }
-      });
+      return NextResponse.json({ success: false, error: 'USER_NOT_FOUND' }, { status: 404 });
     }
 
     // Create venture

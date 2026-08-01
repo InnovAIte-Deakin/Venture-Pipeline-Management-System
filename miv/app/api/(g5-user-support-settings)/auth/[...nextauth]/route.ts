@@ -1,11 +1,11 @@
-import NextAuth from "next-auth";
+import NextAuth, { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { prisma } from "@/lib/prisma";
 
-const handler = NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     GoogleProvider({
@@ -55,10 +55,16 @@ const handler = NextAuth({
             id: user.id,
             email: user.email,
             name: user.name || undefined,
+            role: user.role || undefined,
           };
         }
         if (!ok) return null;
-        return { id: user.id, email: user.email, name: user.name || undefined };
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name || undefined,
+          role: user.role || undefined,
+        };
       },
     }),
   ],
@@ -66,12 +72,14 @@ const handler = NextAuth({
     session: async ({ session, token }) => {
       if (session?.user) {
         session.user.id = token.uid as string;
+        session.user.role = token.role as string;
       }
       return session;
     },
     jwt: async ({ user, token }) => {
       if (user) {
         token.uid = user.id;
+        token.role = (user as any).role;
       }
       return token;
     },
@@ -83,6 +91,8 @@ const handler = NextAuth({
   session: {
     strategy: "jwt",
   },
-});
+};
+
+const handler = NextAuth(authOptions);
 
 export { handler as GET, handler as POST };

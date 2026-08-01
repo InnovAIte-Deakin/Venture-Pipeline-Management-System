@@ -1,10 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
+import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route';
+import { mapRole } from '@/lib/utils';
 
 // GET /api/custom-dashboards - Get custom dashboards (simulated from user data)
 export async function GET(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    const role = mapRole(session.user.role);
+    const isStaff = ['admin', 'miv_analyst'].includes(role);
+    if (!isStaff) {
+      return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
+    }
+
     // For now, we'll simulate custom dashboards based on existing data
     // In a real system, these would be stored in a separate table
     
@@ -142,6 +155,17 @@ export async function GET(request: NextRequest) {
 // POST /api/custom-dashboards - Create a new custom dashboard (placeholder)
 export async function POST(request: NextRequest) {
   try {
+    const session = await getServerSession(authOptions);
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+    }
+
+    const role = mapRole(session.user.role);
+    const isStaff = ['admin', 'miv_analyst'].includes(role);
+    if (!isStaff) {
+      return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
+    }
+
     const body = await request.json();
     
     // In a real implementation, this would save to a dashboards table
@@ -151,7 +175,7 @@ export async function POST(request: NextRequest) {
       ...body,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      createdBy: "Current User", // Would get from session
+      createdBy: session.user.name || "Current User", // Would get from session
       widgets: 0 // Start with no widgets
     };
 

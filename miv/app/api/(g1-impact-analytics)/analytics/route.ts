@@ -3,9 +3,24 @@ import { prisma } from '@/lib/prisma'
 import { CalculationService } from '@/lib/calculation-service'
 import { getMobileFlag } from '@/lib/mobile-detect'
 import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route'
+import { mapRole } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
+    // Enforce authentication & role check
+    const session = await getServerSession(authOptions)
+    if (!session?.user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
+    }
+
+    const role = mapRole(session.user.role)
+    const isStaff = ['admin', 'miv_analyst'].includes(role)
+    if (!isStaff) {
+      return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 })
+    }
+
     // Detect mobile user agent
     const { isMobile } = getMobileFlag(request)
     console.log(`Mobile request: ${isMobile}`)

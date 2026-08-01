@@ -861,8 +861,8 @@ export default function EnterpriseDashboard() {
 
   const handleLogout = async () => {
     try {
-      const res = await fetch('/backend/api/users/logout', {
-        method: 'POST',
+      const res = await fetch('/backend/api/auth/login', {
+        method: 'DELETE',
         credentials: 'include',
       })
       // Regardless of response, clear client state and go to login
