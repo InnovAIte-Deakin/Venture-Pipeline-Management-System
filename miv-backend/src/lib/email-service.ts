@@ -177,7 +177,7 @@ Mekong Inclusive Ventures | Building Inclusive Futures
 
   // Intake notification email template: HTML and plain text
   private generateIntakeNotificationEmailHTML(data: IntakeNotificationEmailData): string {
-    const { founderName, founderEmail, ventureName, country } = data
+    const { founderName, ventureName, country } = data
 
     return `
     <!DOCTYPE html>
@@ -229,7 +229,7 @@ Mekong Inclusive Ventures | Building Inclusive Futures
   }
 
   private generateIntakeNotificationEmailText(data: IntakeNotificationEmailData): string {
-    const { founderName, founderEmail, ventureName, country } = data
+    const { founderName, ventureName, country } = data
     
     return `
 
@@ -288,7 +288,7 @@ Mekong Inclusive Ventures | Building Inclusive Futures
       console.log(`Sending intake notification email to ${data.founderEmail}`)
 
       const mailOptions = {
-        from: `"{this.fromName}" <${this.fromEmail}>`,
+        from: `"${this.fromName}" <${this.fromEmail}>`,
         to: data.founderEmail,
         subject: `Successful Submission, ${data.founderName}!`,
         text: this.generateIntakeNotificationEmailText(data),
