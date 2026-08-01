@@ -77,24 +77,25 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-slate-200 dark:border-slate-700 shadow-xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+    <main className="min-h-screen overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-6 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-md items-center justify-center">
+      <Card className="w-full rounded-xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border-slate-200 dark:border-slate-700 shadow-xl sm:rounded-2xl">
+        <CardHeader className="text-center space-y-4 px-5 pb-3 pt-5 sm:px-8 sm:pt-8">
+          <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg sm:h-14 sm:w-14">
             <span className="text-2xl">🏛️</span>
           </div>
           <div>
-            <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+            <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100 sm:text-3xl">
               MIV
             </CardTitle>
-            <CardDescription className="text-slate-600 dark:text-slate-400">
+            <CardDescription className="text-sm text-slate-600 dark:text-slate-400 sm:text-base">
               Join Our Platform
             </CardDescription>
           </div>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+        <CardContent className="space-y-5 px-5 pb-5 sm:px-8 sm:pb-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
             <div className="space-y-2">
               <Label
                 htmlFor="fullName"
@@ -109,7 +110,7 @@ export default function RegisterPage() {
                   handleInputChange("first_name", e.target.value)
                 }
                 placeholder="Enter your first name"
-                className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500"
+                className="h-11 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 sm:h-12"
                 required
               />
             </div>
@@ -125,7 +126,7 @@ export default function RegisterPage() {
                 value={formData.last_name}
                 onChange={(e) => handleInputChange("last_name", e.target.value)}
                 placeholder="Enter your last name"
-                className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500"
+                className="h-11 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 sm:h-12"
                 required
               />
             </div>
@@ -142,7 +143,7 @@ export default function RegisterPage() {
                 value={formData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="Enter your email"
-                className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500"
+                className="h-11 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 sm:h-12"
                 required
               />
             </div>
@@ -162,7 +163,7 @@ export default function RegisterPage() {
                     handleInputChange("password", e.target.value)
                   }
                   placeholder="Create a password"
-                  className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 pr-10"
+                  className="h-11 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 pr-10 sm:h-12"
                   required
                 />
                 <button
@@ -195,7 +196,7 @@ export default function RegisterPage() {
                     handleInputChange("confirmPassword", e.target.value)
                   }
                   placeholder="Confirm your password"
-                  className="bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 pr-10"
+                  className="h-11 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600 focus:border-blue-500 focus:ring-blue-500 pr-10 sm:h-12"
                   required
                 />
                 <button
@@ -220,7 +221,7 @@ export default function RegisterPage() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3"
+              className="h-11 w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold sm:h-12"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -247,6 +248,7 @@ export default function RegisterPage() {
           </div>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </main>
   );
 }

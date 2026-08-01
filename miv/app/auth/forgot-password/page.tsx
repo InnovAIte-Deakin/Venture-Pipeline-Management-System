@@ -2,7 +2,16 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle2, Eye, EyeOff, Loader2, Mail, RotateCcw, ShieldCheck } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  Eye,
+  EyeOff,
+  Loader2,
+  Mail,
+  RotateCcw,
+  ShieldCheck,
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +28,13 @@ type RecoveryStep = "email" | "otp" | "password" | "success";
 
 const DEMO_OTP = "123456";
 const RESEND_SECONDS = 30;
+
+const steps: Array<{ key: RecoveryStep; label: string }> = [
+  { key: "email", label: "Email" },
+  { key: "otp", label: "Code" },
+  { key: "password", label: "Password" },
+  { key: "success", label: "Done" },
+];
 
 function getPasswordScore(password: string) {
   const checks = [
@@ -47,6 +63,7 @@ export default function ForgotPasswordPage() {
 
   const otpValue = otp.join("");
   const passwordScore = getPasswordScore(password);
+  const activeStepIndex = steps.findIndex((item) => item.key === step);
   const passwordStrength = useMemo(() => {
     if (!password) return { label: "Not started", color: "bg-slate-200", width: "0%" };
     if (passwordScore <= 2) return { label: "Weak", color: "bg-red-500", width: "33%" };
@@ -141,32 +158,45 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 flex items-center justify-center p-4">
-      <Card className="w-full max-w-md bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-slate-200 dark:border-slate-700 shadow-xl">
-        <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
-            {step === "success" ? (
-              <CheckCircle2 className="h-7 w-7 text-white" />
-            ) : (
-              <ShieldCheck className="h-7 w-7 text-white" />
-            )}
-          </div>
-          <div>
-            <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-              Reset Password
-            </CardTitle>
-            <CardDescription className="text-slate-600 dark:text-slate-400">
-              {step === "email" && "Enter your account email to receive a verification code."}
-              {step === "otp" && "Enter the 6-digit code sent to your email."}
-              {step === "password" && "Create a new secure password."}
-              {step === "success" && "Your password has been updated successfully."}
-            </CardDescription>
-          </div>
-        </CardHeader>
+    <main className="min-h-screen overflow-y-auto bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 px-4 py-6 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[calc(100vh-3rem)] w-full max-w-md items-center justify-center sm:max-w-lg">
+        <Card className="w-full rounded-xl border-slate-200 bg-white/95 shadow-xl backdrop-blur-md dark:border-slate-700 dark:bg-slate-800/95 sm:rounded-2xl">
+          <CardHeader className="space-y-4 px-5 pb-3 pt-5 text-center sm:px-8 sm:pt-8">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-blue-500 shadow-lg sm:h-14 sm:w-14">
+              {step === "success" ? (
+                <CheckCircle2 className="h-7 w-7 text-white" />
+              ) : (
+                <ShieldCheck className="h-7 w-7 text-white" />
+              )}
+            </div>
+            <div className="space-y-2">
+              <CardTitle className="text-2xl font-bold text-slate-900 dark:text-slate-100 sm:text-3xl">
+                Reset Password
+              </CardTitle>
+              <CardDescription className="mx-auto max-w-sm text-sm leading-6 text-slate-600 dark:text-slate-400 sm:text-base">
+                {step === "email" && "Enter your account email to receive a verification code."}
+                {step === "otp" && "Enter the 6-digit code sent to your email."}
+                {step === "password" && "Create a new secure password."}
+                {step === "success" && "Your password has been updated successfully."}
+              </CardDescription>
+            </div>
 
-        <CardContent className="space-y-6">
+            <div className="grid grid-cols-4 gap-2 pt-2">
+              {steps.map((item, index) => (
+                <div
+                  key={item.key}
+                  className={`h-1.5 rounded-full ${
+                    index <= activeStepIndex ? "bg-blue-600" : "bg-slate-200 dark:bg-slate-700"
+                  }`}
+                  aria-label={`${item.label} step`}
+                />
+              ))}
+            </div>
+          </CardHeader>
+
+          <CardContent className="space-y-5 px-5 pb-5 sm:px-8 sm:pb-8">
           {step === "email" && (
-            <form onSubmit={submitEmail} className="space-y-4">
+            <form onSubmit={submitEmail} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
                   Email
@@ -179,13 +209,13 @@ export default function ForgotPasswordPage() {
                     value={email}
                     onChange={(event) => setEmail(event.target.value)}
                     placeholder="Enter your email"
-                    className="pl-10 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
+                    className="h-11 bg-slate-50 pl-10 dark:bg-slate-700 border-slate-200 dark:border-slate-600 sm:h-12"
                     required
                   />
                 </div>
               </div>
 
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+              <Button type="submit" className="h-11 w-full bg-blue-600 hover:bg-blue-700 sm:h-12" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -201,8 +231,13 @@ export default function ForgotPasswordPage() {
           {step === "otp" && (
             <form onSubmit={verifyOtp} className="space-y-5">
               <div className="space-y-3">
-                <Label className="text-slate-700 dark:text-slate-300">Verification code</Label>
-                <div className="grid grid-cols-6 gap-2">
+                <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                  <Label className="text-slate-700 dark:text-slate-300">Verification code</Label>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Sent to {email || "your email"}
+                  </span>
+                </div>
+                <div className="grid grid-cols-6 gap-1.5 sm:gap-2">
                   {otp.map((digit, index) => (
                     <Input
                       key={index}
@@ -214,12 +249,12 @@ export default function ForgotPasswordPage() {
                       onKeyDown={(event) => handleOtpKeyDown(index, event)}
                       inputMode="numeric"
                       aria-label={`Digit ${index + 1}`}
-                      className="h-12 text-center text-lg font-semibold bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
+                      className="aspect-square h-auto min-h-10 rounded-lg bg-slate-50 p-0 text-center text-base font-semibold dark:bg-slate-700 border-slate-200 dark:border-slate-600 sm:min-h-12 sm:text-lg"
                       maxLength={1}
                     />
                   ))}
                 </div>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-500 dark:bg-slate-900/60 dark:text-slate-400">
                   Frontend demo code: {DEMO_OTP}
                 </p>
               </div>
@@ -232,7 +267,7 @@ export default function ForgotPasswordPage() {
 
               <Button
                 type="submit"
-                className="w-full bg-blue-600 hover:bg-blue-700"
+                className="h-11 w-full bg-blue-600 hover:bg-blue-700 sm:h-12"
                 disabled={isSubmitting || otpValue.length !== 6}
               >
                 {isSubmitting ? (
@@ -261,7 +296,7 @@ export default function ForgotPasswordPage() {
           )}
 
           {step === "password" && (
-            <form onSubmit={resetPassword} className="space-y-4">
+            <form onSubmit={resetPassword} className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-slate-700 dark:text-slate-300">
                   New password
@@ -273,7 +308,7 @@ export default function ForgotPasswordPage() {
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
                     placeholder="Create a new password"
-                    className="pr-10 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
+                    className="h-11 bg-slate-50 pr-10 dark:bg-slate-700 border-slate-200 dark:border-slate-600 sm:h-12"
                     required
                   />
                   <button
@@ -287,7 +322,7 @@ export default function ForgotPasswordPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-3 rounded-lg border border-slate-200 bg-slate-50 p-3 dark:border-slate-700 dark:bg-slate-900/50">
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-slate-500">Password strength</span>
                   <span className="font-medium text-slate-700 dark:text-slate-200">{passwordStrength.label}</span>
@@ -295,11 +330,11 @@ export default function ForgotPasswordPage() {
                 <div className="h-2 rounded-full bg-slate-200 dark:bg-slate-700">
                   <div className={`h-2 rounded-full transition-all ${passwordStrength.color}`} style={{ width: passwordStrength.width }} />
                 </div>
-                <ul className="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-500 dark:text-slate-400">
-                  <li>8+ characters</li>
-                  <li>Uppercase letter</li>
-                  <li>Lowercase letter</li>
-                  <li>Number or symbol</li>
+                <ul className="grid gap-1 text-xs text-slate-500 dark:text-slate-400 sm:grid-cols-2 sm:gap-x-3">
+                  <li className={password.length >= 8 ? "text-green-700 dark:text-green-400" : ""}>8+ characters</li>
+                  <li className={/[A-Z]/.test(password) ? "text-green-700 dark:text-green-400" : ""}>Uppercase letter</li>
+                  <li className={/[a-z]/.test(password) ? "text-green-700 dark:text-green-400" : ""}>Lowercase letter</li>
+                  <li className={/[\d\W]/.test(password) ? "text-green-700 dark:text-green-400" : ""}>Number or symbol</li>
                 </ul>
               </div>
 
@@ -314,7 +349,7 @@ export default function ForgotPasswordPage() {
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
                     placeholder="Confirm your new password"
-                    className="pr-10 bg-slate-50 dark:bg-slate-700 border-slate-200 dark:border-slate-600"
+                    className="h-11 bg-slate-50 pr-10 dark:bg-slate-700 border-slate-200 dark:border-slate-600 sm:h-12"
                     required
                   />
                   <button
@@ -334,7 +369,7 @@ export default function ForgotPasswordPage() {
                 </Alert>
               )}
 
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700" disabled={isSubmitting}>
+              <Button type="submit" className="h-11 w-full bg-blue-600 hover:bg-blue-700 sm:h-12" disabled={isSubmitting}>
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -349,16 +384,16 @@ export default function ForgotPasswordPage() {
 
           {step === "success" && (
             <div className="space-y-5 text-center">
-              <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm text-green-800">
+              <div className="rounded-lg border border-green-200 bg-green-50 p-4 text-sm leading-6 text-green-800">
                 Password reset complete. You can now sign in with your new password.
               </div>
-              <Button asChild className="w-full bg-blue-600 hover:bg-blue-700">
+              <Button asChild className="h-11 w-full bg-blue-600 hover:bg-blue-700 sm:h-12">
                 <Link href="/auth/login">Back to Login</Link>
               </Button>
             </div>
           )}
 
-          {step !== "success" && (
+            {step !== "success" && (
             <div className="text-center">
               <Link
                 href="/auth/login"
@@ -369,8 +404,9 @@ export default function ForgotPasswordPage() {
               </Link>
             </div>
           )}
-        </CardContent>
-      </Card>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </main>
   );
 }
