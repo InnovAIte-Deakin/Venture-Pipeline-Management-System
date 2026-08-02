@@ -150,7 +150,8 @@ http://localhost:3000
 * Backend unavailable → ensure Docker containers are running
 * Login issues → verify NextAuth environment variables
 * Document upload errors → check file size/type restrictions
-
+* `npm i` fails on Windows with a `lightningcss-linux-x64-gnu` error → known platform-detection issue in this repo. Easiest fix is WSL2; otherwise delete `node_modules`/`package-lock.json` and run `npm i --no-optional`.
+* Payload CMS admin login (`venture.manager@miv.org`) doesn't work → this account isn't actually seeded, despite docs/seed output suggesting otherwise. Use the VPMS test accounts above to confirm your setup instead.
 ---
 
 ## 9. Maintenance Notes

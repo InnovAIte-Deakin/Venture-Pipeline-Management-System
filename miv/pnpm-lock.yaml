@@ -168,9 +168,6 @@ importers:
       eslint-config-next:
         specifier: 15.2.4
         version: 15.2.4(eslint@9.39.2(jiti@2.6.1))(typescript@5.9.3)
-      lightningcss-linux-x64-gnu:
-        specifier: ^1.32.0
-        version: 1.33.0
       lightningcss-win32-x64-msvc:
         specifier: 1.30.1
         version: 1.30.1
@@ -2739,12 +2736,6 @@ packages:
 
   lightningcss-linux-x64-gnu@1.30.2:
     resolution: {integrity: sha512-Cfd46gdmj1vQ+lR6VRTTadNHu6ALuw2pKR9lYq4FnhvgBc4zWY1EtZcAc6EffShbb1MFrIPfLDXD6Xprbnni4w==}
-    engines: {node: '>= 12.0.0'}
-    cpu: [x64]
-    os: [linux]
-
-  lightningcss-linux-x64-gnu@1.33.0:
-    resolution: {integrity: sha512-ar+Ju7LmcN0Jo4FpL4hpFybwNG9/3A/Br5KW2n2jyODg3MEZXaDYADdemoNS+BDNfMgKvylJLj4S5tyRActuAg==}
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
@@ -6459,8 +6450,6 @@ snapshots:
 
   lightningcss-linux-x64-gnu@1.30.2:
     optional: true
-
-  lightningcss-linux-x64-gnu@1.33.0: {}
 
   lightningcss-linux-x64-musl@1.30.2:
     optional: true

@@ -177,6 +177,31 @@ All project documentation has been consolidated in the `/docs` directory.
 - 📄 [Internal Developer Guide](./docs/INTERNAL_DEV_GUIDE.md)
 ---
 
+
+## 🛠️ Troubleshooting
+
+### `npm i` fails on Windows (lightningcss-linux-x64-gnu)
+
+If you're on native Windows, `npm i` in `miv` can fail trying to install `lightningcss-linux-x64-gnu`, a Linux-only binary pulled in through the Tailwind/PostCSS toolchain. It shouldn't try to install on Windows at all — platform detection isn't working right in this repo currently.
+
+**Fix:**
+- Easiest: do your dev work in WSL2 — avoids this and a few other Windows-native issues.
+- If you don't want to touch WSL: delete `node_modules` and `package-lock.json`, then run `npm i --no-optional` (or `--force`).
+- Still stuck? Share your OS + Node version in the dev chat — this is a known repo issue, not something you're doing wrong.
+
+### Payload CMS admin login doesn't work
+
+The docs list `venture.manager@miv.org` / `VentureMgr@123` for the Payload admin panel. These don't work — the account isn't in the seeded database (check `mongo-express` at `localhost:8081` to confirm), even though the seed step reports success. Docs and seed data are out of sync.
+
+**Fix:** Nothing on your end. Use the frontend test accounts instead to confirm your setup works:
+- `admin@example.com` / `changeme123`
+- `founder@example.com` / `changeme123`
+- `analyst@example.com` / `changeme123`
+
+If frontend login works but Payload admin doesn't, this is why — don't assume your environment is broken.
+
+---
+
 ## 📄 Project Status
 
 This repository represents a **functional MVP** developed as part of a capstone initiative. The system is not intended for production deployment in its current form and may contain incomplete features or minor bugs.
