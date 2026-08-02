@@ -1,22 +1,56 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
-import { prisma } from '@/lib/prisma'
 
-export async function GET(_request: NextRequest) {
+const BACKEND_URL =
+  process.env.NEXT_PUBLIC_BACKEND_URL ||
+  process.env.PUBLIC_BACKEND_URL ||
+  'http://localhost:3001'
+
+async function forwardRequest(request: NextRequest, method: string) {
+  const backendUrl = `${BACKEND_URL}/api/users`
+  const headers = new Headers()
+  const contentType = request.headers.get('content-type')
+  if (contentType) {
+    headers.set('content-type', contentType)
+  }
+  const cookieHeader = request.headers.get('cookie')
+  if (cookieHeader) {
+    headers.set('cookie', cookieHeader)
+  }
+
+  const body = method !== 'GET' ? await request.text() : undefined
+
+  const backendResponse = await fetch(backendUrl, {
+    method,
+    headers,
+    body,
+  })
+
+  const responseBody = await backendResponse.text()
+  const response = new NextResponse(responseBody, {
+    status: backendResponse.status,
+  })
+
+  const contentTypeHeader = backendResponse.headers.get('content-type')
+  if (contentTypeHeader) {
+    response.headers.set('content-type', contentTypeHeader)
+  }
+
+  return response
+}
+
+export async function GET(request: NextRequest) {
   try {
-    // Dev: allow without auth by taking first user
-    const session = await getServerSession().catch(() => null)
-    let email: string | null = null
-    if (session?.user?.email) email = session.user.email
-
-    let user
-    if (email) {
-      user = await prisma.user.findUnique({ where: { email }, select: { id: true, name: true, email: true, role: true, organization: true, createdAt: true, updatedAt: true } })
-    } else {
-      user = await prisma.user.findFirst({ select: { id: true, name: true, email: true, role: true, organization: true, createdAt: true, updatedAt: true } })
+    const backendResponse = await forwardRequest(request, 'GET')
+    if (backendResponse.status !== 200) {
+      return backendResponse
     }
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
-    return NextResponse.json(user)
+
+    const data = await backendResponse.json().catch(() => null)
+    if (data?.success && data?.user) {
+      return NextResponse.json(data.user)
+    }
+
+    return backendResponse
   } catch (error) {
     console.error('GET /api/users/me error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -25,17 +59,7 @@ export async function GET(_request: NextRequest) {
 
 export async function PUT(request: NextRequest) {
   try {
-    const body = await request.json()
-    const { name, organization } = body
-
-    // Dev: select first user to update if no session
-    const session = await getServerSession().catch(() => null)
-    const email: string | null = session?.user?.email || null
-    const user = email ? await prisma.user.findUnique({ where: { email } }) : await prisma.user.findFirst()
-    if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
-
-    const updated = await prisma.user.update({ where: { id: user.id }, data: { name, organization } })
-    return NextResponse.json({ ok: true, user: { id: updated.id, name: updated.name, email: updated.email, organization: updated.organization } })
+    return await forwardRequest(request, 'PATCH')
   } catch (error) {
     console.error('PUT /api/users/me error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })

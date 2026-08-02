@@ -3,19 +3,27 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { z } from 'zod'
 
-const LoginSchema = z.object({
-  email: z.string().email('Valid email is required'),
-  password: z.string().min(1, 'Password is required'),
-})
+const LoginSchema = z
+  .object({
+    email: z.string().email('Valid email is required').optional(),
+    username: z.string().min(1, 'Username is required').optional(),
+    password: z.string().min(1, 'Password is required'),
+  })
+  .refine((data) => data.email || data.username, {
+    message: 'Either email or username is required',
+    path: ['email'],
+  })
 
 export async function POST(request: NextRequest) {
   try {
     const payload = await getPayload({ config })
     const body = await request.json()
+    console.log('📥 RECEIVED LOGIN PAYLOAD:', body)
 
     // Validate request body
     const validation = LoginSchema.safeParse(body)
     if (!validation.success) {
+      console.log('❌ LOGIN VALIDATION ERROR:', validation.error.errors)
       return NextResponse.json(
         {
           success: false,
@@ -26,16 +34,23 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { email, password } = validation.data
+    const { email, username, password } = validation.data
 
     // Attempt to login using Payload's authentication
     try {
+      const loginData: Record<string, string> = {
+        password,
+      }
+      if (email) {
+        loginData.email = email.toLowerCase()
+      }
+      if (username) {
+        loginData.username = username
+      }
+
       const result = await payload.login({
         collection: 'users',
-        data: {
-          email: email.toLowerCase(),
-          password: password,
-        },
+        data: loginData,
       })
 
       if (result.user && result.token) {
@@ -97,10 +112,11 @@ export async function POST(request: NextRequest) {
     } catch (authError: unknown) {
       console.error('Authentication error:', authError)
 
-      // Check if it's an invalid credentials error
+      const authErrorMessage = authError instanceof Error ? authError.message : ''
       if (
-        authError.message?.includes('Invalid login attempt') ||
-        authError.message?.includes('Incorrect password')
+        authErrorMessage.includes('Invalid login attempt') ||
+        authErrorMessage.includes('Incorrect password') ||
+        authErrorMessage.includes('Invalid credentials')
       ) {
         return NextResponse.json(
           {

@@ -28,6 +28,8 @@ export default function LoginPage() {
     setError("");
 
     try {
+      const normalizedEmail = email.trim().toLowerCase();
+      const normalizedPassword = password.trim();
       const url = `/api/session/login`;
 
       const response = await fetch(url, {
@@ -36,37 +38,35 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          email: email,
-          password: password,
+          email: normalizedEmail,
+          password: normalizedPassword,
         }),
-        // Allow browser to store Set-Cookie from the backend
         credentials: "include",
       });
 
-      // Try to parse JSON body (even on non-2xx to surface server message)
       const responseBody = await response.json().catch(() => null);
 
-      if (!response.ok) {
-        const msg = responseBody?.message || "Network response was not ok";
+      if (!response.ok || !responseBody?.success) {
+        const msg =
+          responseBody?.message || responseBody?.error ||
+          "Invalid email or password";
         throw new Error(msg);
       }
 
-      // Redirect to dashboard on success
-      console.log("login response", responseBody);
-      if (responseBody?.success && responseBody?.user) {
-        if (
-          responseBody.user.role === "user" ||
-          responseBody.user.role === "founder"
-        ) {
-          window.location.href = "/user-dashboard";
-        } else {
-          window.location.href = "/dashboard";
-        }
+      if (
+        responseBody.user?.role === "user" ||
+        responseBody.user?.role === "founder"
+      ) {
+        window.location.href = "/user-dashboard";
       } else {
-        setError(responseBody?.message || "Invalid email or password");
+        window.location.href = "/dashboard";
       }
     } catch (err) {
-      setError("Invalid email or password");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Invalid email or password"
+      );
     } finally {
       setIsLoading(false);
     }

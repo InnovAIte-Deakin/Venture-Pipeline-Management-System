@@ -1,72 +1,91 @@
 import { NextRequest, NextResponse } from "next/server";
+import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-const BACKEND_URL =
-	process.env.NEXT_PUBLIC_BACKEND_URL ||
-	process.env.PUBLIC_BACKEND_URL ||
-	"http://localhost:3001";
-
-function getPayloadToken(setCookie: string | null): string | null {
-	if (!setCookie) return null;
-
-	const match = setCookie.match(/(?:^|,\s*)payload-token=([^;]+)/);
-	return match?.[1] ?? null;
-}
+const prisma = new PrismaClient();
 
 export async function POST(request: NextRequest) {
-	try {
-		const body = await request.text();
-		const backendResponse = await fetch(`${BACKEND_URL}/api/auth/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": request.headers.get("content-type") || "application/json",
-			},
-			body,
-		});
+  try {
+    const body = await request.json();
+    const email = (body.email || body.username || "").trim().toLowerCase();
+    const password = body.password || "";
 
-		const data = await backendResponse.json().catch(() => ({
-			success: false,
-			message: "Login failed",
-		}));
+    if (!email || !password) {
+      return NextResponse.json(
+        { success: false, message: "Email and password are required" },
+        { status: 400 }
+      );
+    }
 
-		const response = NextResponse.json(data, {
-			status: backendResponse.status,
-		});
+    // Lookup user in database
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
 
-		const token = getPayloadToken(backendResponse.headers.get("set-cookie"));
-		if (token) {
-			response.cookies.set("payload-token", token, {
-				httpOnly: true,
-				secure: process.env.NODE_ENV === "production",
-				sameSite: "lax",
-				maxAge: 60 * 60 * 24 * 7,
-				path: "/",
-			});
-		}
+    if (!user || !user.passwordHash) {
+      return NextResponse.json(
+        { success: false, message: "Invalid email or password" },
+        { status: 400 }
+      );
+    }
 
-		return response;
-	} catch (error) {
-		console.error("Frontend session login error:", error);
+    // Verify password hash
+    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
+    if (!isValidPassword) {
+      return NextResponse.json(
+        { success: false, message: "Invalid email or password" },
+        { status: 400 }
+      );
+    }
 
-		return NextResponse.json(
-			{
-				success: false,
-				message: "An error occurred during login. Please try again.",
-			},
-			{ status: 500 }
-		);
-	}
+    // Create session token payload
+    const tokenData = { id: user.id, email: user.email, role: user.role };
+    const token = Buffer.from(JSON.stringify(tokenData)).toString("base64");
+
+    // Build successful response
+    const response = NextResponse.json(
+      {
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          role: user.role,
+        },
+        token,
+      },
+      { status: 200 }
+    );
+
+    // Set auth cookie
+    response.cookies.set("payload-token", token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 7,
+      path: "/",
+    });
+
+    return response;
+  } catch (error) {
+    console.error("Direct session login error:", error);
+    return NextResponse.json(
+      { success: false, message: "Internal server error" },
+      { status: 500 }
+    );
+  }
 }
 
 export async function DELETE() {
-	const response = NextResponse.json({ success: true });
+  const response = NextResponse.json({ success: true });
 
-	response.cookies.set("payload-token", "", {
-		httpOnly: true,
-		secure: process.env.NODE_ENV === "production",
-		sameSite: "lax",
-		maxAge: 0,
-		path: "/",
-	});
+  response.cookies.set("payload-token", "", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    maxAge: 0,
+    path: "/",
+  });
 
-	return response;
+  return response;
 }
