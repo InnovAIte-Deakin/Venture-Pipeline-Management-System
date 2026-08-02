@@ -380,7 +380,7 @@ export default function DocumentUploadPage() {
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3 flex-1">
-                      <File className="w-10 h-10 text-blue-500 flex-shrink-0" />
+                      <File className="w-10 h-10 text-blue-500 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <h3 className="font-medium text-gray-900 truncate">{doc.filename}</h3>
                         <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-gray-600">

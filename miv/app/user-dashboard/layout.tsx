@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MobileNav } from "@/components/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { Search, Bell, Moon, HelpCircle, Download, User } from "lucide-react";
-import UserSidebar from "@/components/user/user-sidebar";
+import UserSidebar from "@/components/user-dashboard/user-sidebar";
 
 interface UserData {
   firstName: string;
