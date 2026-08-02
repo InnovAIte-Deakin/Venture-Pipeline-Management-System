@@ -1,202 +1,187 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import config from '@payload-config'
 import { getPayload } from 'payload'
+import config from '@payload-config'
+import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import { WSSAnswer } from '@/types/enums'
 
-const FounderSchema = z.object({
-  fullName: z.string().min(1),
-  email: z.string().email(),
-  phone: z.string().optional(),
-})
-
-const IntakeSchema = z.object({
-  ventureName_en: z.string().min(1),
-  country: z.string().min(1),
+// Validation schema for intake submission
+const IntakeSubmissionSchema = z.object({
+  ventureName_en: z.string().min(1, 'Venture name in English is required'),
+  ventureName_km: z.string().optional(),
+  country: z.string().min(1, 'Country is required'),
   description_en: z.string().optional(),
+  description_km: z.string().optional(),
+
+  // WSS (Washington Group Short Set) questions
   wss: z.object({
-    seeing: z.enum(['no_difficulty', 'some_difficulty', 'a_lot_of_difficulty', 'cannot_do_at_all']),
-    hearing: z.enum([
-      'no_difficulty',
-      'some_difficulty',
-      'a_lot_of_difficulty',
-      'cannot_do_at_all',
-    ]),
-    walking: z.enum([
-      'no_difficulty',
-      'some_difficulty',
-      'a_lot_of_difficulty',
-      'cannot_do_at_all',
-    ]),
-    cognition: z.enum([
-      'no_difficulty',
-      'some_difficulty',
-      'a_lot_of_difficulty',
-      'cannot_do_at_all',
-    ]),
-    selfCare: z.enum([
-      'no_difficulty',
-      'some_difficulty',
-      'a_lot_of_difficulty',
-      'cannot_do_at_all',
-    ]),
-    communication: z.enum([
-      'no_difficulty',
-      'some_difficulty',
-      'a_lot_of_difficulty',
-      'cannot_do_at_all',
-    ]),
+    seeing: WSSAnswer,
+    hearing: WSSAnswer,
+    walking: WSSAnswer,
+    cognition: WSSAnswer,
+    selfCare: WSSAnswer,
+    communication: WSSAnswer,
   }),
-  registration: z
-    .object({
-      number: z.string().optional(),
-      country: z.string().optional(),
-      legalType: z.string().optional(),
-      yearEstablished: z.number().int().min(1900).max(new Date().getFullYear()).optional(),
-    })
-    .optional(),
+
+  // Registration information
+  registration: z.object({
+    number: z.string().optional(),
+    country: z.string().optional(),
+    legalType: z.string().optional(),
+    yearEstablished: z.number().min(1900).max(2100).optional(),
+  }).optional(),
+
+  // Impact areas
   impactAreas: z.array(z.enum(['agri', 'gender', 'climate'])).optional(),
-  founders: z.array(FounderSchema).min(1),
-  financials: z
-    .object({
-      currency: z.string().optional(),
-      lastFYRevenue: z.number().optional(),
-      avgMonthlyRevenue: z.number().optional(),
-    })
-    .optional(),
-  gedsi: z.object({ hasPolicy: z.boolean().optional(), notes: z.string().optional() }).optional(),
-  triageTrack: z.enum(['unassigned', 'fast', 'slow']).optional(),
+
+  // Founders
+  founders: z.array(z.object({
+    fullName: z.string().min(1, 'Founder name is required'),
+    email: z.string().email('Valid email is required'),
+    phone: z.string().optional(),
+  })).min(1, 'At least one founder is required'),
+
+  // Financial information
+  financials: z.object({
+    currency: z.string().optional(),
+    lastFYRevenue: z.number().optional(),
+    avgMonthlyRevenue: z.number().optional(),
+  }).optional(),
+
+  // GEDSI (Gender, Equality, Disability, Social Inclusion)
+  gedsi: z.object({
+    hasPolicy: z.boolean().optional(),
+    notes: z.string().optional(),
+  }).optional(),
+
+  // Triage information
+  triageTrack: z.enum(['unassigned', 'fast', 'slow']).default('unassigned'),
   triageRationale: z.string().optional(),
 })
 
-export async function POST(req: Request) {
-  const payload = await getPayload({ config })
+export async function POST(request: NextRequest) {
   try {
-    // Simple rate limit per IP
-    const ip = (req.headers.get('x-forwarded-for') || 'ip') as string
-    ;(globalThis as any).__rl = (globalThis as any).__rl || new Map<string, number[]>()
-    const store = (globalThis as any).__rl as Map<string, number[]>
-    const now = Date.now()
-    const arr = (store.get(ip) || []).filter((t) => now - t < 60_000)
-    if (arr.length > 10) return Response.json({ error: 'Rate limited' }, { status: 429 })
-    arr.push(now)
-    store.set(ip, arr)
-    const body = await req.json()
-    const data = IntakeSchema.parse(body)
+    const payload = await getPayload({ config })
+    const body = await request.json()
 
-    // Duplicate detection by ventureName + country OR founder email
-    const dupVenture = await (payload as any).find({
-      collection: 'ventures',
-      where: {
-        and: [{ name_en: { equals: data.ventureName_en } }, { country: { equals: data.country } }],
-      },
-      limit: 1,
-    })
-    if (dupVenture.totalDocs > 0) {
-      return Response.json({ error: 'Duplicate venture by name+country' }, { status: 409 })
-    }
-    const firstFounderEmail = data.founders[0].email
-    const dupFounder = await (payload as any).find({
-      collection: 'founders',
-      where: { email: { equals: firstFounderEmail } },
-      limit: 1,
-    })
-    if (dupFounder.totalDocs > 0) {
-      return Response.json({ error: 'Duplicate founder email' }, { status: 409 })
+    // Validate the request body
+    const validationResult = IntakeSubmissionSchema.safeParse(body)
+    if (!validationResult.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Validation failed',
+          details: validationResult.error.errors,
+        },
+        { status: 400 }
+      )
     }
 
-    // Create venture
-    const venture = await (payload as any).create({
+    const data = validationResult.data
+
+    // TODO: city/sector aren't collected by the intake form yet.
+    // Using placeholders for now — revisit once the form is updated.
+    const venture = await payload.create({
       collection: 'ventures',
       data: {
-        name_en: data.ventureName_en,
-        description_en: data.description_en,
+        name: data.ventureName_en,
         country: data.country,
-        triageTrack: data.triageTrack ?? 'unassigned',
+        city: 'Unspecified',
+        sector: 'Unspecified',
+        founders: data.founders.map((f) => ({
+          fullName: f.fullName,
+          email: f.email,
+          phone: f.phone || '',
+          role: 'founder',
+        })),
+        triageTrack: data.triageTrack,
         triageRationale: data.triageRationale,
       },
     })
 
-    // Create intake snapshot
-    const disabilityFlag = Object.values(data.wss).some(
-      (v) => v === 'a_lot_of_difficulty' || v === 'cannot_do_at_all',
-    )
-    const intake = await (payload as any).create({
+    // Create the intake record, linked to the venture we just created
+    const intake = await payload.create({
       collection: 'onboardingIntakes',
       data: {
         venture: venture.id,
-        ...data,
-        disabilityFlag,
+        wss: data.wss,
+        impactAreas: data.impactAreas,
+        founders: data.founders,
+        financials: data.financials,
+        gedsi: data.gedsi,
       },
     })
 
-    // Link venture.latestIntake
-    await (payload as any).update({
-      collection: 'ventures',
-      id: venture.id,
-      data: { latestIntake: intake.id },
-    })
-
-    // Create founders and link
-    for (const f of data.founders) {
-      await (payload as any).create({
-        collection: 'founders',
-        data: { fullName: f.fullName, email: f.email, phone: f.phone, venture: venture.id },
-      })
-    }
-    // Update venture founders array
-    const founders = await (payload as any).find({
-      collection: 'founders',
-      where: { venture: { equals: venture.id } },
-      limit: 50,
-    })
-    await (payload as any).update({
-      collection: 'ventures',
-      id: venture.id,
+    return NextResponse.json({
+      success: true,
+      message: 'Venture application submitted successfully',
       data: {
-        founders: founders.docs.map((f: any) => ({
-          fullName: f.fullName,
-          email: f.email,
-          user: (f as any).user || undefined,
-        })),
+        intakeId: intake.id,
+        ventureId: venture.id,
+        ventureName: data.ventureName_en,
+        submissionDate: new Date().toISOString(),
+        status: 'submitted',
       },
     })
 
-    // Create agreement stubs
-    const nda = await (payload as any).create({
-      collection: 'agreements',
-      data: { venture: venture.id, type: 'NDA', status: 'not_requested' },
-    })
-    const mou = await (payload as any).create({
-      collection: 'agreements',
-      data: { venture: venture.id, type: 'MOU', status: 'not_requested' },
-    })
-    await (payload as any).update({
-      collection: 'ventures',
-      id: venture.id,
-      data: { agreements: [nda.id, mou.id] },
-    })
+  } catch (error) {
+    console.error('Failed to submit intake:', error)
 
-    // Activity log
-    await (payload as any).create({
-      collection: 'activityLogs',
-      data: {
-        action: 'intake.submit',
-        entity: 'venture',
-        entityId: String(venture.id),
-        metadata: { intakeId: intake.id },
-        timestamp: new Date().toISOString(),
-      },
-    })
-
-    // Slack mock w/ feature flag
-    const settings = await (payload as any).findGlobal({ slug: 'settings' })
-    if (settings?.enableSlack && process.env.SLACK_WEBHOOK_URL) {
-      console.log('Slack webhook mock:', { venture: venture.name_en, intakeId: intake.id })
+    if (error instanceof Error) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Failed to submit application',
+          message: error.message,
+        },
+        { status: 500 }
+      )
     }
 
-    return Response.json({ intakeId: intake.id, ventureId: venture.id })
-  } catch (e: any) {
-    console.error('intake submit error', e)
-    return Response.json({ error: e.message ?? 'Invalid request' }, { status: 400 })
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Internal server error',
+        message: 'An unexpected error occurred while processing your application',
+      },
+      { status: 500 }
+    )
+  }
+}
+
+// GET method to retrieve submission status (optional)
+export async function GET(request: NextRequest) {
+  const searchParams = request.nextUrl.searchParams
+  const intakeId = searchParams.get('id')
+
+  if (!intakeId) {
+    return NextResponse.json(
+      { error: 'Intake ID is required' },
+      { status: 400 }
+    )
+  }
+
+  try {
+    const payload = await getPayload({ config })
+    const intake = await payload.findByID({
+      collection: 'onboardingIntakes',
+      id: intakeId,
+      select: {
+        id: true,
+        venture: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    })
+
+    return NextResponse.json({
+      success: true,
+      data: intake,
+    })
+  } catch (error) {
+    console.error('Failed to fetch intake:', error)
+    return NextResponse.json(
+      { success: false, error: 'Failed to fetch intake status' },
+      { status: 500 }
+    )
   }
 }

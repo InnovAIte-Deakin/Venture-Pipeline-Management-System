@@ -93,13 +93,14 @@ export async function POST(request: NextRequest) {
           { status: 401 },
         )
       }
-    } catch (authError: unknown) {
+    }  catch (authError: unknown) {
       console.error('Authentication error:', authError)
 
       // Check if it's an invalid credentials error
+      const message = authError instanceof Error ? authError.message : ''
       if (
-        authError.message?.includes('Invalid login attempt') ||
-        authError.message?.includes('Incorrect password')
+        message.includes('Invalid login attempt') ||
+        message.includes('Incorrect password')
       ) {
         return NextResponse.json(
           {

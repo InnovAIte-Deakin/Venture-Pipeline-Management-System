@@ -15,7 +15,7 @@ export const adminOnlyBool = ({ req }: { req: any }) => isAdmin({ req })
 export const adminOrAnalyst: Access = (args) => isAdmin(args) || isAnalyst(args)
 
 // Founder can only access own user doc
-export const selfOrAdminAccess: Access = ({ req, id }: { req: any; id?: string }) => {
+export const selfOrAdminAccess: Access = ({ req, id }: any) => {
   if (!req.user) return false
   if ((req.user as any).role === 'admin') return true
   return (req.user as any).id === id
