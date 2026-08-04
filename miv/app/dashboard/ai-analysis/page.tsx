@@ -1,15 +1,16 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { useAIAnalysis } from "./use-ai-analysis"
+import { formatAnalysisDate, getStatusClasses } from "./analysis-logic"
 import {
   Brain,
   TrendingUp,
@@ -33,237 +34,27 @@ import {
   Award
 } from "lucide-react"
 
-interface AIAnalysis {
-  id: string
-  ventureId: string
-  ventureName: string
-  analysisType: string
-  status: 'pending' | 'processing' | 'completed' | 'failed'
-  riskScore: number
-  impactScore: number
-  recommendations: string[]
-  insights: string[]
-  createdAt: string
-  completedAt?: string
-}
-
-interface Venture {
-  id: string
-  name: string
-  stage: string
-  sector: string
-  location: string
-  fundingAmount: number
-}
-
-const analysisTypes = [
-  { value: 'risk-assessment', label: 'Risk Assessment', icon: Shield },
-  { value: 'impact-analysis', label: 'Impact Analysis', icon: Target },
-  { value: 'market-analysis', label: 'Market Analysis', icon: BarChart3 },
-  { value: 'financial-forecast', label: 'Financial Forecast', icon: DollarSign },
-  { value: 'gedsi-assessment', label: 'GEDSI Assessment', icon: Users },
-  { value: 'sustainability-analysis', label: 'Sustainability Analysis', icon: Globe }
-]
-
-const ventures: Venture[] = [
-  { id: '1', name: 'EcoTech Solutions', stage: 'Due Diligence', sector: 'Clean Energy', location: 'Kenya', fundingAmount: 500000 },
-  { id: '2', name: 'AgriTech Innovations', stage: 'Investment Ready', sector: 'Agriculture', location: 'Uganda', fundingAmount: 750000 },
-  { id: '3', name: 'HealthTech Africa', stage: 'Active', sector: 'Healthcare', location: 'Nigeria', fundingAmount: 1200000 },
-  { id: '4', name: 'FinTech Mobile', stage: 'Due Diligence', sector: 'Financial Services', location: 'Ghana', fundingAmount: 300000 }
-]
 
 export default function AIAnalysisPage() {
-  const [analyses, setAnalyses] = useState<AIAnalysis[]>([])
-  const [loading, setLoading] = useState(true)
-  const [selectedVenture, setSelectedVenture] = useState('')
-  const [selectedAnalysisType, setSelectedAnalysisType] = useState('')
-  const [customPrompt, setCustomPrompt] = useState('')
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const {
+    analyses,
+    loading,
+    selectedVenture,
+    setSelectedVenture,
+    selectedAnalysisType,
+    setSelectedAnalysisType,
+    customPrompt,
+    setCustomPrompt,
+    isAnalyzing,
+    error,
+    submitAnalysis,
+    loadAnalyses,
+    analysisTypes,
+    ventures
+  } = useAIAnalysis()
 
-  useEffect(() => {
-    fetchAnalyses()
-  }, [])
-
-  const fetchAnalyses = async () => {
-    try {
-      setLoading(true)
-      
-      // Fetch ventures from database to generate AI analyses
-      const response = await fetch('/api/ventures?limit=50')
-      if (!response.ok) {
-        throw new Error(`Failed to fetch ventures: ${response.status} ${response.statusText}`)
-      }
-      
-      const data = await response.json()
-      const ventures = data.ventures || []
-      
-      console.log(`📊 Found ${ventures.length} ventures for AI analysis`)
-      
-      // Generate AI analyses based on real venture data
-      const generatedAnalyses: AIAnalysis[] = ventures
-        .filter(venture => venture.aiAnalysis || venture.gedsiMetrics?.length > 0)
-        .slice(0, 10) // Limit to 10 most relevant
-        .map((venture, index) => {
-          // Calculate scores based on venture data
-          const gedsiScore = venture.gedsiMetrics?.length > 0 
-            ? venture.gedsiMetrics.reduce((sum: number, metric: any) => sum + (metric.currentValue || 0), 0) / venture.gedsiMetrics.length
-            : Math.floor(Math.random() * 40) + 60
-
-          const riskScore = calculateRiskScore(venture)
-          const impactScore = Math.min(gedsiScore * 1.2, 100)
-          
-          const analysisTypes = ['Risk Assessment', 'Impact Analysis', 'Market Analysis', 'Financial Analysis']
-          const analysisType = analysisTypes[index % analysisTypes.length]
-          
-          const status = venture.aiAnalysis ? 'completed' : 
-                        venture.stage === 'DUE_DILIGENCE' ? 'processing' : 
-                        'pending'
-
-          return {
-            id: `analysis-${venture.id}`,
-            ventureId: venture.id,
-            ventureName: venture.name,
-            analysisType,
-            status,
-            riskScore: Math.round(riskScore),
-            impactScore: Math.round(impactScore),
-            recommendations: generateRecommendations(venture, analysisType),
-            insights: generateInsights(venture, analysisType),
-            createdAt: new Date(venture.createdAt).toISOString(),
-            completedAt: status === 'completed' ? new Date(venture.updatedAt).toISOString() : undefined
-          }
-        })
-      
-      setAnalyses(generatedAnalyses)
-      console.log(`✅ Successfully generated ${generatedAnalyses.length} AI analyses from database data`)
-    } catch (error) {
-      console.error('❌ Error fetching AI analyses:', error)
-      
-      // Fallback to empty array if API fails
-      setAnalyses([])
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  // Helper functions for generating AI analysis content
-  const calculateRiskScore = (venture: any) => {
-    let risk = 30 // Base risk
-    
-    if (venture.stage === 'INTAKE' || venture.stage === 'SCREENING') risk += 20
-    if (!venture.fundingRaised || venture.fundingRaised < 100000) risk += 15
-    if (!venture.teamSize || venture.teamSize < 5) risk += 10
-    if (venture.sector === 'Technology' || venture.sector === 'FinTech') risk -= 5
-    if (venture.gedsiMetrics?.length > 5) risk -= 10
-    
-    return Math.max(10, Math.min(risk, 80))
-  }
-
-  const generateRecommendations = (venture: any, analysisType: string) => {
-    const baseRecs = {
-      'Risk Assessment': [
-        'Strengthen intellectual property protection',
-        'Diversify revenue streams', 
-        'Enhance regulatory compliance framework'
-      ],
-      'Impact Analysis': [
-        'Expand GEDSI metric tracking',
-        'Develop community engagement programs',
-        'Implement impact measurement framework'
-      ],
-      'Market Analysis': [
-        'Conduct thorough market research',
-        'Identify key competitors and positioning',
-        'Develop go-to-market strategy'
-      ],
-      'Financial Analysis': [
-        'Improve financial reporting accuracy',
-        'Develop sustainable revenue model',
-        'Optimize cost structure'
-      ]
-    }
-
-    const recs = [...(baseRecs[analysisType as keyof typeof baseRecs] || baseRecs['Risk Assessment'])]
-    
-    // Add venture-specific recommendations
-    if (venture.sector === 'Healthcare') {
-      recs.push('Partner with local healthcare providers')
-    }
-    if (venture.inclusionFocus) {
-      recs.push('Strengthen social impact measurement')
-    }
-    if (!venture.fundingRaised) {
-      recs.push('Prepare for investment readiness')
-    }
-    
-    return recs.slice(0, 4)
-  }
-
-  const generateInsights = (venture: any, analysisType: string) => {
-    const insights = []
-    
-    if (venture.sector) {
-      insights.push(`Strong positioning in ${venture.sector} sector`)
-    }
-    if (venture.gedsiMetrics?.length > 0) {
-      insights.push('Good GEDSI metrics tracking in place')
-    }
-    if (venture.inclusionFocus) {
-      insights.push('Clear social impact focus')
-    }
-    if (venture.stage === 'FUNDED' || venture.fundingRaised > 0) {
-      insights.push('Proven ability to raise capital')
-    }
-    if (venture.teamSize > 10) {
-      insights.push('Well-staffed team with growth capacity')
-    }
-    
-    // Add default insights if none generated
-    if (insights.length === 0) {
-      insights.push('Venture shows potential for growth')
-      insights.push('Market opportunity exists in target sector')
-    }
-    
-    return insights.slice(0, 3)
-  }
-
-  const startAnalysis = async () => {
-    if (!selectedVenture || !selectedAnalysisType) return
-
-    setIsAnalyzing(true)
-    
-    // Simulate AI analysis
-    setTimeout(() => {
-      const newAnalysis: AIAnalysis = {
-        id: Date.now().toString(),
-        ventureId: selectedVenture,
-        ventureName: ventures.find(v => v.id === selectedVenture)?.name || '',
-        analysisType: analysisTypes.find(t => t.value === selectedAnalysisType)?.label || '',
-        status: 'processing',
-        riskScore: 0,
-        impactScore: 0,
-        recommendations: [],
-        insights: [],
-        createdAt: new Date().toISOString()
-      }
-      
-      setAnalyses(prev => [newAnalysis, ...prev])
-      setIsAnalyzing(false)
-      setSelectedVenture('')
-      setSelectedAnalysisType('')
-      setCustomPrompt('')
-    }, 2000)
-  }
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'completed': return 'bg-green-100 text-green-800'
-      case 'processing': return 'bg-blue-100 text-blue-800'
-      case 'pending': return 'bg-yellow-100 text-yellow-800'
-      case 'failed': return 'bg-red-100 text-red-800'
-      default: return 'bg-gray-100 text-gray-800'
-    }
-  }
+  const selectedVentureName = ventures.find((venture) => venture.id === selectedVenture)?.name ?? "No venture selected"
+  const selectedAnalysisLabel = analysisTypes.find((type) => type.value === selectedAnalysisType)?.label ?? "No analysis type selected"
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -275,20 +66,10 @@ export default function AIAnalysisPage() {
     }
   }
 
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    })
-  }
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 text-muted-foreground">
           <RefreshCw className="h-6 w-6 animate-spin" />
           <span>Loading AI analyses...</span>
         </div>
@@ -312,6 +93,15 @@ export default function AIAnalysisPage() {
         </Button>
       </div>
 
+      {error && (
+        <Alert className="border-amber-200 bg-amber-50 text-amber-900">
+          <AlertDescription>{error}</AlertDescription>
+          <Button variant="outline" size="sm" className="mt-3" onClick={() => void loadAnalyses()}>
+            Retry loading
+          </Button>
+        </Alert>
+      )}
+
       {/* Quick Analysis */}
       <Card>
         <CardHeader>
@@ -324,7 +114,7 @@ export default function AIAnalysisPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div>
               <label className="text-sm font-medium mb-2 block">Select Venture</label>
               <Select value={selectedVenture} onValueChange={setSelectedVenture}>
@@ -360,7 +150,7 @@ export default function AIAnalysisPage() {
             </div>
             <div className="flex items-end">
               <Button 
-                onClick={startAnalysis} 
+                onClick={submitAnalysis}
                 disabled={!selectedVenture || !selectedAnalysisType || isAnalyzing}
                 className="w-full"
               >
@@ -388,12 +178,26 @@ export default function AIAnalysisPage() {
               rows={3}
             />
           </div>
+
+          <Card className="border-dashed bg-muted/30">
+            <CardContent className="pt-4">
+              <div className="flex flex-col gap-2 text-sm sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-medium">Selection preview</p>
+                  <p className="text-muted-foreground">
+                    Venture: {selectedVentureName} • Analysis: {selectedAnalysisLabel}
+                  </p>
+                </div>
+                <Badge variant="outline">{selectedVenture && selectedAnalysisType ? "Ready" : "Needs selection"}</Badge>
+              </div>
+            </CardContent>
+          </Card>
         </CardContent>
       </Card>
 
       {/* Analysis Results */}
       <Tabs defaultValue="all" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4">
           <TabsTrigger value="all">All Analyses</TabsTrigger>
           <TabsTrigger value="completed">Completed</TabsTrigger>
           <TabsTrigger value="processing">Processing</TabsTrigger>
@@ -401,7 +205,20 @@ export default function AIAnalysisPage() {
         </TabsList>
 
         <TabsContent value="all" className="space-y-4">
-          {analyses.map(analysis => (
+          {analyses.length === 0 ? (
+            <Card className="border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-10 text-center">
+                <Brain className="h-8 w-8 text-muted-foreground mb-3" />
+                <h3 className="font-medium">No analyses yet</h3>
+                <p className="text-sm text-muted-foreground mt-1 mb-4">
+                  Start a new analysis to see venture insights and recommendations here.
+                </p>
+                <Button onClick={submitAnalysis} disabled={!selectedVenture || !selectedAnalysisType || isAnalyzing}>
+                  Start first analysis
+                </Button>
+              </CardContent>
+            </Card>
+          ) : analyses.map(analysis => (
             <Card key={analysis.id}>
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -412,12 +229,12 @@ export default function AIAnalysisPage() {
                       <Badge variant="outline">{analysis.analysisType}</Badge>
                     </CardTitle>
                     <CardDescription>
-                      Started {formatDate(analysis.createdAt)}
-                      {analysis.completedAt && ` • Completed ${formatDate(analysis.completedAt)}`}
+                      Started {formatAnalysisDate(analysis.createdAt)}
+                      {analysis.completedAt && ` • Completed ${formatAnalysisDate(analysis.completedAt)}`}
                     </CardDescription>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <Badge className={getStatusColor(analysis.status)}>
+                    <Badge className={getStatusClasses(analysis.status)}>
                       {getStatusIcon(analysis.status)}
                       <span className="ml-1 capitalize">{analysis.status}</span>
                     </Badge>
@@ -481,7 +298,7 @@ export default function AIAnalysisPage() {
             <Card key={analysis.id}>
               <CardHeader>
                 <CardTitle>{analysis.ventureName} - {analysis.analysisType}</CardTitle>
-                <CardDescription>Completed {formatDate(analysis.completedAt!)}</CardDescription>
+                <CardDescription>Completed {formatAnalysisDate(analysis.completedAt!)}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -521,7 +338,7 @@ export default function AIAnalysisPage() {
                   <RefreshCw className="h-5 w-5 animate-spin" />
                   <span>{analysis.ventureName} - {analysis.analysisType}</span>
                 </CardTitle>
-                <CardDescription>Started {formatDate(analysis.createdAt)}</CardDescription>
+                <CardDescription>Started {formatAnalysisDate(analysis.createdAt)}</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center space-x-2">
