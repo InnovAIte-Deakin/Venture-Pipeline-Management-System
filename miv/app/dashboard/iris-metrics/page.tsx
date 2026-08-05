@@ -165,38 +165,50 @@ export default function IRISMetricsPage() {
                   <TableHead className="w-40">Unit</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-              {items.length === 0 && !loading ? (
-                <TableRow>
-                  <TableCell
-                    colSpan={4}
-                    className="py-8 text-center text-sm text-muted-foreground"
-                  >
-                    No IRIS metrics found for “{query}”.
-                  </TableCell>
-                </TableRow>
-              ) : (
-                items.map((item) => (
-                  <TableRow key={item.code}>
-                    <TableCell className="font-medium">{item.code}</TableCell>
-                    <TableCell>
-                      <div className="font-medium">{item.name}</div>
-                      {item.description && (
-                        <div className="text-xs text-slate-500 line-clamp-2">
-                          {item.description}
-                        </div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.gedsiSuggestion && (
-                        <Badge variant="outline">{item.gedsiSuggestion}</Badge>
-                      )}
-                    </TableCell>
-                    <TableCell>{item.unit || "-"}</TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
+             <TableBody>
+  {loading ? (
+    <TableRow>
+      <TableCell
+        colSpan={4}
+        className="py-10 text-center text-sm text-muted-foreground"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          Loading IRIS metrics...
+        </div>
+      </TableCell>
+    </TableRow>
+  ) : items.length === 0 ? (
+    <TableRow>
+      <TableCell
+        colSpan={4}
+        className="py-8 text-center text-sm text-muted-foreground"
+      >
+        No IRIS metrics found for “{query}”.
+      </TableCell>
+    </TableRow>
+  ) : (
+    items.map((item) => (
+      <TableRow key={item.code}>
+        <TableCell className="font-medium">{item.code}</TableCell>
+        <TableCell>
+          <div className="font-medium">{item.name}</div>
+          {item.description && (
+            <div className="text-xs text-slate-500 line-clamp-2">
+              {item.description}
+            </div>
+          )}
+        </TableCell>
+        <TableCell>
+          {item.gedsiSuggestion && (
+            <Badge variant="outline">{item.gedsiSuggestion}</Badge>
+          )}
+        </TableCell>
+        <TableCell>{item.unit || "-"}</TableCell>
+      </TableRow>
+    ))
+  )}
+</TableBody>
             </Table>
           </div>
         </CardContent>
