@@ -4,6 +4,15 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
 export async function requireAdminDevAccess() {
+    
+  //check whether developer endpoints are enabled
+  if (process.env.ENABLE_DEV_ENDPOINTS !== 'true') {
+    return NextResponse.json(
+      { error: 'Forbidden' },
+      { status: 403 }
+    )
+  }
+
   //check whether someone is logged in
   const session = await getServerSession().catch(() => null)
 
@@ -26,14 +35,6 @@ export async function requireAdminDevAccess() {
 
   //if not admin stop
   if (!user || user.role !== 'ADMIN') {
-    return NextResponse.json(
-      { error: 'Forbidden' },
-      { status: 403 }
-    )
-  }
-
-  //check whether developer endpoints are enabled
-  if (process.env.ENABLE_DEV_ENDPOINTS !== 'true') {
     return NextResponse.json(
       { error: 'Forbidden' },
       { status: 403 }
