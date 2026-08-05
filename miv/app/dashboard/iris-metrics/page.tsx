@@ -165,8 +165,8 @@ setTotalPages(json.totalPages || 1)
             </div>
           </div>
 
-          <div className="rounded-md border overflow-hidden">
-            <Table>
+         <div className="rounded-md border overflow-x-auto">
+            <Table className="min-w-[760px]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-32">Code</TableHead>
