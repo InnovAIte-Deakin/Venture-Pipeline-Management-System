@@ -2,11 +2,11 @@
 
 import React, { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
-import { AnalyticsDashboard } from "@/components/enterprise/analytics-dashboard"
-import { AdvancedDataTable } from "@/components/enterprise/advanced-data-table"
-import { AdvancedFilters } from "@/components/enterprise/advanced-filters"
-import { NotificationCenter, sampleNotifications } from "@/components/enterprise/notification-center"
-import { WorkflowDashboardTab } from "@/components/enterprise/workflow-dashboard-tab"
+import { AnalyticsDashboard } from "@/components/dashboard/analytics-dashboard"
+import { AdvancedDataTable } from "@/components/dashboard/advanced-data-table"
+import { AdvancedFilters } from "@/components/dashboard/advanced-filters"
+import { NotificationCenter, sampleNotifications } from "@/components/dashboard/notification-center"
+import { WorkflowDashboardTab } from "@/components/dashboard/workflow-dashboard-tab"
 import { useTheme } from "@/components/theme-provider"
 import { useToast } from "@/components/ui/toast"
 import { calculateGEDSIScore, calculateGEDSIComplianceRate } from "@/lib/gedsi-utils"
@@ -711,7 +711,7 @@ export default function EnterpriseDashboard() {
         lastUpdate: venture.updatedAt ? new Date(venture.updatedAt).toISOString().split('T')[0] : 'Unknown'
       }
     })
-  }, [filteredVentures, gedsiMetrics, loading])
+  }, [filteredVentures, loading])
 
   const venturesColumns = [
     {
