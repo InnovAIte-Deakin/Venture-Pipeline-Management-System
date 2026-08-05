@@ -100,6 +100,7 @@ export function MobileNav() {
               quickItems={quickItems}
               showMore={showMore}
               onShowMoreChange={setShowMore}
+              onNavigate={() => setIsOpen(false)}
             />
           </Sheet>
           <div className="min-w-0 flex-1 px-4 text-center">
@@ -173,11 +174,13 @@ function MobileSidebar({
   quickItems,
   showMore,
   onShowMoreChange,
+  onNavigate,
 }: {
   pathname: string;
   quickItems: { label: string; item: DashboardNavItem }[];
   showMore: boolean;
   onShowMoreChange: (value: boolean) => void;
+  onNavigate: () => void;
 }) {
   return (
     <SheetContent
@@ -196,7 +199,13 @@ function MobileSidebar({
         <nav className="px-3" aria-label="Mobile dashboard sidebar">
           <div className="grid grid-cols-2 gap-3">
             {quickItems.map(({ label, item }) => (
-              <MobileNavTile key={label} label={label} item={item} />
+              <MobileNavTile
+                key={label}
+                label={label}
+                item={item}
+                active={item.href ? isDashboardRouteActive(pathname, item.href) : false}
+                onNavigate={onNavigate}
+              />
             ))}
           </div>
 
@@ -213,7 +222,12 @@ function MobileSidebar({
           {showMore && (
             <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
               {dashboardDesktopNavigationItems.map((item) => (
-                <MobileNavGroup key={item.title} item={item} pathname={pathname} />
+                <MobileNavGroup
+                  key={item.title}
+                  item={item}
+                  pathname={pathname}
+                  onNavigate={onNavigate}
+                />
               ))}
             </div>
           )}
@@ -265,35 +279,58 @@ function MobileSidebar({
 function MobileNavTile({
   label,
   item,
+  active,
+  onNavigate,
 }: {
   label: string;
   item: DashboardNavItem;
+  active: boolean;
+  onNavigate: () => void;
 }) {
   const Icon = item.icon;
+  const className = cn(
+    "flex min-h-20 flex-col items-start justify-between rounded-md border-2 p-3 text-left text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+    active
+      ? "border-blue-500 bg-blue-50 text-blue-700"
+      : "border-slate-400 bg-white text-slate-600 hover:bg-slate-50",
+  );
+
+  if (!item.href) {
+    return (
+      <button type="button" className={className} disabled>
+        <Icon className="h-8 w-8 text-slate-950" aria-hidden="true" />
+        <span>{label}</span>
+      </button>
+    );
+  }
 
   return (
-    <button
-      type="button"
-      className="flex min-h-20 flex-col items-start justify-between rounded-md border-2 border-slate-400 bg-white p-3 text-left text-sm font-semibold text-slate-600 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      aria-current={active ? "page" : undefined}
+      className={className}
     >
       <Icon className="h-8 w-8 text-slate-950" aria-hidden="true" />
       <span>{label}</span>
-    </button>
+    </Link>
   );
 }
 
 function MobileNavGroup({
   item,
   pathname,
+  onNavigate,
 }: {
   item: DashboardNavItem;
   pathname: string;
+  onNavigate: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const Icon = item.icon;
 
   if (!item.children) {
-    return <MobileNavRow item={item} pathname={pathname} />;
+    return <MobileNavRow item={item} pathname={pathname} onNavigate={onNavigate} />;
   }
 
   return (
@@ -311,7 +348,12 @@ function MobileNavGroup({
       {expanded && (
         <div className="mt-1 space-y-1 pl-5">
           {item.children.map((child) => (
-            <MobileNavRow key={child.title} item={child} pathname={pathname} />
+            <MobileNavRow
+              key={child.title}
+              item={child}
+              pathname={pathname}
+              onNavigate={onNavigate}
+            />
           ))}
         </div>
       )}
@@ -322,27 +364,40 @@ function MobileNavGroup({
 function MobileNavRow({
   item,
   pathname,
+  onNavigate,
 }: {
   item: DashboardNavItem;
   pathname: string;
+  onNavigate: () => void;
 }) {
   const Icon = item.icon;
   const active = item.href ? isDashboardRouteActive(pathname, item.href) : false;
+  const className = cn(
+    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+    active
+      ? "bg-blue-50 text-blue-700"
+      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+  );
+
+  if (!item.href) {
+    return (
+      <button type="button" className={className} disabled>
+        <Icon className="h-4 w-4" aria-hidden="true" />
+        <span>{item.title}</span>
+      </button>
+    );
+  }
 
   return (
-    <button
-      type="button"
+    <Link
+      href={item.href}
+      onClick={onNavigate}
       aria-current={active ? "page" : undefined}
-      className={cn(
-        "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
-        active
-          ? "bg-blue-50 text-blue-700"
-          : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
-      )}
+      className={className}
     >
       <Icon className="h-4 w-4" aria-hidden="true" />
       <span>{item.title}</span>
-    </button>
+    </Link>
   );
 }
 
