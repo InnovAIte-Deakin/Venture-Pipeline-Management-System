@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/app/api/auth/[...nextauth]/route';
 import { prisma } from '@/lib/prisma';
 import { formatTimeAgo } from '@/lib/utils';
 
@@ -21,7 +22,7 @@ function serializeDashboard(dashboard: any) {
 // GET /api/custom-dashboards - Get the current user's custom dashboards
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
 // POST /api/custom-dashboards - Create a new custom dashboard
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -92,7 +93,7 @@ export async function POST(request: NextRequest) {
 // PATCH /api/custom-dashboards - Update an existing dashboard (name/description/category/isPublic/isFavorite)
 export async function PATCH(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
@@ -133,7 +134,7 @@ export async function PATCH(request: NextRequest) {
 // DELETE /api/custom-dashboards?id=DASH-xxx - Delete a dashboard
 export async function DELETE(request: NextRequest) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
