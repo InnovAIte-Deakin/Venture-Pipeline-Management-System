@@ -22,20 +22,23 @@ export default function IRISMetricsPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(50)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     const controller = new AbortController()
     async function search() {
       setLoading(true)
       try {
-        const url = query.trim().length > 0
-          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}`
-          : `/api/iris/metrics?limit=${limit}`
+       const url = query.trim().length > 0
+          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}&page=${page}`
+          : `/api/iris/metrics?limit=${limit}&page=${page}`
         const res = await fetch(url, { signal: controller.signal })
         if (res.ok) {
           const json = await res.json()
           setItems(json.results || [])
           setTotal(json.total || (json.results?.length ?? 0))
+          setTotalPages(json.totalPages || 1)
         }
       } catch {}
       finally {
@@ -44,7 +47,10 @@ export default function IRISMetricsPage() {
     }
     const t = setTimeout(search, 250)
     return () => { controller.abort(); clearTimeout(t) }
-  }, [query, limit])
+  }, [query, limit, page])
+  useEffect(() => {
+  setPage(1)
+}, [query, limit])
 
   return (
     <div className="space-y-6">
@@ -83,6 +89,31 @@ export default function IRISMetricsPage() {
                 {loading ? 'Searching…' : `Results: ${items.length}${total ? ` / ${total}` : ''}`}
               </div>
             </div>
+            <div className="flex items-center justify-between gap-3">
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+    disabled={page <= 1 || loading}
+  >
+    Previous
+  </Button>
+
+  <span className="text-sm text-muted-foreground">
+    Page {page} of {totalPages}
+  </span>
+
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() =>
+      setPage((currentPage) => Math.min(totalPages, currentPage + 1))
+    }
+    disabled={page >= totalPages || loading}
+  >
+    Next
+  </Button>
+</div>
             
             {/* Quick filter buttons */}
             <div className="flex flex-wrap gap-2">
