@@ -135,22 +135,37 @@ export default function IRISMetricsPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {items.map((item) => (
+              {items.length === 0 && !loading ? (
+                <TableRow>
+                  <TableCell
+                    colSpan={4}
+                    className="py-8 text-center text-sm text-muted-foreground"
+                  >
+                    No IRIS metrics found for “{query}”.
+                  </TableCell>
+                </TableRow>
+              ) : (
+                items.map((item) => (
                   <TableRow key={item.code}>
                     <TableCell className="font-medium">{item.code}</TableCell>
                     <TableCell>
                       <div className="font-medium">{item.name}</div>
                       {item.description && (
-                        <div className="text-xs text-slate-500 line-clamp-2">{item.description}</div>
+                        <div className="text-xs text-slate-500 line-clamp-2">
+                          {item.description}
+                        </div>
                       )}
                     </TableCell>
                     <TableCell>
-                      {item.gedsiSuggestion && <Badge variant="outline">{item.gedsiSuggestion}</Badge>}
+                      {item.gedsiSuggestion && (
+                        <Badge variant="outline">{item.gedsiSuggestion}</Badge>
+                      )}
                     </TableCell>
-                    <TableCell>{item.unit || '-'}</TableCell>
+                    <TableCell>{item.unit || "-"}</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
+                ))
+              )}
+            </TableBody>
             </Table>
           </div>
         </CardContent>
