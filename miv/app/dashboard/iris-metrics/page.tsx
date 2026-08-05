@@ -24,30 +24,40 @@ export default function IRISMetricsPage() {
   const [limit, setLimit] = useState(50)
   const [page, setPage] = useState(1)
   const [totalPages, setTotalPages] = useState(1)
+  const [error, setError] = useState("")
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
     async function search() {
       setLoading(true)
+      setError("")
       try {
        const url = query.trim().length > 0
           ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}&page=${page}`
           : `/api/iris/metrics?limit=${limit}&page=${page}`
         const res = await fetch(url, { signal: controller.signal })
-        if (res.ok) {
-          const json = await res.json()
-          setItems(json.results || [])
-          setTotal(json.total || (json.results?.length ?? 0))
-          setTotalPages(json.totalPages || 1)
-        }
-      } catch {}
-      finally {
+        if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`)
+      }
+        const json = await res.json()
+setItems(json.results || [])
+setTotal(json.total || (json.results?.length ?? 0))
+setTotalPages(json.totalPages || 1)
+      } catch (error) {
+  if ((error as Error).name !== "AbortError") {
+    setItems([])
+    setTotal(0)
+    setTotalPages(1)
+    setError("Unable to load IRIS metrics. Please try again.")
+  }
+} finally {
         setLoading(false)
       }
     }
     const t = setTimeout(search, 250)
     return () => { controller.abort(); clearTimeout(t) }
-  }, [query, limit, page])
+ }, [query, limit, page, retryKey])
   useEffect(() => {
   setPage(1)
 }, [query, limit])
@@ -178,7 +188,25 @@ export default function IRISMetricsPage() {
         </div>
       </TableCell>
     </TableRow>
-  ) : items.length === 0 ? (
+  ) : error ? (
+  <TableRow>
+    <TableCell
+      colSpan={4}
+      className="py-10 text-center text-sm text-red-600"
+    >
+      <div className="flex flex-col items-center justify-center gap-3">
+        <span>{error}</span>
+        <Button
+          variant="outline"
+          size="sm"
+         onClick={() => setRetryKey((currentKey) => currentKey + 1)}
+        >
+          Try Again
+        </Button>
+      </div>
+    </TableCell>
+  </TableRow>
+) : items.length === 0 ? (
     <TableRow>
       <TableCell
         colSpan={4}
