@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   ImpactKpiCards,
   type ImpactKpiMetric,
-} from "@/components/impact-kpi-cards"
+} from "./components/impact-kpi-cards"
 import {
   DollarSign,
   Users,
