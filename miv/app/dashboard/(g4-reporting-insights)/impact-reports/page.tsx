@@ -6,11 +6,13 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
+  ImpactKpiCards,
+  type ImpactKpiMetric,
+} from "@/components/impact-kpi-cards"
+import {
   DollarSign,
   Users,
   Briefcase,
-  TrendingUp,
-  TrendingDown,
   Download,
   FileText,
   Lightbulb,
@@ -110,7 +112,7 @@ export default function ImpactReports() {
   }
 
   // Calculate real impact metrics from database
-  const impactSummaryMetrics = useMemo(() => {
+  const impactSummaryMetrics = useMemo<ImpactKpiMetric[]>(() => {
     const totalFunding = ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0)
     const totalJobs = ventures.reduce((sum, v) => {
       const funding = v.fundingRaised || 0
@@ -332,35 +334,7 @@ export default function ImpactReports() {
         </div>
 
         {/* Summary Metrics - Real Data */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-          {impactSummaryMetrics.map((metric, index) => (
-            <Card key={index} className="group border-0 shadow-sm hover:shadow-xl transition-all duration-300">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className={`p-3 rounded-xl ${metric.bgColor} group-hover:scale-110 transition-transform`}>
-                    <metric.icon className={`h-6 w-6 ${metric.color}`} />
-                  </div>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
-                    {metric.trend === "up" ? (
-                      <TrendingUp className="h-3 w-3 mr-1" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3 mr-1" />
-                    )}
-                    +{metric.change}%
-                  </Badge>
-                </div>
-                <div className="space-y-2">
-                  <p className="text-sm font-medium text-gray-600 dark:text-gray-400">{metric.title}</p>
-                  <p className="text-3xl font-bold text-gray-900 dark:text-white">
-                    {metric.prefix || ""}
-                    {metric.value}
-                    {metric.unit}
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <ImpactKpiCards metrics={impactSummaryMetrics} />
 
         <Tabs defaultValue="overview" className="w-full">
           <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800">
