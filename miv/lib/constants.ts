@@ -3,6 +3,6 @@
 export const PUBLIC_BACKEND_URL =
 	process.env.NEXT_PUBLIC_BACKEND_URL ||
 	process.env.PUBLIC_BACKEND_URL ||
-	'http://localhost:3001';
+	'http://localhost:3000';
 
 export default PUBLIC_BACKEND_URL;

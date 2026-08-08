@@ -1,166 +1,78 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getPayload } from "payload";
-import config from "@payload-config";
-import { z } from "zod";
-
-const RegisterSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Valid email is required"),
-  // password: z.string().min(4, "Password must be at least 4 characters"),
-  password: z.string(),
-
-  ventureName: z.string().optional(),
-  positionInVenture: z.string().optional(),
-  phone: z.string().optional(),
-  countryCode: z.string().optional(),
-});
-
-const IMPACT_APPLICANT_ROLE = "USER"; // maps to Prisma enum UserRole.USER
+import { NextRequest, NextResponse } from 'next/server'
+import { getPayload } from 'payload'
+import config from '@payload-config'
 
 export async function POST(req: NextRequest) {
   try {
-    const json = await req.json().catch(() => null);
+    const payload = await getPayload({ config })
+    const body = await req.json()
 
-    if (!json) {
+    const email = body.email
+    const password = body.password
+    const firstName = body.firstName
+    const lastName = body.lastName
+
+    if (!email || !password || !firstName || !lastName) {
       return NextResponse.json(
         {
           success: false,
-          error: "Bad Request",
-          message: "Request body must be JSON.",
+          error: 'Required',
+          message: 'Email, password, first name, and last name are required.',
         },
         { status: 400 }
-      );
+      )
     }
 
-    const parsed = RegisterSchema.safeParse(json);
-
-    if (!parsed.success) {
-      const fieldErrors = parsed.error.flatten().fieldErrors;
-      const message =
-        Object.values(fieldErrors)
-          .flat()
-          .find(Boolean) || "Invalid registration data";
-
-      return NextResponse.json(
-        {
-          success: false,
-          error: "ValidationError",
-          message,
-          details: fieldErrors,
-        },
-        { status: 400 }
-      );
-    }
-
-    const {
-      firstName,
-      lastName,
-      email,
-      password,
-      ventureName,
-      positionInVenture,
-      phone,
-      countryCode,
-    } = parsed.data;
-
-    const payload = await getPayload({ config });
-
-    const existing = await payload.find({
-      collection: "users",
+    const existingUser = await payload.find({
+      collection: 'users',
       where: {
         email: {
-          equals: email.toLowerCase(),
+          equals: email,
         },
       },
       limit: 1,
-    });
+    })
 
-    if (existing.totalDocs > 0) {
+    if (existingUser.totalDocs > 0) {
       return NextResponse.json(
         {
           success: false,
-          error: "UserExists",
-          message: "An account with that email already exists.",
+          error: 'User already exists',
+          message: 'An account with this email already exists.',
         },
         { status: 409 }
-      );
+      )
     }
 
-    // 2. Create Impact Applicant user
-    const user = await payload.create({
-      collection: "users",
+    const newUser = await payload.create({
+      collection: 'users',
       data: {
-        firstName,
-        lastName,
-        email: email.toLowerCase(),
+        email,
         password,
-        role: "user",
-      
-        ventureName,
-        positionInVenture,
-        phone,
-        countryCode,
+        first_name: firstName,
+        last_name: lastName,
+        role: 'founder',
       },
-    });
+    })
 
-    // 3. (Optional) Send welcome email, but don't fail the request if this errors
-    // try {
-    //   await emailService.sendWelcomeEmail({
-    //     to: email,
-    //     firstName,
-    //   });
-    // } catch (err) {
-    //   console.error("Failed to send welcome email", err);
-    // }
-
-    // 4. Log the user in immediately (so dashboard can rely on auth cookie)
-    // Adjust this to match your Payload auth setup if the API differs.
-    const auth = await payload.login({
-      collection: "users",
-      data: {
-        email: email.toLowerCase(),
-        password,
-      },
-    });
-
-    const response = NextResponse.json(
+    return NextResponse.json(
       {
         success: true,
-        message: "Account created successfully",
-        // Keep response small; just what the client might need
-        user: {
-          id: (user as any).id,
-          email: (user as any).email,
-          firstName: (user as any).firstName,
-          lastName: (user as any).lastName,
-          role: (user as any).role,
-        },
+        message: 'Account created successfully',
+        user: newUser,
       },
       { status: 201 }
-    );
-
-    // Attach Payload auth token as cookie if available
-    if (auth?.token) {
-      response.cookies.set("payload-token", auth.token, {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        // secure: true in production
-      });
-    }
-
-    return response;
+    )
   } catch (error) {
-    console.error("Registration error:", error);
+    console.error('Register error:', error)
 
     return NextResponse.json(
       {
         success: false,
-        error: "RegistrationFailed",
-        message: "Failed to create account. Please try again.",
+        error: 'Registration failed',
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
       },
       { status: 500 }
-    );
+    )
   }
 }
