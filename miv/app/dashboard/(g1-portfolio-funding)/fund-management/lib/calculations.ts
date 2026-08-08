@@ -1,4 +1,4 @@
-import type { Fund, FundStatus, FundType } from "@/types/fund-management"
+import type { Fund, FundStatus, FundType } from "../types/fund-management"
 
 export interface FundMetrics {
   totalFunds: number

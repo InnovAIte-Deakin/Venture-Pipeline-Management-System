@@ -1,7 +1,7 @@
 import test from "node:test"
 import assert from "node:assert/strict"
 import { calculateFundMetrics, extractVentureDocuments, filterFunds, parseFinancialAmount } from "./calculations"
-import type { Fund } from "@/types/fund-management"
+import type { Fund } from "../types/fund-management"
 
 const sampleFunds: Fund[] = [
   {

@@ -6,7 +6,7 @@ import {
   TrendingUp,
   XCircle,
 } from "lucide-react"
-import type { CapitalCallStatus, DistributionStatus, FundStatus } from "@/types/fund-management"
+import type { CapitalCallStatus, DistributionStatus, FundStatus } from "../types/fund-management"
 
 export function getFundStatusIcon(status: FundStatus | string) {
   switch (status) {

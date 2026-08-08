@@ -4,8 +4,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
-import { getCapitalCallStatusBadge } from "@/lib/fund-management/status"
-import type { CapitalCall } from "@/types/fund-management"
+import { getCapitalCallStatusBadge } from "../lib/status"
+import type { CapitalCall } from "../types/fund-management"
 
 interface CapitalCallsSectionProps {
   capitalCalls: CapitalCall[]

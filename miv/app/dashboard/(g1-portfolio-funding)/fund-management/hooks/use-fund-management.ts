@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { extractVentureDocuments } from "@/lib/fund-management/calculations"
-import type { CapitalCall, Distribution, Fund, LimitedPartner } from "@/types/fund-management"
+import { extractVentureDocuments, type VentureDocument } from "../lib/calculations"
+import type { CapitalCall, Distribution, Fund, LimitedPartner } from "../types/fund-management"
 
 interface FundManagementApiResponse {
   funds?: Fund[]
@@ -27,7 +27,7 @@ export function useFundManagement() {
   const [capitalCalls, setCapitalCalls] = useState<CapitalCall[]>([])
   const [distributions, setDistributions] = useState<Distribution[]>([])
   const [operationTasks, setOperationTasks] = useState<Array<Record<string, unknown>>>([])
-  const [documents, setDocuments] = useState<Array<Record<string, unknown>>>([])
+  const [documents, setDocuments] = useState<VentureDocument[]>([])
   const [reports, setReports] = useState<Array<Record<string, unknown>>>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

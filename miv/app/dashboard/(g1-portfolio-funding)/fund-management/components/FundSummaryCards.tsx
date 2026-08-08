@@ -1,6 +1,6 @@
 import { Activity, Clock, Mail, Shield, TrendingUp } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { CapitalCall, Distribution, Fund, LimitedPartner } from "@/types/fund-management"
+import type { CapitalCall, Distribution, Fund, LimitedPartner } from "../types/fund-management"
 
 interface FundSummaryCardsProps {
   funds: Fund[]

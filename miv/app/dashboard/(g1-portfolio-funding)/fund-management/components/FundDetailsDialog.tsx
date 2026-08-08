@@ -1,7 +1,7 @@
 import { Mail, MapPin, Phone } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import type { LimitedPartner } from "@/types/fund-management"
+import type { LimitedPartner } from "../types/fund-management"
 
 interface FundDetailsDialogProps {
   open: boolean

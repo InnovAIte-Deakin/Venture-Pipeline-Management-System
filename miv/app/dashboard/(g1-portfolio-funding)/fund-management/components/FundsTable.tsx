@@ -2,8 +2,8 @@ import { ArrowDownRight, ArrowUpRight, BarChart3, Edit, Eye, MoreHorizontal } fr
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { getFundStatusBadge } from "@/lib/fund-management/status"
-import type { Fund } from "@/types/fund-management"
+import { getFundStatusBadge } from "../lib/status"
+import type { Fund } from "../types/fund-management"
 
 interface FundsTableProps {
   funds: Fund[]
