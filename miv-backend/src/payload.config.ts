@@ -7,8 +7,7 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
-console.log("🧪 DB URI at startup:", process.env.DATABASE_URI);
-
+// Collections
 import { Users } from './collections/users'
 import { Media } from './collections/media'
 import { Ventures } from './collections/ventures'
@@ -18,14 +17,19 @@ import { Founders } from './collections/founders'
 import { DataRoomFiles } from './collections/dataRoomFiles'
 import { ActivityLogs } from './collections/activityLogs'
 import { Documents } from './collections/documents'
-import { Settings } from './globals/settings'
-import { Lookups } from './globals/lookups'
 import { SystemSettings } from './collections/systemsettings'
 import { UserSettings } from './collections/userSettings'
+
+// Globals
+import { Settings } from './globals/settings'
+import { Lookups } from './globals/lookups'
+
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 
-const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
+console.log("🧪 DB URI at startup:", process.env.DATABASE_URI);
+
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000,http://localhost:3001')
   .split(',')
   .map((o) => o.trim())
   .filter(Boolean)
@@ -35,6 +39,12 @@ export default buildConfig({
     user: Users.slug,
     importMap: {
       baseDir: path.resolve(dirname),
+    },
+    // Optional: Auto-fill login for faster local dev testing
+    autoLogin: {
+      email: 'admin@example.com',
+      password: 'changeme123',
+      prefillOnly: true,
     },
   },
   localization: {
@@ -46,91 +56,102 @@ export default buildConfig({
     Media,
     Ventures,
     OnboardingIntakes,
-    Founders,
-    Agreements,
+    // 🛡️ Hide Staff-Only management collections from Founders
+    {
+      ...Founders,
+      admin: {
+        ...Founders.admin,
+        hidden: ({ user }) => user?.role === 'founder',
+      },
+    },
+    {
+      ...Agreements,
+      admin: {
+        ...Agreements.admin,
+        hidden: ({ user }) => user?.role === 'founder',
+      },
+    },
     DataRoomFiles,
-    ActivityLogs,
+    // 🛡️ Hide Activity Logs from everyone except Admin/Analyst
+    {
+      ...ActivityLogs,
+      admin: {
+        ...ActivityLogs.admin,
+        hidden: ({ user }) => user?.role === 'founder',
+      },
+    },
     Documents,
-    SystemSettings,
+    // 🛡️ Hide System Settings from Founders
+    {
+      ...SystemSettings,
+      admin: {
+        ...SystemSettings.admin,
+        hidden: ({ user }) => user?.role === 'founder',
+      }
+    },
     UserSettings
   ],
-  globals: [Settings, Lookups],
-  // Explicit origins are required when sending credentials (cookies)
+  globals: [
+    // 🛡️ Hide Globals from Founders so they don't see system configuration
+    {
+      ...Settings,
+      admin: {
+        ...Settings.admin,
+        hidden: ({ user }) => user?.role === 'founder',
+      },
+      access: {
+        update: ({ req: { user } }) => user?.role === 'admin',
+      }
+    },
+    {
+      ...Lookups,
+      admin: {
+        ...Lookups.admin,
+        hidden: ({ user }) => user?.role === 'founder',
+      },
+      access: {
+        update: ({ req: { user } }) => user?.role === 'admin',
+      }
+    }
+  ],
   cors: allowedOrigins,
-  // Allow CSRF from the same set of origins when using cookies
   csrf: allowedOrigins,
   editor: lexicalEditor(),
-  secret: process.env.PAYLOAD_SECRET || '',
+  secret: process.env.PAYLOAD_SECRET || 'f8b68b3e5316e663b938338f',
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
   db: mongooseAdapter({
-    url: process.env.DATABASE_URI || '',
+    url: process.env.DATABASE_URI || 'mongodb://mongo:27017/payload',
   }),
   sharp,
-  plugins: [
-    payloadCloudPlugin(),
-    // storage-adapter-placeholder
-  ],
+  plugins: [payloadCloudPlugin()],
   onInit: async (payload) => {
-    // Ensure a default admin exists (first-run only)
-    const users = await payload.find({
-      collection: 'users',
-      where: { email: { equals: 'admin@example.com' } },
-      limit: 1,
-    })
-    if (users.totalDocs === 0) {
-      await payload.create({
+    // Helper to seed a user if they don't exist
+    const seedUser = async (email, firstName, lastName, role) => {
+      const result = await payload.find({
         collection: 'users',
-        data: {
-          email: 'admin@example.com',
-          password: 'changeme123',
-          first_name: 'Admin',
-          last_name: 'User',
-          role: 'admin',
-        },
+        where: { email: { equals: email } },
+        limit: 1,
       })
-      console.log('Seeded default admin user admin@example.com / changeme123')
+      if (result.totalDocs === 0) {
+        await payload.create({
+          collection: 'users',
+          data: {
+            email,
+            password: 'changeme123',
+            first_name: firstName,
+            last_name: lastName,
+            role,
+          },
+        })
+        console.log(`✅ Seeded ${role}: ${email}`)
+      }
     }
 
-    // Ensure a default founder exists (first-run only)
-    const founders = await payload.find({
-      collection: 'users',
-      where: { email: { equals: 'founder@example.com' } },
-      limit: 1,
-    })
-    if (founders.totalDocs === 0) {
-      await payload.create({
-        collection: 'users',
-        data: {
-          email: 'founder@example.com',
-          password: 'changeme123',
-          first_name: 'Founder',
-          last_name: 'user',
-          role: 'founder',
-        },
-      })
-      console.log('Seeded default founder user founder@example.com / changeme123')
-    }
-
-    // Ensure a default miv_analyst exists (first-run only)
-    const analysts = await payload.find({
-      collection: 'users',
-      where: { email: { equals: 'analyst@example.com' } },
-      limit: 1,
-    })
-    if (analysts.totalDocs === 0) {
-      await payload.create({
-        collection: 'users',
-        data: {
-          email: 'analyst@example.com',
-          password: 'changeme123',
-          first_name: 'Analyst',
-          last_name: 'User',
-          role: 'miv_analyst',
-        },
-      })
-      console.log('Seeded default miv_analyst user analyst@example.com / changeme123')
-    }
+    // Seed our 3 core personas for Sprint 1 Testing
+    await seedUser('admin@example.com', 'Admin', 'User', 'admin')
+    await seedUser('founder@example.com', 'Founder', 'User', 'founder')
+    await seedUser('analyst@example.com', 'Analyst', 'User', 'miv_analyst')
   },
 })

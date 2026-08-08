@@ -263,22 +263,15 @@ export interface Media {
 export interface Venture {
   id: string;
   name: string;
-  country: string;
-  city: string;
-  sector: string;
-  website?: string | null;
-  description?: string | null;
   founders?:
     | {
-        email: string;
-        role: string;
-        phone: string;
         fullName: string;
+        email: string;
         id?: string | null;
       }[]
     | null;
-  triageTrack?: ('unassigned' | 'fast' | 'slow') | null;
-  triageRationale?: string | null;
+  sector: string;
+  internalNotes?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -288,37 +281,9 @@ export interface Venture {
  */
 export interface OnboardingIntake {
   id: string;
-  venture?: (string | null) | Venture;
-  wss: {
-    seeing: 'no_difficulty' | 'some_difficulty' | 'a_lot_of_difficulty' | 'cannot_do_at_all';
-    hearing: 'no_difficulty' | 'some_difficulty' | 'a_lot_of_difficulty' | 'cannot_do_at_all';
-    walking: 'no_difficulty' | 'some_difficulty' | 'a_lot_of_difficulty' | 'cannot_do_at_all';
-    cognition: 'no_difficulty' | 'some_difficulty' | 'a_lot_of_difficulty' | 'cannot_do_at_all';
-    selfCare: 'no_difficulty' | 'some_difficulty' | 'a_lot_of_difficulty' | 'cannot_do_at_all';
-    communication: 'no_difficulty' | 'some_difficulty' | 'a_lot_of_difficulty' | 'cannot_do_at_all';
-  };
-  disabilityFlag?: boolean | null;
-  impactAreas?: ('agri' | 'gender' | 'climate')[] | null;
-  founders?:
-    | {
-        fullName: string;
-        email: string;
-        phone?: string | null;
-        id?: string | null;
-      }[]
-    | null;
-  financials?: {
-    currency?: string | null;
-    lastFYRevenue?: number | null;
-    avgMonthlyRevenue?: number | null;
-    currentCashBalance?: number | null;
-    stage?: string | null;
-    notes?: string | null;
-  };
-  gedsi?: {
-    hasPolicy?: boolean | null;
-    notes?: string | null;
-  };
+  venture: string | Venture;
+  submittedByEmail: string;
+  status?: ('pending' | 'reviewed' | 'approved') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -357,20 +322,10 @@ export interface Agreement {
  */
 export interface DataRoomFile {
   id: string;
-  venture?: (string | null) | Venture;
-  category: 'pitch' | 'financials' | 'policies' | 'registration' | 'other';
-  notes?: string | null;
+  category?: 'pitch' | null;
+  ownerEmail?: string | null;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -401,31 +356,11 @@ export interface ActivityLog {
  */
 export interface Document {
   id: string;
-  documentType:
-    | 'pitch_deck'
-    | 'financial_statements'
-    | 'legal_documents'
-    | 'gedsi_reports'
-    | 'impact_reports'
-    | 'other';
-  status?: ('pending_review' | 'approved' | 'rejected' | 'needs_revision') | null;
-  version?: number | null;
-  uploadedBy: string | User;
-  venture?: (string | null) | Venture;
-  notes?: string | null;
-  reviewedBy?: (string | null) | User;
-  reviewedAt?: string | null;
+  title: string;
+  file: string | Media;
+  uploadedBy?: (string | null) | User;
   updatedAt: string;
   createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
 }
 /**
  * Global system settings (single record)
@@ -463,12 +398,7 @@ export interface SystemSetting {
 export interface UserSetting {
   id: string;
   user: string | User;
-  notifications?: {
-    emailAlerts?: boolean | null;
-    inApp?: boolean | null;
-    push?: boolean | null;
-    frequency?: ('immediate' | 'daily' | 'weekly') | null;
-  };
+  theme?: ('dark' | 'light') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -689,22 +619,15 @@ export interface MediaSelect<T extends boolean = true> {
  */
 export interface VenturesSelect<T extends boolean = true> {
   name?: T;
-  country?: T;
-  city?: T;
-  sector?: T;
-  website?: T;
-  description?: T;
   founders?:
     | T
     | {
-        email?: T;
-        role?: T;
-        phone?: T;
         fullName?: T;
+        email?: T;
         id?: T;
       };
-  triageTrack?: T;
-  triageRationale?: T;
+  sector?: T;
+  internalNotes?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -714,42 +637,8 @@ export interface VenturesSelect<T extends boolean = true> {
  */
 export interface OnboardingIntakesSelect<T extends boolean = true> {
   venture?: T;
-  wss?:
-    | T
-    | {
-        seeing?: T;
-        hearing?: T;
-        walking?: T;
-        cognition?: T;
-        selfCare?: T;
-        communication?: T;
-      };
-  disabilityFlag?: T;
-  impactAreas?: T;
-  founders?:
-    | T
-    | {
-        fullName?: T;
-        email?: T;
-        phone?: T;
-        id?: T;
-      };
-  financials?:
-    | T
-    | {
-        currency?: T;
-        lastFYRevenue?: T;
-        avgMonthlyRevenue?: T;
-        currentCashBalance?: T;
-        stage?: T;
-        notes?: T;
-      };
-  gedsi?:
-    | T
-    | {
-        hasPolicy?: T;
-        notes?: T;
-      };
+  submittedByEmail?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -785,20 +674,10 @@ export interface AgreementsSelect<T extends boolean = true> {
  * via the `definition` "dataRoomFiles_select".
  */
 export interface DataRoomFilesSelect<T extends boolean = true> {
-  venture?: T;
   category?: T;
-  notes?: T;
+  ownerEmail?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -819,25 +698,11 @@ export interface ActivityLogsSelect<T extends boolean = true> {
  * via the `definition` "documents_select".
  */
 export interface DocumentsSelect<T extends boolean = true> {
-  documentType?: T;
-  status?: T;
-  version?: T;
+  title?: T;
+  file?: T;
   uploadedBy?: T;
-  venture?: T;
-  notes?: T;
-  reviewedBy?: T;
-  reviewedAt?: T;
   updatedAt?: T;
   createdAt?: T;
-  url?: T;
-  thumbnailURL?: T;
-  filename?: T;
-  mimeType?: T;
-  filesize?: T;
-  width?: T;
-  height?: T;
-  focalX?: T;
-  focalY?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -873,14 +738,7 @@ export interface SystemSettingsSelect<T extends boolean = true> {
  */
 export interface UserSettingsSelect<T extends boolean = true> {
   user?: T;
-  notifications?:
-    | T
-    | {
-        emailAlerts?: T;
-        inApp?: T;
-        push?: T;
-        frequency?: T;
-      };
+  theme?: T;
   updatedAt?: T;
   createdAt?: T;
 }
