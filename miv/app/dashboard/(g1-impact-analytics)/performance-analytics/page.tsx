@@ -52,7 +52,7 @@ import {
   generateAIInsights,
   generateRiskAssessment,
   generateOptimizationOpportunities,
-} from "@/lib/performance-analytics-calculations"
+} from "@/app/dashboard/(g1-impact-analytics)/performance-analytics/lib/performance-analytics-calculations"
 
 export default function PerformanceAnalytics() {
   const {
@@ -286,7 +286,7 @@ export default function PerformanceAnalytics() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-4" />
@@ -298,7 +298,7 @@ export default function PerformanceAnalytics() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="p-6 space-y-6">
         {/* Enhanced Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -425,7 +425,7 @@ export default function PerformanceAnalytics() {
                   <CardDescription>Multi-metric performance over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={{}} className="h-[300px] w-full">
+                  <ChartContainer config={{}} className="h-75 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <RCLineChart data={performanceTrends}>
                         <XAxis dataKey="month" axisLine={false} tickLine={false} />
@@ -514,7 +514,7 @@ export default function PerformanceAnalytics() {
                   </div>
                   <div>
                     <h4 className="font-medium mb-4">Capital Distribution</h4>
-                    <ChartContainer config={{}} className="h-[200px] w-full">
+                    <ChartContainer config={{}} className="h-50 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <RCPieChart>
                           <Pie
@@ -550,7 +550,7 @@ export default function PerformanceAnalytics() {
                   <CardDescription>Monthly onboarding and funding trends</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={{}} className="h-[300px] w-full">
+                  <ChartContainer config={{}} className="h-75 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={performanceTrends}>
                         <XAxis dataKey="month" axisLine={false} tickLine={false} />
@@ -655,7 +655,7 @@ export default function PerformanceAnalytics() {
                   <CardDescription>Compliance progress over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={{}} className="h-[300px] w-full">
+                  <ChartContainer config={{}} className="h-75 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={performanceTrends}>
                         <XAxis dataKey="month" axisLine={false} tickLine={false} />
@@ -687,7 +687,7 @@ export default function PerformanceAnalytics() {
                   <CardDescription>Platform user adoption over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={{}} className="h-[300px] w-full">
+                  <ChartContainer config={{}} className="h-75 w-full">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={performanceTrends}>
                         <XAxis dataKey="month" axisLine={false} tickLine={false} />
@@ -759,7 +759,7 @@ export default function PerformanceAnalytics() {
           <TabsContent value="insights" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* AI Recommendations */}
-              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+              <Card className="bg-linear-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Lightbulb className="h-5 w-5 text-blue-600" />
@@ -799,7 +799,7 @@ export default function PerformanceAnalytics() {
               </Card>
 
               {/* Predictive Analytics */}
-              <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+              <Card className="bg-linear-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-purple-600" />
@@ -876,7 +876,7 @@ export default function PerformanceAnalytics() {
         </Tabs>
 
         {/* Advanced Analytics Actions */}
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+        <Card className="bg-linear-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BarChart3 className="h-5 w-5 text-blue-600" />

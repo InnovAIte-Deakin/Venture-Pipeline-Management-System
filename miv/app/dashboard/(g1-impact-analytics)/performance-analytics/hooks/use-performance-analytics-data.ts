@@ -9,7 +9,7 @@
 // reasoned about on its own ("Test polling behaviour" checklist item).
 
 import { useEffect, useState } from "react"
-import type { AnalyticsData } from "@/lib/performance-analytics-calculations"
+import type { AnalyticsData } from "@/app/dashboard/(g1-impact-analytics)/performance-analytics/lib/performance-analytics-calculations"
 
 export function usePerformanceAnalyticsData() {
   const [data, setData] = useState<AnalyticsData>({

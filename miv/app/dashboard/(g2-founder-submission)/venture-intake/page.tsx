@@ -1,7 +1,7 @@
 "use client"
 
-import { VentureIntakeForm } from "@/components/venture-intake-form"
-import { VentureGuidelines } from "./_components/venture-guidelines"
+import { VentureIntakeForm } from "@/app/dashboard/(g2-founder-submission)/venture-intake/components/venture-intake-form"
+import { VentureGuidelines } from "./components/venture-guidelines"
 
 export default function VentureIntakePage() {
   return (

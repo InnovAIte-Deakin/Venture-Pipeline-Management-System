@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ventureIntakeSchema, type VentureIntakeFormData } from '@/schemas/venture-intake-schema'
+import { ventureIntakeSchema, type VentureIntakeFormData } from '@/app/dashboard/(g2-founder-submission)/venture-intake/schemas/venture-intake-schema'
 import { FileUpload } from '@/components/ui/file-upload'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"

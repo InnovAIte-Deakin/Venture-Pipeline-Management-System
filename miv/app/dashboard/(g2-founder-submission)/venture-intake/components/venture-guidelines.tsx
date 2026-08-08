@@ -119,19 +119,19 @@ export function VentureGuidelines() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                     <p className="text-sm">Don't oversell or exaggerate your current state—honesty builds trust</p>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                     <p className="text-sm">Avoid vague descriptions—be specific about your target market and value proposition</p>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                     <p className="text-sm">Don't skip the inclusion focus—this is central to MIV's mission</p>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 flex-shrink-0" />
+                    <CheckCircle2 className="h-4 w-4 text-red-500 mt-0.5 shrink-0" />
                     <p className="text-sm">Don't select GEDSI goals just to impress—choose ones you're committed to achieving</p>
                   </div>
                 </div>
@@ -231,28 +231,28 @@ export function VentureGuidelines() {
               <CardContent>
                 <div className="space-y-3">
                   <div className="flex items-start space-x-2">
-                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-sm font-medium">IRIS+ Metrics Catalog</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Learn about impact measurement standards</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-sm font-medium">2X Criteria Guidelines</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Gender lens investing framework</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-sm font-medium">Washington Group Questions</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Disability inclusion assessment tool</p>
                     </div>
                   </div>
                   <div className="flex items-start space-x-2">
-                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 flex-shrink-0" />
+                    <FileText className="h-4 w-4 text-purple-500 mt-0.5 shrink-0" />
                     <div>
                       <p className="text-sm font-medium">Investment Readiness Checklist</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">Prepare for funding conversations</p>
