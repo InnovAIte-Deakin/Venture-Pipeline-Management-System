@@ -1,5 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { afterIntakeCreate, setDisabilityFlag } from '@/hooks/intakes'
+import { adminOnly, adminOrAnalyst } from '@/access/roles'
+import { founderVentureScopedRead, fieldAdminOnly } from '@/access/scoping'
 
 const wssOptions: { label: string; value: string }[] = [
   { label: 'No difficulty', value: 'no_difficulty' },
@@ -11,10 +13,13 @@ const wssOptions: { label: string; value: string }[] = [
 export const OnboardingIntakes: CollectionConfig = {
   slug: 'onboardingIntakes',
   access: {
-    read: ({ req }) => Boolean(req.user),
+    // Founder sees only their venture's intake; staff see all (matrix §2 / A4).
+    read: founderVentureScopedRead('venture'),
+    // Public intake form — create stays open by design.
     create: () => true,
-    update: ({ req }) => Boolean(req.user && req.user.role !== 'founder'),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    // Was `role !== 'founder'` — allowed the legacy `user` role on disability data. Staff-only now.
+    update: adminOrAnalyst,
+    delete: adminOnly,
   },
   versions: { drafts: false },
   hooks: {
@@ -27,6 +32,12 @@ export const OnboardingIntakes: CollectionConfig = {
     {
       name: 'wss',
       type: 'group',
+      // Washington Short Set — disability data. Tightest control: admin-only read/write
+      // (matrix §4). Staff-analyst read can be widened at review if GEDSI needs it.
+      access: {
+        read: fieldAdminOnly,
+        update: fieldAdminOnly,
+      },
       fields: [
         { name: 'seeing', type: 'select', required: true, options: wssOptions },
         { name: 'hearing', type: 'select', required: true, options: wssOptions },
@@ -36,7 +47,16 @@ export const OnboardingIntakes: CollectionConfig = {
         { name: 'communication', type: 'select', required: true, options: wssOptions },
       ],
     },
-    { name: 'disabilityFlag', type: 'checkbox', defaultValue: false },
+    {
+      name: 'disabilityFlag',
+      type: 'checkbox',
+      defaultValue: false,
+      // Derived from WSS by a hook — never founder-writable (matrix §4).
+      access: {
+        read: fieldAdminOnly,
+        update: fieldAdminOnly,
+      },
+    },
     {
       name: 'impactAreas',
       type: 'select',

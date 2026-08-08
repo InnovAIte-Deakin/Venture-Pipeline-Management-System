@@ -1,4 +1,6 @@
 import type { CollectionConfig } from 'payload'
+import { isAuthenticated, adminOnly } from '@/access/roles'
+import { founderOwnVenturesRead, fieldAdminOrAnalyst } from '@/access/scoping'
 
 export const Ventures: CollectionConfig = {
   slug: 'ventures',
@@ -6,10 +8,12 @@ export const Ventures: CollectionConfig = {
     useAsTitle: 'name',
   },
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: () => true,
-    update: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    // Founders see only their own venture(s); staff see all (matrix §2 / A4).
+    read: founderOwnVenturesRead,
+    // Was fully public — now requires auth (matrix A3). Confirm intake flow at review.
+    create: isAuthenticated,
+    update: adminOnly,
+    delete: adminOnly,
   },
   fields: [
     { name: 'name', type: 'text', required: true, label: 'Venture Name (EN)' },
@@ -32,6 +36,11 @@ export const Ventures: CollectionConfig = {
     {
       name: 'triageTrack',
       type: 'select',
+      // Internal staff assessment — hidden from founders (matrix §4).
+      access: {
+        read: fieldAdminOrAnalyst,
+        update: fieldAdminOrAnalyst,
+      },
       options: [
         { label: 'Unassigned', value: 'unassigned' },
         { label: 'Fast', value: 'fast' },
@@ -39,6 +48,13 @@ export const Ventures: CollectionConfig = {
       ],
       defaultValue: 'unassigned',
     },
-    { name: 'triageRationale', type: 'textarea' },
+    {
+      name: 'triageRationale',
+      type: 'textarea',
+      access: {
+        read: fieldAdminOrAnalyst,
+        update: fieldAdminOrAnalyst,
+      },
+    },
   ],
 }

@@ -1,13 +1,17 @@
 import type { CollectionConfig } from 'payload'
+import { isAuthenticated, adminOnly, adminOrAnalyst } from '@/access/roles'
+import { founderVentureScopedRead } from '@/access/scoping'
 
 export const Agreements: CollectionConfig = {
   slug: 'agreements',
   admin: { useAsTitle: 'type' },
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    // Founder sees only their venture's agreements; staff see all (matrix §2 / A4).
+    read: founderVentureScopedRead('venture'),
+    create: isAuthenticated,
+    // Was any-authenticated (A5) — any user could flip NDA/MOU status to signed/verified.
+    update: adminOrAnalyst,
+    delete: adminOnly,
   },
   fields: [
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -1,13 +1,17 @@
 import type { CollectionConfig } from 'payload'
+import { isAuthenticated } from '@/access/roles'
+import { actorScopedRead } from '@/access/scoping'
 
 export const ActivityLogs: CollectionConfig = {
   slug: 'activityLogs',
   admin: { useAsTitle: 'action' },
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
+    // Users see only their own activity; staff see all (matrix §2 / A4).
+    read: actorScopedRead,
+    create: isAuthenticated,
+    // Immutable audit trail — no updates, and no deletes even by admin (matrix A7).
     update: () => false,
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    delete: () => false,
   },
   fields: [
     { name: 'actor', type: 'relationship', relationTo: 'users' },

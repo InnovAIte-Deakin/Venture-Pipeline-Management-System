@@ -1,24 +1,25 @@
-import { anyone } from '@/access/anyone'
 import type { CollectionConfig } from 'payload'
+import { adminOnly, adminOrAnalyst } from '@/access/roles'
+import { fieldAdminOnly, selfOrStaffRead } from '@/access/scoping'
 
 export const Users: CollectionConfig = {
   slug: 'users',
 
-  // 🔐 Admin panel access control (THIS is the correct place)
+  // 🔐 Admin panel + REST/Local-API access control (RBAC matrix §2)
   access: {
-    admin: ({ req }) =>
-      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+    admin: adminOrAnalyst,
 
-    create: anyone,
+    // Closed: public self-signup is not allowed at the collection level.
+    // The vetted /api/register route creates users through a privileged, validated
+    // path, so signup still works — this just shuts the open door (matrix A1).
+    create: adminOnly,
 
-    read: ({ req }) =>
-      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+    // Staff read all; a user may read only their own record (needed for /me).
+    read: selfOrStaffRead,
 
-    update: ({ req }) =>
-      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+    update: adminOrAnalyst,
 
-    delete: ({ req }) =>
-      req.user?.role === 'admin',
+    delete: adminOnly,
   },
 
   admin: {
@@ -45,6 +46,11 @@ export const Users: CollectionConfig = {
       name: 'role',
       label: 'Role',
       type: 'select',
+      // Privilege field: only admins may write it (matrix §4 / anomaly A2 —
+      // previously any analyst could escalate themselves or a peer to admin).
+      access: {
+        update: fieldAdminOnly,
+      },
       options: [
         { label: 'Founder', value: 'founder' },
         { label: 'MIV Analyst', value: 'miv_analyst' },
