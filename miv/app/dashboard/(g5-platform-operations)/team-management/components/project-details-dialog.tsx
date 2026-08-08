@@ -4,8 +4,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
-import { formatDate, projectStatusClassName, projectStatusLabel, priorityClassName } from '@/lib/team-management/team-utils'
-import type { Project } from '@/types/team-management'
+import { formatDate, projectStatusClassName, projectStatusLabel, priorityClassName } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
+import type { Project } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 interface ProjectDetailsDialogProps {
   open: boolean

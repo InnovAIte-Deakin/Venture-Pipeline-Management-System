@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Search, Plus } from 'lucide-react'
-import { teamApi } from '@/lib/team-management/team-api'
+import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
 import { EventCard } from './event-card'
 import { EventDetailsDialog } from './event-details-dialog'
 import { EventFormDialog } from './event-form-dialog'
 import { SectionEmptyState } from './section-empty-state'
 import { SectionErrorState } from './section-error-state'
 import { SectionLoadingState } from './section-loading-state'
-import type { TeamEvent, TeamMember, UpdateTeamEventInput } from '@/types/team-management'
+import type { TeamEvent, TeamMember, UpdateTeamEventInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 export function EventsSection() {
   const [events, setEvents] = useState<TeamEvent[]>([])

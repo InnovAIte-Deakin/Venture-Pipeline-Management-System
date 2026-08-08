@@ -7,19 +7,30 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { Announcement, ProjectPriority, TeamMember, CreateAnnouncementInput, UpdateAnnouncementInput } from '@/types/team-management'
+import type { Announcement, ProjectPriority, TeamMember, CreateAnnouncementInput, UpdateAnnouncementInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 const priorities: ProjectPriority[] = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
 
 interface AnnouncementFormDialogProps {
   open: boolean
-  announcement?: Announcement | CreateAnnouncementInput | UpdateAnnouncementInput | null
+  announcement?: Announcement | null
   members: TeamMember[]
   loading?: boolean
   error?: string
   onOpenChange: (open: boolean) => void
   onSubmit: (payload: CreateAnnouncementInput | UpdateAnnouncementInput) => Promise<void>
 }
+
+const toDateInputValue = (date: string | null | undefined) => date?.split('T')[0] ?? undefined
+
+const getInitialFormState = (announcement?: Announcement | null): CreateAnnouncementInput => ({
+  title: announcement?.title ?? '',
+  content: announcement?.content ?? '',
+  priority: announcement?.priority ?? 'MEDIUM',
+  isActive: announcement?.isActive ?? true,
+  expiresAt: toDateInputValue(announcement?.expiresAt),
+  authorId: announcement?.author.id ?? '',
+})
 
 export function AnnouncementFormDialog({
   open,
@@ -30,24 +41,12 @@ export function AnnouncementFormDialog({
   onOpenChange,
   onSubmit,
 }: AnnouncementFormDialogProps) {
-  const [formState, setFormState] = React.useState<CreateAnnouncementInput>({
-    title: announcement?.title ?? '',
-    content: announcement?.content ?? '',
-    priority: announcement?.priority ?? 'MEDIUM',
-    isActive: announcement?.isActive ?? true,
-    expiresAt: announcement?.expiresAt ?? undefined,
-    authorId: 'authorId' in announcement ? announcement.authorId ?? '' : '',
-  })
+  const [formState, setFormState] = React.useState<CreateAnnouncementInput>(() =>
+    getInitialFormState(announcement),
+  )
 
   React.useEffect(() => {
-    setFormState({
-      title: announcement?.title ?? '',
-      content: announcement?.content ?? '',
-      priority: announcement?.priority ?? 'MEDIUM',
-      isActive: announcement?.isActive ?? true,
-      expiresAt: announcement?.expiresAt ?? undefined,
-      authorId: 'authorId' in announcement ? announcement.authorId ?? '' : '',
-    })
+    setFormState(getInitialFormState(announcement))
   }, [announcement])
 
   const handleField = (key: keyof CreateAnnouncementInput, value: CreateAnnouncementInput[keyof CreateAnnouncementInput]) => {
@@ -55,7 +54,7 @@ export function AnnouncementFormDialog({
   }
 
   const handleSubmit = async () => {
-    if (announcement && 'id' in announcement) {
+    if (announcement) {
       const payload: UpdateAnnouncementInput = {
         title: formState.title,
         content: formState.content,

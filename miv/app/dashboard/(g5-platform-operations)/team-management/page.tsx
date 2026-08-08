@@ -2,11 +2,11 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Briefcase, CalendarDays, MessageSquare, Users } from 'lucide-react'
-import { AnnouncementsSection } from '@/components/team-management/announcements-section'
-import { EventsSection } from '@/components/team-management/events-section'
-import { MembersSection } from '@/components/team-management/members-section'
-import { ProjectsSection } from '@/components/team-management/projects-section'
-import { TeamManagementHeader } from '@/components/team-management/team-management-header'
+import { AnnouncementsSection } from '@/app/dashboard/(g5-platform-operations)/team-management/components/announcements-section'
+import { EventsSection } from '@/app/dashboard/(g5-platform-operations)/team-management/components/events-section'
+import { MembersSection } from '@/app/dashboard/(g5-platform-operations)/team-management/components/members-section'
+import { ProjectsSection } from '@/app/dashboard/(g5-platform-operations)/team-management/components/projects-section'
+import { TeamManagementHeader } from '@/app/dashboard/(g5-platform-operations)/team-management/components/team-management-header'
 
 export default function TeamManagementPage() {
   return (
@@ -15,7 +15,7 @@ export default function TeamManagementPage() {
         <TeamManagementHeader />
 
         <Tabs defaultValue="members" className="w-full">
-          <TabsList className="mb-6 grid w-full grid-cols-2 gap-2 bg-transparent p-0 sm:grid-cols-4">
+          <TabsList className="mb-8 grid h-auto w-full grid-cols-2 gap-2 bg-transparent p-0 sm:mb-6 sm:grid-cols-4">
             <TabsTrigger value="members" className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm hover:bg-slate-50 data-[state=active]:border-teal-500 data-[state=active]:bg-teal-50 data-[state=active]:text-teal-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
               <Users className="mr-2 h-4 w-4" />
               Members
@@ -34,19 +34,19 @@ export default function TeamManagementPage() {
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="members" className="mt-0">
+          <TabsContent value="members" className="mt-2 sm:mt-0">
             <MembersSection />
           </TabsContent>
 
-          <TabsContent value="projects" className="mt-0">
+          <TabsContent value="projects" className="mt-2 sm:mt-0">
             <ProjectsSection />
           </TabsContent>
 
-          <TabsContent value="communication" className="mt-0">
+          <TabsContent value="communication" className="mt-2 sm:mt-0">
             <AnnouncementsSection />
           </TabsContent>
 
-          <TabsContent value="calendar" className="mt-0">
+          <TabsContent value="calendar" className="mt-2 sm:mt-0">
             <EventsSection />
           </TabsContent>
         </Tabs>

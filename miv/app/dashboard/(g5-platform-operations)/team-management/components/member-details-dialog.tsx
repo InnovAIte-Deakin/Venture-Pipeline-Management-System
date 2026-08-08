@@ -5,8 +5,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Mail, Award, Briefcase } from 'lucide-react'
-import { formatDate, getInitials } from '@/lib/team-management/team-utils'
-import type { TeamMember } from '@/types/team-management'
+import { formatDate, getInitials } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
+import type { TeamMember } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 interface MemberDetailsDialogProps {
   open: boolean

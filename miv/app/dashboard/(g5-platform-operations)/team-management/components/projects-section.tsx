@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Search, Plus, Filter } from 'lucide-react'
-import { teamApi } from '@/lib/team-management/team-api'
+import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
 import { ProjectCard } from './project-card'
 import { ProjectDetailsDialog } from './project-details-dialog'
 import { ProjectFormDialog } from './project-form-dialog'
 import { SectionEmptyState } from './section-empty-state'
 import { SectionErrorState } from './section-error-state'
 import { SectionLoadingState } from './section-loading-state'
-import type { Project, TeamMember, UpdateProjectInput } from '@/types/team-management'
+import type { Project, TeamMember, UpdateProjectInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 export function ProjectsSection() {
   const [projects, setProjects] = useState<Project[]>([])

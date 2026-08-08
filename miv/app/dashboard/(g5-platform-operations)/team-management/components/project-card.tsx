@@ -1,8 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Briefcase } from 'lucide-react'
-import type { Project } from '@/types/team-management'
-import { projectStatusClassName, projectStatusLabel, priorityClassName } from '@/lib/team-management/team-utils'
+import type { Project } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
+import { projectStatusClassName, projectStatusLabel, priorityClassName } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
 
 interface ProjectCardProps {
   project: Project

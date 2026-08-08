@@ -8,19 +8,34 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { TeamEvent, TeamMember, CreateTeamEventInput, UpdateTeamEventInput, EventFrequency, TeamEventRecurrence } from '@/types/team-management'
+import type { TeamEvent, TeamMember, CreateTeamEventInput, UpdateTeamEventInput, EventFrequency, TeamEventRecurrence } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 const recurrenceFrequencies: EventFrequency[] = ['DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY']
 
 interface EventFormDialogProps {
   open: boolean
-  event?: TeamEvent | CreateTeamEventInput | UpdateTeamEventInput | null
+  event?: TeamEvent | null
   members: TeamMember[]
   loading?: boolean
   error?: string
   onOpenChange: (open: boolean) => void
   onSubmit: (payload: CreateTeamEventInput | UpdateTeamEventInput) => Promise<void>
 }
+
+const toDateInputValue = (date: string | null | undefined) => date?.split('T')[0] ?? ''
+
+const getInitialFormState = (event?: TeamEvent | null): CreateTeamEventInput => ({
+  title: event?.title ?? '',
+  description: event?.description ?? undefined,
+  date: toDateInputValue(event?.date),
+  time: event?.time ?? undefined,
+  location: event?.location ?? undefined,
+  isAllDay: event?.isAllDay ?? false,
+  isRecurring: event?.isRecurring ?? false,
+  recurrence: event?.recurrence ?? undefined,
+  organizerId: event?.organizer.id ?? '',
+  attendeeIds: event?.attendees.map((attendee) => attendee.id) ?? undefined,
+})
 
 export function EventFormDialog({
   open,
@@ -31,32 +46,12 @@ export function EventFormDialog({
   onOpenChange,
   onSubmit,
 }: EventFormDialogProps) {
-  const [formState, setFormState] = React.useState<CreateTeamEventInput>({
-    title: event?.title ?? '',
-    description: event?.description ?? undefined,
-    date: event?.date ?? '',
-    time: event?.time ?? undefined,
-    location: event?.location ?? undefined,
-    isAllDay: event?.isAllDay ?? false,
-    isRecurring: event?.isRecurring ?? false,
-    recurrence: event?.recurrence ?? undefined,
-    organizerId: 'organizerId' in event ? event.organizerId ?? '' : '',
-    attendeeIds: 'attendeeIds' in event ? event.attendeeIds ?? undefined : undefined,
-  })
+  const [formState, setFormState] = React.useState<CreateTeamEventInput>(() =>
+    getInitialFormState(event),
+  )
 
   React.useEffect(() => {
-    setFormState({
-      title: event?.title ?? '',
-      description: event?.description ?? undefined,
-      date: event?.date ?? '',
-      time: event?.time ?? undefined,
-      location: event?.location ?? undefined,
-      isAllDay: event?.isAllDay ?? false,
-      isRecurring: event?.isRecurring ?? false,
-      recurrence: event?.recurrence ?? undefined,
-      organizerId: 'organizerId' in event ? event.organizerId ?? '' : '',
-      attendeeIds: 'attendeeIds' in event ? event.attendeeIds ?? undefined : undefined,
-    })
+    setFormState(getInitialFormState(event))
   }, [event])
 
   const handleField = (key: keyof CreateTeamEventInput, value: CreateTeamEventInput[keyof CreateTeamEventInput] | TeamEventRecurrence | string[] | undefined) => {
@@ -69,7 +64,7 @@ export function EventFormDialog({
   }
 
   const handleSubmit = async () => {
-    if (event && 'id' in event) {
+    if (event) {
       const payload: UpdateTeamEventInput = {
         title: formState.title,
         description: formState.description,

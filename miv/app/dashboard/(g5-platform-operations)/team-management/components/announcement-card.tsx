@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import type { Announcement } from '@/types/team-management'
-import { formatDate } from '@/lib/team-management/team-utils'
+import type { Announcement } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
+import { formatDate } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
 
 interface AnnouncementCardProps {
   announcement: Announcement

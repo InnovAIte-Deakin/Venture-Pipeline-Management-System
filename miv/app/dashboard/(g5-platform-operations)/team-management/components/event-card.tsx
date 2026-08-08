@@ -1,8 +1,8 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { CalendarDays } from 'lucide-react'
-import type { TeamEvent } from '@/types/team-management'
-import { formatDateTime } from '@/lib/team-management/team-utils'
+import type { TeamEvent } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
+import { formatDateTime } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
 
 interface EventCardProps {
   event: TeamEvent

@@ -3,8 +3,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import type { Announcement } from '@/types/team-management'
-import { formatDate } from '@/lib/team-management/team-utils'
+import type { Announcement } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
+import { formatDate } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
 
 interface AnnouncementDetailsDialogProps {
   open: boolean

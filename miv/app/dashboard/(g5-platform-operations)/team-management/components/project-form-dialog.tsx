@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import type { Project, TeamMember, ProjectStatus, ProjectPriority, UpdateProjectInput } from '@/types/team-management'
+import type { Project, TeamMember, ProjectStatus, ProjectPriority, UpdateProjectInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 interface ProjectFormDialogProps {
   open: boolean

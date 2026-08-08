@@ -3,8 +3,8 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { formatDateTime } from '@/lib/team-management/team-utils'
-import type { TeamEvent } from '@/types/team-management'
+import { formatDateTime } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-utils'
+import type { TeamEvent } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 interface EventDetailsDialogProps {
   open: boolean

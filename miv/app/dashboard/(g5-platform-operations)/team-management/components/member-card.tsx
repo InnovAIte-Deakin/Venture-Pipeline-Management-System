@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
-import type { TeamMember } from '@/types/team-management'
+import type { TeamMember } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 interface MemberCardProps {
   member: TeamMember

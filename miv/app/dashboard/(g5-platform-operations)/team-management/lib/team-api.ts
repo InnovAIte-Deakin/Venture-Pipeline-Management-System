@@ -13,7 +13,7 @@ import type {
   UpdateProjectInput,
   UpdateTeamEventInput,
   UpdateTeamMemberInput,
-} from '@/types/team-management'
+} from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 export class ApiError extends Error {
   public readonly status: number

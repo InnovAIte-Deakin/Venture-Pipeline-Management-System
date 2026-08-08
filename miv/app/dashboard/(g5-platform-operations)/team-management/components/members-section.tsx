@@ -5,14 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Search, Plus } from 'lucide-react'
-import { teamApi } from '@/lib/team-management/team-api'
+import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
 import { MemberCard } from './member-card'
 import { MemberDetailsDialog } from './member-details-dialog'
 import { MemberFormDialog } from './member-form-dialog'
 import { SectionEmptyState } from './section-empty-state'
 import { SectionErrorState } from './section-error-state'
 import { SectionLoadingState } from './section-loading-state'
-import type { TeamMember, TeamMemberRole, UpdateTeamMemberInput } from '@/types/team-management'
+import type { TeamMember, TeamMemberRole, UpdateTeamMemberInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 const roles: TeamMemberRole[] = [
   'ADMIN',

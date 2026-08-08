@@ -207,7 +207,6 @@ export interface TeamPagination {
   pages: number
 }
 
-export interface PaginatedResponse<T> {
+export type PaginatedResponse<K extends string, T> = {
   pagination: TeamPagination
-  [key: string]: T
-}
+} & Record<K, T>

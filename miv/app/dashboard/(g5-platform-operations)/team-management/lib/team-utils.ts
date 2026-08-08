@@ -3,7 +3,7 @@ import type {
   ProjectStatus,
   TeamEvent,
   TeamMember,
-} from '@/types/team-management'
+} from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
 
 export const projectStatusLabel = (status: ProjectStatus) => {
   switch (status) {
