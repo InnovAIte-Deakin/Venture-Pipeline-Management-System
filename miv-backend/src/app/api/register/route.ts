@@ -6,10 +6,14 @@ import type { User } from "@/payload-types";
 
 // Validation schema for registration
 const RegisterSchema = z.object({
-  firstName: z.string().min(1, "First name is required"),
-  lastName: z.string().min(1, "Last name is required"),
-  email: z.string().email("Valid email is required"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  firstName: z.string().min(1, "First name is required").regex(/^[A-Za-z]+$/, "First name should contain only letters"),
+  lastName: z.string().min(1, "Last name is required").regex(/^[A-Za-z]+$/, "Last name should contain only letters"),
+  email: z.string().email("Valid email is required").refine((val) => !val.endsWith(".") && !val.endsWith("@"),"Email cannot end with '.' or '@'"),
+  password: z.string().min(8, "Password must be at least 8 characters")
+  .regex(/[A-Z]/, "Must include at least one uppercase letter")
+  .regex(/[a-z]/, "Must include at least one lowercase letter")
+  .regex(/[0-9]/, "Must include at least one number")
+  .regex(/[^A-Za-z0-9]/, "Must include a special character"),
 });
 
 export async function POST(req: NextRequest) {
