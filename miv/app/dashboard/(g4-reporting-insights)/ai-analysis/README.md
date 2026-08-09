@@ -31,6 +31,11 @@ Tailwind's `lg` breakpoint:
 - Mobile/tablet (`< 1024px`) uses dedicated mobile components, vertical form
   steps, compact cards, touch-friendly controls and a two-by-two tab layout.
 
+The mobile presentation follows the approved VPMS visual reference supplied by
+the frontend stream: primary teal `#138075`, secondary orange `#F4A261`,
+tertiary teal `#2A9D8F`, neutral `#F8F9FA`, and a Hanken Grotesk-compatible
+font stack. Desktop presentation remains unchanged.
+
 The two presentations share the same `useAIAnalysis` controller, types and
 calculation utilities, so the feature behaviour remains consistent without
 mixing desktop and mobile markup.

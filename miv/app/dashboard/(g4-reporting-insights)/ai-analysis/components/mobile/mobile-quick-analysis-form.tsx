@@ -42,32 +42,38 @@ export function MobileQuickAnalysisForm({
   startAnalysis,
 }: MobileQuickAnalysisFormProps) {
   return (
-    <Card id="quick-analysis" className="overflow-hidden rounded-2xl shadow-sm">
-      <CardHeader className="border-b bg-slate-50/80 p-4 dark:bg-slate-900/50">
-        <CardTitle className="flex items-center gap-2 text-lg">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-600 text-white">
+    <Card
+      id="quick-analysis"
+      className="overflow-hidden rounded-2xl border-[#138075]/20 bg-white shadow-sm"
+    >
+      <CardHeader className="border-b border-[#138075]/10 bg-[#2A9D8F]/10 p-4">
+        <CardTitle className="flex items-center gap-2 text-lg text-slate-950">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#138075] text-white">
             <Sparkles className="h-4 w-4" />
           </span>
           <span>Quick Analysis</span>
         </CardTitle>
-        <CardDescription>
+        <CardDescription className="text-slate-600">
           Select a venture and the insight you want to generate.
         </CardDescription>
       </CardHeader>
 
       <CardContent className="space-y-4 p-4">
-        <div className="rounded-xl border bg-background p-3">
+        <div className="rounded-xl border border-[#138075]/20 bg-[#F8F9FA] p-3">
           <label
             htmlFor="mobile-analysis-venture"
             className="mb-2 flex items-center gap-2 text-sm font-medium"
           >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#138075] text-xs font-bold text-white">
               1
             </span>
             Select Venture
           </label>
           <Select value={selectedVenture} onValueChange={setSelectedVenture}>
-            <SelectTrigger id="mobile-analysis-venture" className="h-11 w-full">
+            <SelectTrigger
+              id="mobile-analysis-venture"
+              className="h-11 w-full border-slate-300 bg-white focus:ring-[#138075]"
+            >
               <SelectValue placeholder="Choose a venture" />
             </SelectTrigger>
             <SelectContent>
@@ -80,12 +86,12 @@ export function MobileQuickAnalysisForm({
           </Select>
         </div>
 
-        <div className="rounded-xl border bg-background p-3">
+        <div className="rounded-xl border border-[#138075]/20 bg-[#F8F9FA] p-3">
           <label
             htmlFor="mobile-analysis-type"
             className="mb-2 flex items-center gap-2 text-sm font-medium"
           >
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100 text-xs font-bold text-blue-700">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#138075] text-xs font-bold text-white">
               2
             </span>
             Analysis Type
@@ -94,7 +100,10 @@ export function MobileQuickAnalysisForm({
             value={selectedAnalysisType}
             onValueChange={setSelectedAnalysisType}
           >
-            <SelectTrigger id="mobile-analysis-type" className="h-11 w-full">
+            <SelectTrigger
+              id="mobile-analysis-type"
+              className="h-11 w-full border-slate-300 bg-white focus:ring-[#138075]"
+            >
               <SelectValue placeholder="Choose analysis type" />
             </SelectTrigger>
             <SelectContent>
@@ -115,7 +124,7 @@ export function MobileQuickAnalysisForm({
             htmlFor="mobile-analysis-prompt"
             className="mb-2 block text-sm font-medium"
           >
-            Custom Prompt <span className="text-muted-foreground">(Optional)</span>
+            Custom Prompt <span className="font-normal text-[#9a5a1b]">(Optional)</span>
           </label>
           <Textarea
             id="mobile-analysis-prompt"
@@ -123,7 +132,7 @@ export function MobileQuickAnalysisForm({
             value={customPrompt}
             onChange={(event) => setCustomPrompt(event.target.value)}
             rows={3}
-            className="min-h-24 resize-none rounded-xl"
+            className="min-h-24 resize-none rounded-xl border-slate-300 bg-[#F8F9FA] focus-visible:ring-[#138075]"
           />
         </div>
 
@@ -131,7 +140,7 @@ export function MobileQuickAnalysisForm({
           type="button"
           onClick={startAnalysis}
           disabled={!selectedVenture || !selectedAnalysisType || isAnalyzing}
-          className="h-11 w-full rounded-xl"
+          className="h-11 w-full rounded-xl bg-[#138075] text-white shadow-sm hover:bg-[#0f6a62] disabled:bg-slate-300 disabled:text-slate-600"
         >
           {isAnalyzing ? (
             <>

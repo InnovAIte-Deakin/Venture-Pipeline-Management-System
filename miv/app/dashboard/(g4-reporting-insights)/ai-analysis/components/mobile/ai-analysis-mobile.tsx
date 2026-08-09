@@ -11,7 +11,10 @@ export function AIAnalysisMobile({
   controller: UseAIAnalysisResult
 }) {
   return (
-    <div className="space-y-5 pb-4">
+    <div
+      className="space-y-4 pb-4"
+      style={{ fontFamily: '"Hanken Grotesk", Geist, sans-serif' }}
+    >
       <MobileAIAnalysisHeader />
       <MobileQuickAnalysisForm {...controller} />
       <MobileAnalysisResults

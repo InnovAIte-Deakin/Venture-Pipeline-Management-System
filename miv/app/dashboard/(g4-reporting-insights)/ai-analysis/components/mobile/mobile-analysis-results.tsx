@@ -37,17 +37,29 @@ export function MobileAnalysisResults({
       {error && <AnalysisErrorAlert error={error} onRetry={onRetry} />}
 
       <Tabs defaultValue="all" className="space-y-4">
-        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-xl p-1">
-          <TabsTrigger value="all" className="py-2 text-xs">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 rounded-2xl border border-[#138075]/15 bg-white p-1.5 shadow-sm">
+          <TabsTrigger
+            value="all"
+            className="rounded-xl py-2.5 text-xs text-slate-600 data-[state=active]:bg-[#138075] data-[state=active]:text-white"
+          >
             All Analyses
           </TabsTrigger>
-          <TabsTrigger value="completed" className="py-2 text-xs">
+          <TabsTrigger
+            value="completed"
+            className="rounded-xl py-2.5 text-xs text-slate-600 data-[state=active]:bg-[#138075] data-[state=active]:text-white"
+          >
             Completed
           </TabsTrigger>
-          <TabsTrigger value="processing" className="py-2 text-xs">
+          <TabsTrigger
+            value="processing"
+            className="rounded-xl py-2.5 text-xs text-slate-600 data-[state=active]:bg-[#138075] data-[state=active]:text-white"
+          >
             Processing
           </TabsTrigger>
-          <TabsTrigger value="insights" className="py-2 text-xs">
+          <TabsTrigger
+            value="insights"
+            className="rounded-xl py-2.5 text-xs text-slate-600 data-[state=active]:bg-[#138075] data-[state=active]:text-white"
+          >
             Key Insights
           </TabsTrigger>
         </TabsList>
