@@ -10,6 +10,8 @@ This guide explains how to set up, run, and maintain the Venture Pipeline Manage
 
 All instructions reflect the **current, official implementation provided by the development team** and are aligned with the project README.
 
+> **Prerequisite — read this first:** VPMS's backend depends on Docker (running MongoDB and PostgreSQL as containers) and will not work without it. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running before attempting any setup steps below. Skipping this is the single most common cause of "nothing works" for new contributors.
+
 ---
 
 ## 2. Repository Structure

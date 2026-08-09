@@ -133,11 +133,11 @@ export async function GET(request: NextRequest) {
     const workflowAutomationRate = totalWorkflows > 0 ? Math.round((activeWorkflows / totalWorkflows) * 100) : 0
     
     // Calculate success rates
-    const successfulRuns = workflowRuns.filter(run => run.status === 'SUCCEEDED').length
+    const successfulRuns = workflowRuns.filter((run: { status: string }) => run.status === 'SUCCEEDED').length
     const workflowSuccessRate = workflowRuns.length > 0 ? Math.round((successfulRuns / workflowRuns.length) * 100) : 0
 
     // Activity analysis
-    const activityByType = recentActivities.reduce((acc: any, activity) => {
+      const activityByType = recentActivities.reduce((acc: any, activity: { type?: string }) => {
       const type = activity.type || 'OTHER'
       acc[type] = (acc[type] || 0) + 1
       return acc
@@ -247,7 +247,7 @@ async function getTopSectors() {
 
     const sectorStats: Record<string, { count: number, funded: number, capital: number }> = {}
     
-    ventures.forEach(v => {
+    ventures.forEach((v: { sector: string | null; stage: string | null; fundingRaised: number | null }) => {
       const sector = v.sector || 'Other'
       if (!sectorStats[sector]) {
         sectorStats[sector] = { count: 0, funded: 0, capital: 0 }

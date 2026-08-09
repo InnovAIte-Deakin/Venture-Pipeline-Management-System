@@ -191,7 +191,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper functions
-function inferDocumentType(fileName: string, mimeType: string): string {
+function inferDocumentType(fileName: string, mimeType: string): "OTHER" | "PITCH_DECK" | "FINANCIAL_STATEMENTS" | "BUSINESS_PLAN" | "LEGAL_DOCUMENTS" | "MARKET_RESEARCH" | "TEAM_PROFILE" {
   const extension = fileName.split('.').pop()?.toLowerCase();
   const type = mimeType.toLowerCase();
 
