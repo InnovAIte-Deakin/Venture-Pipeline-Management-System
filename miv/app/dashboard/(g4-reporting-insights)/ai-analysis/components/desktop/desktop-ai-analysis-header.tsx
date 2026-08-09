@@ -1,9 +1,10 @@
 import { Brain } from "lucide-react"
 import { Button } from "@/components/ui/button"
 
-export function AIAnalysisHeader() {
+/** Desktop header intentionally preserves the existing wide-screen design. */
+export function DesktopAIAnalysisHeader() {
   return (
-    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex items-center justify-between">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">AI Analysis</h1>
         <p className="text-muted-foreground">
@@ -11,7 +12,7 @@ export function AIAnalysisHeader() {
           risk assessment
         </p>
       </div>
-      <Button type="button" className="w-full gap-2 sm:w-auto">
+      <Button type="button" className="gap-2">
         <Brain className="h-4 w-4" />
         <span>New Analysis</span>
       </Button>

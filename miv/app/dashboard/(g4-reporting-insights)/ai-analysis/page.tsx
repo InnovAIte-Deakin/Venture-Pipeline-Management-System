@@ -1,47 +1,22 @@
 "use client"
 
-import { AIAnalysisHeader } from "./components/ai-analysis-header"
-import { AnalysisResults } from "./components/analysis-results"
-import { QuickAnalysisForm } from "./components/quick-analysis-form"
+import { AIAnalysisDesktop } from "./components/desktop/ai-analysis-desktop"
+import { AIAnalysisMobile } from "./components/mobile/ai-analysis-mobile"
+import { AnalysisLoadingState } from "./components/shared/analysis-feedback"
 import { useAIAnalysis } from "./hooks/use-ai-analysis"
+import { useViewport } from "./hooks/use-viewport"
 
 export default function AIAnalysisPage() {
-  const {
-    analyses,
-    loading,
-    error,
-    selectedVenture,
-    selectedAnalysisType,
-    customPrompt,
-    isAnalyzing,
-    setSelectedVenture,
-    setSelectedAnalysisType,
-    setCustomPrompt,
-    startAnalysis,
-    retry,
-  } = useAIAnalysis()
+  const controller = useAIAnalysis()
+  const { isMobile, isReady } = useViewport()
 
-  return (
-    <div className="space-y-6">
-      <AIAnalysisHeader />
+  if (!isReady || controller.loading) {
+    return <AnalysisLoadingState />
+  }
 
-      <QuickAnalysisForm
-        selectedVenture={selectedVenture}
-        selectedAnalysisType={selectedAnalysisType}
-        customPrompt={customPrompt}
-        isAnalyzing={isAnalyzing}
-        onVentureChange={setSelectedVenture}
-        onAnalysisTypeChange={setSelectedAnalysisType}
-        onCustomPromptChange={setCustomPrompt}
-        onStartAnalysis={startAnalysis}
-      />
-
-      <AnalysisResults
-        analyses={analyses}
-        loading={loading}
-        error={error}
-        onRetry={retry}
-      />
-    </div>
+  return isMobile ? (
+    <AIAnalysisMobile controller={controller} />
+  ) : (
+    <AIAnalysisDesktop controller={controller} />
   )
 }

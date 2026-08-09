@@ -15,32 +15,32 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import {
-  ANALYSIS_TYPES,
-  QUICK_ANALYSIS_VENTURES,
-} from "../data/ai-analysis-data"
+import { ANALYSIS_TYPES } from "../../constants/analysis-types"
+import { QUICK_ANALYSIS_VENTURES } from "../../mock-data/ventures.mock-data"
+import type { UseAIAnalysisResult } from "../../hooks/use-ai-analysis"
 
-interface QuickAnalysisFormProps {
-  selectedVenture: string
-  selectedAnalysisType: string
-  customPrompt: string
-  isAnalyzing: boolean
-  onVentureChange: (value: string) => void
-  onAnalysisTypeChange: (value: string) => void
-  onCustomPromptChange: (value: string) => void
-  onStartAnalysis: () => void
-}
+type DesktopQuickAnalysisFormProps = Pick<
+  UseAIAnalysisResult,
+  | "selectedVenture"
+  | "selectedAnalysisType"
+  | "customPrompt"
+  | "isAnalyzing"
+  | "setSelectedVenture"
+  | "setSelectedAnalysisType"
+  | "setCustomPrompt"
+  | "startAnalysis"
+>
 
-export function QuickAnalysisForm({
+export function DesktopQuickAnalysisForm({
   selectedVenture,
   selectedAnalysisType,
   customPrompt,
   isAnalyzing,
-  onVentureChange,
-  onAnalysisTypeChange,
-  onCustomPromptChange,
-  onStartAnalysis,
-}: QuickAnalysisFormProps) {
+  setSelectedVenture,
+  setSelectedAnalysisType,
+  setCustomPrompt,
+  startAnalysis,
+}: DesktopQuickAnalysisFormProps) {
   return (
     <Card id="quick-analysis">
       <CardHeader>
@@ -53,16 +53,16 @@ export function QuickAnalysisForm({
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="grid grid-cols-3 gap-4">
           <div>
             <label
-              htmlFor="analysis-venture"
+              htmlFor="desktop-analysis-venture"
               className="mb-2 block text-sm font-medium"
             >
               Select Venture
             </label>
-            <Select value={selectedVenture} onValueChange={onVentureChange}>
-              <SelectTrigger id="analysis-venture" className="w-full">
+            <Select value={selectedVenture} onValueChange={setSelectedVenture}>
+              <SelectTrigger id="desktop-analysis-venture" className="w-full">
                 <SelectValue placeholder="Choose a venture" />
               </SelectTrigger>
               <SelectContent>
@@ -77,16 +77,16 @@ export function QuickAnalysisForm({
 
           <div>
             <label
-              htmlFor="analysis-type"
+              htmlFor="desktop-analysis-type"
               className="mb-2 block text-sm font-medium"
             >
               Analysis Type
             </label>
             <Select
               value={selectedAnalysisType}
-              onValueChange={onAnalysisTypeChange}
+              onValueChange={setSelectedAnalysisType}
             >
-              <SelectTrigger id="analysis-type" className="w-full">
+              <SelectTrigger id="desktop-analysis-type" className="w-full">
                 <SelectValue placeholder="Choose analysis type" />
               </SelectTrigger>
               <SelectContent>
@@ -105,7 +105,7 @@ export function QuickAnalysisForm({
           <div className="flex items-end">
             <Button
               type="button"
-              onClick={onStartAnalysis}
+              onClick={startAnalysis}
               disabled={
                 !selectedVenture || !selectedAnalysisType || isAnalyzing
               }
@@ -128,16 +128,16 @@ export function QuickAnalysisForm({
 
         <div>
           <label
-            htmlFor="analysis-prompt"
+            htmlFor="desktop-analysis-prompt"
             className="mb-2 block text-sm font-medium"
           >
             Custom Prompt (Optional)
           </label>
           <Textarea
-            id="analysis-prompt"
+            id="desktop-analysis-prompt"
             placeholder="Add specific questions or focus areas for the analysis..."
             value={customPrompt}
-            onChange={(event) => onCustomPromptChange(event.target.value)}
+            onChange={(event) => setCustomPrompt(event.target.value)}
             rows={3}
           />
         </div>

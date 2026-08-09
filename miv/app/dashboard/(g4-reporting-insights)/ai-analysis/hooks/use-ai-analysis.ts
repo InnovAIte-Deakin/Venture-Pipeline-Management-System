@@ -1,10 +1,8 @@
 "use client"
 
 import { useCallback, useEffect, useState } from "react"
-import {
-  ANALYSIS_TYPES,
-  QUICK_ANALYSIS_VENTURES,
-} from "../data/ai-analysis-data"
+import { ANALYSIS_TYPES } from "../constants/analysis-types"
+import { QUICK_ANALYSIS_VENTURES } from "../mock-data/ventures.mock-data"
 import type {
   AIAnalysis,
   VenturesResponse,
@@ -105,3 +103,5 @@ export function useAIAnalysis() {
     retry: fetchAnalyses,
   }
 }
+
+export type UseAIAnalysisResult = ReturnType<typeof useAIAnalysis>
