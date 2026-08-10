@@ -1,10 +1,11 @@
 import { existsSync } from 'node:fs'
+import { dirname, resolve } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { config } from 'dotenv'
 
-if (!existsSync('.env.test')) {
-  throw new Error(
-    '.env.test is missing. Copy .env.test.example and point it at a throwaway database.'
-  )
-}
+const setupDirectory = dirname(fileURLToPath(import.meta.url))
+const envPath = resolve(setupDirectory, '.env.test')
 
-config({ path: '.env.test', override: true })
+if (existsSync(envPath)) {
+  config({ path: envPath, override: true })
+}
