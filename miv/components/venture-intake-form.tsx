@@ -79,6 +79,14 @@ const gedsiGoals = [
   'OI.8 - Healthcare access enhanced'
 ]
 
+const stepFields: Record<number, Array<keyof VentureIntakeFormData>> = {
+  1: ['name', 'sector', 'location', 'contactEmail', 'contactPhone'],
+  2: ['founderTypes', 'teamSize', 'foundingYear', 'pitchSummary', 'inclusionFocus'],
+  3: ['targetMarket', 'revenueModel', 'challenges', 'supportNeeded', 'timeline'],
+  4: ['operationalReadiness', 'capitalReadiness'],
+  5: ['washingtonShortSet', 'disabilityInclusion'],
+}
+
 export function VentureIntakeForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -90,18 +98,40 @@ export function VentureIntakeForm() {
     handleSubmit,
     watch,
     setValue,
+    trigger,
     formState: { errors, isValid },
   } = useForm<VentureIntakeFormData>({
     resolver: zodResolver(ventureIntakeSchema),
     mode: 'onChange',
+    defaultValues: {
+      operationalReadiness: {
+        businessPlan: false,
+        financialProjections: false,
+        legalStructure: false,
+        teamComposition: false,
+        marketResearch: false,
+      },
+      capitalReadiness: {
+        pitchDeck: false,
+        financialStatements: false,
+        investorMaterials: false,
+        dueDiligence: false,
+        fundingHistory: false,
+      },
+    },
   })
 
   const watchedValues = watch()
 
   const progress = (currentStep / steps.length) * 100
 
-  const nextStep = () => {
-    if (currentStep < steps.length) {
+  const handleNext = async () => {
+    const fields = stepFields[currentStep]
+    const isStepValid = fields
+      ? await trigger(fields, { shouldFocus: true })
+      : true
+
+    if (isStepValid && currentStep < steps.length) {
       setCurrentStep(currentStep + 1)
     }
   }
@@ -1013,8 +1043,7 @@ export function VentureIntakeForm() {
               {currentStep < steps.length ? (
                 <Button
                   type="button"
-                  onClick={nextStep}
-                  disabled={isValid}
+                  onClick={handleNext}
                 >
                   Next
                   <ChevronRight className="h-4 w-4 ml-2" />
@@ -1023,7 +1052,7 @@ export function VentureIntakeForm() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || !isValid}
-                  className="bg-linear-to-rrom-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-linear-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-600 disabled:opacity-100 dark:disabled:from-slate-700 dark:disabled:to-slate-700 dark:disabled:text-slate-300"
                 >
                   {isSubmitting ? (
                     <>
