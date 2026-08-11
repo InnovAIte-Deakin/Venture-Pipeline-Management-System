@@ -59,7 +59,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
       {/* Innovative Header with Digital Twin Toggle */}
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent sm:text-3xl">
+          <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
             Regenerative Impact Dashboard
           </h1>
           <p className="text-muted-foreground">
@@ -84,7 +84,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
             <RefreshCw className="mr-2 h-4 w-4" />
             Sync Data
           </Button>
-          <Button className="w-full bg-gradient-to-r from-green-600 to-blue-600 hover:from-green-700 hover:to-blue-700 lg:w-auto">
+          <Button className="w-full lg:w-auto">
             <Sparkles className="mr-2 h-4 w-4" />
             AI Insights
           </Button>
@@ -103,11 +103,11 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
 
       {/* AI-Powered Sustainability Intelligence */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-gradient-to-br from-green-50 via-blue-50 to-purple-50 border-0 shadow-lg">
+        <Card className="bg-linear-to-br from-green-50 via-blue-50 to-purple-50 border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-green-600" />
-              <span className="bg-gradient-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
                 AI Carbon Intelligence
               </span>
             </CardTitle>
@@ -167,11 +167,11 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-cyan-50 via-teal-50 to-green-50 border-0 shadow-lg">
+        <Card className="bg-linear-to-br from-cyan-50 via-teal-50 to-green-50 border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Layers className="h-5 w-5 text-cyan-600" />
-              <span className="bg-gradient-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">
+              <span className="bg-linear-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">
                 Circular Economy Hub
               </span>
             </CardTitle>
@@ -313,7 +313,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
 
         <TabsContent value="digital-twin" className="space-y-4">
           {/* Digital Twin Visualization */}
-          <Card className="bg-gradient-to-br from-slate-50 to-gray-100 border-0 shadow-xl">
+          <Card className="bg-linear-to-br from-slate-50 to-gray-100 border-0 shadow-xl">
             <CardHeader>
               <div className="flex flex-col gap-3">
                 <div>
@@ -390,7 +390,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
         <TabsContent value="circular-economy" className="space-y-4">
           {/* Circular Economy Dashboard */}
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gradient-to-br from-blue-50 to-cyan-50 border-0 shadow-lg">
+            <Card className="bg-linear-to-br from-blue-50 to-cyan-50 border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Infinity className="h-5 w-5 text-blue-600" />
@@ -487,7 +487,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-0 shadow-lg">
+            <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Recycle className="h-5 w-5 text-green-600" />
@@ -506,7 +506,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
 
         <TabsContent value="nature-solutions" className="space-y-4">
           {/* Nature-Based Solutions */}
-          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 border-0 shadow-lg">
+          <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TreePine className="h-5 w-5 text-green-600" />
@@ -580,7 +580,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
 
         <TabsContent value="carbon-intelligence" className="space-y-4">
           {/* AI Carbon Intelligence */}
-          <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-0 shadow-lg">
+          <Card className="bg-linear-to-br from-indigo-50 to-purple-50 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-indigo-600" />
@@ -642,7 +642,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
         <TabsContent value="regenerative" className="space-y-4">
           {/* Regenerative Impact */}
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-gradient-to-br from-emerald-50 to-green-50 border-0 shadow-lg">
+            <Card className="bg-linear-to-br from-emerald-50 to-green-50 border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Leaf className="h-5 w-5 text-emerald-600" />
@@ -693,7 +693,7 @@ export function SustainabilityMobile(props: SustainabilityViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-0 shadow-lg">
+            <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Award className="h-5 w-5 text-blue-600" />

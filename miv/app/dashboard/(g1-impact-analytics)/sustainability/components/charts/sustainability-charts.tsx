@@ -52,7 +52,7 @@ interface BiodiversityImpactChartProps {
 
 export function DigitalTwinRadarChart({ data }: DigitalTwinRadarChartProps) {
   return (
-    <div className="h-[280px] w-full sm:h-[400px]">
+    <div className="h-70ll sm:h-100">
       <ResponsiveContainer width="100%" height="100%">
         <RadarChart data={data}>
           <PolarGrid />
@@ -88,7 +88,7 @@ export function DigitalTwinRadarChart({ data }: DigitalTwinRadarChartProps) {
 
 export function ResourceFlowChart({ data }: TimelineChartProps) {
   return (
-    <div className="h-[260px] w-full sm:h-[300px]">
+    <div className="h-65 w-full sm:h-75">
       <ResponsiveContainer width="100%" height="100%">
         <AreaChart data={data} margin={{ left: -20, right: 8 }}>
           <CartesianGrid strokeDasharray="3 3" />
@@ -139,7 +139,7 @@ export function BiodiversityImpactChart({
   ];
 
   return (
-    <div className="h-[330px] w-full sm:h-[300px]">
+    <div className="h-82.5 w-full sm:h-75">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart
           data={data}
@@ -165,7 +165,7 @@ export function BiodiversityImpactChart({
 
 export function CarbonIntelligenceChart({ data }: TimelineChartProps) {
   return (
-    <div className="h-[260px] w-full sm:h-[300px]">
+    <div className="h-65 w-full sm:h-75">
       <ResponsiveContainer width="100%" height="100%">
         <LineChart data={data} margin={{ left: -20, right: 8 }}>
           <CartesianGrid strokeDasharray="3 3" />
