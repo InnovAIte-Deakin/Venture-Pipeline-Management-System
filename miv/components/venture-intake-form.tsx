@@ -99,7 +99,7 @@ export function VentureIntakeForm() {
     watch,
     setValue,
     trigger,
-    formState: { errors, isValid },
+    formState: { errors },
   } = useForm<VentureIntakeFormData>({
     resolver: zodResolver(ventureIntakeSchema),
     mode: 'onChange',
@@ -811,9 +811,9 @@ export function VentureIntakeForm() {
                     onCheckedChange={(checked) => {
                       const current = watchedValues.gedsiGoals || []
                       if (checked) {
-                        setValue('gedsiGoals', [...current, goal])
+                        setValue('gedsiGoals', [...current, goal], { shouldValidate: true })
                       } else {
-                        setValue('gedsiGoals', current.filter(g => g !== goal))
+                        setValue('gedsiGoals', current.filter(g => g !== goal), { shouldValidate: true })
                       }
                     }}
                   />
@@ -1051,8 +1051,8 @@ export function VentureIntakeForm() {
               ) : (
                 <Button
                   type="submit"
-                  disabled={isSubmitting || !isValid}
-                  className="bg-linear-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 disabled:from-slate-200 disabled:to-slate-200 disabled:text-slate-600 disabled:opacity-100 dark:disabled:from-slate-700 dark:disabled:to-slate-700 dark:disabled:text-slate-300"
+                  disabled={isSubmitting}
+                  className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-800 disabled:text-white disabled:opacity-80"
                 >
                   {isSubmitting ? (
                     <>
