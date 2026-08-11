@@ -28,7 +28,7 @@ This document describes the centralized calculation system implemented to ensure
 3. **API Endpoints**
    - `/api/calculations`: Trigger recalculations
    - `/api/calculations/portfolio`: Get aggregated portfolio metrics
-   - `/api/seed-calculations`: Initial population of calculated values
+   - `npm run db:seed:calculations`: Initial population of calculated values
 
 ### Calculation Logic
 
@@ -152,7 +152,7 @@ After implementing the centralized system:
 1. Run database migration to add calculated fields
 2. Execute initial calculation seeding:
    ```bash
-   curl -X POST http://localhost:3000/api/seed-calculations
+   npm run db:seed:calculations
    ```
 3. Verify calculations are populated correctly
 

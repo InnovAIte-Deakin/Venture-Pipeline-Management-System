@@ -14,7 +14,6 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
-import { PUBLIC_BACKEND_URL } from "@/lib/constants";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -29,7 +28,7 @@ export default function LoginPage() {
     setError("");
 
     try {
-      const url = `/backend/api/users/login`;
+      const url = `/api/session/login`;
 
       const response = await fetch(url, {
         method: "POST",
@@ -54,8 +53,11 @@ export default function LoginPage() {
 
       // Redirect to dashboard on success
       console.log("login response", responseBody);
-      if (responseBody?.message === "Authentication Passed") {
-        if (responseBody?.user.role === "user") {
+      if (responseBody?.success && responseBody?.user) {
+        if (
+          responseBody.user.role === "user" ||
+          responseBody.user.role === "founder"
+        ) {
           window.location.href = "/user-dashboard";
         } else {
           window.location.href = "/dashboard";

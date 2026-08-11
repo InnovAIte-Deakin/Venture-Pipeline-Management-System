@@ -347,7 +347,7 @@ export function GEDSITracker() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-linear-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
             GEDSI Intelligence Hub
           </h1>
           <p className="text-muted-foreground">
@@ -359,7 +359,7 @@ export function GEDSITracker() {
             <Download className="h-4 w-4 mr-2" />
             {isExporting ? 'Exporting...' : 'UN Standards Report'}
           </Button>
-          <Button variant="outline" className="bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+          <Button variant="outline" className="bg-linear-to-r from-blue-50 to-indigo-50 border-blue-200">
             <Sparkles className="h-4 w-4 mr-2" />
             AI Insights
           </Button>
@@ -449,12 +449,12 @@ export function GEDSITracker() {
       </Card>
 
       {/* Enhanced AI Insights with UN Standards */}
-      <Card className="bg-gradient-to-br from-purple-50 via-blue-50 to-indigo-50 border-0 shadow-lg">
+      <Card className="bg-linear-to-br from-purple-50 via-blue-50 to-indigo-50 border-0 shadow-lg">
         <CardHeader>
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <Sparkles className="h-5 w-5 text-purple-600" />
-              <CardTitle className="bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <CardTitle className="bg-linear-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 AI-Powered GEDSI Intelligence
               </CardTitle>
             </div>
@@ -672,11 +672,11 @@ export function GEDSITracker() {
 
         <TabsContent value="washington-group" className="space-y-6">
           {/* Washington Group Short Set Implementation */}
-          <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 border-0 shadow-lg">
+          <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-blue-600" />
-                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+                <span className="bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
                   Washington Group Short Set
                 </span>
               </CardTitle>
@@ -766,7 +766,7 @@ export function GEDSITracker() {
                       </div>
                     </div>
 
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
+                    <Button className="w-full bg-linear-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700">
                       <Plus className="mr-2 h-4 w-4" />
                       Implement WG-SS Assessment
                     </Button>
