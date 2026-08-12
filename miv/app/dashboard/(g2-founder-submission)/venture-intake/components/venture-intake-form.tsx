@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ventureIntakeSchema, type VentureIntakeFormData } from '@/schemas/venture-intake-schema'
+import { ventureIntakeSchema, type VentureIntakeFormData } from '../schemas/venture-intake-schema'
 import { FileUpload } from '@/components/ui/file-upload'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -90,8 +90,12 @@ const stepFields: Record<number, Array<keyof VentureIntakeFormData>> = {
 export function VentureIntakeForm() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [isRetryingAnalysis, setIsRetryingAnalysis] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<any>(null)
   const [showAiInsights, setShowAiInsights] = useState(false)
+  const [createdVentureId, setCreatedVentureId] = useState<string | null>(null)
+  const [ventureCreated, setVentureCreated] = useState(false)
+  const [analysisFailed, setAnalysisFailed] = useState(false)
 
   const {
     register,
@@ -142,9 +146,40 @@ export function VentureIntakeForm() {
     }
   }
 
+  const analyzeVenture = async (ventureId: string) => {
+    try {
+      const aiResponse = await fetch('/api/ai/analyze-venture', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ ventureId }),
+      })
+
+      if (!aiResponse.ok) {
+        await aiResponse.json().catch(() => null)
+        setAnalysisFailed(true)
+        return
+      }
+
+      const aiResult = await aiResponse.json()
+      setAiAnalysis(aiResult)
+      setAnalysisFailed(false)
+      setShowAiInsights(true)
+    } catch (error) {
+      console.error('Error analyzing venture:', error)
+      setAnalysisFailed(true)
+    }
+  }
+
   const onSubmit = async (data: VentureIntakeFormData) => {
     setIsSubmitting(true)
     try {
+      if (createdVentureId) {
+        await analyzeVenture(createdVentureId)
+        return
+      }
+
       // Submit venture data
       const response = await fetch('/api/ventures', {
         method: 'POST',
@@ -156,26 +191,27 @@ export function VentureIntakeForm() {
 
       if (response.ok) {
         const result = await response.json()
-        
-        // Trigger AI analysis
-        const aiResponse = await fetch('/api/ai/analyze-venture', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ ventureId: result.id }),
-        })
+        setCreatedVentureId(result.id)
+        setVentureCreated(true)
 
-        if (aiResponse.ok) {
-          const aiResult = await aiResponse.json()
-          setAiAnalysis(aiResult)
-          setShowAiInsights(true)
-        }
+        // Trigger AI analysis
+        await analyzeVenture(result.id)
       }
     } catch (error) {
       console.error('Error submitting venture:', error)
     } finally {
       setIsSubmitting(false)
+    }
+  }
+
+  const retryAnalysis = async () => {
+    if (!createdVentureId) return
+
+    setIsRetryingAnalysis(true)
+    try {
+      await analyzeVenture(createdVentureId)
+    } finally {
+      setIsRetryingAnalysis(false)
     }
   }
 
@@ -990,6 +1026,50 @@ export function VentureIntakeForm() {
                 View Venture Dashboard
               </Button>
             </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (ventureCreated && analysisFailed) {
+    return (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <Card>
+          <CardHeader role="status">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CardTitle>Venture submitted successfully</CardTitle>
+            </div>
+            <CardDescription>
+              Your application has been saved, but the analysis could not be completed.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <Alert role="alert" className="border-amber-200 bg-amber-50 dark:bg-amber-950">
+              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertDescription className="text-amber-800 dark:text-amber-200">
+                Your application is already submitted and does not need to be submitted again.
+              </AlertDescription>
+            </Alert>
+
+            <Button
+              type="button"
+              onClick={retryAnalysis}
+              disabled={isRetryingAnalysis}
+            >
+              {isRetryingAnalysis ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Retrying Analysis...
+                </>
+              ) : (
+                <>
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Retry Analysis
+                </>
+              )}
+            </Button>
           </CardContent>
         </Card>
       </div>
