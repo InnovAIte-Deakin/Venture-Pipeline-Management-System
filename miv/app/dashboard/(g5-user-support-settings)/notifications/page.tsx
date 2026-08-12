@@ -14,7 +14,6 @@ import {
   Filter, 
   Search,
   CheckCheck,
-  Trash2,
   RefreshCw
 } from 'lucide-react'
 
@@ -23,7 +22,7 @@ interface Notification {
   type: 'info' | 'warning' | 'success' | 'error'
   title: string
   message: string
-  read: boolean
+  isRead: boolean
   createdAt: string
   userId: string
 }
@@ -62,16 +61,18 @@ export default function NotificationsPage() {
 
   const markAsRead = async (id: string) => {
     try {
-      const response = await fetch(`/api/notifications/${id}`, {
+      const response = await fetch('/api/notifications', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ read: true })
+        body: JSON.stringify({ id, isRead: true })
       })
 
       if (response.ok) {
         setNotifications(prev => 
-          prev.map(n => n.id === id ? { ...n, read: true } : n)
+          prev.map(n => n.id === id ? { ...n, isRead: true } : n)
         )
+      } else {
+        console.error('Error marking notification as read:', response.status)
       }
     } catch (error) {
       console.error('Error marking notification as read:', error)
@@ -80,31 +81,41 @@ export default function NotificationsPage() {
 
   const markAllAsRead = async () => {
     try {
-      const response = await fetch('/api/notifications/mark-all-read', {
-        method: 'PUT'
-      })
+      const unreadNotifications = notifications.filter(notification => !notification.isRead)
+      const results = await Promise.all(
+        unreadNotifications.map(async notification => {
+          try {
+            const response = await fetch('/api/notifications', {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ id: notification.id, isRead: true })
+            })
 
-      if (response.ok) {
-        setNotifications(prev => 
-          prev.map(n => ({ ...n, read: true }))
+            if (!response.ok) {
+              console.error('Error marking notification as read:', response.status)
+              return null
+            }
+
+            return notification.id
+          } catch (error) {
+            console.error('Error marking notification as read:', error)
+            return null
+          }
+        })
+      )
+      const updatedIds = new Set(results.filter((id): id is string => id !== null))
+
+      if (updatedIds.size > 0) {
+        setNotifications(prev =>
+          prev.map(notification =>
+            updatedIds.has(notification.id)
+              ? { ...notification, isRead: true }
+              : notification
+          )
         )
       }
     } catch (error) {
       console.error('Error marking all notifications as read:', error)
-    }
-  }
-
-  const deleteNotification = async (id: string) => {
-    try {
-      const response = await fetch(`/api/notifications/${id}`, {
-        method: 'DELETE'
-      })
-
-      if (response.ok) {
-        setNotifications(prev => prev.filter(n => n.id !== id))
-      }
-    } catch (error) {
-      console.error('Error deleting notification:', error)
     }
   }
 
@@ -113,8 +124,8 @@ export default function NotificationsPage() {
                          notification.message.toLowerCase().includes(searchQuery.toLowerCase())
     const matchesType = typeFilter === 'all' || notification.type === typeFilter
     const matchesStatus = statusFilter === 'all' || 
-                         (statusFilter === 'read' && notification.read) ||
-                         (statusFilter === 'unread' && !notification.read)
+                         (statusFilter === 'read' && notification.isRead) ||
+                         (statusFilter === 'unread' && !notification.isRead)
     
     return matchesSearch && matchesType && matchesStatus
   })
@@ -173,17 +184,22 @@ export default function NotificationsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-3xl font-bold text-gray-900">Notifications</h1>
           <p className="text-gray-600">Manage your notifications and alerts</p>
         </div>
-        <div className="flex items-center space-x-4">
-          <Button variant="outline" onClick={fetchNotifications}>
+        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
+          <Button className="w-full sm:w-auto" variant="outline" onClick={fetchNotifications}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
-          <Button variant="outline" onClick={markAllAsRead}>
+          <Button
+            className="w-full sm:w-auto"
+            variant="outline"
+            onClick={markAllAsRead}
+            disabled={notifications.every(notification => notification.isRead)}
+          >
             <CheckCheck className="h-4 w-4 mr-2" />
             Mark All Read
           </Button>
@@ -258,22 +274,22 @@ export default function NotificationsPage() {
           </Card>
         ) : (
           filteredNotifications.map((notification) => (
-            <Card key={notification.id} className={`${!notification.read ? 'border-blue-200 bg-blue-50' : ''}`}>
+            <Card key={notification.id} className={`${!notification.isRead ? 'border-blue-200 bg-blue-50' : ''}`}>
               <CardContent className="p-6">
-                <div className="flex items-start justify-between">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-start space-x-4 flex-1">
                     <div className="flex-shrink-0">
                       {getNotificationIcon(notification.type)}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center space-x-2 mb-2">
+                      <div className="flex flex-wrap items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
                           {notification.title}
                         </h3>
                         <Badge className={getNotificationBadgeColor(notification.type)}>
                           {notification.type}
                         </Badge>
-                        {!notification.read && (
+                        {!notification.isRead && (
                           <Badge variant="outline" className="bg-blue-100 text-blue-800">
                             New
                           </Badge>
@@ -288,8 +304,8 @@ export default function NotificationsPage() {
                       </div>
                     </div>
                   </div>
-                  <div className="flex items-center space-x-2 ml-4">
-                    {!notification.read && (
+                  {!notification.isRead && (
+                    <div className="flex w-full items-center gap-2 sm:ml-4 sm:w-auto">
                       <Button
                         variant="outline"
                         size="sm"
@@ -298,15 +314,8 @@ export default function NotificationsPage() {
                         <CheckCircle className="h-4 w-4 mr-1" />
                         Mark Read
                       </Button>
-                    )}
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => deleteNotification(notification.id)}
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
@@ -327,13 +336,13 @@ export default function NotificationsPage() {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-blue-600">
-                {notifications.filter(n => !n.read).length}
+                {notifications.filter(n => !n.isRead).length}
               </div>
               <div className="text-sm text-gray-600">Unread</div>
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-green-600">
-                {notifications.filter(n => n.read).length}
+                {notifications.filter(n => n.isRead).length}
               </div>
               <div className="text-sm text-gray-600">Read</div>
             </div>
