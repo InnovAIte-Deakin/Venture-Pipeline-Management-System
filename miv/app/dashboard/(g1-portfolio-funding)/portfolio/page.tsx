@@ -552,7 +552,7 @@ export default function PortfolioPage() {
   return (
     <div className="space-y-6">
       {/* Header - Action-Oriented */}
-      <div className="flex items-center justify-between">
+      <div className="hidden md:flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Portfolio Command Center</h1>
           <p className="text-muted-foreground">
@@ -624,7 +624,7 @@ export default function PortfolioPage() {
       {/* Key Metrics - From Real Data */}
       {!loading && !error && (
         <>
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="hidden md:grid gap-4 md:grid-cols-4">
         <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
@@ -687,7 +687,7 @@ export default function PortfolioPage() {
           </div>
 
           {/* Today's Action Items - From Real Data */}
-        <Card>
+        <Card className="hidden md:flex">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
                 <Clock className="h-5 w-5 text-blue-500" />
