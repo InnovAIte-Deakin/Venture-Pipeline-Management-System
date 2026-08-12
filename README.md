@@ -161,6 +161,55 @@ Password: VentureMgr@123
 ```
 
 ---
+## 🧪 Integration Tests
+
+### miv — Vitest integration tests
+
+From the `miv` folder, create the local test environment file if needed:
+
+```powershell
+Copy-Item .env.test.example .env.test
+```
+
+Run the Vitest integration tests:
+
+```bash
+npm run test:int
+```
+
+Run the tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Vitest integration tests must be placed in:
+
+```text
+miv/tests/int/
+```
+
+Test filenames must follow this pattern:
+
+```text
+*.int.spec.ts
+```
+
+### Existing miv integration tests
+
+The existing `node:test` files inside `miv/tests/integration/` use this separate command:
+
+```bash
+npm run test:integration
+```
+
+### miv-backend
+
+From the `miv-backend` folder, run:
+
+```bash
+pnpm test:int
+```
 
 ## 📚 Documentation
 
