@@ -106,7 +106,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   const [recentSearches, setRecentSearches] = useState<string[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
-  const debounceRef = useRef<NodeJS.Timeout>()
+  const debounceRef = useRef<NodeJS.Timeout | null>(null)
 
   // Load recent searches from localStorage
   useEffect(() => {
@@ -172,6 +172,17 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
     }
   }, [query, performSearch])
 
+  const handleSelectResult = useCallback((result: SearchResult) => {
+    // Save to recent searches
+    const updated = [query, ...recentSearches.filter(q => q !== query)].slice(0, 5)
+    setRecentSearches(updated)
+    localStorage.setItem('miv_recent_searches', JSON.stringify(updated))
+
+    // Navigate to result
+    router.push(result.url)
+    onClose()
+  }, [onClose, query, recentSearches, router])
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -201,7 +212,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
 
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
-  }, [isOpen, results, selectedIndex, onClose])
+  }, [isOpen, results, selectedIndex, onClose, handleSelectResult])
 
   // Scroll selected item into view
   useEffect(() => {
@@ -217,17 +228,6 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
   useEffect(() => {
     setSelectedIndex(0)
   }, [results])
-
-  const handleSelectResult = (result: SearchResult) => {
-    // Save to recent searches
-    const updated = [query, ...recentSearches.filter(q => q !== query)].slice(0, 5)
-    setRecentSearches(updated)
-    localStorage.setItem('miv_recent_searches', JSON.stringify(updated))
-
-    // Navigate to result
-    router.push(result.url)
-    onClose()
-  }
 
   const handleRecentSearch = (searchQuery: string) => {
     setQuery(searchQuery)
@@ -262,7 +262,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
         <div className="w-full max-w-2xl bg-slate-900 rounded-xl shadow-2xl border border-slate-700 overflow-hidden animate-in zoom-in-95 duration-200">
           {/* Search Input */}
           <div className="flex items-center gap-3 px-4 py-4 border-b border-slate-700">
-            <Search className="h-5 w-5 text-slate-400 flex-shrink-0" />
+            <Search className="h-5 w-5 text-slate-400 shrink-0" />
             <input
               ref={inputRef}
               type="text"
@@ -352,7 +352,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                               )}
                             >
                               <div className={cn(
-                                "p-2 rounded-lg flex-shrink-0",
+                                "p-2 rounded-lg shrink-0",
                                 config.bgColor
                               )}>
                                 <config.icon className={cn("h-4 w-4", config.color)} />
@@ -386,7 +386,7 @@ export function GlobalSearch({ isOpen, onClose }: GlobalSearchProps) {
                                   </div>
                                 )}
                               </div>
-                              <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-slate-400 flex-shrink-0" />
+                              <ChevronRight className="h-4 w-4 text-slate-600 group-hover:text-slate-400 shrink-0" />
                             </button>
                           )
                         })}
