@@ -2,27 +2,21 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Sidebar } from "@/components/sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { useAuth } from "@/hooks/useAuth";
+import { AccessDenied } from "@/components/role-guard";
+import { canAccessRoute } from "@/lib/rbac";
 
 export default function DashboardLayout({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	const [isAuthenticated, setIsAuthenticated] = useState(false);
-	const [loading, setLoading] = useState(true);
-
-	useEffect(() => {
-		// Development authentication bypass
-		// In production, this would check for proper authentication
-		if (typeof window !== "undefined") {
-			// For development, always authenticate
-			setIsAuthenticated(true);
-		}
-		setLoading(false);
-	}, []);
+	const pathname = usePathname();
+	const { user, loading, isAuthenticated } = useAuth();
 
 	if (loading) {
 		return (
@@ -30,6 +24,25 @@ export default function DashboardLayout({
 				<div className="flex items-center space-x-2">
 					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
 					<span className="text-gray-600">Loading...</span>
+				</div>
+			</div>
+		);
+	}
+
+	if (isAuthenticated && !canAccessRoute(user, pathname)) {
+		return (
+			<div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 transition-colors duration-300">
+				<div className="hidden lg:block">
+					<Sidebar />
+				</div>
+				<div className="lg:hidden fixed top-4 left-4 z-50">
+					<MobileNav />
+				</div>
+				<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+					<div className="p-4 lg:p-6">
+						<Breadcrumb />
+						<AccessDenied />
+					</div>
 				</div>
 			</div>
 		);

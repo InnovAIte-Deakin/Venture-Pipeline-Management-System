@@ -21,6 +21,8 @@ import {
   isDashboardRouteActive,
 } from "@/lib/dashboard-navigation";
 import type { DashboardNavItem } from "@/lib/dashboard-navigation";
+import { useAuth } from "@/hooks/useAuth";
+import { filterNavItems } from "@/lib/rbac";
 
 const contactDetails = [
   "#1381, National Road 2, Phum Tuol Roka,",
@@ -32,16 +34,15 @@ function flattenNavItems(items: DashboardNavItem[]) {
   return items.flatMap((item) => (item.children ? item.children : [item]));
 }
 
-function findNavItem(title: string) {
-  return flattenNavItems(dashboardDesktopNavigationItems).find(
+function findNavItem(title: string, items: DashboardNavItem[]) {
+  return flattenNavItems(items).find(
     (item) => item.title === title,
   );
 }
 
-function getScreenTitle(pathname: string) {
+function getScreenTitle(pathname: string, items: DashboardNavItem[]) {
   const activeItem = flattenNavItems([
-    ...dashboardMobileBottomItems,
-    ...dashboardDesktopNavigationItems,
+    ...items,
   ])
     .filter((item) => item.href && isDashboardRouteActive(pathname, item.href))
     .sort((a, b) => (b.href?.length ?? 0) - (a.href?.length ?? 0))[0];
@@ -51,10 +52,23 @@ function getScreenTitle(pathname: string) {
 
 export function MobileNav() {
   const pathname = usePathname();
+  const { user, logout } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const screenTitle = getScreenTitle(pathname);
-  const isMoreActive = dashboardDesktopNavigationItems.some((item) => {
+  const visibleDesktopItems = useMemo(
+    () => filterNavItems(dashboardDesktopNavigationItems, user),
+    [user],
+  );
+  const visibleBottomItems = useMemo(
+    () => filterNavItems(dashboardMobileBottomItems, user),
+    [user],
+  );
+  const visibleItems = useMemo(
+    () => [...visibleBottomItems, ...visibleDesktopItems],
+    [visibleBottomItems, visibleDesktopItems],
+  );
+  const screenTitle = getScreenTitle(pathname, visibleItems);
+  const isMoreActive = visibleDesktopItems.some((item) => {
     if (item.href && isDashboardRouteActive(pathname, item.href)) {
       return true;
     }
@@ -64,19 +78,22 @@ export function MobileNav() {
     );
   });
   const quickItems = useMemo(
-    () =>
-      [
-        { label: "Start A New Venture", item: findNavItem("Venture Intake") },
-        { label: "Reports", item: findNavItem("Advanced Reports") },
-        { label: "Dashboard", item: findNavItem("Dashboard") },
-        { label: "Account", item: findNavItem("Team Management") },
-        { label: "Ventures", item: { ...findNavItem("Deal Flow"), title: "Ventures" } },
-        { label: "Notifications", item: findNavItem("Notifications") },
+    () => {
+      const dealFlowItem = findNavItem("Deal Flow", visibleDesktopItems);
+
+      return [
+        { label: "Start A New Venture", item: findNavItem("Venture Intake", visibleDesktopItems) },
+        { label: "Reports", item: findNavItem("Advanced Reports", visibleDesktopItems) },
+        { label: "Dashboard", item: findNavItem("Dashboard", visibleItems) },
+        { label: "Account", item: findNavItem("Team Management", visibleDesktopItems) },
+        { label: "Ventures", item: dealFlowItem ? { ...dealFlowItem, title: "Ventures" } : undefined },
+        { label: "Notifications", item: findNavItem("Notifications", visibleDesktopItems) },
       ].filter(
         (entry): entry is { label: string; item: DashboardNavItem } =>
-          Boolean(entry.item),
-      ),
-    [],
+          Boolean(entry.item?.href),
+      );
+    },
+    [visibleDesktopItems, visibleItems],
   );
 
   return (
@@ -98,8 +115,10 @@ export function MobileNav() {
             <MobileSidebar
               pathname={pathname}
               quickItems={quickItems}
+              navigationItems={visibleDesktopItems}
               showMore={showMore}
               onShowMoreChange={setShowMore}
+              onLogout={logout}
             />
           </Sheet>
           <div className="min-w-0 flex-1 px-4 text-center">
@@ -124,7 +143,7 @@ export function MobileNav() {
         aria-label="Mobile dashboard bottom navigation"
       >
         <div className="grid grid-cols-5 gap-1">
-          {dashboardMobileBottomItems.map((item) => {
+          {visibleBottomItems.map((item) => {
             if (!item.href) return null;
 
             const active = isDashboardRouteActive(pathname, item.href);
@@ -171,13 +190,17 @@ export function MobileNav() {
 function MobileSidebar({
   pathname,
   quickItems,
+  navigationItems,
   showMore,
   onShowMoreChange,
+  onLogout,
 }: {
   pathname: string;
   quickItems: { label: string; item: DashboardNavItem }[];
+  navigationItems: DashboardNavItem[];
   showMore: boolean;
   onShowMoreChange: (value: boolean) => void;
+  onLogout: () => void;
 }) {
   return (
     <SheetContent
@@ -212,7 +235,7 @@ function MobileSidebar({
 
           {showMore && (
             <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
-              {dashboardDesktopNavigationItems.map((item) => (
+              {navigationItems.map((item) => (
                 <MobileNavGroup key={item.title} item={item} pathname={pathname} />
               ))}
             </div>
@@ -235,6 +258,7 @@ function MobileSidebar({
         <div className="px-10 py-4">
           <Button
             type="button"
+            onClick={onLogout}
             className="h-10 w-full rounded-md bg-red-300 text-xs font-semibold text-slate-600 hover:bg-red-300"
           >
             <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />

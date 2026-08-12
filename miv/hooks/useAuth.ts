@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
+import { normalizeRole } from '@/lib/rbac'
 
 interface User {
   id: string
   email: string
   firstName: string
   lastName: string
+  name?: string
+  image?: string
   role: string
 }
 
@@ -14,21 +17,38 @@ interface ApiUser {
   name?: string | null
   firstName?: string | null
   lastName?: string | null
+  image?: string | null
   role?: string | null
+}
+
+interface ApiUserResponse {
+  success?: boolean
+  user?: ApiUser
 }
 
 function normalizeUser(user: ApiUser): User {
   const nameParts = (user.name || '').trim().split(/\s+/).filter(Boolean)
   const firstName = user.firstName || nameParts[0] || 'User'
   const lastName = user.lastName || nameParts.slice(1).join(' ') || ''
+  const normalizedRole = normalizeRole(user.role)
 
   return {
     id: user.id,
     email: user.email,
     firstName,
     lastName,
-    role: user.role || 'USER',
+    name: user.name || undefined,
+    image: user.image || undefined,
+    role: normalizedRole || user.role || 'USER',
   }
+}
+
+function getUserFromResponse(data: ApiUser | ApiUserResponse): ApiUser | undefined {
+  if (Object.prototype.hasOwnProperty.call(data, 'user')) {
+    return (data as ApiUserResponse).user
+  }
+
+  return data as ApiUser
 }
 
 interface AuthState {
@@ -55,8 +75,8 @@ export function useAuth() {
       })
 
       if (response.ok) {
-        const data: ApiUser | { success?: boolean; user?: ApiUser } = await response.json()
-        const user = 'user' in data ? data.user : data
+        const data: ApiUser | ApiUserResponse = await response.json()
+        const user = getUserFromResponse(data)
 
         if (user?.id && user.email) {
           setAuthState({
