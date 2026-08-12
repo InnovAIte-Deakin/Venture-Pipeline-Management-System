@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect } from "react"
 import DashboardCard, { type Dashboard } from "@/components/dashboard-card"
@@ -12,6 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/components/ui/toast"
+import { useAuth } from "@/hooks/useAuth"
 import {
   BarChart,
   Plus,
@@ -118,6 +119,7 @@ const categories = [
 
 export default function CustomDashboardsPage() {
   const { addToast } = useToast()
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedView, setSelectedView] = useState("all")
@@ -156,9 +158,9 @@ export default function CustomDashboardsPage() {
       const data = await response.json()
       setDashboards(data.dashboards || [])
       
-      console.log(`✅ Successfully loaded ${data.dashboards?.length || 0} custom dashboards`)
+      console.log(`âœ… Successfully loaded ${data.dashboards?.length || 0} custom dashboards`)
     } catch (err) {
-      console.error('❌ Error fetching dashboards:', err)
+      console.error('âŒ Error fetching dashboards:', err)
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
       setError(`Failed to load dashboards: ${errorMessage}`)
       
@@ -210,6 +212,7 @@ export default function CustomDashboardsPage() {
           category: newDashboard.category,
           isPublic: newDashboard.isPublic,
           widgets: newDashboard.widgets,
+          createdById: user?.id ?? "cmsfgffh10000iqc0wuumq74r",
         }),
       })
 
@@ -353,6 +356,7 @@ export default function CustomDashboardsPage() {
           category: dashboard.category,
           isPublic: false,
           widgets: [],
+          createdById: user?.id ?? "cmsfgffh10000iqc0wuumq74r",
         }),
       })
 
@@ -392,6 +396,7 @@ export default function CustomDashboardsPage() {
           category,
           isPublic: false,
           widgets: placeholderWidgets,
+          createdById: user?.id ?? "cmsfgffh10000iqc0wuumq74r",
         }),
       })
 
