@@ -1,6 +1,6 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { gedsiScoreClass, RiskBadge, RiskIcon } from "./round-presentation"
-import type { InvestmentRound } from "@/lib/investment-rounds/types"
+import type { InvestmentRound } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
 
 export function RoundDetailDialog({ round, open, onOpenChange }: { round: InvestmentRound | null; open: boolean; onOpenChange: (open: boolean) => void }) {
   if (!round) return null

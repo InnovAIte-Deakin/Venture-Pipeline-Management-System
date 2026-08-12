@@ -1,8 +1,8 @@
 import { Activity, Building2, DollarSign, Globe, Heart, Shield, Star, TrendingUp, Users } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { FOUNDER_TYPES, SECTORS } from "@/lib/investment-rounds/constants"
-import { percentage } from "@/lib/investment-rounds/calculations"
-import type { InvestmentRound, InvestmentRoundSummary, RiskLevel, RoundStatus } from "@/lib/investment-rounds/types"
+import { FOUNDER_TYPES, SECTORS } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/constants"
+import { percentage } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/calculations"
+import type { InvestmentRound, InvestmentRoundSummary, RiskLevel, RoundStatus } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
 import { gedsiScoreClass, RiskIcon, StatusIcon } from "./round-presentation"
 
 export function InvestmentRoundKpis({ summary: s }: { summary: InvestmentRoundSummary }) {

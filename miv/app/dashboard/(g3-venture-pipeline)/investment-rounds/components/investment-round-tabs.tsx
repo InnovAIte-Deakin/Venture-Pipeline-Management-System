@@ -2,9 +2,9 @@ import { AlertCircle, Download, Globe, Lightbulb, Share2, Shield, Sparkles, Zap 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { SECTORS } from "@/lib/investment-rounds/constants"
-import { amountInMillions, percentage, timelineRounds, topGedsiRounds } from "@/lib/investment-rounds/calculations"
-import type { InvestmentRound, InvestmentRoundSummary, RiskLevel } from "@/lib/investment-rounds/types"
+import { SECTORS } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/constants"
+import { amountInMillions, percentage, timelineRounds, topGedsiRounds } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/calculations"
+import type { InvestmentRound, InvestmentRoundSummary, RiskLevel } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
 import { gedsiScoreClass, RiskBadge, RiskIcon, StatusBadge } from "./round-presentation"
 
 export function GedsiImpactPanel({ rounds, summary: s }: { rounds: InvestmentRound[]; summary: InvestmentRoundSummary }) {

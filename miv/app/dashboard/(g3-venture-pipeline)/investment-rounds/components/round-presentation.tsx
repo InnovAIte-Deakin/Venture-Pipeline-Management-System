@@ -1,6 +1,6 @@
 import { AlertCircle, AlertTriangle, CheckCircle, Clock, Shield, XCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import type { RiskLevel, RoundStatus } from "@/lib/investment-rounds/types"
+import type { RiskLevel, RoundStatus } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
 
 export function gedsiScoreClass(score: number) {
   if (score >= 90) return "text-green-600"

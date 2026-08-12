@@ -4,8 +4,8 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { fundingProgress } from "@/lib/investment-rounds/calculations"
-import type { InvestmentRound } from "@/lib/investment-rounds/types"
+import { fundingProgress } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/calculations"
+import type { InvestmentRound } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
 import { gedsiScoreClass, RiskIcon, StatusBadge } from "./round-presentation"
 
 export function InvestmentRoundsTable({ rounds, onView }: { rounds: InvestmentRound[]; onView: (round: InvestmentRound) => void }) {

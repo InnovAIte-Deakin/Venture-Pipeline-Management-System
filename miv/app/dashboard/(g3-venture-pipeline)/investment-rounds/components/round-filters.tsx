@@ -2,8 +2,8 @@ import { Filter, Search } from "lucide-react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { FOUNDER_TYPES, ROUND_TYPES, SECTORS, STAGES } from "@/lib/investment-rounds/constants"
-import type { RoundFiltersState } from "@/lib/investment-rounds/types"
+import { FOUNDER_TYPES, ROUND_TYPES, SECTORS, STAGES } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/constants"
+import type { RoundFiltersState } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
 
 export function RoundFilters({ filters, onChange }: { filters: RoundFiltersState; onChange: <K extends keyof RoundFiltersState>(key: K, value: RoundFiltersState[K]) => void }) {
   const selects = [

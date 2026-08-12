@@ -1,9 +1,9 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { calculateSummary, filterInvestmentRounds } from "@/lib/investment-rounds/calculations"
-import type { InvestmentRound, RoundFiltersState, Venture } from "@/lib/investment-rounds/types"
-import { ventureToInvestmentRound } from "@/lib/investment-rounds/venture-to-round"
+import { calculateSummary, filterInvestmentRounds } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/calculations"
+import type { InvestmentRound, RoundFiltersState, Venture } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/types"
+import { ventureToInvestmentRound } from "@/app/dashboard/(g3-venture-pipeline)/investment-rounds/libs/venture-to-round"
 
 const initialFilters: RoundFiltersState = { searchTerm: "", roundType: "all", stage: "all", status: "all", sector: "all", founderType: "all" }
 
