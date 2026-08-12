@@ -165,7 +165,7 @@ setTotalPages(json.totalPages || 1)
             </div>
           </div>
 
-         <div className="rounded-md border overflow-x-auto">
+        <div className="hidden md:block rounded-md border overflow-x-auto">
             <Table className="min-w-[760px]">
               <TableHeader>
                 <TableRow>
@@ -239,6 +239,70 @@ setTotalPages(json.totalPages || 1)
 </TableBody>
             </Table>
           </div>
+          {/* Mobile results */}
+<div className="md:hidden space-y-3">
+  {loading ? (
+    <div className="py-10 text-center text-sm text-muted-foreground">
+      <div className="flex items-center justify-center gap-2">
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        Loading IRIS metrics...
+      </div>
+    </div>
+  ) : error ? (
+    <div className="rounded-lg border p-6 text-center">
+      <p className="text-sm text-red-600">{error}</p>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-3"
+        onClick={() => setRetryKey((currentKey) => currentKey + 1)}
+      >
+        Try Again
+      </Button>
+    </div>
+  ) : items.length === 0 ? (
+    <div className="rounded-lg border p-6 text-center text-sm text-muted-foreground">
+      No IRIS metrics found for “{query}”.
+    </div>
+  ) : (
+    items.map((item) => (
+      <div
+        key={item.code}
+        className="rounded-xl border bg-background p-4 shadow-sm"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">
+              {item.code}
+            </p>
+            <h3 className="mt-1 font-semibold leading-tight">
+              {item.name}
+            </h3>
+          </div>
+
+          {item.gedsiSuggestion && (
+            <Badge variant="outline" className="shrink-0">
+              {item.gedsiSuggestion}
+            </Badge>
+          )}
+        </div>
+
+        {item.description && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {item.description}
+          </p>
+        )}
+
+        <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
+          <span>Unit</span>
+          <span className="font-medium text-foreground">
+            {item.unit || "—"}
+          </span>
+        </div>
+      </div>
+    ))
+  )}
+</div>
         </CardContent>
       </Card>
     </div>
