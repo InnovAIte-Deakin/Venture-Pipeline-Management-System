@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { ventureIntakeSchema, type VentureIntakeFormData } from '../schemas/venture-intake-schema'
@@ -15,6 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { FieldError } from './field-error'
 import { 
   ChevronLeft, 
   ChevronRight, 
@@ -89,6 +90,8 @@ const stepFields: Record<number, Array<keyof VentureIntakeFormData>> = {
 
 export function VentureIntakeForm() {
   const [currentStep, setCurrentStep] = useState(1)
+  const stepHeadingRef = useRef<HTMLHeadingElement>(null)
+  const shouldFocusStepHeadingRef = useRef(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isRetryingAnalysis, setIsRetryingAnalysis] = useState(false)
   const [aiAnalysis, setAiAnalysis] = useState<any>(null)
@@ -96,6 +99,7 @@ export function VentureIntakeForm() {
   const [createdVentureId, setCreatedVentureId] = useState<string | null>(null)
   const [ventureCreated, setVentureCreated] = useState(false)
   const [analysisFailed, setAnalysisFailed] = useState(false)
+  const [submissionError, setSubmissionError] = useState<string | null>(null)
 
   const {
     register,
@@ -129,6 +133,13 @@ export function VentureIntakeForm() {
 
   const progress = (currentStep / steps.length) * 100
 
+  useEffect(() => {
+    if (shouldFocusStepHeadingRef.current) {
+      stepHeadingRef.current?.focus()
+      shouldFocusStepHeadingRef.current = false
+    }
+  }, [currentStep])
+
   const handleNext = async () => {
     const fields = stepFields[currentStep]
     const isStepValid = fields
@@ -136,12 +147,14 @@ export function VentureIntakeForm() {
       : true
 
     if (isStepValid && currentStep < steps.length) {
+      shouldFocusStepHeadingRef.current = true
       setCurrentStep(currentStep + 1)
     }
   }
 
   const prevStep = () => {
     if (currentStep > 1) {
+      shouldFocusStepHeadingRef.current = true
       setCurrentStep(currentStep - 1)
     }
   }
@@ -180,6 +193,8 @@ export function VentureIntakeForm() {
         return
       }
 
+      setSubmissionError(null)
+
       // Submit venture data
       const response = await fetch('/api/ventures', {
         method: 'POST',
@@ -196,9 +211,14 @@ export function VentureIntakeForm() {
 
         // Trigger AI analysis
         await analyzeVenture(result.id)
+      } else {
+        setSubmissionError('We could not submit your application. Please try again.')
       }
     } catch (error) {
       console.error('Error submitting venture:', error)
+      if (!createdVentureId) {
+        setSubmissionError('We could not submit your application. Please try again.')
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -224,21 +244,19 @@ export function VentureIntakeForm() {
           <Card className="p-4 border-dashed border-2 hover:border-blue-400 transition-colors">
             <div className="space-y-2">
               <div className="flex items-center space-x-2">
-                <Building2 className="h-4 w-4 text-blue-500" />
-                <Label htmlFor="name" className="font-medium">Venture Name *</Label>
+                <Building2 aria-hidden="true" className="h-4 w-4 text-blue-500" />
+                <Label htmlFor="name" className="font-medium">Venture Name <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
               </div>
               <Input
                 id="name"
+                aria-required="true"
+                aria-invalid={Boolean(errors.name)}
+                aria-describedby={errors.name ? 'name-error' : undefined}
                 {...register('name')}
                 placeholder="e.g., EcoFarm Solutions"
                 className="border-0 text-lg font-medium focus:ring-2 focus:ring-blue-500"
               />
-              {errors.name && (
-                <p className="text-sm text-red-500 flex items-center space-x-1">
-                  <AlertCircle className="h-3 w-3" />
-                  <span>{errors.name.message}</span>
-                </p>
-              )}
+              {errors.name && <FieldError id="name-error" message={errors.name.message} />}
             </div>
           </Card>
         </div>
@@ -247,11 +265,17 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <Label htmlFor="sector" className="font-medium">Industry Sector *</Label>
+              <TrendingUp aria-hidden="true" className="h-4 w-4 text-green-500" />
+              <Label htmlFor="sector" className="font-medium">Industry Sector <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Select onValueChange={(value) => setValue('sector', value)}>
-              <SelectTrigger className="border-0 focus:ring-2 focus:ring-green-500">
+              <SelectTrigger
+                id="sector"
+                aria-required="true"
+                aria-invalid={Boolean(errors.sector)}
+                aria-describedby={errors.sector ? 'sector-error' : undefined}
+                className="border-0 focus:ring-2 focus:ring-green-500"
+              >
                 <SelectValue placeholder="Choose your industry" />
               </SelectTrigger>
               <SelectContent>
@@ -262,12 +286,7 @@ export function VentureIntakeForm() {
                 ))}
               </SelectContent>
             </Select>
-            {errors.sector && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.sector.message}</span>
-              </p>
-            )}
+            {errors.sector && <FieldError id="sector-error" message={errors.sector.message} />}
           </div>
         </Card>
 
@@ -275,21 +294,19 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <MapPin className="h-4 w-4 text-purple-500" />
-              <Label htmlFor="location" className="font-medium">Location *</Label>
+              <MapPin aria-hidden="true" className="h-4 w-4 text-purple-500" />
+              <Label htmlFor="location" className="font-medium">Location <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Input
               id="location"
+              aria-required="true"
+              aria-invalid={Boolean(errors.location)}
+              aria-describedby={errors.location ? 'location-error' : undefined}
               {...register('location')}
               placeholder="Ho Chi Minh City, Vietnam"
               className="border-0 focus:ring-2 focus:ring-purple-500"
             />
-            {errors.location && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.location.message}</span>
-              </p>
-            )}
+            {errors.location && <FieldError id="location-error" message={errors.location.message} />}
           </div>
         </Card>
 
@@ -297,22 +314,20 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Mail className="h-4 w-4 text-blue-500" />
-              <Label htmlFor="contactEmail" className="font-medium">Contact Email *</Label>
+              <Mail aria-hidden="true" className="h-4 w-4 text-blue-500" />
+              <Label htmlFor="contactEmail" className="font-medium">Contact Email <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Input
               id="contactEmail"
               type="email"
+              aria-required="true"
+              aria-invalid={Boolean(errors.contactEmail)}
+              aria-describedby={errors.contactEmail ? 'contact-email-error' : undefined}
               {...register('contactEmail')}
               placeholder="founder@yourventure.com"
               className="border-0 focus:ring-2 focus:ring-blue-500"
             />
-            {errors.contactEmail && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.contactEmail.message}</span>
-              </p>
-            )}
+            {errors.contactEmail && <FieldError id="contact-email-error" message={errors.contactEmail.message} />}
           </div>
         </Card>
 
@@ -320,7 +335,7 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Phone className="h-4 w-4 text-green-500" />
+              <Phone aria-hidden="true" className="h-4 w-4 text-green-500" />
               <Label htmlFor="contactPhone" className="font-medium">Contact Phone</Label>
               <Badge variant="secondary" className="text-xs">Optional</Badge>
             </div>
@@ -336,7 +351,7 @@ export function VentureIntakeForm() {
 
       {/* Progress indicator */}
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
           <span>✅ Basic information</span>
           <span>Next: Team & Foundation</span>
         </div>
@@ -351,16 +366,23 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Heart className="h-5 w-5 text-purple-500" />
-            <Label className="font-semibold text-lg">Founder Types *</Label>
+            <Heart aria-hidden="true" className="h-5 w-5 text-purple-500" />
+            <div id="founder-types-label" className="font-semibold text-lg">Founder Types <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></div>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             Select all that apply to your founding team
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div
+            role="group"
+            aria-labelledby="founder-types-label"
+            aria-required="true"
+            aria-invalid={Boolean(errors.founderTypes)}
+            aria-describedby={errors.founderTypes ? 'founder-types-error' : undefined}
+            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4"
+          >
             {founderTypes.map((type) => (
-              <Card key={type} className="p-3 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-2">
+              <Card key={type} className="p-3 hover:shadow-md transition-shadow">
+                <div className="flex min-h-11 items-center space-x-2">
                   <Checkbox
                     id={type}
                     onCheckedChange={(checked) => {
@@ -372,19 +394,14 @@ export function VentureIntakeForm() {
                       }
                     }}
                   />
-                  <Label htmlFor={type} className="text-sm capitalize cursor-pointer">
+                  <Label htmlFor={type} className="flex min-h-11 flex-1 cursor-pointer items-center text-sm capitalize">
                     {type.replace('-', ' ')}
                   </Label>
                 </div>
               </Card>
             ))}
           </div>
-          {errors.founderTypes && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.founderTypes.message}</span>
-            </p>
-          )}
+          {errors.founderTypes && <FieldError id="founder-types-error" message={errors.founderTypes.message} />}
         </div>
       </Card>
 
@@ -393,11 +410,17 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Users className="h-4 w-4 text-blue-500" />
-              <Label htmlFor="teamSize" className="font-medium">Team Size *</Label>
+              <Users aria-hidden="true" className="h-4 w-4 text-blue-500" />
+              <Label htmlFor="teamSize" className="font-medium">Team Size <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Select onValueChange={(value) => setValue('teamSize', value)}>
-              <SelectTrigger className="border-0 focus:ring-2 focus:ring-blue-500">
+              <SelectTrigger
+                id="teamSize"
+                aria-required="true"
+                aria-invalid={Boolean(errors.teamSize)}
+                aria-describedby={errors.teamSize ? 'team-size-error' : undefined}
+                className="border-0 focus:ring-2 focus:ring-blue-500"
+              >
                 <SelectValue placeholder="How many team members?" />
               </SelectTrigger>
               <SelectContent>
@@ -408,12 +431,7 @@ export function VentureIntakeForm() {
                 ))}
               </SelectContent>
             </Select>
-            {errors.teamSize && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.teamSize.message}</span>
-              </p>
-            )}
+            {errors.teamSize && <FieldError id="team-size-error" message={errors.teamSize.message} />}
           </div>
         </Card>
 
@@ -421,21 +439,19 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Calendar className="h-4 w-4 text-green-500" />
-              <Label htmlFor="foundingYear" className="font-medium">Founding Year *</Label>
+              <Calendar aria-hidden="true" className="h-4 w-4 text-green-500" />
+              <Label htmlFor="foundingYear" className="font-medium">Founding Year <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Input
               id="foundingYear"
+              aria-required="true"
+              aria-invalid={Boolean(errors.foundingYear)}
+              aria-describedby={errors.foundingYear ? 'founding-year-error' : undefined}
               {...register('foundingYear')}
               placeholder="When was your venture founded?"
               className="border-0 focus:ring-2 focus:ring-green-500"
             />
-            {errors.foundingYear && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.foundingYear.message}</span>
-              </p>
-            )}
+            {errors.foundingYear && <FieldError id="founding-year-error" message={errors.foundingYear.message} />}
           </div>
         </Card>
       </div>
@@ -444,23 +460,21 @@ export function VentureIntakeForm() {
       <Card className="p-6 border-dashed border-2 hover:border-blue-400 transition-colors">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <MessageSquare className="h-4 w-4 text-blue-500" />
-            <Label htmlFor="pitchSummary" className="font-medium">Pitch Summary *</Label>
+            <MessageSquare aria-hidden="true" className="h-4 w-4 text-blue-500" />
+            <Label htmlFor="pitchSummary" className="font-medium">Pitch Summary <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <p className="text-sm text-gray-500 mb-3">Tell us about your venture's mission and value proposition</p>
           <Textarea
             id="pitchSummary"
+            aria-required="true"
+            aria-invalid={Boolean(errors.pitchSummary)}
+            aria-describedby={errors.pitchSummary ? 'pitch-summary-error' : undefined}
             {...register('pitchSummary')}
             placeholder="We are solving [problem] for [target audience] by providing [solution]. Our unique approach is..."
             rows={4}
             className="border-0 focus:ring-2 focus:ring-blue-500 resize-none"
           />
-          {errors.pitchSummary && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.pitchSummary.message}</span>
-            </p>
-          )}
+          {errors.pitchSummary && <FieldError id="pitch-summary-error" message={errors.pitchSummary.message} />}
         </div>
       </Card>
 
@@ -468,29 +482,27 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Heart className="h-4 w-4 text-green-500" />
-            <Label htmlFor="inclusionFocus" className="font-medium">Inclusion Focus *</Label>
+            <Heart aria-hidden="true" className="h-4 w-4 text-green-500" />
+            <Label htmlFor="inclusionFocus" className="font-medium">Inclusion Focus <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <p className="text-sm text-gray-500 mb-3">How does your venture promote inclusion and address social challenges?</p>
           <Textarea
             id="inclusionFocus"
+            aria-required="true"
+            aria-invalid={Boolean(errors.inclusionFocus)}
+            aria-describedby={errors.inclusionFocus ? 'inclusion-focus-error' : undefined}
             {...register('inclusionFocus')}
             placeholder="Our venture promotes inclusion by... We address social challenges through... Our target beneficiaries are..."
             rows={3}
             className="border-0 focus:ring-2 focus:ring-green-500 resize-none"
           />
-          {errors.inclusionFocus && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.inclusionFocus.message}</span>
-            </p>
-          )}
+          {errors.inclusionFocus && <FieldError id="inclusion-focus-error" message={errors.inclusionFocus.message} />}
         </div>
       </Card>
 
       {/* Progress indicator */}
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
           <span>✅ Team & Foundation</span>
           <span>Next: Market & Business Model</span>
         </div>
@@ -506,21 +518,19 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Target className="h-4 w-4 text-blue-500" />
-              <Label htmlFor="targetMarket" className="font-medium">Target Market *</Label>
+              <Target aria-hidden="true" className="h-4 w-4 text-blue-500" />
+              <Label htmlFor="targetMarket" className="font-medium">Target Market <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Input
               id="targetMarket"
+              aria-required="true"
+              aria-invalid={Boolean(errors.targetMarket)}
+              aria-describedby={errors.targetMarket ? 'target-market-error' : undefined}
               {...register('targetMarket')}
               placeholder="Rural farmers in Vietnam"
               className="border-0 focus:ring-2 focus:ring-blue-500"
             />
-            {errors.targetMarket && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.targetMarket.message}</span>
-              </p>
-            )}
+            {errors.targetMarket && <FieldError id="target-market-error" message={errors.targetMarket.message} />}
           </div>
         </Card>
 
@@ -528,11 +538,17 @@ export function VentureIntakeForm() {
         <Card className="p-4 hover:shadow-md transition-shadow">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <TrendingUp className="h-4 w-4 text-green-500" />
-              <Label htmlFor="revenueModel" className="font-medium">Revenue Model *</Label>
+              <TrendingUp aria-hidden="true" className="h-4 w-4 text-green-500" />
+              <Label htmlFor="revenueModel" className="font-medium">Revenue Model <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Select onValueChange={(value) => setValue('revenueModel', value)}>
-              <SelectTrigger className="border-0 focus:ring-2 focus:ring-green-500">
+              <SelectTrigger
+                id="revenueModel"
+                aria-required="true"
+                aria-invalid={Boolean(errors.revenueModel)}
+                aria-describedby={errors.revenueModel ? 'revenue-model-error' : undefined}
+                className="border-0 focus:ring-2 focus:ring-green-500"
+              >
                 <SelectValue placeholder="How do you make money?" />
               </SelectTrigger>
               <SelectContent>
@@ -543,12 +559,7 @@ export function VentureIntakeForm() {
                 ))}
               </SelectContent>
             </Select>
-            {errors.revenueModel && (
-              <p className="text-sm text-red-500 flex items-center space-x-1">
-                <AlertCircle className="h-3 w-3" />
-                <span>{errors.revenueModel.message}</span>
-              </p>
-            )}
+            {errors.revenueModel && <FieldError id="revenue-model-error" message={errors.revenueModel.message} />}
           </div>
         </Card>
       </div>
@@ -557,23 +568,21 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 border-orange-200">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <AlertCircle className="h-4 w-4 text-orange-500" />
-            <Label htmlFor="challenges" className="font-medium">Key Challenges *</Label>
+            <AlertCircle aria-hidden="true" className="h-4 w-4 text-orange-500" />
+            <Label htmlFor="challenges" className="font-medium">Key Challenges <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <p className="text-sm text-gray-500 mb-3">What are the main challenges your venture faces?</p>
           <Textarea
             id="challenges"
+            aria-required="true"
+            aria-invalid={Boolean(errors.challenges)}
+            aria-describedby={errors.challenges ? 'challenges-error' : undefined}
             {...register('challenges')}
             placeholder="Market access, funding constraints, regulatory barriers, technology challenges..."
             rows={3}
             className="border-0 focus:ring-2 focus:ring-orange-500 resize-none"
           />
-          {errors.challenges && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.challenges.message}</span>
-            </p>
-          )}
+          {errors.challenges && <FieldError id="challenges-error" message={errors.challenges.message} />}
         </div>
       </Card>
 
@@ -581,23 +590,21 @@ export function VentureIntakeForm() {
       <Card className="p-6 border-dashed border-2 hover:border-purple-400 transition-colors">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Heart className="h-4 w-4 text-purple-500" />
-            <Label htmlFor="supportNeeded" className="font-medium">Support Needed *</Label>
+            <Heart aria-hidden="true" className="h-4 w-4 text-purple-500" />
+            <Label htmlFor="supportNeeded" className="font-medium">Support Needed <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <p className="text-sm text-gray-500 mb-3">What type of support do you need from MIV?</p>
           <Textarea
             id="supportNeeded"
+            aria-required="true"
+            aria-invalid={Boolean(errors.supportNeeded)}
+            aria-describedby={errors.supportNeeded ? 'support-needed-error' : undefined}
             {...register('supportNeeded')}
             placeholder="Funding, mentorship, market access, technical assistance, network connections..."
             rows={3}
             className="border-0 focus:ring-2 focus:ring-purple-500 resize-none"
           />
-          {errors.supportNeeded && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.supportNeeded.message}</span>
-            </p>
-          )}
+          {errors.supportNeeded && <FieldError id="support-needed-error" message={errors.supportNeeded.message} />}
         </div>
       </Card>
 
@@ -605,27 +612,25 @@ export function VentureIntakeForm() {
       <Card className="p-4 hover:shadow-md transition-shadow">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Calendar className="h-4 w-4 text-indigo-500" />
-            <Label htmlFor="timeline" className="font-medium">Timeline to Investment Readiness *</Label>
+            <Calendar aria-hidden="true" className="h-4 w-4 text-indigo-500" />
+            <Label htmlFor="timeline" className="font-medium">Timeline to Investment Readiness <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <Input
             id="timeline"
+            aria-required="true"
+            aria-invalid={Boolean(errors.timeline)}
+            aria-describedby={errors.timeline ? 'timeline-error' : undefined}
             {...register('timeline')}
             placeholder="6-12 months to Series A"
             className="border-0 focus:ring-2 focus:ring-indigo-500"
           />
-          {errors.timeline && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.timeline.message}</span>
-            </p>
-          )}
+          {errors.timeline && <FieldError id="timeline-error" message={errors.timeline.message} />}
         </div>
       </Card>
 
       {/* Progress indicator */}
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
           <span>✅ Market & Business Model</span>
           <span>Next: Readiness Assessment</span>
         </div>
@@ -640,7 +645,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <FileText className="h-5 w-5 text-blue-500" />
+            <FileText aria-hidden="true" className="h-5 w-5 text-blue-500" />
             <h3 className="text-lg font-semibold">Operational Readiness</h3>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -654,16 +659,16 @@ export function VentureIntakeForm() {
               { key: 'teamComposition', label: 'Team Composition', icon: Users },
               { key: 'marketResearch', label: 'Market Research', icon: Target },
             ].map((item) => (
-              <Card key={item.key} className="p-3 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3">
+              <Card key={item.key} className="p-3 hover:shadow-md transition-shadow">
+                <div className="flex min-h-11 items-center space-x-3">
                   <Checkbox
                     id={item.key}
                     onCheckedChange={(checked) => {
                       setValue(`operationalReadiness.${item.key}` as any, checked as boolean)
                     }}
                   />
-                  <item.icon className="h-4 w-4 text-blue-500" />
-                  <Label htmlFor={item.key} className="cursor-pointer">{item.label}</Label>
+                  <item.icon aria-hidden="true" className="h-4 w-4 text-blue-500" />
+                  <Label htmlFor={item.key} className="flex min-h-11 flex-1 cursor-pointer items-center">{item.label}</Label>
                 </div>
               </Card>
             ))}
@@ -675,7 +680,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Award className="h-5 w-5 text-purple-500" />
+            <Award aria-hidden="true" className="h-5 w-5 text-purple-500" />
             <h3 className="text-lg font-semibold">Capital Readiness</h3>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -689,16 +694,16 @@ export function VentureIntakeForm() {
               { key: 'dueDiligence', label: 'Due Diligence Ready', icon: CheckCircle },
               { key: 'fundingHistory', label: 'Funding History', icon: Calendar },
             ].map((item) => (
-              <Card key={item.key} className="p-3 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3">
+              <Card key={item.key} className="p-3 hover:shadow-md transition-shadow">
+                <div className="flex min-h-11 items-center space-x-3">
                   <Checkbox
                     id={item.key}
                     onCheckedChange={(checked) => {
                       setValue(`capitalReadiness.${item.key}` as any, checked as boolean)
                     }}
                   />
-                  <item.icon className="h-4 w-4 text-purple-500" />
-                  <Label htmlFor={item.key} className="cursor-pointer">{item.label}</Label>
+                  <item.icon aria-hidden="true" className="h-4 w-4 text-purple-500" />
+                  <Label htmlFor={item.key} className="flex min-h-11 flex-1 cursor-pointer items-center">{item.label}</Label>
                 </div>
               </Card>
             ))}
@@ -708,7 +713,7 @@ export function VentureIntakeForm() {
 
       {/* Progress indicator */}
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
           <span>✅ Readiness Assessment</span>
           <span>Next: Accessibility & Disability Inclusion</span>
         </div>
@@ -723,7 +728,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-teal-50 to-cyan-50 dark:from-teal-950 dark:to-cyan-950 border-teal-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Activity className="h-5 w-5 text-teal-500" />
+            <Activity aria-hidden="true" className="h-5 w-5 text-teal-500" />
             <Label className="font-semibold text-lg">Washington Group Short Set</Label>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -741,11 +746,11 @@ export function VentureIntakeForm() {
               <Card key={item.key} className="p-4 hover:shadow-md transition-shadow">
                 <div className="space-y-2">
                   <div className="flex items-center space-x-2">
-                    <item.icon className="h-4 w-4 text-teal-500" />
-                    <Label className="text-sm font-medium">{item.label}</Label>
+                    <item.icon aria-hidden="true" className="h-4 w-4 text-teal-500" />
+                    <Label htmlFor={`washington-${item.key}`} className="text-sm font-medium">{item.label}</Label>
                   </div>
                   <Select onValueChange={(value) => setValue(`washingtonShortSet.${item.key}` as any, value as any)}>
-                    <SelectTrigger className="border-0 focus:ring-2 focus:ring-teal-500">
+                    <SelectTrigger id={`washington-${item.key}`} className="border-0 focus:ring-2 focus:ring-teal-500">
                       <SelectValue placeholder="Select level" />
                     </SelectTrigger>
                     <SelectContent>
@@ -766,7 +771,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-cyan-50 to-blue-50 dark:from-cyan-950 dark:to-blue-950 border-cyan-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Shield className="h-5 w-5 text-cyan-500" />
+            <Shield aria-hidden="true" className="h-5 w-5 text-cyan-500" />
             <Label className="font-semibold text-lg">Disability Inclusion Attributes</Label>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -778,16 +783,16 @@ export function VentureIntakeForm() {
               { key: 'inclusiveHiringPractices', label: 'Inclusive hiring practices', icon: CheckCircle },
               { key: 'accessibleProductsOrServices', label: 'Accessible products/services', icon: Shield },
             ].map((item) => (
-              <Card key={item.key} className="p-3 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-center space-x-3">
+              <Card key={item.key} className="p-3 hover:shadow-md transition-shadow">
+                <div className="flex min-h-11 items-center space-x-3">
                   <Checkbox
                     id={item.key}
                     onCheckedChange={(checked) => {
                       setValue(`disabilityInclusion.${item.key}` as any, checked as boolean)
                     }}
                   />
-                  <item.icon className="h-4 w-4 text-cyan-500" />
-                  <Label htmlFor={item.key} className="cursor-pointer text-sm">{item.label}</Label>
+                  <item.icon aria-hidden="true" className="h-4 w-4 text-cyan-500" />
+                  <Label htmlFor={item.key} className="flex min-h-11 flex-1 cursor-pointer items-center text-sm">{item.label}</Label>
                 </div>
               </Card>
             ))}
@@ -799,7 +804,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 border-dashed border-2 hover:border-teal-400 transition-colors">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <MessageSquare className="h-4 w-4 text-teal-500" />
+            <MessageSquare aria-hidden="true" className="h-4 w-4 text-teal-500" />
             <Label htmlFor="dliNotes" className="font-medium">Additional Notes</Label>
             <Badge variant="secondary" className="text-xs">Optional</Badge>
           </div>
@@ -816,7 +821,7 @@ export function VentureIntakeForm() {
 
       {/* Progress indicator */}
       <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-        <div className="flex items-center justify-between text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-col gap-1 text-sm text-gray-600 dark:text-gray-400 sm:flex-row sm:items-center sm:justify-between">
           <span>✅ Accessibility & Disability Inclusion</span>
           <span>Next: GEDSI Goals</span>
         </div>
@@ -831,16 +836,23 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 border-emerald-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Target className="h-5 w-5 text-emerald-500" />
-            <Label className="font-semibold text-lg">GEDSI Goals *</Label>
+            <Target aria-hidden="true" className="h-5 w-5 text-emerald-500" />
+            <div id="gedsi-goals-label" className="font-semibold text-lg">GEDSI Goals <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></div>
           </div>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
             These goals will be used to track your venture's impact and align with IRIS+ metrics
           </p>
-          <div className="grid grid-cols-1 gap-3">
+          <div
+            role="group"
+            aria-labelledby="gedsi-goals-label"
+            aria-required="true"
+            aria-invalid={Boolean(errors.gedsiGoals)}
+            aria-describedby={errors.gedsiGoals ? 'gedsi-goals-error' : undefined}
+            className="grid grid-cols-1 gap-3"
+          >
             {gedsiGoals.map((goal) => (
-              <Card key={goal} className="p-4 hover:shadow-md transition-shadow cursor-pointer">
-                <div className="flex items-start space-x-3">
+              <Card key={goal} className="p-4 hover:shadow-md transition-shadow">
+                <div className="flex min-h-11 items-start space-x-3">
                   <Checkbox
                     id={goal}
                     className="mt-0.5"
@@ -854,7 +866,7 @@ export function VentureIntakeForm() {
                     }}
                   />
                   <div className="flex-1">
-                    <Label htmlFor={goal} className="cursor-pointer font-medium">
+                    <Label htmlFor={goal} className="flex min-h-11 cursor-pointer items-center font-medium">
                       {goal.split(' - ')[0]} - {goal.split(' - ')[1]}
                     </Label>
                     <div className="mt-1">
@@ -863,17 +875,12 @@ export function VentureIntakeForm() {
                       </Badge>
                     </div>
                   </div>
-                  <CheckCircle className="h-4 w-4 text-emerald-500" />
+                  <CheckCircle aria-hidden="true" className="h-4 w-4 text-emerald-500" />
                 </div>
               </Card>
             ))}
           </div>
-          {errors.gedsiGoals && (
-            <p className="text-sm text-red-500 flex items-center space-x-1">
-              <AlertCircle className="h-3 w-3" />
-              <span>{errors.gedsiGoals.message}</span>
-            </p>
-          )}
+          {errors.gedsiGoals && <FieldError id="gedsi-goals-error" message={errors.gedsiGoals.message} />}
         </div>
       </Card>
 
@@ -881,7 +888,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
         <div className="flex items-start space-x-3">
           <div className="p-2 bg-blue-500 rounded-full">
-            <Sparkles className="h-4 w-4 text-white" />
+            <Sparkles aria-hidden="true" className="h-4 w-4 text-white" />
           </div>
           <div className="flex-1">
             <h4 className="font-semibold text-blue-900 dark:text-blue-100">AI-Powered Impact Analysis</h4>
@@ -896,7 +903,7 @@ export function VentureIntakeForm() {
       <Card className="p-6 bg-linear-to-r from-slate-50 to-gray-50 dark:from-slate-950 dark:to-gray-950 border-slate-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
-            <Upload className="h-5 w-5 text-slate-500" />
+            <Upload aria-hidden="true" className="h-5 w-5 text-slate-500" />
             <h3 className="text-lg font-semibold">Supporting Documents</h3>
             <Badge variant="secondary" className="text-xs">Optional</Badge>
           </div>
@@ -906,7 +913,7 @@ export function VentureIntakeForm() {
           
           <div className="space-y-4">
             <h4 className="font-medium text-slate-700 dark:text-slate-300 flex items-center space-x-2">
-              <FileText className="h-4 w-4" />
+              <FileText aria-hidden="true" className="h-4 w-4" />
               <span>All Supporting Materials</span>
             </h4>
             <FileUpload
@@ -931,7 +938,7 @@ export function VentureIntakeForm() {
 
       {/* Final Info Alert */}
       <Alert className="border-emerald-200 bg-emerald-50 dark:bg-emerald-950">
-        <Award className="h-4 w-4 text-emerald-600" />
+        <Award aria-hidden="true" className="h-4 w-4 text-emerald-600" />
         <AlertDescription className="text-emerald-800 dark:text-emerald-200">
           🎉 You're almost done! After submitting, you'll receive a comprehensive readiness assessment and personalized recommendations for your venture's growth.
         </AlertDescription>
@@ -939,7 +946,7 @@ export function VentureIntakeForm() {
 
       {/* Progress indicator */}
       <div className="bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 p-4 rounded-lg border border-emerald-200">
-        <div className="flex items-center justify-between text-sm text-emerald-800 dark:text-emerald-200">
+        <div className="flex flex-col gap-1 text-sm text-emerald-800 dark:text-emerald-200 sm:flex-row sm:items-center sm:justify-between">
           <span>✅ GEDSI Goals & Impact</span>
           <span>Ready to Submit & Analyze!</span>
         </div>
@@ -970,9 +977,9 @@ export function VentureIntakeForm() {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
         <Card>
-          <CardHeader>
+          <CardHeader role="status">
             <div className="flex items-center space-x-2">
-              <Sparkles className="h-5 w-5 text-blue-500" />
+              <Sparkles aria-hidden="true" className="h-5 w-5 text-blue-500" />
               <CardTitle>AI Analysis Complete!</CardTitle>
             </div>
             <CardDescription>
@@ -1000,7 +1007,7 @@ export function VentureIntakeForm() {
               <div className="space-y-2">
                 {aiAnalysis.recommendations?.map((rec: string, index: number) => (
                   <div key={index} className="flex items-start space-x-2">
-                    <CheckCircle className="h-4 w-4 text-green-500 mt-0.5" />
+                    <CheckCircle aria-hidden="true" className="h-4 w-4 text-green-500 mt-0.5" />
                     <p className="text-sm">{rec}</p>
                   </div>
                 ))}
@@ -1011,18 +1018,18 @@ export function VentureIntakeForm() {
               <h4 className="font-semibold">Suggested GEDSI Metrics</h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                 {aiAnalysis.suggestedMetrics?.map((metric: any, index: number) => (
-                  <Badge key={index} variant="outline" className="justify-start">
+                  <Badge key={index} variant="outline" className="w-full justify-start whitespace-normal text-left">
                     {metric.code}: {metric.name}
                   </Badge>
                 ))}
               </div>
             </div>
 
-            <div className="flex space-x-4">
-              <Button onClick={() => setShowAiInsights(false)} variant="outline">
+            <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
+              <Button className="w-full min-h-11 sm:w-auto" onClick={() => setShowAiInsights(false)} variant="outline">
                 Back to Form
               </Button>
-              <Button>
+              <Button className="w-full min-h-11 sm:w-auto">
                 View Venture Dashboard
               </Button>
             </div>
@@ -1035,10 +1042,13 @@ export function VentureIntakeForm() {
   if (ventureCreated && analysisFailed) {
     return (
       <div className="max-w-4xl mx-auto space-y-6">
-        <Card>
+        <Card aria-busy={isRetryingAnalysis}>
+          <p className="sr-only" role="status" aria-live="polite">
+            {isRetryingAnalysis ? 'Retrying analysis.' : ''}
+          </p>
           <CardHeader role="status">
             <div className="flex items-center space-x-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              <CheckCircle aria-hidden="true" className="h-5 w-5 text-green-600" />
               <CardTitle>Venture submitted successfully</CardTitle>
             </div>
             <CardDescription>
@@ -1047,7 +1057,7 @@ export function VentureIntakeForm() {
           </CardHeader>
           <CardContent className="space-y-6">
             <Alert role="alert" className="border-amber-200 bg-amber-50 dark:bg-amber-950">
-              <AlertCircle className="h-4 w-4 text-amber-600" />
+              <AlertCircle aria-hidden="true" className="h-4 w-4 text-amber-600" />
               <AlertDescription className="text-amber-800 dark:text-amber-200">
                 Your application is already submitted and does not need to be submitted again.
               </AlertDescription>
@@ -1057,15 +1067,16 @@ export function VentureIntakeForm() {
               type="button"
               onClick={retryAnalysis}
               disabled={isRetryingAnalysis}
+              className="min-h-11"
             >
               {isRetryingAnalysis ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Loader2 aria-hidden="true" className="h-4 w-4 mr-2 animate-spin" />
                   Retrying Analysis...
                 </>
               ) : (
                 <>
-                  <Sparkles className="h-4 w-4 mr-2" />
+                  <Sparkles aria-hidden="true" className="h-4 w-4 mr-2" />
                   Retry Analysis
                 </>
               )}
@@ -1080,13 +1091,19 @@ export function VentureIntakeForm() {
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Progress Header */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col items-start gap-2 sm:flex-row sm:items-center sm:justify-between">
           <h2 className="text-2xl font-bold">Venture Intake Form</h2>
-          <Badge variant="outline">Step {currentStep} of {steps.length}</Badge>
+          <Badge variant="outline" aria-live="polite" aria-atomic="true">
+            Step {currentStep} of {steps.length}
+          </Badge>
         </div>
-        <Progress value={progress} className="w-full" />
-        <div className="flex items-center space-x-2">
-          <Building2 className="h-4 w-4 text-blue-500" />
+        <Progress
+          value={progress}
+          aria-label={`Form progress: step ${currentStep} of ${steps.length}`}
+          className="w-full"
+        />
+        <div className="flex items-center space-x-2" aria-live="polite" aria-atomic="true">
+          <Building2 aria-hidden="true" className="h-4 w-4 text-blue-500" />
           <span className="text-sm text-gray-600">
             {steps[currentStep - 1].title} - {steps[currentStep - 1].description}
           </span>
@@ -1097,16 +1114,29 @@ export function VentureIntakeForm() {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
-            <span>{steps[currentStep - 1].title}</span>
-            {currentStep === steps.length && <Sparkles className="h-4 w-4 text-blue-500" />}
+            <h3 ref={stepHeadingRef} tabIndex={-1}>{steps[currentStep - 1].title}</h3>
+            {currentStep === steps.length && <Sparkles aria-hidden="true" className="h-4 w-4 text-blue-500" />}
           </CardTitle>
           <CardDescription>
             {steps[currentStep - 1].description}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            aria-busy={isSubmitting}
+            className="space-y-6"
+          >
+            <p className="sr-only" role="status" aria-live="polite">
+              {isSubmitting ? 'Submitting your application.' : ''}
+            </p>
             {renderStep()}
+
+            {submissionError && (
+              <p role="alert" className="text-sm text-red-700 dark:text-red-300">
+                {submissionError}
+              </p>
+            )}
 
             {/* Navigation */}
             <div className="flex justify-between pt-6">
@@ -1115,8 +1145,9 @@ export function VentureIntakeForm() {
                 variant="outline"
                 onClick={prevStep}
                 disabled={currentStep === 1}
+                className="min-h-11"
               >
-                <ChevronLeft className="h-4 w-4 mr-2" />
+                <ChevronLeft aria-hidden="true" className="h-4 w-4 mr-2" />
                 Previous
               </Button>
 
@@ -1124,24 +1155,25 @@ export function VentureIntakeForm() {
                 <Button
                   type="button"
                   onClick={handleNext}
+                  className="min-h-11"
                 >
                   Next
-                  <ChevronRight className="h-4 w-4 ml-2" />
+                  <ChevronRight aria-hidden="true" className="h-4 w-4 ml-2" />
                 </Button>
               ) : (
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-800 disabled:text-white disabled:opacity-80"
+                  className="min-h-11 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-800 disabled:text-white disabled:opacity-80"
                 >
                   {isSubmitting ? (
                     <>
-                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      <Loader2 aria-hidden="true" className="h-4 w-4 mr-2 animate-spin" />
                       Submitting...
                     </>
                   ) : (
                     <>
-                      <Sparkles className="h-4 w-4 mr-2" />
+                      <Sparkles aria-hidden="true" className="h-4 w-4 mr-2" />
                       Submit & Analyze
                     </>
                   )}
