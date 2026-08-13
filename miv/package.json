@@ -6,14 +6,19 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "test:integration": "tsx --test tests/integration/*.test.ts",
+    "test:int": "vitest run --config ./vitest.config.mts",
+    "test:watch": "vitest --config ./vitest.config.mts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
     "db:seed": "tsx prisma/seed.ts",
     "db:seed:test": "tsx prisma/seed-test.ts",
-    "postinstall": "node scripts/install-lightningcss.js"
+    "db:seed:calculations": "tsx scripts/seed-calculations.ts",
+    "dev:set-password": "tsx scripts/set-dev-password.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.58.0",
@@ -37,9 +42,6 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-toast": "^1.2.14",
     "@tanstack/react-table": "^8.21.3",
-    "@types/bcryptjs": "^3.0.0",
-    "@types/mongodb": "^4.0.7",
-    "@types/nodemailer": "^7.0.1",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -49,7 +51,6 @@
     "mongodb": "^6.19.0",
     "next": "^16.2.1",
     "next-auth": "^4.24.11",
-    "nodemailer": "^7.0.7",
     "openai": "^5.12.0",
     "react": "^19.0.0",
     "react-day-picker": "^9.10.0",
@@ -64,18 +65,26 @@
     "zod": "^3.25.76"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3",
+    "@next/eslint-plugin-next": "16.2.12",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
-    "eslint-config-next": "15.2.4",
-    "lightningcss-linux-x64-gnu": "^1.32.0",
+    "eslint": "^10.8.0",
+    "eslint-plugin-react-hooks": "^7.1.1",
+    "lightningcss": "^1.30.2",
     "prisma": "^6.13.0",
     "tailwindcss": "^4.1.11",
-    "tsx": "^4.20.3",
-    "typescript": "^5"
+    "tsx": "^4.23.1",
+    "typescript": "^5",
+    "typescript-eslint": "^8.65.0",
+    "vitest": "^4.1.10"
   },
-  "packageManager": "pnpm@10.28.1+sha512.7d7dbbca9e99447b7c3bf7a73286afaaf6be99251eb9498baefa7d406892f67b879adb3a1d7e687fc4ccc1a388c7175fbaae567a26ab44d1067b54fcb0d6a316"
+  "overrides": {
+    "brace-expansion": "^5.0.8",
+    "minimatch": "^10.2.5",
+    "postcss": "^8.5.23",
+    "sharp": "^0.35.0"
+  },
+  "packageManager": "npm@11.13.0"
 }
