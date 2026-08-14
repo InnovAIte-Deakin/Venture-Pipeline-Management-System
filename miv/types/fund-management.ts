@@ -143,3 +143,59 @@ export interface Transaction {
   currency: string
   exchangeRate: number
 }
+
+export interface OperationTask {
+  id: string
+  title?: string
+  task?: string
+  description?: string
+  status?: string
+  dueDate?: string
+  assignee?: string
+  priority?: string
+}
+
+export interface FundDocument {
+  id: string
+  name: string
+  type?: string
+  uploadedAt?: string
+  ventureName: string
+}
+
+export interface FundReport {
+  id: string
+  name?: string
+  title?: string
+  type?: string
+  status?: string
+  generatedAt?: string
+  createdAt?: string
+}
+
+export interface FundMetrics {
+  totalFunds: number
+  activeFunds: number
+  totalCommittedCapital: number
+  totalCalledCapital: number
+  totalDistributedCapital: number
+  averageIRR: number
+}
+
+export interface FundManagementApiResponse {
+  funds?: Fund[]
+  limitedPartners?: LimitedPartner[]
+  capitalCalls?: CapitalCall[]
+  distributions?: Distribution[]
+  operationTasks?: OperationTask[]
+  reports?: FundReport[]
+  ventures?: Array<{
+    name: string
+    documents?: Array<{
+      id?: string
+      name?: string
+      type?: string
+      uploadedAt?: string
+    }>
+  }>
+}

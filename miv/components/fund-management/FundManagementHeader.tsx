@@ -1,4 +1,4 @@
-import { Activity, Briefcase, Download, FileText, Plus, RefreshCw } from "lucide-react"
+import { Activity, Briefcase, Plus, RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -32,8 +32,8 @@ export function FundManagementHeader({
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Fund Operations</h1>
-        <p className="text-muted-foreground">End-to-end fund lifecycle and operational workflow management</p>
+        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Capital Facilitation</h1>
+        <p className="max-w-2xl text-sm text-muted-foreground sm:text-base">Manage funds, investor capital, distributions, and operational workflows in one place.</p>
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Dialog open={isWorkflowStatusOpen} onOpenChange={setIsWorkflowStatusOpen}>
@@ -43,7 +43,7 @@ export function FundManagementHeader({
               Workflow Status
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-h-[90vh] w-[95vw] max-w-2xl overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Fund Operations Workflow Status</DialogTitle>
               <DialogDescription>Current status of all operational workflows and processes</DialogDescription>
@@ -122,7 +122,7 @@ export function FundManagementHeader({
               Launch Fund
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-3xl">
+          <DialogContent className="max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Launch New Fund</DialogTitle>
               <DialogDescription>Set up a new fund with complete operational parameters and LP onboarding</DialogDescription>
@@ -138,8 +138,8 @@ export function FundManagementHeader({
                     { task: "Fund Documentation", completed: false, required: true },
                     { task: "LP Prospect List", completed: false, required: false },
                     { task: "Marketing Materials", completed: false, required: false },
-                  ].map((item, index) => (
-                    <div key={`${item.task}-${index}`} className="flex items-center justify-between rounded-lg border p-3">
+                  ].map((item) => (
+                    <div key={item.task} className="flex items-center justify-between rounded-lg border p-3">
                       <div className="flex items-center gap-3">
                         <div className={`h-4 w-4 rounded-full ${item.completed ? "bg-green-500" : "bg-gray-300"}`} />
                         <div>

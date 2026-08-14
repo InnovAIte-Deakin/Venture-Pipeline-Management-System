@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { getFundStatusBadge } from "@/lib/fund-management/status"
+import { parseFinancialAmount } from "@/lib/fund-management/calculations"
 import type { Fund } from "@/types/fund-management"
 
 interface FundsTableProps {
@@ -36,13 +37,14 @@ export function FundsTable({ funds, onSelectFund }: FundsTableProps) {
             </TableHeader>
             <TableBody>
               {funds.map((fund) => {
-                const calledPercentage = (Number.parseFloat(fund.calledCapital.replace(/[^0-9.]/g, "")) / Number.parseFloat(fund.committedCapital.replace(/[^0-9.]/g, ""))) * 100
+                const committed = parseFinancialAmount(fund.committedCapital)
+                const calledPercentage = committed > 0 ? (parseFinancialAmount(fund.calledCapital) / committed) * 100 : 0
 
                 return (
                   <TableRow key={fund.id}>
                     <TableCell>
                       <div>
-                        <div className="font-medium">{fund.name}</div>
+                        <div className="max-w-64 truncate font-medium" title={fund.name}>{fund.name}</div>
                         <div className="text-sm text-muted-foreground">{fund.id}</div>
                       </div>
                     </TableCell>

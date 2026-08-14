@@ -1,0 +1,18 @@
+import { FileText, FolderOpen, ListChecks } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import type { FundDocument, FundReport, OperationTask } from "@/types/fund-management"
+
+const EmptyState = ({ message }: { message: string }) => <div className="rounded-lg border border-dashed p-8 text-center text-sm text-muted-foreground">{message}</div>
+
+export function FundOperationsSection({ tasks }: { tasks: OperationTask[] }) {
+  return <Card><CardHeader><CardTitle className="flex items-center gap-2"><ListChecks className="h-5 w-5" />Operations</CardTitle><CardDescription>Current operational tasks across the fund lifecycle</CardDescription></CardHeader><CardContent>{tasks.length === 0 ? <EmptyState message="No operational tasks are currently available." /> : <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{tasks.map((task) => <div key={task.id} className="min-w-0 rounded-lg border p-4"><div className="flex items-start justify-between gap-3"><p className="break-words font-medium">{task.title ?? task.task ?? "Operational task"}</p><Badge variant="outline" className="shrink-0 capitalize">{task.status ?? "pending"}</Badge></div>{task.description && <p className="mt-2 break-words text-sm text-muted-foreground">{task.description}</p>}<div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">{task.assignee && <span>{task.assignee}</span>}{task.dueDate && <span>Due {task.dueDate}</span>}</div></div>)}</div>}</CardContent></Card>
+}
+
+export function FundDocumentsSection({ documents }: { documents: FundDocument[] }) {
+  return <Card><CardHeader><CardTitle className="flex items-center gap-2"><FolderOpen className="h-5 w-5" />Documents</CardTitle><CardDescription>Documents supplied by portfolio ventures</CardDescription></CardHeader><CardContent>{documents.length === 0 ? <EmptyState message="No venture documents have been uploaded yet." /> : <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{documents.map((document) => <div key={document.id} className="flex min-w-0 items-start gap-3 rounded-lg border p-4"><FileText className="mt-0.5 h-5 w-5 shrink-0 text-blue-600" /><div className="min-w-0"><p className="truncate font-medium" title={document.name}>{document.name}</p><p className="break-words text-sm text-muted-foreground">{document.ventureName}</p>{document.uploadedAt && <p className="mt-1 text-xs text-muted-foreground">Uploaded {document.uploadedAt}</p>}</div></div>)}</div>}</CardContent></Card>
+}
+
+export function FundReportsSection({ reports }: { reports: FundReport[] }) {
+  return <Card><CardHeader><CardTitle className="flex items-center gap-2"><FileText className="h-5 w-5" />Reports</CardTitle><CardDescription>Generated fund performance and compliance reports</CardDescription></CardHeader><CardContent>{reports.length === 0 ? <EmptyState message="No reports have been generated yet." /> : <div className="space-y-3">{reports.map((report) => <div key={report.id} className="flex flex-col gap-2 rounded-lg border p-4 sm:flex-row sm:items-center sm:justify-between"><div className="min-w-0"><p className="break-words font-medium">{report.title ?? report.name ?? "Fund report"}</p><p className="text-sm text-muted-foreground">{report.type ?? "Performance report"}</p></div><div className="flex shrink-0 items-center gap-3"><Badge variant="outline" className="capitalize">{report.status ?? "available"}</Badge><span className="text-xs text-muted-foreground">{report.generatedAt ?? report.createdAt}</span></div></div>)}</div>}</CardContent></Card>
+}

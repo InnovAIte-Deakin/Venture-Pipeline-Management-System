@@ -1,13 +1,4 @@
-import type { Fund, FundStatus, FundType } from "@/types/fund-management"
-
-export interface FundMetrics {
-  totalFunds: number
-  activeFunds: number
-  totalCommittedCapital: number
-  totalCalledCapital: number
-  totalDistributedCapital: number
-  averageIRR: number
-}
+import type { Fund, FundMetrics } from "@/types/fund-management"
 
 export interface FundFilters {
   searchTerm?: string
@@ -69,7 +60,8 @@ export function parseFinancialAmount(value: string | number | null | undefined):
         ? 1000000000
         : 1
 
-  return amount * multiplier
+  const result = amount * multiplier
+  return Number.isFinite(result) ? result : 0
 }
 
 export function calculateFundMetrics(funds: Fund[]): FundMetrics {
@@ -79,7 +71,7 @@ export function calculateFundMetrics(funds: Fund[]): FundMetrics {
   const totalCalledCapital = funds.reduce((sum, fund) => sum + parseFinancialAmount(fund.calledCapital), 0)
   const totalDistributedCapital = funds.reduce((sum, fund) => sum + parseFinancialAmount(fund.distributedCapital), 0)
   const averageIRR = totalFunds > 0
-    ? funds.reduce((sum, fund) => sum + fund.irr, 0) / totalFunds
+    ? funds.reduce((sum, fund) => sum + (Number.isFinite(fund.irr) ? fund.irr : 0), 0) / totalFunds
     : 0
 
   return {

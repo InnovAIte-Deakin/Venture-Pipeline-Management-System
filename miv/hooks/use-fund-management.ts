@@ -1,34 +1,15 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { extractVentureDocuments } from "@/lib/fund-management/calculations"
-import type { CapitalCall, Distribution, Fund, LimitedPartner } from "@/types/fund-management"
-
-interface FundManagementApiResponse {
-  funds?: Fund[]
-  limitedPartners?: LimitedPartner[]
-  capitalCalls?: CapitalCall[]
-  distributions?: Distribution[]
-  operationTasks?: Array<Record<string, unknown>>
-  documents?: Array<Record<string, unknown>>
-  reports?: Array<Record<string, unknown>>
-  ventures?: Array<{
-    name: string
-    documents?: Array<{
-      id?: string
-      name?: string
-      type?: string
-      uploadedAt?: string
-    }>
-  }>
-}
+import type { CapitalCall, Distribution, Fund, FundDocument, FundManagementApiResponse, FundReport, LimitedPartner, OperationTask } from "@/types/fund-management"
 
 export function useFundManagement() {
   const [funds, setFunds] = useState<Fund[]>([])
   const [limitedPartners, setLimitedPartners] = useState<LimitedPartner[]>([])
   const [capitalCalls, setCapitalCalls] = useState<CapitalCall[]>([])
   const [distributions, setDistributions] = useState<Distribution[]>([])
-  const [operationTasks, setOperationTasks] = useState<Array<Record<string, unknown>>>([])
-  const [documents, setDocuments] = useState<Array<Record<string, unknown>>>([])
-  const [reports, setReports] = useState<Array<Record<string, unknown>>>([])
+  const [operationTasks, setOperationTasks] = useState<OperationTask[]>([])
+  const [documents, setDocuments] = useState<FundDocument[]>([])
+  const [reports, setReports] = useState<FundReport[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const mountedRef = useRef(true)
@@ -70,7 +51,7 @@ export function useFundManagement() {
       setCapitalCalls(data.capitalCalls ?? [])
       setDistributions(data.distributions ?? [])
       setOperationTasks(data.operationTasks ?? [])
-      setDocuments(nextDocuments)
+      setDocuments(nextDocuments as FundDocument[])
       setReports(data.reports ?? [])
     } catch (err) {
       if (controller.signal.aborted || !mountedRef.current) {

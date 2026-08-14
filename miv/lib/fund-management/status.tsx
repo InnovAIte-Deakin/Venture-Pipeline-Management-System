@@ -6,7 +6,7 @@ import {
   TrendingUp,
   XCircle,
 } from "lucide-react"
-import type { CapitalCallStatus, DistributionStatus, FundStatus } from "@/types/fund-management"
+import type { CapitalCallStatus, DistributionStatus, FundStatus, KycStatus, PartnerStatus } from "@/types/fund-management"
 
 export function getFundStatusIcon(status: FundStatus | string) {
   switch (status) {
@@ -70,4 +70,13 @@ export function getDistributionStatusBadge(status: DistributionStatus | string) 
     default:
       return <Badge variant="secondary">Unknown</Badge>
   }
+}
+
+export function getLimitedPartnerStatusBadge(status: PartnerStatus | string) {
+  const label = status.replace("_", " ")
+  return <Badge variant={status === "active" ? "default" : status === "defaulted" ? "destructive" : "secondary"} className={status === "active" ? "bg-green-100 text-green-800" : "capitalize"}>{label}</Badge>
+}
+
+export function getKycStatusBadge(status: KycStatus | string) {
+  return <Badge variant={status === "approved" ? "default" : status === "expired" ? "destructive" : "secondary"} className={status === "approved" ? "bg-green-100 text-green-800" : "capitalize"}>KYC: {status}</Badge>
 }

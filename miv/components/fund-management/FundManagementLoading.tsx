@@ -5,12 +5,12 @@ export function FundManagementLoading() {
     <div className="space-y-6">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Fund Operations</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Capital Facilitation</h1>
           <p className="text-muted-foreground">Loading fund data...</p>
         </div>
       </div>
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">
-        {Array.from({ length: 5 }).map((_, index) => (
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        {Array.from({ length: 6 }).map((_, index) => (
           <Card key={index}>
             <CardHeader className="animate-pulse">
               <div className="h-4 w-3/4 rounded bg-gray-200" />

@@ -1,4 +1,5 @@
-import { Filter, Search } from "lucide-react"
+import { Filter, RotateCcw, Search } from "lucide-react"
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -13,6 +14,7 @@ interface FundFiltersProps {
   onStatusChange: (value: string) => void
   onVintageChange: (value: string) => void
   onFundTypeChange: (value: string) => void
+  onReset: () => void
 }
 
 export function FundFilters({
@@ -25,6 +27,7 @@ export function FundFilters({
   onStatusChange,
   onVintageChange,
   onFundTypeChange,
+  onReset,
 }: FundFiltersProps) {
   return (
     <Card>
@@ -35,7 +38,7 @@ export function FundFilters({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5 xl:items-end">
           <div className="space-y-2">
             <label className="text-sm font-medium">Search</label>
             <div className="relative">
@@ -91,6 +94,7 @@ export function FundFilters({
               </SelectContent>
             </Select>
           </div>
+          <Button type="button" variant="outline" onClick={onReset}><RotateCcw className="mr-2 h-4 w-4" />Reset filters</Button>
         </div>
       </CardContent>
     </Card>
