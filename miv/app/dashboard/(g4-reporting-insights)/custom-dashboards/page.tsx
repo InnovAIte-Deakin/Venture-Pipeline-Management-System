@@ -150,16 +150,10 @@ export default function CustomDashboardsPage() {
       setIsLoading(true)
       setError(null)
       
-    //   const response = await fetch(`/api/custom-dashboards?userId=${user?.id ?? 'cmsfgffh10000iqc0wuumq74r'}`)
-    //   if (!response.ok) {
-    // throw new Error(`Failed to fetch dashboards: ${response.status} ${response.statusText}`)
-    //   }
-    const response = await fetch("/api/custom-dashboards")
-if (!response.ok) {
-  throw new Error(
-    `Failed to fetch dashboards: ${response.status} ${response.statusText}`,
-  )
-}
+      const response = await fetch(`/api/custom-dashboards?userId=${user?.id ?? 'cmsfgffh10000iqc0wuumq74r'}`)
+      if (!response.ok) {
+        throw new Error(`Failed to fetch dashboards: ${response.status} ${response.statusText}`)
+      }
       
       const data = await response.json()
       setDashboards(data.dashboards || [])
@@ -773,4 +767,5 @@ if (!response.ok) {
     </div>
   )
 }
+
 
