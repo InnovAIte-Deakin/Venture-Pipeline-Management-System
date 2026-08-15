@@ -10,6 +10,7 @@ import {
   type ImpactKpiMetric,
 } from "./components/impact-kpi-cards"
 import { ImpactBySectorChart } from "./components/impact-by-sector-chart"
+import { DetailedImpactMetricsTable } from "./components/detailed-impact-metrics-table"
 import {
   DollarSign,
   Users,
@@ -20,7 +21,7 @@ import {
   Globe,
   Activity
 } from "lucide-react"
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Legend } from "recharts"
+import { AreaChart, Area, XAxis, YAxis, Legend } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 interface Venture {
@@ -70,7 +71,7 @@ export default function ImpactReports() {
   const fetchImpactData = async () => {
     try {
       setLoading(true)
-      
+
       // Fetch ventures
       const venturesResponse = await fetch('/api/ventures?limit=100')
       if (venturesResponse.ok) {
@@ -109,15 +110,15 @@ export default function ImpactReports() {
     const totalFunding = ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0)
     const totalJobs = ventures.reduce((sum, v) => {
       const funding = v.fundingRaised || 0
-      const jobsPerMillion = v.sector === 'Agriculture' ? 50 : 
+      const jobsPerMillion = v.sector === 'Agriculture' ? 50 :
                            v.sector === 'Technology' ? 20 :
                            v.sector === 'CleanTech' ? 30 : 25
       return sum + Math.floor((funding / 1000000) * jobsPerMillion)
     }, 0)
-    
+
     const totalBeneficiaries = ventures.reduce((sum, v) => {
       const funding = v.fundingRaised || 0
-      const beneficiariesPerMillion = v.sector === 'Agriculture' ? 2000 : 
+      const beneficiariesPerMillion = v.sector === 'Agriculture' ? 2000 :
                                     v.sector === 'Technology' ? 5000 :
                                     v.sector === 'CleanTech' ? 3000 : 2500
       return sum + Math.floor((funding / 1000000) * beneficiariesPerMillion)
@@ -172,13 +173,13 @@ export default function ImpactReports() {
     // Generate timeline data based on venture creation dates
     const currentMonth = new Date().getMonth()
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    
+
     return months.slice(0, currentMonth + 1).map((month, index) => {
       const venturesUpToMonth = Math.floor(ventures.length * (index + 1) / (currentMonth + 1))
       const capitalUpToMonth = ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0) * (index + 1) / (currentMonth + 1) / 1000000
       const jobsUpToMonth = Math.floor(venturesUpToMonth * 25) // Average jobs per venture
       const beneficiariesUpToMonth = Math.floor(venturesUpToMonth * 1000) // Average beneficiaries per venture
-      
+
       return {
         month,
         ventures: venturesUpToMonth,
@@ -195,18 +196,18 @@ export default function ImpactReports() {
       if (!acc[sector]) {
         acc[sector] = { jobs: 0, beneficiaries: 0 }
       }
-      
+
       const funding = venture.fundingRaised || 0
-      const jobsPerMillion = sector === 'Agriculture' ? 50 : 
+      const jobsPerMillion = sector === 'Agriculture' ? 50 :
                            sector === 'Technology' ? 20 :
                            sector === 'CleanTech' ? 30 : 25
-      const beneficiariesPerMillion = sector === 'Agriculture' ? 2000 : 
+      const beneficiariesPerMillion = sector === 'Agriculture' ? 2000 :
                                     sector === 'Technology' ? 5000 :
                                     sector === 'CleanTech' ? 3000 : 2500
-      
+
       acc[sector].jobs += Math.floor((funding / 1000000) * jobsPerMillion)
       acc[sector].beneficiaries += Math.floor((funding / 1000000) * beneficiariesPerMillion)
-      
+
       return acc
     }, {} as Record<string, { jobs: number, beneficiaries: number }>)
 
@@ -221,9 +222,9 @@ export default function ImpactReports() {
     return ventures.map((venture, index) => {
       const ventureMetrics = gedsiMetrics.filter(m => m.ventureId === venture.id)
       const topMetric = ventureMetrics.find(m => m.status === 'VERIFIED') || ventureMetrics[0]
-      const estimatedJobs = Math.floor(((venture.fundingRaised || 0) / 1000000) * 
+      const estimatedJobs = Math.floor(((venture.fundingRaised || 0) / 1000000) *
         (venture.sector === 'Agriculture' ? 50 : venture.sector === 'Technology' ? 20 : 30))
-      
+
       return {
         id: venture.id,
         title: `Transforming ${venture.sector} in ${venture.location.split(',')[0]}`,
@@ -240,7 +241,7 @@ export default function ImpactReports() {
     const verifiedMetrics = gedsiMetrics.filter(m => m.status === 'VERIFIED').length
     const inProgressMetrics = gedsiMetrics.filter(m => m.status === 'IN_PROGRESS').length
     const totalFunding = ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0) / 1000000
-    
+
     return [
       { metric: "New Ventures Onboarded", Q1: Math.floor(ventures.length * 0.3), Q2: Math.floor(ventures.length * 0.25), Q3: Math.floor(ventures.length * 0.25), Q4: Math.floor(ventures.length * 0.2) },
       { metric: "GEDSI Metrics Verified", Q1: Math.floor(verifiedMetrics * 0.4), Q2: Math.floor(verifiedMetrics * 0.3), Q3: Math.floor(verifiedMetrics * 0.2), Q4: Math.floor(verifiedMetrics * 0.1) },
@@ -252,7 +253,7 @@ export default function ImpactReports() {
   const handleExportReport = async () => {
     try {
       setIsExporting(true)
-      
+
       // Generate CSV report
       const reportData = [
         ['MIV Impact Report', new Date().toLocaleDateString()],
@@ -270,7 +271,7 @@ export default function ImpactReports() {
           gedsiMetrics.filter(m => m.ventureId === v.id).length
         ])
       ]
-      
+
       const csvContent = reportData.map(row => row.map(cell => `"${cell}"`).join(',')).join('\n')
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
       const link = document.createElement('a')
@@ -281,7 +282,7 @@ export default function ImpactReports() {
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
-      
+
       setIsExporting(false)
     } catch (error) {
       console.error('Error exporting report:', error)
@@ -309,32 +310,63 @@ export default function ImpactReports() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
       <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Impact Reports</h1>
-            <p className="text-gray-600 dark:text-gray-400">Comprehensive overview of our impact and achievements</p>
-          </div>
-          <div className="flex items-center space-x-3">
-            <Button variant="outline" onClick={() => fetchImpactData()}>
-              <Activity className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
-            <Button className="bg-teal-600 hover:bg-teal-700" onClick={handleExportReport} disabled={isExporting}>
-              <Download className="h-4 w-4 mr-2" />
-              {isExporting ? 'Generating...' : 'Generate Full Report'}
-            </Button>
-          </div>
-        </div>
+       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+  <div className="min-w-0">
+    <h1 className="text-2xl font-bold text-gray-900 dark:text-white sm:text-3xl">
+      Impact Reports
+    </h1>
+    <p className="mt-1 text-sm text-gray-600 dark:text-gray-400 sm:text-base">
+      Comprehensive overview of our impact and achievements
+    </p>
+  </div>
+
+  <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:items-center sm:gap-3">
+    <Button
+      variant="outline"
+      className="w-full px-2 text-xs sm:w-auto sm:px-4 sm:text-sm"
+      onClick={() => fetchImpactData()}
+    >
+      <Activity className="mr-2 h-4 w-4 shrink-0" />
+      Refresh
+    </Button>
+
+    <Button
+      className="w-full bg-teal-600 px-2 text-xs hover:bg-teal-700 sm:w-auto sm:px-4 sm:text-sm"
+      onClick={handleExportReport}
+      disabled={isExporting}
+    >
+      <Download className="mr-2 h-4 w-4 shrink-0" />
+      {isExporting ? "Generating..." : "Generate Full Report"}
+    </Button>
+  </div>
+</div>
 
         {/* Summary Metrics - Real Data */}
         <ImpactKpiCards metrics={impactSummaryMetrics} />
 
         <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="detailed-metrics">Detailed Metrics</TabsTrigger>
-            <TabsTrigger value="featured-stories">Featured Stories</TabsTrigger>
-          </TabsList>
+          <TabsList className="grid h-auto w-full grid-cols-3 gap-1 bg-gray-100 p-1 dark:bg-gray-800">
+  <TabsTrigger
+    value="overview"
+    className="min-w-0 px-1 py-2 text-[11px] sm:px-3 sm:text-sm"
+  >
+    Overview
+  </TabsTrigger>
+
+  <TabsTrigger
+    value="detailed-metrics"
+    className="min-w-0 px-1 py-2 text-[11px] sm:px-3 sm:text-sm"
+  >
+    Detailed Metrics
+  </TabsTrigger>
+
+  <TabsTrigger
+    value="featured-stories"
+    className="min-w-0 px-1 py-2 text-[11px] sm:px-3 sm:text-sm"
+  >
+    Featured Stories
+  </TabsTrigger>
+</TabsList>
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
@@ -347,8 +379,7 @@ export default function ImpactReports() {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                    <ResponsiveContainer width="100%" height="100%">
+                 <ChartContainer config={chartConfig} className="h-[300px] w-full">
                       <AreaChart data={impactOverTimeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                         <XAxis
                           dataKey="month"
@@ -393,7 +424,7 @@ export default function ImpactReports() {
                           name="Capital Mobilized"
                         />
                       </AreaChart>
-                    </ResponsiveContainer>
+
                   </ChartContainer>
                 </CardContent>
               </Card>
@@ -404,40 +435,7 @@ export default function ImpactReports() {
           </TabsContent>
 
           <TabsContent value="detailed-metrics" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Detailed Impact Metrics</CardTitle>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  Quarterly breakdown of key performance indicators
-                </p>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <table className="w-full min-w-[600px] border-collapse">
-                    <thead>
-                      <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium text-gray-600 uppercase tracking-wider">
-                        <th className="py-3 px-4">Metric</th>
-                        <th className="py-3 px-4">Q1</th>
-                        <th className="py-3 px-4">Q2</th>
-                        <th className="py-3 px-4">Q3</th>
-                        <th className="py-3 px-4">Q4</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {detailedImpactMetrics.map((row, index) => (
-                        <tr key={index} className="border-b border-gray-100 hover:bg-gray-50">
-                          <td className="py-3 px-4 text-sm font-medium text-gray-900">{row.metric}</td>
-                          <td className="py-3 px-4 text-sm text-gray-700">{row.Q1}</td>
-                          <td className="py-3 px-4 text-sm text-gray-700">{row.Q2}</td>
-                          <td className="py-3 px-4 text-sm text-gray-700">{row.Q3}</td>
-                          <td className="py-3 px-4 text-sm text-gray-700">{row.Q4}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
+            <DetailedImpactMetricsTable metrics={detailedImpactMetrics} />
           </TabsContent>
 
           <TabsContent value="featured-stories" className="space-y-6">
