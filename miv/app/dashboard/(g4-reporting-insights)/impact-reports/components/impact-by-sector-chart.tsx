@@ -2,7 +2,6 @@ import {
   Bar,
   BarChart,
   Legend,
-  ResponsiveContainer,
   XAxis,
   YAxis,
 } from "recharts"
@@ -32,11 +31,11 @@ interface ImpactBySectorChartProps {
 const sectorChartConfig = {
   jobs: {
     label: "Jobs Created",
-    color: "hsl(var(--chart-3))",
+    color: "hsl(var(--chart-1))",
   },
   beneficiaries: {
-    label: "Beneficiaries",
-    color: "hsl(var(--chart-5))",
+    label: "Beneficiaries Reached",
+    color: "hsl(var(--chart-2))",
   },
 }
 
@@ -44,7 +43,7 @@ export function ImpactBySectorChart({
   data,
 }: ImpactBySectorChartProps) {
   return (
-    <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
+    <Card className="bg-white/80 backdrop-blur-sm dark:bg-gray-800/80">
       <CardHeader>
         <CardTitle>Impact by Sector</CardTitle>
         <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -57,52 +56,36 @@ export function ImpactBySectorChart({
           config={sectorChartConfig}
           className="h-[300px] w-full"
         >
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={data}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <XAxis
-                dataKey="sector"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12, fill: "#6b7280" }}
-                angle={-45}
-                textAnchor="end"
-                height={60}
-              />
-
-              <YAxis
-                yAxisId="left"
-                axisLine={false}
-                tickLine={false}
-                tick={{ fontSize: 12, fill: "#6b7280" }}
-                label={{
-                  value: "Count",
-                  angle: -90,
-                  position: "insideLeft",
-                  fill: "#6b7280",
-                }}
-              />
-
-              <ChartTooltip content={<ChartTooltipContent />} />
-              <Legend />
-
-              <Bar
-                yAxisId="left"
-                dataKey="jobs"
-                fill="var(--color-jobs)"
-                name="Jobs Created"
-              />
-
-              <Bar
-                yAxisId="left"
-                dataKey="beneficiaries"
-                fill="var(--color-beneficiaries)"
-                name="Beneficiaries Reached"
-              />
-            </BarChart>
-          </ResponsiveContainer>
+          <BarChart
+            data={data}
+            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+          >
+            <XAxis
+              dataKey="sector"
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: "#6b7280" }}
+            />
+            <YAxis
+              axisLine={false}
+              tickLine={false}
+              tick={{ fontSize: 12, fill: "#6b7280" }}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Legend />
+            <Bar
+              dataKey="jobs"
+              fill="var(--color-jobs)"
+              name="Jobs Created"
+              radius={[4, 4, 0, 0]}
+            />
+            <Bar
+              dataKey="beneficiaries"
+              fill="var(--color-beneficiaries)"
+              name="Beneficiaries Reached"
+              radius={[4, 4, 0, 0]}
+            />
+          </BarChart>
         </ChartContainer>
       </CardContent>
     </Card>
