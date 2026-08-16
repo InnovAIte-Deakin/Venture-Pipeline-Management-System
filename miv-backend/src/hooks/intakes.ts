@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CollectionBeforeChangeHook, CollectionAfterChangeHook } from 'payload'
-// EmailJS service removed - intake notifications temporarily disabled
+
+// EmailJS service added and intake notifications enabled
+import { emailService } from '@/lib/email-service'
 
 export const setDisabilityFlag: CollectionBeforeChangeHook = async ({ data }: any) => {
   if (data?.wss) {
@@ -41,8 +43,20 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
     action: 'intake.created', entity: 'onboardingIntakes', entityId: String((doc as any).id), timestamp: new Date().toISOString(),
   } })
 
-  // TODO: Implement intake notification emails using the new Nodemailer email service
-  // Email notifications for intake submissions have been temporarily disabled
-  // during the migration from EmailJS to Nodemailer
-  console.log('Intake created successfully. Email notifications currently disabled.')
+  // COMPLETED: Implement intake notification emails using the new Nodemailer email service
+  // Email notification for intake submissions
+  // Send an email to all available founders of the submitted venture through the email service
+  const ventureFounders = (doc as any).founders || []
+  const venture = await payload.findByID({ collection: 'ventures' as any, id: ventureId })
+
+  for (const founder of ventureFounders) {
+    if (founder?.email) {
+      await emailService.sendIntakeNotificationEmail({
+        founderEmail: founder.email,
+        founderName: founder.fullName || 'founder',
+        ventureName: (venture as any)?.name || 'your venture',
+        country: (venture as any)?.country,
+      })
+    }
+  }
 }
