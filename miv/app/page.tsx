@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -769,7 +768,6 @@ export default function HomePage() {
 				<div className="flex justify-center py-8">
 					<div className="w-1/2 h-px bg-gray-300"></div>
 				</div>
-
 				{/* Latest Reviews Section */}
 				<section id="reviews" className="py-20 bg-transparent">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
