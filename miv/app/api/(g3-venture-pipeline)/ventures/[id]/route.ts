@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
-import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route';
+import { getSessionUser } from '@/lib/auth';
 import { mapRole } from '@/lib/utils';
 
 // Validation schema for updates
@@ -36,12 +35,12 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
 
     // Get venture from database only
@@ -88,7 +87,7 @@ export async function GET(
     }
 
     // Founders (non-staff) can ONLY view their own ventures
-    const isOwner = venture.createdById === session.user.id;
+    const isOwner = venture.createdById === user.id || venture.contactEmail === user.email;
     if (!isStaff && !isOwner) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
     }
@@ -110,24 +109,16 @@ export async function PUT(
 ) {
   const { id } = await params;
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
 
     const body = await request.json();
     const validatedData = updateVentureSchema.parse(body);
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email! }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
 
     // Check if venture exists
     const existingVenture = await prisma.venture.findUnique({
@@ -139,7 +130,7 @@ export async function PUT(
     }
 
     // Founders (non-staff) can ONLY update their own ventures
-    const isOwner = existingVenture.createdById === session.user.id;
+    const isOwner = existingVenture.createdById === user.id || existingVenture.contactEmail === user.email;
     if (!isStaff && !isOwner) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
     }
@@ -200,21 +191,13 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
-
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email! }
-    });
-
-    if (!user) {
-      return NextResponse.json({ error: 'User not found' }, { status: 404 });
-    }
 
     // Check if venture exists
     const existingVenture = await prisma.venture.findUnique({
@@ -226,7 +209,7 @@ export async function DELETE(
     }
 
     // Founders (non-staff) can ONLY delete their own ventures
-    const isOwner = existingVenture.createdById === session.user.id;
+    const isOwner = existingVenture.createdById === user.id || existingVenture.contactEmail === user.email;
     if (!isStaff && !isOwner) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
     }

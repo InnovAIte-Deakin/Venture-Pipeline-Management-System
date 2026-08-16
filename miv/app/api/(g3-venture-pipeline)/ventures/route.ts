@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { AIServices } from '@/lib/ai-services';
 import { triggerVentureRecalculation } from '@/lib/calculation-service';
 import { z } from 'zod';
 import { getMobileFlag } from '@/lib/mobile-detect';
 import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers';
-import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route';
+import { getSessionUser } from '@/lib/auth';
 import { mapRole } from '@/lib/utils';
 
 // Validation schemas
@@ -60,12 +59,12 @@ export async function GET(request: NextRequest) {
     console.log(`Mobile request: ${isMobile}`);
 
     // Enforce authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
 
     const { searchParams } = new URL(request.url);
@@ -99,7 +98,10 @@ export async function GET(request: NextRequest) {
 
     // Non-staff can ONLY see their own ventures
     if (!isStaff) {
-      where.createdById = session.user.id;
+      where.OR = [
+        { createdById: user.id },
+        { contactEmail: user.email }
+      ];
     }
 
     // Optimize includes based on device type
@@ -162,7 +164,7 @@ export async function GET(request: NextRequest) {
       isMobile
     };
 
-    return createCachedResponse(responseData, CACHE_CONFIGS.ANALYTICS);
+    return createCachedResponse(responseData, CACHE_CONFIGS.DYNAMIC);
   } catch (error) {
     console.error('Error fetching ventures:', error);
     return NextResponse.json(
@@ -176,21 +178,13 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     // Enforce authentication
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
     const body = await request.json();
     const validatedData = createVentureSchema.parse(body);
-
-    // Get user from database using session email
-    const user = await prisma.user.findUnique({
-      where: { email: session.user.email! }
-    });
-    if (!user) {
-      return NextResponse.json({ success: false, error: 'USER_NOT_FOUND' }, { status: 404 });
-    }
 
     // Create venture
     const venture = await prisma.venture.create({

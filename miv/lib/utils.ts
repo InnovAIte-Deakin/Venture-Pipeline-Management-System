@@ -9,6 +9,6 @@ export function mapRole(prismaRole: string | null | undefined): string {
   const r = (prismaRole || '').toUpperCase();
   if (r === 'USER') return 'founder';
   if (r === 'ANALYST' || r === 'GEDSI_ANALYST') return 'miv_analyst';
-  if (r === 'ADMIN' || r === 'MANAGER') return 'admin';
+  if (r === 'ADMIN') return 'admin';
   return r.toLowerCase();
 }

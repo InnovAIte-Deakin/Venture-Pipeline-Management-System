@@ -137,11 +137,11 @@ describe('VPMS Integration Security Gates Tests', { skip: !runIntegrationTests }
       assert.ok(Array.isArray(data.ventures), 'Response should contain ventures array')
       
       // Get current user profile to verify creator ID
-      const meRes = await fetch(new URL('/api/users', baseUrl), {
+      const meRes = await fetch(new URL('/api/users/me', baseUrl), {
         headers: { Cookie: founderCookie }
       })
       const meData = await meRes.json()
-      const userId = meData.user?.id
+      const userId = meData.id
 
       if (userId) {
         for (const venture of data.ventures) {
@@ -159,11 +159,11 @@ describe('VPMS Integration Security Gates Tests', { skip: !runIntegrationTests }
 
       assert.ok(Array.isArray(data.notifications), 'Response should contain notifications array')
 
-      const meRes = await fetch(new URL('/api/users', baseUrl), {
+      const meRes = await fetch(new URL('/api/users/me', baseUrl), {
         headers: { Cookie: founderCookie }
       })
       const meData = await meRes.json()
-      const userId = meData.user?.id
+      const userId = meData.id
 
       if (userId) {
         for (const notification of data.notifications) {
@@ -230,7 +230,7 @@ describe('VPMS Integration Security Gates Tests', { skip: !runIntegrationTests }
 
     // Backend admin checks
     it('allows admin to query random venture summary (returns 404 instead of 403)', async () => {
-      const res = await fetch(new URL('/backend/api/ventures/65809794dbcd4f014e7a6344', baseUrl), {
+      const res = await fetch(new URL('/backend/api/ventures/65809794dbcd4f014e7a6344/summary', baseUrl), {
         headers: { Cookie: backendAdminCookie }
       })
       // Admins are not forbidden (no 403), they just get 404 because the ID is random/nonexistent.
@@ -240,13 +240,15 @@ describe('VPMS Integration Security Gates Tests', { skip: !runIntegrationTests }
 
   // 4. Logout endpoint
   describe('Logout Operation', () => {
-    it('successfully calls DELETE on /backend/api/auth/login to destroy session', async () => {
-      const res = await fetch(new URL('/backend/api/auth/login', baseUrl), {
+    it('successfully calls DELETE on /api/session/login to destroy session', async () => {
+      const res = await fetch(new URL('/api/session/login', baseUrl), {
         method: 'DELETE',
-        headers: { Cookie: founderCookie }
       })
-      // Should clear credentials/cookie
       assert.equal(res.status, 200, 'Logout DELETE request should respond with 200')
+      const cookies = res.headers.getSetCookie()
+      const tokenCookie = cookies.find(c => c.includes('payload-token')) || ''
+      const lower = tokenCookie.toLowerCase()
+      assert.ok(lower.includes('max-age=0') || lower.includes('expires='), 'Should clear payload-token cookie')
     })
   })
 })

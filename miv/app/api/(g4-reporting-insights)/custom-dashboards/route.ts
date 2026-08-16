@@ -1,18 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
-import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route';
+import { getSessionUser } from '@/lib/auth';
 import { mapRole } from '@/lib/utils';
 
 // GET /api/custom-dashboards - Get custom dashboards (simulated from user data)
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
     if (!isStaff) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
@@ -57,7 +56,7 @@ export async function GET(request: NextRequest) {
         data: {
           totalVentures: ventures.length,
           activeDeals: ventures.filter(v => v.stage === 'DUE_DILIGENCE' || v.stage === 'INVESTMENT_READY').length,
-          fundedVentures: ventures.filter(v => v.stage === 'FUNDED' || v.fundingRaised > 0).length
+          fundedVentures: ventures.filter(v => v.stage === 'FUNDED' || (v.fundingRaised ?? 0) > 0).length
         }
       },
       {
@@ -65,14 +64,14 @@ export async function GET(request: NextRequest) {
         name: "Portfolio Performance",
         description: "Real-time portfolio performance and IRR tracking",
         category: "Portfolio",
-        widgets: Math.min(ventures.filter(v => v.fundingRaised > 0).length, 12),
+        widgets: Math.min(ventures.filter(v => (v.fundingRaised ?? 0) > 0).length, 12),
         lastModified: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
         isPublic: false,
         isFavorite: false,
         createdBy: users[1]?.name || "Portfolio Manager",
         createdById: users[1]?.id || "system",
         data: {
-          portfolioVentures: ventures.filter(v => v.fundingRaised > 0).length,
+          portfolioVentures: ventures.filter(v => (v.fundingRaised ?? 0) > 0).length,
           totalFunding: ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0),
           avgGedsiScore: ventures.filter(v => v.gedsiMetrics.length > 0)
             .reduce((sum, v) => sum + (v.gedsiMetrics.reduce((s, m) => s + m.currentValue, 0) / v.gedsiMetrics.length), 0) / 
@@ -155,12 +154,12 @@ export async function GET(request: NextRequest) {
 // POST /api/custom-dashboards - Create a new custom dashboard (placeholder)
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
     if (!isStaff) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
@@ -175,7 +174,7 @@ export async function POST(request: NextRequest) {
       ...body,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      createdBy: session.user.name || "Current User", // Would get from session
+      createdBy: user.name || "Current User", // Would get from session
       widgets: 0 // Start with no widgets
     };
 

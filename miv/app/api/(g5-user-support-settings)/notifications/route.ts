@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
-import { authOptions } from '@/app/api/(g5-user-support-settings)/auth/[...nextauth]/route';
+import { getSessionUser } from '@/lib/auth';
 import { mapRole } from '@/lib/utils';
 
 // Validation schema for notifications
@@ -21,12 +20,12 @@ const updateNotificationSchema = createNotificationSchema.partial().extend({
 // GET /api/notifications - List notifications with filtering
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
 
     const { searchParams } = new URL(request.url);
@@ -38,7 +37,10 @@ export async function GET(request: NextRequest) {
 
     // Non-staff can ONLY see their own notifications
     if (!isStaff) {
-      userId = session.user.id;
+      userId = user.id;
+      if (!userId) {
+        return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
+      }
     }
 
     const skip = (page - 1) * limit;
@@ -85,12 +87,12 @@ export async function GET(request: NextRequest) {
 // POST /api/notifications - Create new notification
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
     if (!isStaff) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
@@ -100,11 +102,11 @@ export async function POST(request: NextRequest) {
     const validatedData = createNotificationSchema.parse(body);
 
     // Verify user exists
-    const user = await prisma.user.findUnique({
+    const targetUser = await prisma.user.findUnique({
       where: { id: validatedData.userId }
     });
 
-    if (!user) {
+    if (!targetUser) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
@@ -140,8 +142,8 @@ export async function POST(request: NextRequest) {
 // PUT /api/notifications - Update notification (mark as read, etc.)
 export async function PUT(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    const user = await getSessionUser();
+    if (!user) {
       return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 });
     }
 
@@ -164,11 +166,11 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Notification not found' }, { status: 404 });
     }
 
-    const role = mapRole(session.user.role);
+    const role = mapRole(user.role);
     const isStaff = ['admin', 'miv_analyst'].includes(role);
     
     // Non-staff can only update their own notifications
-    if (!isStaff && existingNotification.userId !== session.user.id) {
+    if (!isStaff && existingNotification.userId !== user.id) {
       return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 });
     }
 
