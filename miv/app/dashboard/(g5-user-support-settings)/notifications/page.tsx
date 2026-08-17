@@ -133,13 +133,13 @@ export default function NotificationsPage() {
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-green-500" />
+        return <CheckCircle className="h-5 w-5 text-green-500" aria-hidden="true" />
       case 'warning':
-        return <AlertCircle className="h-5 w-5 text-yellow-500" />
+        return <AlertCircle className="h-5 w-5 text-yellow-500" aria-hidden="true" />
       case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-500" />
+        return <AlertCircle className="h-5 w-5 text-red-500" aria-hidden="true" />
       default:
-        return <Bell className="h-5 w-5 text-blue-500" />
+        return <Bell className="h-5 w-5 text-blue-500" aria-hidden="true" />
     }
   }
 
@@ -159,8 +159,8 @@ export default function NotificationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-4" />
+        <div className="text-center" role="status" aria-live="polite">
+          <RefreshCw className="h-8 w-8 text-gray-400 animate-spin mx-auto mb-4" aria-hidden="true" />
           <p className="text-gray-600">Loading notifications...</p>
         </div>
       </div>
@@ -169,9 +169,9 @@ export default function NotificationsPage() {
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+      <div className="bg-red-50 border border-red-200 rounded-lg p-4" role="alert">
         <div className="flex items-center">
-          <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+          <AlertCircle className="h-5 w-5 text-red-500 mr-2" aria-hidden="true" />
           <div>
             <h3 className="text-sm font-medium text-red-800">Error Loading Notifications</h3>
             <p className="text-sm text-red-600 mt-1">{error}</p>
@@ -190,17 +190,17 @@ export default function NotificationsPage() {
           <p className="text-gray-600">Manage your notifications and alerts</p>
         </div>
         <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center sm:gap-4">
-          <Button className="w-full sm:w-auto" variant="outline" onClick={fetchNotifications}>
-            <RefreshCw className="h-4 w-4 mr-2" />
+          <Button className="min-h-11 w-full sm:w-auto" variant="outline" onClick={fetchNotifications}>
+            <RefreshCw className="h-4 w-4 mr-2" aria-hidden="true" />
             Refresh
           </Button>
           <Button
-            className="w-full sm:w-auto"
+            className="min-h-11 w-full sm:w-auto"
             variant="outline"
             onClick={markAllAsRead}
             disabled={notifications.every(notification => notification.isRead)}
           >
-            <CheckCheck className="h-4 w-4 mr-2" />
+            <CheckCheck className="h-4 w-4 mr-2" aria-hidden="true" />
             Mark All Read
           </Button>
         </div>
@@ -214,10 +214,11 @@ export default function NotificationsPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="text-sm font-medium mb-2 block">Search</label>
+              <label htmlFor="notifications-search" className="text-sm font-medium mb-2 block">Search</label>
               <div className="relative">
-                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" />
+                <Search className="h-4 w-4 absolute left-3 top-3 text-gray-400" aria-hidden="true" />
                 <Input
+                  id="notifications-search"
                   placeholder="Search notifications..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -226,9 +227,9 @@ export default function NotificationsPage() {
               </div>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Type</label>
+              <label htmlFor="notifications-type" className="text-sm font-medium mb-2 block">Type</label>
               <Select value={typeFilter} onValueChange={setTypeFilter}>
-                <SelectTrigger>
+                <SelectTrigger id="notifications-type">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -241,9 +242,9 @@ export default function NotificationsPage() {
               </Select>
             </div>
             <div>
-              <label className="text-sm font-medium mb-2 block">Status</label>
+              <label htmlFor="notifications-status" className="text-sm font-medium mb-2 block">Status</label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger>
+                <SelectTrigger id="notifications-status">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -258,11 +259,15 @@ export default function NotificationsPage() {
       </Card>
 
       {/* Notifications List */}
-      <div className="space-y-4">
+      <div
+        className="space-y-4"
+        role={filteredNotifications.length > 0 ? "list" : undefined}
+        aria-label={filteredNotifications.length > 0 ? "Notifications" : undefined}
+      >
         {filteredNotifications.length === 0 ? (
           <Card>
-            <CardContent className="text-center py-12">
-              <Bell className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <CardContent className="text-center py-12" role="status" aria-live="polite">
+              <Bell className="h-16 w-16 text-gray-400 mx-auto mb-4" aria-hidden="true" />
               <h3 className="text-lg font-semibold text-gray-900 mb-2">No Notifications</h3>
               <p className="text-gray-600">
                 {searchQuery || typeFilter !== 'all' || statusFilter !== 'all' 
@@ -274,7 +279,11 @@ export default function NotificationsPage() {
           </Card>
         ) : (
           filteredNotifications.map((notification) => (
-            <Card key={notification.id} className={`${!notification.isRead ? 'border-blue-200 bg-blue-50' : ''}`}>
+            <Card
+              key={notification.id}
+              role="listitem"
+              className={`${!notification.isRead ? 'border-blue-200 bg-blue-50' : ''}`}
+            >
               <CardContent className="p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex items-start space-x-4 flex-1">
@@ -298,7 +307,7 @@ export default function NotificationsPage() {
                       <p className="text-gray-600 mb-3">{notification.message}</p>
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
                         <div className="flex items-center">
-                          <Clock className="h-4 w-4 mr-1" />
+                          <Clock className="h-4 w-4 mr-1" aria-hidden="true" />
                           {new Date(notification.createdAt).toLocaleDateString()}
                         </div>
                       </div>
@@ -309,9 +318,10 @@ export default function NotificationsPage() {
                       <Button
                         variant="outline"
                         size="sm"
+                        className="min-h-11"
                         onClick={() => markAsRead(notification.id)}
                       >
-                        <CheckCircle className="h-4 w-4 mr-1" />
+                        <CheckCircle className="h-4 w-4 mr-1" aria-hidden="true" />
                         Mark Read
                       </Button>
                     </div>
