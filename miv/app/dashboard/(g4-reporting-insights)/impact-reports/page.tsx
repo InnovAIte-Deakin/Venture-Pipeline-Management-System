@@ -13,6 +13,10 @@ import { ImpactBySectorChart } from "./components/impact-by-sector-chart"
 import { DetailedImpactMetricsTable } from "./components/detailed-impact-metrics-table"
 import { ImpactOverTimeChart } from "./components/impact-over-time-chart"
 import {
+  ImpactReportsError,
+  ImpactReportsLoading,
+} from "./components/impact-reports-status"
+import {
   DollarSign,
   Users,
   Briefcase,
@@ -50,6 +54,7 @@ export default function ImpactReports() {
   const [ventures, setVentures] = useState<Venture[]>([])
   const [gedsiMetrics, setGedsiMetrics] = useState<GEDSIMetric[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [isExporting, setIsExporting] = useState(false)
 
   useEffect(() => {
@@ -59,16 +64,22 @@ export default function ImpactReports() {
   const fetchImpactData = async () => {
     try {
       setLoading(true)
+      setError(null)
 
-      // Fetch ventures
-      const venturesResponse = await fetch('/api/ventures?limit=100')
+      const [venturesResponse, gedsiResponse] = await Promise.all([
+        fetch('/api/ventures?limit=100'),
+        fetch('/api/gedsi-metrics'),
+      ])
+
+      const failedSources: string[] = []
+
       if (venturesResponse.ok) {
         const data = await venturesResponse.json()
         setVentures(data.ventures || [])
+      } else {
+        failedSources.push('venture data')
       }
 
-      // Fetch GEDSI metrics
-      const gedsiResponse = await fetch('/api/gedsi-metrics')
       if (gedsiResponse.ok) {
         const data = await gedsiResponse.json()
         const metrics = data.metrics || []
@@ -84,11 +95,19 @@ export default function ImpactReports() {
           unit: m.unit,
           status: m.status
         })))
+      } else {
+        failedSources.push('GEDSI metrics')
       }
 
-      setLoading(false)
+      if (failedSources.length > 0) {
+        setError(
+          `Unable to load ${failedSources.join(' and ')}. Displaying the data currently available.`
+        )
+      }
     } catch (error) {
       console.error('Error fetching impact data:', error)
+      setError('Unable to connect to the impact data service. Displaying the data currently available.')
+    } finally {
       setLoading(false)
     }
   }
@@ -279,20 +298,7 @@ export default function ImpactReports() {
   }
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-        <div className="p-6 space-y-6">
-          <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/3 mb-6"></div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded"></div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    )
+    return <ImpactReportsLoading />
   }
 
   return (
@@ -328,6 +334,14 @@ export default function ImpactReports() {
     </Button>
   </div>
 </div>
+
+        {error && (
+          <ImpactReportsError
+            message={error}
+            onRetry={fetchImpactData}
+            isRetrying={loading}
+          />
+        )}
 
         {/* Summary Metrics - Real Data */}
         <ImpactKpiCards metrics={impactSummaryMetrics} />
