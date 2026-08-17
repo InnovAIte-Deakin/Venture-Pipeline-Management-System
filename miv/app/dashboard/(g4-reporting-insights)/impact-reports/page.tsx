@@ -35,6 +35,7 @@ interface Venture {
   stage: string
   fundingRaised: number
   lastValuation: number
+  createdAt: string
 }
 
 interface GEDSIMetric {
@@ -177,22 +178,46 @@ export default function ImpactReports() {
   }, [ventures])
 
   const impactOverTimeData = useMemo(() => {
-    // Generate timeline data based on venture creation dates
-    const currentMonth = new Date().getMonth()
+    const currentDate = new Date()
+    const currentMonth = currentDate.getMonth()
+    const currentYear = currentDate.getFullYear()
+    const yearStart = new Date(currentYear, 0, 1)
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
+    const venturesWithValidDates = ventures.filter((venture) => {
+      const createdAt = new Date(venture.createdAt)
+      return !Number.isNaN(createdAt.getTime())
+    })
+
+    const venturesBeforeCurrentYear = venturesWithValidDates.filter(
+      (venture) => new Date(venture.createdAt) < yearStart
+    )
+
+    let cumulativeVentures = venturesBeforeCurrentYear.length
+    let cumulativeCapital = venturesBeforeCurrentYear.reduce(
+      (sum, venture) => sum + (venture.fundingRaised || 0) / 1000000,
+      0
+    )
+
     return months.slice(0, currentMonth + 1).map((month, index) => {
-      const venturesUpToMonth = Math.floor(ventures.length * (index + 1) / (currentMonth + 1))
-      const capitalUpToMonth = ventures.reduce((sum, v) => sum + (v.fundingRaised || 0), 0) * (index + 1) / (currentMonth + 1) / 1000000
-      const jobsUpToMonth = Math.floor(venturesUpToMonth * 25) // Average jobs per venture
-      const beneficiariesUpToMonth = Math.floor(venturesUpToMonth * 1000) // Average beneficiaries per venture
+      const venturesCreatedThisMonth = venturesWithValidDates.filter((venture) => {
+        const createdAt = new Date(venture.createdAt)
+        return (
+          createdAt.getFullYear() === currentYear &&
+          createdAt.getMonth() === index
+        )
+      })
+
+      cumulativeVentures += venturesCreatedThisMonth.length
+      cumulativeCapital += venturesCreatedThisMonth.reduce(
+        (sum, venture) => sum + (venture.fundingRaised || 0) / 1000000,
+        0
+      )
 
       return {
         month,
-        ventures: venturesUpToMonth,
-        capital: capitalUpToMonth,
-        jobs: jobsUpToMonth,
-        beneficiaries: beneficiariesUpToMonth
+        ventures: cumulativeVentures,
+        capital: Number(cumulativeCapital.toFixed(2)),
       }
     })
   }, [ventures])
