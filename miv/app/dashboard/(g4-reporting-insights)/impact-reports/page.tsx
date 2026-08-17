@@ -11,6 +11,7 @@ import {
 } from "./components/impact-kpi-cards"
 import { ImpactBySectorChart } from "./components/impact-by-sector-chart"
 import { DetailedImpactMetricsTable } from "./components/detailed-impact-metrics-table"
+import { ImpactOverTimeChart } from "./components/impact-over-time-chart"
 import {
   DollarSign,
   Users,
@@ -21,8 +22,6 @@ import {
   Globe,
   Activity
 } from "lucide-react"
-import { AreaChart, Area, XAxis, YAxis, Legend } from "recharts"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 interface Venture {
   id: string
@@ -45,17 +44,6 @@ interface GEDSIMetric {
   targetValue: number
   unit: string
   status: string
-}
-
-const chartConfig = {
-  ventures: {
-    label: "Ventures",
-    color: "hsl(var(--chart-1))", // teal
-  },
-  capital: {
-    label: "Capital ($M)",
-    color: "hsl(var(--chart-2))", // amber
-  },
 }
 
 export default function ImpactReports() {
@@ -371,63 +359,7 @@ export default function ImpactReports() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
               {/* Impact Over Time Chart */}
-              <Card className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle>Impact Over Time</CardTitle>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Ventures impacted and capital mobilized monthly
-                  </p>
-                </CardHeader>
-                <CardContent>
-                 <ChartContainer config={chartConfig} className="h-[300px] w-full">
-                      <AreaChart data={impactOverTimeData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                        <XAxis
-                          dataKey="month"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{ fontSize: 12, fill: "#6b7280" }}
-                        />
-                        <YAxis
-                          yAxisId="left"
-                          axisLine={false}
-                          tickLine={false}
-                          tick={{ fontSize: 12, fill: "#6b7280" }}
-                          label={{ value: "Ventures", angle: -90, position: "insideLeft", fill: "#6b7280" }}
-                        />
-                        <YAxis
-                          yAxisId="right"
-                          orientation="right"
-                          axisLine={false}
-                          tickLine={false}
-                          tickFormatter={(value) => `$${value}M`}
-                          tick={{ fontSize: 12, fill: "#6b7280" }}
-                          label={{ value: "Capital ($M)", angle: 90, position: "insideRight", fill: "#6b7280" }}
-                        />
-                        <ChartTooltip content={<ChartTooltipContent />} />
-                        <Legend />
-                        <Area
-                          yAxisId="left"
-                          type="monotone"
-                          dataKey="ventures"
-                          stroke="var(--color-ventures)"
-                          fill="var(--color-ventures)"
-                          fillOpacity={0.3}
-                          name="Ventures Impacted"
-                        />
-                        <Area
-                          yAxisId="right"
-                          type="monotone"
-                          dataKey="capital"
-                          stroke="var(--color-capital)"
-                          fill="var(--color-capital)"
-                          fillOpacity={0.3}
-                          name="Capital Mobilized"
-                        />
-                      </AreaChart>
-
-                  </ChartContainer>
-                </CardContent>
-              </Card>
+              <ImpactOverTimeChart data={impactOverTimeData} />
 
               {/* Impact by Sector Chart */}
               <ImpactBySectorChart data={impactBySectorData} />
