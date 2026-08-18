@@ -1,32 +1,34 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-// Paths that do not require authentication
+// Paths that do not require authentication. Each entry matches the exact path or a
+// child segment (`p` or `p/...`) — NOT a bare prefix, so `/public` never matches
+// `/publications`.
 const PUBLIC_PATHS = [
   '/auth/login',
   '/auth/register',
   '/auth/forgot-password',
   '/auth/reset-password',
-  '/_next',
   '/favicon.ico',
+  // Only the build asset subtrees — NOT all of `/_next`. `/_next/data` deliberately
+  // routes through the proxy so a protected page's data route can't leak.
+  '/_next/static',
+  '/_next/image',
+  '/static',
   '/assets',
+  '/images',
   '/public',
 ]
 
 function isPublicPath(pathname: string): boolean {
-  if (pathname.startsWith('/api/')) return true // never block Next API routes
-  if (pathname.startsWith('/_next')) return true // Next.js internals
-  if (pathname.startsWith('/static')) return true
-  if (pathname.startsWith('/assets')) return true
-  if (pathname.startsWith('/images')) return true
-  if (pathname.startsWith('/public')) return true
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
 
 /**
  * Payload signs its auth JWTs (HS256) with a key derived from the secret as
- * `sha256(secret).hex().slice(0, 32)`. We reproduce that here with Web Crypto so the
- * check runs on the Edge runtime with no Node `crypto` import.
+ * `crypto.createHash('sha256').update(secret).digest('hex').slice(0, 32)`
+ * (payload@3.49.1). We reproduce that here with Web Crypto so it works whether the
+ * proxy runs on the Node or Edge runtime — no Node `crypto` import needed.
  *
  * The frontend must be given the SAME secret as the backend, as a SERVER-side env var
  * `PAYLOAD_SECRET` (never NEXT_PUBLIC_*). Verifying locally means we validate the
@@ -46,9 +48,13 @@ async function getPayloadJwtKey(): Promise<Uint8Array | null> {
 }
 
 /**
- * True only for a genuinely valid session: correct signature AND not expired.
- * Fails CLOSED on anything else — missing secret, bad signature, expired, malformed,
- * or an unexpected error. Never treats an unverifiable token as authenticated.
+ * True when the token is validly SIGNED and UNEXPIRED. This is a cryptographic check,
+ * not an authorization or liveness check: it deliberately does NOT call the backend, so
+ * it does NOT detect a session that was logged out / revoked before its `exp` (up to the
+ * 7-day token lifetime). That's an accepted trade to avoid a round trip per navigation —
+ * the backend still 401s revoked tokens on `/backend/api/*`, so protected data stays
+ * guarded even though the page shell may render. Fails CLOSED on anything else — missing
+ * secret, bad signature, expired, malformed, or an unexpected error.
  */
 async function hasValidSession(token: string | undefined): Promise<boolean> {
   if (!token) return false
