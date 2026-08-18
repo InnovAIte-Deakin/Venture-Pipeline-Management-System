@@ -16,6 +16,13 @@ type CatalogItem = {
   gedsiSuggestion?: string
 }
 
+const quickFilters = [
+  { label: "Women/Gender", value: "women" },
+  { label: "Disability", value: "disability" },
+  { label: "Marginalized Groups", value: "marginalized" },
+  { label: "Youth", value: "youth" },
+]
+
 export default function IRISMetricsPage() {
   const [query, setQuery] = useState("")
   const [items, setItems] = useState<CatalogItem[]>([])
@@ -86,34 +93,17 @@ export default function IRISMetricsPage() {
             
             {/* Quick filter buttons */}
             <div className="flex flex-wrap gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("women")}
-              >
-                Women/Gender
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("disability")}
-              >
-                Disability
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("marginalized")}
-              >
-                Marginalized Groups
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("youth")}
-              >
-                Youth
-              </Button>
+              {quickFilters.map((filter) => (
+                <Button
+                  key={filter.value}
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setQuery(filter.value)}
+                >
+                  {filter.label}
+                </Button>
+              ))}
+              
               <Button 
                 variant="outline" 
                 size="sm"
