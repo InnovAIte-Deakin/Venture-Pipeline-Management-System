@@ -48,7 +48,9 @@ export const Users: CollectionConfig = {
       type: 'select',
       // Privilege field: only admins may write it (matrix §4 / anomaly A2 —
       // previously any analyst could escalate themselves or a peer to admin).
+      // Locked on BOTH create and update so it can't be set at creation either.
       access: {
+        create: fieldAdminOnly,
         update: fieldAdminOnly,
       },
       options: [

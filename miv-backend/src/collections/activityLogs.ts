@@ -13,7 +13,22 @@ export const ActivityLogs: CollectionConfig = {
     update: () => false,
     delete: () => false,
   },
+  hooks: {
+    // Force the actor to the authenticated user so entries can't be attributed to
+    // someone else (review finding #5). Server-initiated writes (no req.user) keep
+    // whatever actor they set explicitly.
+    beforeChange: [
+      ({ req, data, operation }) => {
+        if (operation === 'create' && req.user) {
+          data.actor = req.user.id
+        }
+        return data
+      },
+    ],
+  },
   fields: [
+    // actor is forced to req.user.id by the beforeChange hook above; any client-supplied
+    // value is overwritten, so it can't be forged. (create requires auth, so req.user exists.)
     { name: 'actor', type: 'relationship', relationTo: 'users' },
     { name: 'action', type: 'text', required: true },
     { name: 'entity', type: 'text', required: true },

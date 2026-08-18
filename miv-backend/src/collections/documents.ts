@@ -67,9 +67,11 @@ export const Documents: CollectionConfig = {
       label: 'Status',
       type: 'select',
       defaultValue: 'pending_review',
-      // Review workflow — only staff may change status (matrix §4). A founder must
-      // not be able to approve their own document.
+      // Review workflow — only staff may set status (matrix §4). A founder must not
+      // approve their own document, at create or update. The upload route sets the
+      // safe default 'pending_review'; a founder-denied field just falls back to it.
       access: {
+        create: fieldAdminOrAnalyst,
         update: fieldAdminOrAnalyst,
       },
       options: [
@@ -119,6 +121,7 @@ export const Documents: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       access: {
+        create: fieldAdminOrAnalyst,
         update: fieldAdminOrAnalyst,
       },
       admin: {
@@ -130,6 +133,7 @@ export const Documents: CollectionConfig = {
       label: 'Reviewed At',
       type: 'date',
       access: {
+        create: fieldAdminOrAnalyst,
         update: fieldAdminOrAnalyst,
       },
       admin: {

@@ -32,9 +32,11 @@ export const OnboardingIntakes: CollectionConfig = {
     {
       name: 'wss',
       type: 'group',
-      // Washington Short Set — disability data. Tightest control: admin-only read/write
-      // (matrix §4). Staff-analyst read can be widened at review if GEDSI needs it.
+      // Washington Short Set — disability data. Tightest control: admin-only at create,
+      // read and update (matrix §4). The public intake writes it via overrideAccess, so
+      // this lock doesn't block onboarding. Analyst read can be widened at review.
       access: {
+        create: fieldAdminOnly,
         read: fieldAdminOnly,
         update: fieldAdminOnly,
       },
@@ -51,8 +53,9 @@ export const OnboardingIntakes: CollectionConfig = {
       name: 'disabilityFlag',
       type: 'checkbox',
       defaultValue: false,
-      // Derived from WSS by a hook — never founder-writable (matrix §4).
+      // Derived from WSS by a hook — never founder-writable, at create or update (matrix §4).
       access: {
+        create: fieldAdminOnly,
         read: fieldAdminOnly,
         update: fieldAdminOnly,
       },

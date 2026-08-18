@@ -36,8 +36,10 @@ export const Ventures: CollectionConfig = {
     {
       name: 'triageTrack',
       type: 'select',
-      // Internal staff assessment — hidden from founders (matrix §4).
+      // Internal staff assessment — hidden from founders, and not settable by a
+      // founder at create time either (matrix §4). Intake sets it via overrideAccess.
       access: {
+        create: fieldAdminOrAnalyst,
         read: fieldAdminOrAnalyst,
         update: fieldAdminOrAnalyst,
       },
@@ -52,6 +54,7 @@ export const Ventures: CollectionConfig = {
       name: 'triageRationale',
       type: 'textarea',
       access: {
+        create: fieldAdminOrAnalyst,
         read: fieldAdminOrAnalyst,
         update: fieldAdminOrAnalyst,
       },

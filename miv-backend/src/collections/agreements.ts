@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { isAuthenticated, adminOnly, adminOrAnalyst } from '@/access/roles'
-import { founderVentureScopedRead } from '@/access/scoping'
+import { founderVentureScopedRead, fieldAdminOrAnalyst } from '@/access/scoping'
 
 export const Agreements: CollectionConfig = {
   slug: 'agreements',
@@ -30,6 +30,13 @@ export const Agreements: CollectionConfig = {
       type: 'select',
       required: true,
       defaultValue: 'not_requested',
+      // NDA/MOU state is staff/provider-controlled. Lock it at create AND update so a
+      // founder can't POST an agreement pre-set to "signed"/"verified" (review finding #3).
+      // Intake creates stubs at 'not_requested' via overrideAccess, so onboarding is fine.
+      access: {
+        create: fieldAdminOrAnalyst,
+        update: fieldAdminOrAnalyst,
+      },
       options: [
         { label: 'Not Requested', value: 'not_requested' },
         { label: 'Requested', value: 'requested' },
