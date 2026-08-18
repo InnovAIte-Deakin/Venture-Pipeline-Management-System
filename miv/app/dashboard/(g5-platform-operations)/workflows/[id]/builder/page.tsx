@@ -16,84 +16,34 @@ import {
   Plus, 
   Trash2, 
   Copy, 
-  ArrowRight, 
-  Clock, 
-  Webhook, 
-  Mail, 
-  Bell, 
-  Database, 
-  FileText, 
-  Users, 
-  Building2, 
-  Target,
-  MessageSquare,
-  Calendar,
-  Globe,
   Zap,
-  Eye,
-  Code,
   History,
   AlertCircle,
   CheckCircle,
   XCircle,
   RotateCcw
 } from "lucide-react"
-
-interface WorkflowNode {
-  id: string
-  type: 'trigger' | 'action' | 'condition'
-  nodeType: string
-  config: any
-  position: { x: number, y: number }
-  connections: string[]
-}
-
-interface WorkflowDefinition {
-  trigger: any
-  steps: any[]
-  metadata?: any
-}
-
-const NODE_TYPES = {
-  trigger: [
-    { value: "manual", label: "Manual Trigger", icon: <Play className="h-4 w-4" />, color: "bg-green-100 text-green-700" },
-    { value: "schedule", label: "Schedule", icon: <Clock className="h-4 w-4" />, color: "bg-blue-100 text-blue-700" },
-    { value: "webhook", label: "Webhook", icon: <Webhook className="h-4 w-4" />, color: "bg-purple-100 text-purple-700" },
-    { value: "venture_created", label: "Venture Created", icon: <Building2 className="h-4 w-4" />, color: "bg-orange-100 text-orange-700" },
-    { value: "stage_changed", label: "Stage Changed", icon: <ArrowRight className="h-4 w-4" />, color: "bg-yellow-100 text-yellow-700" }
-  ],
-  action: [
-    { value: "send_email", label: "Send Email", icon: <Mail className="h-4 w-4" />, color: "bg-red-100 text-red-700" },
-    { value: "create_notification", label: "Create Notification", icon: <Bell className="h-4 w-4" />, color: "bg-blue-100 text-blue-700" },
-    { value: "update_database", label: "Update Database", icon: <Database className="h-4 w-4" />, color: "bg-green-100 text-green-700" },
-    { value: "generate_document", label: "Generate Document", icon: <FileText className="h-4 w-4" />, color: "bg-purple-100 text-purple-700" },
-    { value: "assign_task", label: "Assign Task", icon: <Users className="h-4 w-4" />, color: "bg-orange-100 text-orange-700" },
-    { value: "schedule_meeting", label: "Schedule Meeting", icon: <Calendar className="h-4 w-4" />, color: "bg-pink-100 text-pink-700" },
-    { value: "webhook_call", label: "Webhook Call", icon: <Globe className="h-4 w-4" />, color: "bg-indigo-100 text-indigo-700" }
-  ],
-  condition: [
-    { value: "if_condition", label: "If Condition", icon: <Target className="h-4 w-4" />, color: "bg-yellow-100 text-yellow-700" },
-    { value: "delay", label: "Delay", icon: <Clock className="h-4 w-4" />, color: "bg-gray-100 text-gray-700" }
-  ]
-}
+import { NODE_TYPES } from "../../config"
+import type { Workflow, WorkflowNode, WorkflowNodeKind, WorkflowRun } from "../../types"
+import { definitionToNodes, nodesToDefinition } from "../../utils"
 
 export default function WorkflowBuilderPage() {
   const params = useParams()
-  const [workflow, setWorkflow] = useState<any>(null)
+  const [workflow, setWorkflow] = useState<Workflow | null>(null)
   const [nodes, setNodes] = useState<WorkflowNode[]>([])
   const [selectedNode, setSelectedNode] = useState<WorkflowNode | null>(null)
   const [loading, setLoading] = useState(true)
   const [isDragging, setIsDragging] = useState(false)
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
-  const [runs, setRuns] = useState([])
+  const [runs, setRuns] = useState<WorkflowRun[]>([])
   const canvasRef = useRef<HTMLDivElement>(null)
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const [workflowRes, runsRes] = await Promise.all([
         fetch(`/api/workflows/${params.id}`),
-        fetch(`/api/workflows/${params.id}/runs?limit=10`).catch(() => ({ ok: false }))
+        fetch(`/api/workflows/${params.id}/runs?limit=10`).catch(() => null)
       ])
       
       if (workflowRes.ok) {
@@ -101,11 +51,11 @@ export default function WorkflowBuilderPage() {
         setWorkflow(wf)
         
         // Convert workflow definition to nodes
-        const convertedNodes = convertDefinitionToNodes(wf.definition || { trigger: { type: 'manual' }, steps: [] })
+        const convertedNodes = definitionToNodes(wf.definition || { trigger: { type: 'manual', config: {} }, steps: [] })
         setNodes(convertedNodes)
       }
       
-      if (runsRes.ok) {
+      if (runsRes?.ok) {
         const runsData = await runsRes.json()
         setRuns(runsData.results || [])
       }
@@ -113,65 +63,12 @@ export default function WorkflowBuilderPage() {
       console.error('Error loading workflow:', error)
     }
     setLoading(false)
-  }
-
-  const convertDefinitionToNodes = (definition: WorkflowDefinition): WorkflowNode[] => {
-    const nodes: WorkflowNode[] = []
-    let yPosition = 100
-
-    // Add trigger node
-    if (definition.trigger) {
-      nodes.push({
-        id: 'trigger',
-        type: 'trigger',
-        nodeType: definition.trigger.type || 'manual',
-        config: definition.trigger.config || {},
-        position: { x: 100, y: yPosition },
-        connections: definition.steps && definition.steps.length > 0 ? ['step-0'] : []
-      })
-      yPosition += 150
-    }
-
-    // Add step nodes
-    if (definition.steps) {
-      definition.steps.forEach((step, index) => {
-        nodes.push({
-          id: `step-${index}`,
-          type: 'action',
-          nodeType: step.type || 'send_email',
-          config: step.config || {},
-          position: { x: 100, y: yPosition },
-          connections: index < definition.steps.length - 1 ? [`step-${index + 1}`] : []
-        })
-        yPosition += 150
-      })
-    }
-
-    return nodes
-  }
-
-  const convertNodesToDefinition = (nodes: WorkflowNode[]): WorkflowDefinition => {
-    const triggerNode = nodes.find(n => n.type === 'trigger')
-    const actionNodes = nodes.filter(n => n.type === 'action').sort((a, b) => {
-      const aIndex = parseInt(a.id.split('-')[1] || '0')
-      const bIndex = parseInt(b.id.split('-')[1] || '0')
-      return aIndex - bIndex
-    })
-
-    return {
-      trigger: triggerNode ? { type: triggerNode.nodeType, config: triggerNode.config } : { type: 'manual' },
-      steps: actionNodes.map(node => ({ type: node.nodeType, config: node.config })),
-      metadata: {
-        lastModified: new Date().toISOString(),
-        nodeCount: nodes.length
-      }
-    }
-  }
+  }, [params.id])
 
   const save = async () => {
     if (!workflow) return
 
-    const definition = convertNodesToDefinition(nodes)
+    const definition = nodesToDefinition(nodes)
     
     try {
       const res = await fetch(`/api/workflows/${params.id}`, { 
@@ -216,7 +113,7 @@ export default function WorkflowBuilderPage() {
     }
   }
 
-  const addNode = (type: 'trigger' | 'action' | 'condition', nodeType: string) => {
+  const addNode = (type: WorkflowNodeKind, nodeType: string) => {
     const newNode: WorkflowNode = {
       id: `${type}-${Date.now()}`,
       type,
@@ -230,7 +127,7 @@ export default function WorkflowBuilderPage() {
     setSelectedNode(newNode)
   }
 
-  const updateNode = (nodeId: string, updates: Partial<WorkflowNode>) => {
+  const updateNode = useCallback((nodeId: string, updates: Partial<WorkflowNode>) => {
     setNodes(prev => prev.map(node => 
       node.id === nodeId ? { ...node, ...updates } : node
     ))
@@ -238,7 +135,7 @@ export default function WorkflowBuilderPage() {
     if (selectedNode && selectedNode.id === nodeId) {
       setSelectedNode({ ...selectedNode, ...updates })
     }
-  }
+  }, [selectedNode])
 
   const deleteNode = (nodeId: string) => {
     setNodes(prev => prev.filter(node => node.id !== nodeId))
@@ -286,7 +183,7 @@ export default function WorkflowBuilderPage() {
     }
 
     updateNode(selectedNode.id, { position: newPosition })
-  }, [isDragging, selectedNode, dragOffset])
+  }, [isDragging, selectedNode, dragOffset, updateNode])
 
   const handleMouseUp = useCallback(() => {
     setIsDragging(false)
@@ -305,7 +202,7 @@ export default function WorkflowBuilderPage() {
 
   useEffect(() => { 
     if (params.id) load() 
-  }, [params.id])
+  }, [params.id, load])
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -321,7 +218,7 @@ export default function WorkflowBuilderPage() {
     </div>
   )
 
-  const getNodeTypeInfo = (type: 'trigger' | 'action' | 'condition', nodeType: string) => {
+  const getNodeTypeInfo = (type: WorkflowNodeKind, nodeType: string) => {
     return NODE_TYPES[type]?.find(nt => nt.value === nodeType) || NODE_TYPES[type]?.[0]
   }
 
@@ -371,7 +268,7 @@ export default function WorkflowBuilderPage() {
                       onClick={() => addNode('trigger', nodeType.value)}
                     >
                       <div className={`w-6 h-6 rounded flex items-center justify-center mr-2 ${nodeType.color}`}>
-                        {nodeType.icon}
+                        <nodeType.icon className="h-4 w-4" />
                       </div>
                       {nodeType.label}
                     </Button>
@@ -391,7 +288,7 @@ export default function WorkflowBuilderPage() {
                       onClick={() => addNode('action', nodeType.value)}
                     >
                       <div className={`w-6 h-6 rounded flex items-center justify-center mr-2 ${nodeType.color}`}>
-                        {nodeType.icon}
+                        <nodeType.icon className="h-4 w-4" />
                       </div>
                       {nodeType.label}
                     </Button>
@@ -411,7 +308,7 @@ export default function WorkflowBuilderPage() {
                       onClick={() => addNode('condition', nodeType.value)}
                     >
                       <div className={`w-6 h-6 rounded flex items-center justify-center mr-2 ${nodeType.color}`}>
-                        {nodeType.icon}
+                        <nodeType.icon className="h-4 w-4" />
                       </div>
                       {nodeType.label}
                     </Button>
@@ -439,7 +336,7 @@ export default function WorkflowBuilderPage() {
                             {NODE_TYPES[selectedNode.type]?.map((nodeType) => (
                               <SelectItem key={nodeType.value} value={nodeType.value}>
                                 <div className="flex items-center gap-2">
-                                  {nodeType.icon}
+                                  <nodeType.icon className="h-4 w-4" />
                                   {nodeType.label}
                                 </div>
                               </SelectItem>
@@ -580,7 +477,7 @@ export default function WorkflowBuilderPage() {
                 <h3 className="font-medium">Recent Runs</h3>
                 {runs.length > 0 ? (
                   <div className="space-y-2">
-                    {runs.slice(0, 5).map((run: any) => (
+                    {runs.slice(0, 5).map((run) => (
                       <div key={run.id} className="flex items-center justify-between p-2 bg-white rounded border">
                         <div className="flex items-center gap-2">
                           {run.status === 'SUCCEEDED' && <CheckCircle className="h-4 w-4 text-green-500" />}
@@ -670,7 +567,7 @@ export default function WorkflowBuilderPage() {
                   <div className="p-3">
                     <div className="flex items-center gap-2 mb-2">
                       <div className={`w-6 h-6 rounded flex items-center justify-center ${nodeTypeInfo?.color || 'bg-gray-100'}`}>
-                        {nodeTypeInfo?.icon}
+                        {nodeTypeInfo && <nodeTypeInfo.icon className="h-4 w-4" />}
                       </div>
                       <span className="text-sm font-medium truncate">
                         {nodeTypeInfo?.label || node.nodeType}
