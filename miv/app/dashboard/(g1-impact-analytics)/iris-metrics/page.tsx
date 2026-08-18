@@ -29,20 +29,23 @@ export default function IRISMetricsPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(50)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
 
   useEffect(() => {
     const controller = new AbortController()
     async function search() {
       setLoading(true)
       try {
-        const url = query.trim().length > 0
-          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}`
-          : `/api/iris/metrics?limit=${limit}`
+       const url = query.trim().length > 0
+        ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}&page=${page}`
+        : `/api/iris/metrics?limit=${limit}&page=${page}`
         const res = await fetch(url, { signal: controller.signal })
         if (res.ok) {
           const json = await res.json()
           setItems(json.results || [])
           setTotal(json.total || (json.results?.length ?? 0))
+          setTotalPages(Math.max(1, Math.ceil((json.total || 0) / limit)))
         }
       } catch {}
       finally {
@@ -51,7 +54,7 @@ export default function IRISMetricsPage() {
     }
     const t = setTimeout(search, 250)
     return () => { controller.abort(); clearTimeout(t) }
-  }, [query, limit])
+  }, [query, limit, page])
 
   return (
     <div className="space-y-6">
@@ -70,11 +73,17 @@ export default function IRISMetricsPage() {
                 <Input
                   placeholder="Search by code, name, or description (e.g., PI4060, women, disability)"
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => {
+                    setQuery(e.target.value)
+                    setPage(1)
+                  }}
                 />
               </div>
               <div>
-                <Select value={limit.toString()} onValueChange={(value) => setLimit(parseInt(value))}>
+                <Select value={limit.toString()} onValueChange={(value) => {
+                  setLimit(parseInt(value))
+                  setPage(1)
+                }}
                   <SelectTrigger>
                     <SelectValue placeholder="Results per page" />
                   </SelectTrigger>
@@ -98,7 +107,10 @@ export default function IRISMetricsPage() {
                   key={filter.value}
                   variant="outline"
                   size="sm"
-                  onClick={() => setQuery(filter.value)}
+                  onClick={() => {
+                    setQuery(filter.value)
+                    setPage(1)
+                  }}
                 >
                   {filter.label}
                 </Button>
@@ -107,13 +119,41 @@ export default function IRISMetricsPage() {
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setQuery("")}
+                onClick={() => {
+                  setQuery("")
+                  setPage(1)
+                }}
               >
                 Clear
               </Button>
             </div>
           </div>
 
+        <div className="flex items-center justify-between gap-3">
+  <Button
+    variant="outline"
+    size="sm"
+    disabled={page <= 1 || loading}
+    onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+  >
+    Previous
+  </Button>
+
+  <span className="text-sm text-muted-foreground">
+    Page {page} of {totalPages}
+  </span>
+
+  <Button
+    variant="outline"
+    size="sm"
+    disabled={page >= totalPages || loading}
+    onClick={() =>
+      setPage((currentPage) => Math.min(totalPages, currentPage + 1))
+    }
+  >
+    Next
+  </Button>
+</div>
           <div className="rounded-md border overflow-hidden">
             <Table>
               <TableHeader>
