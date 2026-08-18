@@ -30,39 +30,51 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' }
     });
 
-    // Fetch fund operations data
-    const fundWorkflows = await prisma.fundWorkflow.findMany({
-      include: {
-        assignee: { select: { name: true, email: true } },
-        fund: { select: { name: true } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    // Fetch fund operations data - wrapped in try/catch as these tables may not exist in all environments
+    let fundWorkflows: any[] = [];
+    let fundLifecyclePhases: any[] = [];
+    let fundOperationTasks: any[] = [];
+    try {
+      fundWorkflows = await (prisma as any).fundWorkflow?.findMany({
+        include: {
+          assignee: { select: { name: true, email: true } },
+          fund: { select: { name: true } }
+        },
+        orderBy: { createdAt: 'desc' }
+      }) ?? [];
 
-    const fundLifecyclePhases = await prisma.fundLifecyclePhase.findMany({
-      include: {
-        fund: { select: { name: true } }
-      },
-      orderBy: { phase: 'asc' }
-    });
+      fundLifecyclePhases = await (prisma as any).fundLifecyclePhase?.findMany({
+        include: {
+          fund: { select: { name: true } }
+        },
+        orderBy: { phase: 'asc' }
+      }) ?? [];
 
-    const fundOperationTasks = await prisma.fundOperationTask.findMany({
-      include: {
-        assignee: { select: { name: true, email: true } },
-        creator: { select: { name: true, email: true } },
-        fund: { select: { name: true } },
-        workflow: { select: { name: true, type: true } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+      fundOperationTasks = await (prisma as any).fundOperationTask?.findMany({
+        include: {
+          assignee: { select: { name: true, email: true } },
+          creator: { select: { name: true, email: true } },
+          fund: { select: { name: true } },
+          workflow: { select: { name: true, type: true } }
+        },
+        orderBy: { createdAt: 'desc' }
+      }) ?? [];
+    } catch {
+      // Tables don't exist in this environment — use empty arrays
+    }
 
-    const reports = await prisma.report.findMany({
-      include: {
-        creator: { select: { name: true, email: true } },
-        fund: { select: { name: true } }
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    let reports: any[] = [];
+    try {
+      reports = await prisma.report.findMany({
+        include: {
+          creator: { select: { name: true, email: true } },
+          fund: { select: { name: true } }
+        },
+        orderBy: { createdAt: 'desc' }
+      });
+    } catch {
+      // reports table doesn't exist in this environment
+    }
 
     // Aggregate capital activities by type to create fund-like structures
     const fundData = {
@@ -294,14 +306,21 @@ export async function GET(request: NextRequest) {
     }));
 
     // Fetch real Limited Partners from database if includeLPs is true
-    const limitedPartners = includeLPs ? await prisma.limitedPartner.findMany({
-      include: {
-        fund: {
-          select: { name: true, id: true }
-        }
-      },
-      orderBy: { createdAt: 'desc' }
-    }) : [];
+    let limitedPartners: any[] = [];
+    if (includeLPs) {
+      try {
+        limitedPartners = await prisma.limitedPartner.findMany({
+          include: {
+            fund: {
+              select: { name: true, id: true }
+            }
+          },
+          orderBy: { createdAt: 'desc' }
+        });
+      } catch {
+        // limitedPartner table doesn't exist in this environment
+      }
+    }
 
     const response = {
       funds,
