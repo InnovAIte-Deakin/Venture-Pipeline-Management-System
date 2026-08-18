@@ -80,11 +80,14 @@ export default function IRISMetricsPage() {
                 />
               </div>
               <div>
-                <Select value={limit.toString()} onValueChange={(value) => {
-                  setLimit(parseInt(value))
-                  setPage(1)
-                }}
-                  <SelectTrigger>
+                <Select
+  value={limit.toString()}
+  onValueChange={(value) => {
+    setLimit(parseInt(value))
+    setPage(1)
+  }}
+>
+  <SelectTrigger>
                     <SelectValue placeholder="Results per page" />
                   </SelectTrigger>
                   <SelectContent>
