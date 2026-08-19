@@ -86,7 +86,7 @@ export default function SupportPage() {
                       {faq.question}
                     </span>
                     <ChevronDown
-                      className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform duration-200 ${
+                      className={`w-5 h-5 text-gray-500 shrink-0 transition-transform duration-200 ${
                         openIndex === index ? 'rotate-180' : ''
                       }`}
                     />
@@ -113,7 +113,7 @@ export default function SupportPage() {
             <div className="space-y-4 mb-8">
               {/* Address */}
               <div className="flex items-center gap-4 bg-teal-600 text-white rounded-xl px-5 py-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
@@ -124,7 +124,7 @@ export default function SupportPage() {
 
               {/* Email */}
               <div className="flex items-center gap-4 bg-teal-600 text-white rounded-xl px-5 py-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
                 <a href="mailto:support@miv.com" className="font-medium hover:underline">
@@ -134,7 +134,7 @@ export default function SupportPage() {
 
               {/* Phone */}
               <div className="flex items-center gap-4 bg-teal-600 text-white rounded-xl px-5 py-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <Phone className="w-5 h-5" />
                 </div>
                 <a href="tel:+85517350544" className="font-medium hover:underline">
@@ -165,7 +165,7 @@ export default function SupportPage() {
                 className="flex items-center gap-4 bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5 hover:shadow-md transition-shadow text-left"
               >
                 <div
-                  className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center flex-shrink-0`}
+                  className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center shrink-0`}
                 >
                   <Icon className={`w-6 h-6 ${resource.color}`} />
                 </div>

@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
-import { MobileNav } from "@/components/mobile-nav";
+import { MobileNav } from "@/components/dashboard/navigation/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
 
 export default function DashboardLayout({

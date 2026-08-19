@@ -58,6 +58,37 @@ const formatFileSize = (bytes: number) => {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
 }
 
+const fileTypeToMime: Record<string, string> = {
+  '.pdf': 'application/pdf',
+  '.doc': 'application/msword',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.ppt': 'application/vnd.ms-powerpoint',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png'
+}
+
+const buildDropzoneAccept = (fileTypes: string[]) => {
+  return fileTypes.reduce<Record<string, string[]>>((acc, type) => {
+    if (type.includes('/')) {
+      acc[type] = acc[type] ?? []
+      return acc
+    }
+
+    const extension = type.startsWith('.') ? type.toLowerCase() : `.${type.toLowerCase()}`
+    const mimeType = fileTypeToMime[extension]
+
+    if (mimeType) {
+      acc[mimeType] = [...(acc[mimeType] ?? []), extension]
+    }
+
+    return acc
+  }, {})
+}
+
 export function FileUpload({
   onFilesUploaded,
   onFileRemoved,
@@ -152,10 +183,7 @@ export function FileUpload({
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: acceptedFileTypes.reduce((acc, type) => {
-      acc[`*/${type.replace('.', '')}`] = [type]
-      return acc
-    }, {} as any),
+    accept: buildDropzoneAccept(acceptedFileTypes),
     maxSize: maxFileSize * 1024 * 1024,
     disabled,
     onDragEnter: () => setIsDragOver(true),
