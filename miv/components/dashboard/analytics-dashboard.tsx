@@ -24,7 +24,6 @@ import {
   Calendar,
   Filter,
   Download,
-  RefreshCw,
   Maximize2,
   Settings,
   AlertTriangle,
@@ -193,7 +192,6 @@ interface AnalyticsDashboardProps {
   customizable?: boolean
   onOpenFilters?: () => void
   onExport?: (payload: { charts: ChartWidget[] }) => void
-  onRefresh?: () => void
 }
 
 export function AnalyticsDashboard({
@@ -206,7 +204,6 @@ export function AnalyticsDashboard({
   customizable = true,
   onOpenFilters,
   onExport,
-  onRefresh,
 }: AnalyticsDashboardProps) {
   const [selectedTimeRange, setSelectedTimeRange] = useState(timeRange)
   const [isCustomizing, setIsCustomizing] = useState(false)
@@ -284,11 +281,6 @@ export function AnalyticsDashboard({
     // Default: export charts data as JSON
     const payload = charts.map(c => ({ id: c.id, title: c.title, type: c.type, data: c.data }))
     download(`dashboard-charts-${new Date().toISOString().slice(0,10)}.json`, JSON.stringify(payload, null, 2))
-  }
-
-  const handleRefresh = () => {
-    if (onRefresh) return onRefresh()
-    if (typeof window !== 'undefined') window.location.reload()
   }
 
   const getChangeIcon = (changeType: string) => {
@@ -504,17 +496,17 @@ export function AnalyticsDashboard({
   }
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-4 sm:space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">{title}</h1>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
+          <h1 className="break-words text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent sm:text-3xl">{title}</h1>
           <p className="text-slate-600 font-medium">Real-time insights and performance metrics</p>
         </div>
         
-        <div className="flex items-center space-x-3">
+        <div className="grid grid-cols-3 gap-2 sm:flex sm:items-center sm:space-x-3 sm:gap-0">
           <Select value={selectedTimeRange} onValueChange={handleTimeRangeChange}>
-            <SelectTrigger className="w-32">
+            <SelectTrigger className="col-span-3 w-full sm:w-32">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -527,24 +519,19 @@ export function AnalyticsDashboard({
             </SelectContent>
           </Select>
           
-          <Button variant="outline" size="sm" onClick={handleOpenFilters}>
+          <Button className="w-full bg-black px-2 text-white hover:bg-neutral-800 sm:w-auto sm:px-3" size="sm" onClick={handleOpenFilters}>
             <Filter className="h-4 w-4 mr-2" />
             Filters
           </Button>
           
-          <Button variant="outline" size="sm" onClick={handleExport}>
+          <Button className="w-full bg-black px-2 text-white hover:bg-neutral-800 sm:w-auto sm:px-3" size="sm" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
           
-          <Button variant="outline" size="sm" onClick={handleRefresh}>
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
-          </Button>
-          
           {customizable && (
             <Button 
-              variant="outline" 
+              className="w-full bg-black px-2 text-white hover:bg-neutral-800 sm:w-auto sm:px-3"
               size="sm"
               onClick={() => setIsCustomizing(!isCustomizing)}
             >
@@ -557,15 +544,15 @@ export function AnalyticsDashboard({
 
       {/* Key Metrics */}
       {widgetConfig.keyMetrics && (
-      <div className={`grid ${layoutMode === 'compact' ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} ${layoutMode === 'wide' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-6`}>
+      <div className={`grid ${layoutMode === 'compact' ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} ${layoutMode === 'wide' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-3 sm:gap-6`}>
         {metrics.map((metric, index) => (
           <Card key={index} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-white to-gray-50/50">
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
+            <CardContent className="p-4 sm:p-6">
+              <div className="flex min-w-0 items-center justify-between gap-3">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-600 mb-1">{metric.title}</p>
-                  <div className="flex items-baseline space-x-2">
-                    <p className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">{metric.value}</p>
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <p className="break-words text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent sm:text-3xl">{metric.value}</p>
                     {metric.change !== 0 && (
                       <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getChangeColor(metric.changeType)} ${metric.changeType === 'increase' ? 'bg-emerald-50' : 'bg-red-50'}`}>
                         {getChangeIcon(metric.changeType)}
@@ -579,7 +566,7 @@ export function AnalyticsDashboard({
                     <p className="text-xs text-gray-500 mt-1">{metric.subtitle}</p>
                   )}
                 </div>
-                <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${metric.color} transform transition-all duration-300 hover:scale-110 hover:shadow-xl`}>
+                <div className={`w-10 h-10 shrink-0 rounded-xl flex items-center justify-center sm:h-12 sm:w-12 ${metric.color} transform transition-all duration-300 hover:scale-110 hover:shadow-xl`}>
                   {metric.icon}
                 </div>
               </div>
@@ -591,7 +578,7 @@ export function AnalyticsDashboard({
 
       {/* Charts Grid */}
       {widgetConfig.performanceCharts && (
-      <div className={`grid grid-cols-1 ${layoutMode === 'wide' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} xl:grid-cols-3 gap-6`}>
+      <div className={`grid min-w-0 grid-cols-1 ${layoutMode === 'wide' ? 'lg:grid-cols-3' : 'lg:grid-cols-2'} xl:grid-cols-3 gap-4 sm:gap-6`}>
         {charts.map((chart) => (
           <Card 
             key={chart.id} 
@@ -600,11 +587,11 @@ export function AnalyticsDashboard({
             } ${chart.span === 3 ? 'xl:col-span-3' : ''}`}
           >
             <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg font-semibold text-gray-900">
+              <div className="flex min-w-0 items-center justify-between gap-2">
+                <CardTitle className="min-w-0 break-words text-base font-semibold text-gray-900 sm:text-lg">
                   {chart.title}
                 </CardTitle>
-                <div className="flex items-center space-x-2">
+                <div className="flex shrink-0 items-center space-x-2">
                   <Button variant="ghost" size="sm">
                     <Maximize2 className="h-4 w-4" />
                   </Button>
@@ -615,7 +602,7 @@ export function AnalyticsDashboard({
               </div>
             </CardHeader>
             <CardContent>
-              <div className="bg-white rounded-lg">
+              <div className="min-w-0 overflow-x-auto rounded-lg bg-white">
                 <ChartRenderer chart={{...chart, options: { ...chart.options, ...(chartOptionsMap[chart.id] || {}) }}} />
                 
                 
