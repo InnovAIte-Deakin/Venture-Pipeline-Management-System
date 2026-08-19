@@ -7,28 +7,34 @@ import type { Access, FieldAccess, Where } from 'payload'
  * Documents.read already uses) so founders see only their own rows rather than a
  * plain allow/deny boolean. See docs/rbac/RBAC_MATRIX.md §2/§4.
  *
- * NOTE: this replaces the broken `founderOfVenture` in ./roles.ts, which mapped
- * `ventures.founders[].user` — an array field that has no `user` sub-field, so it
- * denied every founder. We resolve the founder→venture link through the `founders`
- * COLLECTION instead (it carries a real `user` relationship), which needs no schema
- * migration.
+ * The founder→venture link is resolved by matching the AUTHENTICATED session email
+ * against `founders.email` (which is required + unique). We deliberately do NOT use a
+ * `founders.user` relationship: nothing populates it, and it's client-writable, so it
+ * would be both empty and forgeable. The session email is trusted and not client-set.
+ *
+ * Case is normalised on both sides: registration lowercases the user's email, and a
+ * beforeChange hook on the founders collection lowercases `founders.email`, so the
+ * (case-sensitive on Mongo) `equals` match can't silently miss.
+ *
+ * (This replaced the broken `founderOfVenture` from ./roles.ts, which mapped
+ * `ventures.founders[].user` — an embedded array field with no `user` sub-field.)
  */
 
 export const isStaff = (user: any): boolean =>
   user?.role === 'admin' || user?.role === 'miv_analyst'
 
 /**
- * Venture ids the current founder is linked to, resolved via the founders collection.
- * Uses overrideAccess for this internal lookup (it computes scope; it does not return
- * user-facing data).
+ * Venture ids the current founder is linked to, resolved via the founders collection by
+ * matching the session email. Uses overrideAccess for this internal lookup (it computes
+ * scope; it does not return user-facing data).
  */
 export async function ventureIdsForUser(req: any): Promise<string[]> {
   const payload = req?.payload
-  const userId = req?.user?.id
-  if (!payload || !userId) return []
+  const email = req?.user?.email
+  if (!payload || !email) return []
   const founders = await payload.find({
     collection: 'founders',
-    where: { user: { equals: userId } },
+    where: { email: { equals: String(email).toLowerCase() } },
     depth: 0,
     limit: 1000,
     overrideAccess: true,
