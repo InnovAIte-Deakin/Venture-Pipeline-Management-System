@@ -23,9 +23,9 @@ import {
   XCircle,
   RotateCcw
 } from "lucide-react"
-import { NODE_TYPES } from "../../config"
-import type { Workflow, WorkflowNode, WorkflowNodeKind, WorkflowRun } from "../../types"
-import { definitionToNodes, nodesToDefinition } from "../../utils"
+import { NODE_TYPES } from "../../constants/workflow.constants"
+import type { Workflow, WorkflowNode, WorkflowNodeKind, WorkflowRun } from "../../types/workflow"
+import { definitionToNodes, nodesToDefinition } from "../../lib/workflow-utils"
 
 export default function WorkflowBuilderPage() {
   const params = useParams()
@@ -223,14 +223,14 @@ export default function WorkflowBuilderPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col">
+    <div className="flex min-h-[calc(100vh-5rem)] flex-col">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b bg-white">
-        <div>
+      <div className="flex flex-col gap-3 border-b bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="min-w-0">
           <h1 className="text-xl font-bold">{workflow.name}</h1>
           <p className="text-sm text-gray-600">{workflow.description || 'No description'}</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant={workflow.isActive ? "default" : "secondary"}>
             {workflow.isActive ? "Active" : "Inactive"}
           </Badge>
@@ -245,9 +245,9 @@ export default function WorkflowBuilderPage() {
         </div>
       </div>
 
-      <div className="flex-1 flex">
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
         {/* Sidebar */}
-        <div className="w-80 border-r bg-gray-50 overflow-y-auto">
+        <div className="max-h-80 w-full overflow-y-auto border-b bg-gray-50 lg:max-h-none lg:w-80 lg:border-b-0 lg:border-r">
           <Tabs defaultValue="nodes" className="w-full">
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="nodes">Nodes</TabsTrigger>
@@ -503,10 +503,10 @@ export default function WorkflowBuilderPage() {
         </div>
 
         {/* Canvas */}
-        <div className="flex-1 relative overflow-hidden bg-gray-100">
+        <div className="relative min-h-[28rem] flex-1 overflow-auto bg-gray-100">
           <div 
             ref={canvasRef}
-            className="w-full h-full relative"
+            className="relative h-full min-h-[28rem] min-w-[42rem]"
             style={{ backgroundImage: 'radial-gradient(circle, #e5e7eb 1px, transparent 1px)', backgroundSize: '20px 20px' }}
           >
             {/* Render connections */}

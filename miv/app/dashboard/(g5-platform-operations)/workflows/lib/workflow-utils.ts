@@ -1,4 +1,4 @@
-import type { WorkflowDefinition, WorkflowNode, WorkflowRun, WorkflowRunStats } from "./types"
+import type { WorkflowDefinition, WorkflowNode, WorkflowRun, WorkflowRunStats } from "../types/workflow"
 
 const DEFAULT_TRIGGER = { type: "manual", config: {} }
 

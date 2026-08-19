@@ -13,8 +13,8 @@ import {
   Zap,
   Plus
 } from "lucide-react"
-import { ACTION_TYPES, TRIGGER_TYPES, WORKFLOW_TEMPLATES } from "../config"
-import type { WorkflowStep, WorkflowTrigger } from "../types"
+import { ACTION_TYPES, TRIGGER_TYPES, WORKFLOW_TEMPLATES } from "../constants/workflow.constants"
+import type { WorkflowStep, WorkflowTrigger } from "../types/workflow"
 
 export default function WorkflowWizardPage() {
   const router = useRouter()
@@ -113,23 +113,25 @@ export default function WorkflowWizardPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 px-4 sm:px-0">
       {/* Progress Indicator */}
-      <div className="flex items-center justify-between mb-8">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-              i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-            }`}>
-              {i}
+      <div className="mb-8 overflow-x-auto pb-2">
+        <div className="flex min-w-max items-center justify-between">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
+                i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              }`}>
+                {i}
+              </div>
+              {i < 5 && (
+                <div className={`mx-2 h-0.5 w-8 sm:w-16 ${
+                  i < step ? 'bg-blue-600' : 'bg-gray-200'
+                }`} />
+              )}
             </div>
-            {i < 5 && (
-              <div className={`w-16 h-0.5 mx-2 ${
-                i < step ? 'bg-blue-600' : 'bg-gray-200'
-              }`} />
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <Card>
@@ -347,17 +349,17 @@ export default function WorkflowWizardPage() {
               <div className="space-y-4">
                 {actions.map((action, index) => (
                   <Card key={index} className="p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-sm font-medium">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-medium">
                         {index + 1}
                       </div>
                       <div className="flex-1 space-y-3">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                           <Select 
                             value={action.type} 
                             onValueChange={(value) => updateAction(index, 'type', value)}
                           >
-                            <SelectTrigger className="w-64">
+                            <SelectTrigger className="w-full sm:w-64">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -376,7 +378,7 @@ export default function WorkflowWizardPage() {
                               variant="ghost" 
                               size="sm" 
                               onClick={() => removeAction(index)}
-                              className="text-red-600 hover:text-red-700"
+                              className="w-full text-red-600 hover:text-red-700 sm:w-auto"
                             >
                               Remove
                             </Button>

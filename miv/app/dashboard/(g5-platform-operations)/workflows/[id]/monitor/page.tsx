@@ -20,8 +20,8 @@ import {
   AlertTriangle,
   Eye
 } from "lucide-react"
-import type { Workflow, WorkflowRun } from "../../types"
-import { formatDuration, getRunStats } from "../../utils"
+import type { Workflow, WorkflowRun } from "../../types/workflow"
+import { formatDuration, getRunStats } from "../../lib/workflow-utils"
 
 export default function WorkflowMonitorPage() {
   const params = useParams()
@@ -122,10 +122,10 @@ export default function WorkflowMonitorPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/workflows">
-            <Button variant="outline" size="sm">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <Link href="/dashboard/workflows" className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Workflows
             </Button>
@@ -135,7 +135,7 @@ export default function WorkflowMonitorPage() {
             <p className="text-gray-600">Workflow Monitoring & Analytics</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant={workflow.isActive ? "default" : "secondary"}>
             {workflow.isActive ? "Active" : "Inactive"}
           </Badge>
@@ -151,7 +151,7 @@ export default function WorkflowMonitorPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ export default function WorkflowMonitorPage() {
                         }`}
                         onClick={() => setSelectedRun(run)}
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-center gap-3">
                             {getStatusIcon(run.status)}
                             <div>
@@ -261,7 +261,7 @@ export default function WorkflowMonitorPage() {
                               </p>
                             </div>
                           </div>
-                          <div className="text-right text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 sm:text-right">
                             {run.finishedAt && (
                               <p>Duration: {formatDuration(duration)}</p>
                             )}

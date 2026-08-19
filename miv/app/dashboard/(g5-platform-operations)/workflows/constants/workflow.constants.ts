@@ -16,7 +16,7 @@ import {
   Users,
   Webhook,
 } from "lucide-react"
-import type { WorkflowNodeKind, WorkflowOption, WorkflowTemplate } from "./types"
+import type { WorkflowNodeKind, WorkflowOption, WorkflowTemplate } from "../types/workflow"
 
 export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
   {
