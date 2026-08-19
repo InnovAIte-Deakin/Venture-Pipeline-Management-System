@@ -6,14 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Play, RefreshCw, Zap } from "lucide-react"
-
-type Workflow = {
-  id: string
-  name: string
-  description?: string | null
-  isActive: boolean
-  updatedAt: string
-}
+import type { Workflow } from "./types"
 
 export default function WorkflowsPage() {
   const [workflows, setWorkflows] = useState<Workflow[]>([])
