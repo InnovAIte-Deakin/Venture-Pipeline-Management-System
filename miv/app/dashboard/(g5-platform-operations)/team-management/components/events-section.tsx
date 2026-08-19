@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Search, Plus } from 'lucide-react'
 import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
 import { EventCard } from './event-card'
@@ -24,6 +23,7 @@ export function EventsSection() {
   const [selectedEvent, setSelectedEvent] = useState<TeamEvent | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const requestRef = useRef(0)
 
@@ -78,6 +78,7 @@ export function EventsSection() {
   }
 
   const handleSubmit = async (payload: UpdateTeamEventInput) => {
+    setSaving(true)
     setFormError(null)
     try {
       if (selectedEvent) {
@@ -92,6 +93,8 @@ export function EventsSection() {
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to save event')
       throw err
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -160,7 +163,7 @@ export function EventsSection() {
         open={formOpen}
         event={selectedEvent ?? undefined}
         members={members}
-        loading={false}
+        loading={saving}
         error={formError ?? undefined}
         onOpenChange={(open) => {
           if (!open) {

@@ -63,20 +63,6 @@ export async function GET(
                 email: true,
               }
             },
-            dependencies: {
-              select: {
-                id: true,
-                name: true,
-                status: true,
-              }
-            },
-            dependentOn: {
-              select: {
-                id: true,
-                name: true,
-                status: true,
-              }
-            }
           },
           orderBy: { createdAt: 'desc' }
         },

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 // Validation schemas
@@ -164,7 +165,7 @@ export async function POST(request: NextRequest) {
         location: validatedData.location,
         isAllDay: validatedData.isAllDay,
         isRecurring: validatedData.isRecurring,
-        recurrence: validatedData.recurrence || null,
+        recurrence: validatedData.isRecurring ? validatedData.recurrence ?? Prisma.JsonNull : Prisma.JsonNull,
         organizerId: validatedData.organizerId,
         attendees: validatedData.attendeeIds ? {
           connect: validatedData.attendeeIds.map(id => ({ id }))

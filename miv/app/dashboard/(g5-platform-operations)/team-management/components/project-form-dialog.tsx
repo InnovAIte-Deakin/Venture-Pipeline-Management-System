@@ -21,6 +21,7 @@ interface ProjectFormDialogProps {
 
 const statuses: ProjectStatus[] = ['NOT_STARTED', 'IN_PROGRESS', 'COMPLETED', 'ON_HOLD', 'CANCELLED']
 const priorities: ProjectPriority[] = ['LOW', 'MEDIUM', 'HIGH', 'URGENT']
+const toDateInputValue = (value: string | null | undefined) => value?.split('T')[0] ?? undefined
 
 export function ProjectFormDialog({
   open,
@@ -36,8 +37,8 @@ export function ProjectFormDialog({
     description: project?.description || undefined,
     status: project?.status,
     priority: project?.priority,
-    dueDate: project?.dueDate ?? undefined,
-    startDate: project?.startDate ?? undefined,
+    dueDate: toDateInputValue(project?.dueDate),
+    startDate: toDateInputValue(project?.startDate),
     leadId: project?.lead.id,
     memberIds: project?.members.map((member) => member.id) ?? undefined,
   })
@@ -48,8 +49,8 @@ export function ProjectFormDialog({
       description: project?.description ?? undefined,
       status: project?.status,
       priority: project?.priority,
-      dueDate: project?.dueDate ?? undefined,
-      startDate: project?.startDate ?? undefined,
+      dueDate: toDateInputValue(project?.dueDate),
+      startDate: toDateInputValue(project?.startDate),
       leadId: project?.lead.id,
       memberIds: project?.members.map((member) => member.id) ?? undefined,
     })

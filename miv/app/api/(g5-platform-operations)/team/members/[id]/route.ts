@@ -245,6 +245,38 @@ export async function PUT(
         emailVerified: true,
         createdAt: true,
         updatedAt: true,
+        ledProjects: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+          }
+        },
+        projectMemberships: {
+          select: {
+            id: true,
+            name: true,
+            status: true,
+          }
+        },
+        assignedTasks: {
+          where: {
+            status: { not: 'COMPLETED' }
+          },
+          select: {
+            id: true,
+            name: true,
+            status: true,
+            dueDate: true,
+          }
+        },
+        _count: {
+          select: {
+            ledProjects: true,
+            projectMemberships: true,
+            assignedTasks: true,
+          }
+        }
       }
     });
 

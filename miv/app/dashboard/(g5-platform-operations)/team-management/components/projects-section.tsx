@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
-import { Search, Plus, Filter } from 'lucide-react'
+import { Search, Plus } from 'lucide-react'
 import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
 import { ProjectCard } from './project-card'
 import { ProjectDetailsDialog } from './project-details-dialog'
@@ -25,6 +25,7 @@ export function ProjectsSection() {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const requestRef = useRef(0)
 
@@ -78,6 +79,7 @@ export function ProjectsSection() {
   }
 
   const handleSubmit = async (payload: UpdateProjectInput) => {
+    setSaving(true)
     setFormError(null)
     try {
       if (selectedProject) {
@@ -92,6 +94,8 @@ export function ProjectsSection() {
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to save project')
       throw err
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -178,7 +182,7 @@ export function ProjectsSection() {
         open={formOpen}
         project={selectedProject}
         members={members}
-        loading={false}
+        loading={saving}
         error={formError ?? undefined}
         onOpenChange={(open) => {
           if (!open) {

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
 import { Search, Plus } from 'lucide-react'
 import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
 import { AnnouncementCard } from './announcement-card'
@@ -24,6 +23,7 @@ export function AnnouncementsSection() {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null)
   const [detailsOpen, setDetailsOpen] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
   const requestRef = useRef(0)
 
@@ -77,6 +77,7 @@ export function AnnouncementsSection() {
   }
 
   const handleSubmit = async (payload: UpdateAnnouncementInput) => {
+    setSaving(true)
     setFormError(null)
     try {
       if (selectedAnnouncement) {
@@ -91,6 +92,8 @@ export function AnnouncementsSection() {
     } catch (err) {
       setFormError(err instanceof Error ? err.message : 'Failed to save announcement')
       throw err
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -159,7 +162,7 @@ export function AnnouncementsSection() {
         open={formOpen}
         announcement={selectedAnnouncement ?? undefined}
         members={members}
-        loading={false}
+        loading={saving}
         error={formError ?? undefined}
         onOpenChange={(open) => {
           if (!open) {
