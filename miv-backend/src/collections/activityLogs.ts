@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated } from '@/access/roles'
+import { isAuthenticated, adminOnly } from '@/access/roles'
 import { actorScopedRead } from '@/access/scoping'
 
 export const ActivityLogs: CollectionConfig = {
@@ -9,9 +9,11 @@ export const ActivityLogs: CollectionConfig = {
     // Users see only their own activity; staff see all (matrix §2 / A4).
     read: actorScopedRead,
     create: isAuthenticated,
-    // Immutable audit trail — no updates, and no deletes even by admin (matrix A7).
+    // Append-only for everyone: no updates. Entries can be deleted only by admin, to keep
+    // an erasure path for disability data that may appear in a log (team decision, review
+    // round 2 — chosen over full immutability precisely because of right-to-erasure).
     update: () => false,
-    delete: () => false,
+    delete: adminOnly,
   },
   hooks: {
     // Force the actor to the authenticated user so entries can't be attributed to

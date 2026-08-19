@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { afterIntakeCreate, setDisabilityFlag } from '@/hooks/intakes'
 import { adminOnly, adminOrAnalyst } from '@/access/roles'
-import { founderVentureScopedRead, fieldAdminOnly } from '@/access/scoping'
+import { founderVentureScopedRead, fieldAdminOnly, fieldAdminOrAnalyst } from '@/access/scoping'
 
 const wssOptions: { label: string; value: string }[] = [
   { label: 'No difficulty', value: 'no_difficulty' },
@@ -32,12 +32,12 @@ export const OnboardingIntakes: CollectionConfig = {
     {
       name: 'wss',
       type: 'group',
-      // Washington Short Set — disability data. Tightest control: admin-only at create,
-      // read and update (matrix §4). The public intake writes it via overrideAccess, so
-      // this lock doesn't block onboarding. Analyst read can be widened at review.
+      // Washington Short Set — disability data (matrix §4): analyst + admin READ (analysts
+      // run GEDSI reporting), admin-only create/update. The public intake writes it via
+      // overrideAccess, so the create lock doesn't block onboarding.
       access: {
         create: fieldAdminOnly,
-        read: fieldAdminOnly,
+        read: fieldAdminOrAnalyst,
         update: fieldAdminOnly,
       },
       fields: [
@@ -53,10 +53,10 @@ export const OnboardingIntakes: CollectionConfig = {
       name: 'disabilityFlag',
       type: 'checkbox',
       defaultValue: false,
-      // Derived from WSS by a hook — never founder-writable, at create or update (matrix §4).
+      // Derived from WSS by a hook (matrix §4): analyst + admin read, admin-only create/update.
       access: {
         create: fieldAdminOnly,
-        read: fieldAdminOnly,
+        read: fieldAdminOrAnalyst,
         update: fieldAdminOnly,
       },
     },
