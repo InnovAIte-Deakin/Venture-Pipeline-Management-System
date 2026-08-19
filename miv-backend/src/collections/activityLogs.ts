@@ -1,5 +1,5 @@
 import type { CollectionConfig } from 'payload'
-import { isAuthenticated, adminOnly } from '@/access/roles'
+import { isAuthenticated } from '@/access/roles'
 import { actorScopedRead } from '@/access/scoping'
 
 export const ActivityLogs: CollectionConfig = {
@@ -9,11 +9,13 @@ export const ActivityLogs: CollectionConfig = {
     // Users see only their own activity; staff see all (matrix §2 / A4).
     read: actorScopedRead,
     create: isAuthenticated,
-    // Append-only for everyone: no updates. Entries can be deleted only by admin, to keep
-    // an erasure path for disability data that may appear in a log (team decision, review
-    // round 2 — chosen over full immutability precisely because of right-to-erasure).
+    // Fully immutable through the API — no update and no delete, admin included (team
+    // decision, review round 2). An audit trail an admin can quietly edit or delete is not
+    // an audit trail; the actor-forcing hook below only matters if entries can't be altered.
+    // Erasure (e.g. a right-to-erasure request touching data logged in `metadata`) is a
+    // documented DATABASE-LEVEL procedure, not an admin button — see docs/rbac/RBAC_MATRIX.md.
     update: () => false,
-    delete: adminOnly,
+    delete: () => false,
   },
   hooks: {
     // Force the actor to the authenticated user so entries can't be attributed to
@@ -35,6 +37,10 @@ export const ActivityLogs: CollectionConfig = {
     { name: 'action', type: 'text', required: true },
     { name: 'entity', type: 'text', required: true },
     { name: 'entityId', type: 'text' },
+    // RULE: NO personal data in `metadata`. This collection is immutable (never deleted via
+    // the API), so anything logged here has no erasure route. Do not log request bodies,
+    // error payloads, or anything that could carry PII / disability data. Keep it to ids,
+    // enums, and counts. (Documented in docs/rbac/RBAC_MATRIX.md.)
     { name: 'metadata', type: 'json' },
     { name: 'timestamp', type: 'date', defaultValue: () => new Date().toISOString() },
   ],

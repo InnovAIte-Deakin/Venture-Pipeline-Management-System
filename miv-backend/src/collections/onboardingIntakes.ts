@@ -1,7 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { afterIntakeCreate, setDisabilityFlag } from '@/hooks/intakes'
 import { adminOnly, adminOrAnalyst } from '@/access/roles'
-import { founderVentureScopedRead, fieldAdminOnly, fieldAdminOrAnalyst } from '@/access/scoping'
+import { founderVentureScopedRead, fieldAdminOnly } from '@/access/scoping'
 
 const wssOptions: { label: string; value: string }[] = [
   { label: 'No difficulty', value: 'no_difficulty' },
@@ -32,12 +32,15 @@ export const OnboardingIntakes: CollectionConfig = {
     {
       name: 'wss',
       type: 'group',
-      // Washington Short Set — disability data (matrix §4): analyst + admin READ (analysts
-      // run GEDSI reporting), admin-only create/update. The public intake writes it via
-      // overrideAccess, so the create lock doesn't block onboarding.
+      // Washington Short Set — disability data. ADMIN-ONLY at row level (create/read/update).
+      // Decision (review round 2): keep it narrow — nothing consumes these fields at row
+      // level today, and it's far easier to widen later than to claw back after it's been on
+      // screens/exports. Analyst GEDSI reporting is to be served by an AGGREGATE endpoint
+      // (counts/percentages), never row-level field read. Matrix §4 updated to match.
+      // The public intake writes it via overrideAccess, so the create lock doesn't block onboarding.
       access: {
         create: fieldAdminOnly,
-        read: fieldAdminOrAnalyst,
+        read: fieldAdminOnly,
         update: fieldAdminOnly,
       },
       fields: [
@@ -53,10 +56,11 @@ export const OnboardingIntakes: CollectionConfig = {
       name: 'disabilityFlag',
       type: 'checkbox',
       defaultValue: false,
-      // Derived from WSS by a hook (matrix §4): analyst + admin read, admin-only create/update.
+      // Derived from WSS by a hook — admin-only at row level (matrix §4). Same rationale as
+      // the wss block: analyst needs come from aggregate reporting, not this field.
       access: {
         create: fieldAdminOnly,
-        read: fieldAdminOrAnalyst,
+        read: fieldAdminOnly,
         update: fieldAdminOnly,
       },
     },
