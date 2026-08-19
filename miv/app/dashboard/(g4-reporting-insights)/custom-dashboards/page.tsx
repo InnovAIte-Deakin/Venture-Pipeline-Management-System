@@ -10,7 +10,6 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
 import { useToast } from "@/components/ui/toast"
 import { useAuth } from "@/hooks/useAuth"
 import {
@@ -28,6 +27,7 @@ import {
   Search,
   Star,
   Clock,
+  Gauge,
 } from "lucide-react"
 
 
@@ -99,13 +99,25 @@ const mockDashboards: Dashboard[] = [
 ]
 
 const widgetTypes = [
-  { type: "chart", name: "Chart", icon: BarChart, description: "Line, bar, or pie charts" },
-  { type: "metric", name: "Metric", icon: Target, description: "Single value with trend" },
-  { type: "table", name: "Table", icon: Grid3X3, description: "Data table with sorting" },
-  { type: "progress", name: "Progress", icon: Progress, description: "Progress bars and gauges" },
-  { type: "list", name: "List", icon: Activity, description: "Simple list of items" },
-  { type: "calendar", name: "Calendar", icon: Calendar, description: "Calendar view" }
+  { type: "chart", name: "Chart", icon: BarChart, description: "Line, bar, or pie charts", color: "blue" },
+  { type: "metric", name: "Metric", icon: Target, description: "Single value with trend", color: "red" },
+  { type: "table", name: "Table", icon: Grid3X3, description: "Data table with sorting", color: "purple" },
+  { type: "progress", name: "Progress", icon: Gauge, description: "Progress bars and gauges", color: "amber" },
+  { type: "list", name: "List", icon: Activity, description: "Simple list of items", color: "green" },
+  { type: "calendar", name: "Calendar", icon: Calendar, description: "Calendar view", color: "pink" }
 ]
+
+// Tailwind needs full, literal class strings to detect them at build time —
+// dynamic template strings like `bg-${color}-100` are invisible to it, so
+// every combination we might use is spelled out here instead.
+const widgetColorClasses: Record<string, { border: string; iconBg: string; iconText: string }> = {
+  blue:   { border: "border-t-blue-400",   iconBg: "bg-blue-100",   iconText: "text-blue-600" },
+  red:    { border: "border-t-red-400",    iconBg: "bg-red-100",    iconText: "text-red-600" },
+  purple: { border: "border-t-purple-400", iconBg: "bg-purple-100", iconText: "text-purple-600" },
+  amber:  { border: "border-t-amber-400",  iconBg: "bg-amber-100",  iconText: "text-amber-600" },
+  green:  { border: "border-t-green-400",  iconBg: "bg-green-100",  iconText: "text-green-600" },
+  pink:   { border: "border-t-pink-400",   iconBg: "bg-pink-100",   iconText: "text-pink-600" },
+}
 
 const categories = [
   "Pipeline",
@@ -158,9 +170,9 @@ export default function CustomDashboardsPage() {
       const data = await response.json()
       setDashboards(data.dashboards || [])
       
-      console.log(`âœ… Successfully loaded ${data.dashboards?.length || 0} custom dashboards`)
+      console.log(`Successfully loaded ${data.dashboards?.length || 0} custom dashboards`)
     } catch (err) {
-      console.error('âŒ Error fetching dashboards:', err)
+      console.error('Error fetching dashboards:', err)
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
       setError(`Failed to load dashboards: ${errorMessage}`)
       
@@ -440,11 +452,16 @@ export default function CustomDashboardsPage() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Custom Dashboards</h1>
-          <p className="text-muted-foreground">
-            Create and manage your personalized dashboards
-          </p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
+            <Grid3X3 className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Custom Dashboards</h1>
+            <p className="text-muted-foreground">
+              Create and manage your personalized dashboards
+            </p>
+          </div>
         </div>
         <Button onClick={() => setIsCreating(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
@@ -454,10 +471,12 @@ export default function CustomDashboardsPage() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-        <Card>
+        <Card className="border-t-4 border-t-blue-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Dashboards</CardTitle>
-            <BarChart className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+              <BarChart className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{dashboards.length}</div>
@@ -466,10 +485,12 @@ export default function CustomDashboardsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-purple-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Widgets</CardTitle>
-            <Grid3X3 className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
+              <Grid3X3 className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -480,10 +501,12 @@ export default function CustomDashboardsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-amber-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Favorites</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+              <Star className="h-4 w-4 text-amber-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -494,10 +517,12 @@ export default function CustomDashboardsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-green-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Recently Updated</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+              <Clock className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -598,10 +623,12 @@ export default function CustomDashboardsPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-blue-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <BarChart className="h-5 w-5 text-blue-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
+                        <BarChart className="h-5 w-5 text-blue-600" />
+                      </div>
                       <CardTitle className="text-base">Pipeline Overview</CardTitle>
                     </div>
                   </CardHeader>
@@ -616,10 +643,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-green-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
+                        <TrendingUp className="h-5 w-5 text-green-600" />
+                      </div>
                       <CardTitle className="text-base">Portfolio Performance</CardTitle>
                     </div>
                   </CardHeader>
@@ -634,10 +663,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-purple-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-purple-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100">
+                        <Users className="h-5 w-5 text-purple-600" />
+                      </div>
                       <CardTitle className="text-base">GEDSI Impact</CardTitle>
                     </div>
                   </CardHeader>
@@ -652,10 +683,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-orange-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Activity className="h-5 w-5 text-orange-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-100">
+                        <Activity className="h-5 w-5 text-orange-600" />
+                      </div>
                       <CardTitle className="text-base">Due Diligence</CardTitle>
                     </div>
                   </CardHeader>
@@ -670,10 +703,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-green-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-green-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
+                        <DollarSign className="h-5 w-5 text-green-600" />
+                      </div>
                       <CardTitle className="text-base">Financial Overview</CardTitle>
                     </div>
                   </CardHeader>
@@ -688,10 +723,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-red-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-red-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100">
+                        <Target className="h-5 w-5 text-red-600" />
+                      </div>
                       <CardTitle className="text-base">Team Performance</CardTitle>
                     </div>
                   </CardHeader>
@@ -721,10 +758,12 @@ export default function CustomDashboardsPage() {
             <CardContent>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {widgetTypes.map((widget) => (
-                  <Card key={widget.type} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <Card key={widget.type} className={`cursor-pointer border-t-4 ${widgetColorClasses[widget.color].border} transition-shadow hover:shadow-md`}>
                     <CardHeader className="pb-3">
                       <div className="flex items-center gap-2">
-                        <widget.icon className="h-5 w-5 text-blue-600" />
+                        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${widgetColorClasses[widget.color].iconBg}`}>
+                          <widget.icon className={`h-5 w-5 ${widgetColorClasses[widget.color].iconText}`} />
+                        </div>
                         <CardTitle className="text-base">{widget.name}</CardTitle>
                       </div>
                     </CardHeader>
@@ -732,7 +771,17 @@ export default function CustomDashboardsPage() {
                       <p className="text-sm text-muted-foreground mb-3">
                         {widget.description}
                       </p>
-                      <Button size="sm" variant="outline" className="w-full">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() =>
+                          addToast({
+                            title: `To add a ${widget.name} widget, open a dashboard and use Manage Widgets`,
+                            type: "info",
+                          })
+                        }
+                      >
                         Add Widget
                       </Button>
                     </CardContent>
@@ -767,5 +816,3 @@ export default function CustomDashboardsPage() {
     </div>
   )
 }
-
-
