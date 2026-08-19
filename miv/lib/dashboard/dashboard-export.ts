@@ -1,4 +1,4 @@
-import type { DashboardChartWidget } from "@/types/dashboard/types"
+import type { DashboardChartWidget } from "../../types/dashboard/types"
 
 export function downloadDashboardCharts(charts: DashboardChartWidget[]): void {
   const blob = new Blob([JSON.stringify(charts, null, 2)], { type: "application/json" })
