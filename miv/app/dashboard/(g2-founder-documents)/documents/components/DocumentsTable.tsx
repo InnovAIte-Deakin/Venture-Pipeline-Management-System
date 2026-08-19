@@ -61,7 +61,7 @@ export default function DocumentsTable({
   // Empty State
   if (filteredDocuments.length === 0) {
     return (
-      <Card className="rounded-2xl border border-slate-200 shadow-sm">
+      <Card className="rounded-lg border border-slate-200 shadow-sm">
         <CardHeader className="pb-2">
           <CardTitle>Documents</CardTitle>
         </CardHeader>
@@ -84,7 +84,7 @@ export default function DocumentsTable({
   }
 
   return (
-    <Card className="rounded-2xl border border-slate-200 shadow-sm">
+    <Card className="rounded-lg border border-slate-200 shadow-sm">
       <CardHeader className="pb-2">
         <CardTitle>
           Documents ({filteredDocuments.length})
@@ -114,7 +114,7 @@ export default function DocumentsTable({
                 <TableRow key={document.id}>
                   <TableCell>
                     <div className="flex items-center space-x-3">
-                      <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded bg-gray-100">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded bg-gray-100">
                         {getFileIcon(document.type)}
                       </div>
 

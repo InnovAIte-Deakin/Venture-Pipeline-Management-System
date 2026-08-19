@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import DocumentsUpload from "../components/DocumentsUpload";
 import DocumentsFilters from "../components/DocumentsFilters";
 import MobileDocumentCard from "../components/MobileDocumentCard";
@@ -12,30 +14,30 @@ interface DocumentsMobileScreenProps {
   selectedVenture: string;
   error: string | null;
 
-  handleDrag: any;
-  handleDrop: any;
-  handleFileUpload: any;
+  handleDrag: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleFileUpload: (files: FileList | null) => void;
 
   searchQuery: string;
-  setSearchQuery: any;
+  setSearchQuery: (value: string) => void;
 
   selectedType: string;
-  setSelectedType: any;
+  setSelectedType: (value: string) => void;
 
-  setSelectedVenture: any;
+  setSelectedVenture: (value: string) => void;
 
   documentTypes: any[];
   ventures: any[];
 
   filteredDocuments: any[];
 
-  getFileIcon: any;
-  getStatusIcon: any;
-  getStatusColor: any;
+  getFileIcon: (type: string) => React.ReactNode;
+  getStatusIcon: (status: string) => React.ReactNode;
+  getStatusColor: (status: string) => string;
 
-  formatDate: any;
+  formatDate: (date: string) => string;
 
-  handleDeleteDocument: any;
+  handleDeleteDocument: (id: string) => void;
 }
 
 export default function DocumentsMobileScreen(
@@ -47,24 +49,15 @@ export default function DocumentsMobileScreen(
       <div className="px-6 py-8 space-y-8">
 
         {/* Page Header */}
-        <div className="pt-6">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-            Documents for Review
+        <div className="pt-4">
+          <h1 className="text-2xl font-bold tracking-tight text-slate-900">
+            Document Management
           </h1>
 
           <p className="mt-3 text-sm leading-6 text-slate-500">
-            Review submitted venture documents before making a decision.
+            Upload, organize and manage venture documents.
           </p>
         </div>
-        <div>
-  <h2 className="text-lg font-semibold text-slate-900">
-    Upload Documents
-  </h2>
-
-  <p className="text-sm text-slate-500 mt-1">
-    Upload venture files for review and approval.
-  </p>
-</div>
 
         {/* Upload */}
         <DocumentsUpload
@@ -76,17 +69,6 @@ export default function DocumentsMobileScreen(
           handleDrop={props.handleDrop}
           handleFileUpload={props.handleFileUpload}
         />
-        <div>
-  <h2 className="text-lg font-semibold text-slate-900">
-    Search & Filters
-  </h2>
-
-  <p className="text-sm text-slate-500 mt-1">
-    Find documents by name, type or venture.
-  </p>
-</div>
-
-        {/* Filters */}
         <DocumentsFilters
           searchQuery={props.searchQuery}
           setSearchQuery={props.setSearchQuery}
@@ -111,7 +93,7 @@ export default function DocumentsMobileScreen(
 
         {/* Documents */}
         {props.filteredDocuments.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white shadow-sm p-8 text-center">
+          <div className="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
 
 <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
               <FileText className="h-8 w-8 text-blue-600" />
@@ -125,9 +107,14 @@ export default function DocumentsMobileScreen(
               Upload your first venture document above to begin reviewing
               submissions.
             </p>
-            <Button className="mt-6 rounded-xl bg-green-600 hover:bg-green-700">
-    Choose Files
-</Button>
+            <Button
+              className="mt-6 bg-green-600 hover:bg-green-700"
+              onClick={() =>
+                (document.getElementById("file-upload") as HTMLInputElement)?.click()
+              }
+            >
+              Choose Files
+            </Button>
 
           </div>
         ) : (
@@ -139,6 +126,7 @@ export default function DocumentsMobileScreen(
                 date={props.formatDate(document.uploadedAt)}
                 status={document.status}
                 statusColor={props.getStatusColor(document.status)}
+                onReview={() => window.open(document.url, "_blank")}
               />
             ))}
           </div>

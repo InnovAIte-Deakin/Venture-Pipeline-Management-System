@@ -1,5 +1,7 @@
 'use client';
 
+import type React from "react";
+
 import DocumentsHeader from "../components/DocumentsHeader";
 import DocumentsUpload from "../components/DocumentsUpload";
 import DocumentsFilters from "../components/DocumentsFilters";
@@ -19,8 +21,8 @@ interface DocumentsDesktopScreenProps {
   dragActive: boolean;
   selectedVenture: string;
   error: string | null;
-  handleDrag: (e: React.DragEvent) => void;
-  handleDrop: (e: React.DragEvent) => void;
+  handleDrag: (e: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (e: React.DragEvent<HTMLDivElement>) => void;
   handleFileUpload: (files: FileList | null) => void;
 
   searchQuery: string;
@@ -74,8 +76,8 @@ export default function DocumentsDesktopScreen({
   
     handleDeleteDocument,
   }: DocumentsDesktopScreenProps) {
-    return (
-      <div className="space-y-6">
+  return (
+    <div className="space-y-6">
     
         <DocumentsHeader
           uploading={uploading}
@@ -141,7 +143,13 @@ export default function DocumentsDesktopScreen({
     
           <TabsContent value="recent">
             <DocumentsTable
-              filteredDocuments={filteredDocuments}
+              filteredDocuments={filteredDocuments.filter((document) => {
+                const daysSinceUpload =
+                  (Date.now() - new Date(document.uploadedAt).getTime()) /
+                  (1000 * 60 * 60 * 24);
+
+                return daysSinceUpload <= 7;
+              })}
               documentTypes={documentTypes}
               getFileIcon={getFileIcon}
               getStatusIcon={getStatusIcon}
@@ -154,7 +162,7 @@ export default function DocumentsDesktopScreen({
           <TabsContent value="pending">
             <DocumentsTable
               filteredDocuments={filteredDocuments.filter(
-                d => d.status === "pending"
+                d => d.status === "pending" || d.status === "review"
               )}
               documentTypes={documentTypes}
               getFileIcon={getFileIcon}
@@ -181,5 +189,6 @@ export default function DocumentsDesktopScreen({
     
         </Tabs>
     
-      </div>
-    );}
+    </div>
+  );
+}

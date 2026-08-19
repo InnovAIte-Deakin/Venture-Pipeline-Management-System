@@ -20,18 +20,18 @@ export default function MobileDocumentCard({
   onReview,
 }: MobileDocumentCardProps) {
   return (
-    <Card className="rounded-3xl border border-slate-200 shadow-sm transition-shadow hover:shadow-md">
+    <Card className="rounded-lg border border-slate-200 shadow-sm transition-shadow hover:shadow-md">
       <CardContent className="p-5">
         <div className="flex items-start gap-4">
 
           {/* File Icon */}
-          <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-xl bg-blue-100">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-100">
             <FileText className="h-6 w-6 text-blue-600" />
           </div>
 
           {/* Document Details */}
           <div className="flex-1">
-            <h3 className="text-sm font-semibold text-slate-900">
+            <h3 className="wrap-break-word text-sm font-semibold text-slate-900">
               {title}
             </h3>
 
@@ -53,7 +53,7 @@ export default function MobileDocumentCard({
           <Button
             size="sm"
             variant="outline"
-            className="rounded-xl"
+            className="rounded-md"
             onClick={onReview}
           >
             <Eye className="mr-2 h-4 w-4" />

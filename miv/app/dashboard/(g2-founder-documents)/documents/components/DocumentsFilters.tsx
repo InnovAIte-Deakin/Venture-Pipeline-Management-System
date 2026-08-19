@@ -43,7 +43,7 @@ export default function DocumentsFilters({
   ventures,
 }: DocumentsFiltersProps) {
   return (
-    <><Card className="rounded-2xl border border-slate-200 shadow-sm">
+    <><Card className="rounded-lg border border-slate-200 shadow-sm">
     <CardContent className="p-5 space-y-4">
       <div className="flex flex-col gap-4 lg:flex-row">
         <div className="flex-1">
@@ -53,13 +53,13 @@ export default function DocumentsFilters({
               placeholder="Search documents..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 h-11 rounded-xl border-slate-200"
+              className="h-11 rounded-md border-slate-200 pl-10"
             />
           </div>
         </div>
   
         <Select value={selectedType} onValueChange={setSelectedType}>
-        <SelectTrigger className="w-full h-11 rounded-xl lg:w-52">
+        <SelectTrigger className="h-11 w-full rounded-md lg:w-52">
             <SelectValue placeholder="Document Type" />
           </SelectTrigger>
   
@@ -78,7 +78,7 @@ export default function DocumentsFilters({
           value={selectedVenture}
           onValueChange={setSelectedVenture}
         >
-          <SelectTrigger className="w-full h-11 rounded-xl lg:w-52">
+          <SelectTrigger className="h-11 w-full rounded-md lg:w-52">
             <SelectValue placeholder="Venture" />
           </SelectTrigger>
   

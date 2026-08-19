@@ -35,14 +35,14 @@ export default function DocumentsHeader({
             (document.getElementById("file-upload") as HTMLInputElement)?.click()
           }
           disabled={uploading}
-          className="rounded-xl bg-slate-900 hover:bg-slate-800 px-5"
+          className="bg-slate-900 px-5 hover:bg-slate-800"
         >
           <Upload className="mr-2 h-4 w-4" />
           {uploading ? "Uploading..." : "Upload Documents"}
         </Button>
 
         {analytics && (
-          <div className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white px-5 py-3 shadow-sm">
+          <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-3 shadow-sm">
 
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
               <FileText className="h-5 w-5 text-blue-600" />
