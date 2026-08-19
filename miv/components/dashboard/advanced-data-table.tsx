@@ -186,9 +186,9 @@ export function AdvancedDataTable({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>
           <p className="text-sm text-slate-600">
@@ -197,7 +197,7 @@ export function AdvancedDataTable({
           </p>
         </div>
         
-        <div className="flex items-center space-x-2">
+        <div className="flex flex-wrap items-center gap-2 sm:space-x-2 sm:gap-0">
           {selectedRows.size > 0 && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -242,9 +242,9 @@ export function AdvancedDataTable({
       </div>
 
       {/* Search and Filters */}
-      <div className="flex items-center space-x-4">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-4 sm:gap-0">
         {searchable && (
-          <div className="relative flex-1 max-w-sm">
+          <div className="relative w-full flex-1 sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 h-4 w-4" />
             <Input
               placeholder="Search..."
@@ -282,7 +282,7 @@ export function AdvancedDataTable({
       </div>
 
       {/* Table */}
-      <div className="border rounded-lg">
+      <div className="overflow-x-auto rounded-lg border">
         <Table>
           <TableHeader>
             <TableRow>
