@@ -1,193 +1,25 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { MoreHorizontal, Plus, Search } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Search, Plus } from 'lucide-react'
-import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
-import { EventCard } from './event-card'
-import { EventDetailsDialog } from './event-details-dialog'
-import { EventFormDialog } from './event-form-dialog'
-import { SectionEmptyState } from './section-empty-state'
-import { SectionErrorState } from './section-error-state'
-import { SectionLoadingState } from './section-loading-state'
-import type { TeamEvent, TeamMember, UpdateTeamEventInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
+
+interface DemoEvent { id: string; title: string; date: string; time: string; location: string; organizer: string; type: 'Review' | 'Meeting' | 'Presentation' | 'Testing' }
+const demoEvents: DemoEvent[] = [
+  { id: 'sprint-review', title: 'Frontend Sprint Review', date: '22 Aug 2026', time: '10:00 AM', location: 'Microsoft Teams', organizer: 'Sarah Lee', type: 'Review' },
+  { id: 'team-meeting', title: 'VPMS Team Meeting', date: '24 Aug 2026', time: '2:00 PM', location: 'Online', organizer: 'Alex Morgan', type: 'Meeting' },
+  { id: 'capital-demo', title: 'Capital Facilitation Demo', date: '26 Aug 2026', time: '11:30 AM', location: 'Microsoft Teams', organizer: 'Priya Shah', type: 'Presentation' },
+  { id: 'management-testing', title: 'Team Management Testing', date: '28 Aug 2026', time: '3:00 PM', location: 'Lab', organizer: 'Daniel Kim', type: 'Testing' },
+]
+
+const typeClass = (type: DemoEvent['type']) => type === 'Review' ? 'border-0 bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300' : type === 'Meeting' ? 'border-0 bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300' : type === 'Presentation' ? 'border-0 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
 
 export function EventsSection() {
-  const [events, setEvents] = useState<TeamEvent[]>([])
-  const [members, setMembers] = useState<TeamMember[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [formOpen, setFormOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<TeamEvent | null>(null)
-  const [detailsOpen, setDetailsOpen] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
-  const requestRef = useRef(0)
+  const [typeFilter, setTypeFilter] = useState('All types')
+  const visibleEvents = useMemo(() => demoEvents.filter((event) => `${event.title} ${event.organizer} ${event.location}`.toLowerCase().includes(searchQuery.toLowerCase()) && (typeFilter === 'All types' || event.type === typeFilter)), [searchQuery, typeFilter])
 
-  const loadEvents = async (query = '') => {
-    const requestId = ++requestRef.current
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await teamApi.events.list({ search: query, startDate: new Date().toISOString().split('T')[0], limit: 50 })
-      if (requestId !== requestRef.current) return
-      setEvents(response.events)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load events')
-    } finally {
-      if (requestId === requestRef.current) setLoading(false)
-    }
-  }
-
-  const loadMembers = async () => {
-    try {
-      const response = await teamApi.members.list({ limit: 50 })
-      setMembers(response.members)
-    } catch {
-      // ignore member load errors for events section
-    }
-  }
-
-  useEffect(() => {
-    loadEvents('')
-    loadMembers()
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      loadEvents(searchQuery)
-    }, 250)
-
-    return () => window.clearTimeout(timer)
-  }, [searchQuery])
-
-  const visibleEvents = useMemo(() => events, [events])
-
-  const openCreate = () => {
-    setSelectedEvent(null)
-    setFormError(null)
-    setFormOpen(true)
-  }
-
-  const openDetails = (event: TeamEvent) => {
-    setSelectedEvent(event)
-    setDetailsOpen(true)
-  }
-
-  const handleSubmit = async (payload: UpdateTeamEventInput) => {
-    setFormError(null)
-    try {
-      if (selectedEvent) {
-        const updated = await teamApi.events.update(selectedEvent.id, payload)
-        setEvents((current) => current.map((event) => (event.id === updated.id ? updated : event)))
-      } else {
-        const created = await teamApi.events.create(payload as any)
-        setEvents((current) => [created, ...current])
-      }
-      setFormOpen(false)
-      setSelectedEvent(null)
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to save event')
-      throw err
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!selectedEvent) return
-    setDeleting(true)
-    try {
-      await teamApi.events.remove(selectedEvent.id)
-      setEvents((current) => current.filter((event) => event.id !== selectedEvent.id))
-      setDetailsOpen(false)
-      setSelectedEvent(null)
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to delete event')
-      throw err
-    } finally {
-      setDeleting(false)
-    }
-  }
-
-  if (loading) {
-    return <SectionLoadingState message="Loading events…" />
-  }
-
-  if (error) {
-    return <SectionErrorState message={error} onRetry={() => loadEvents(searchQuery)} />
-  }
-
-  return (
-    <section className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Events</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Schedule and manage upcoming team events.</p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-[320px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              className="pl-10"
-              placeholder="Search events"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
-          </div>
-          <Button className="w-full sm:w-auto" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            New event
-          </Button>
-        </div>
-      </div>
-
-      {visibleEvents.length === 0 ? (
-        <SectionEmptyState
-          title="No events found"
-          description="Try a different search or create a new event."
-        />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visibleEvents.map((event) => (
-            <EventCard key={event.id} event={event} onClick={() => openDetails(event)} />
-          ))}
-        </div>
-      )}
-
-      <EventFormDialog
-        open={formOpen}
-        event={selectedEvent ?? undefined}
-        members={members}
-        loading={false}
-        error={formError ?? undefined}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedEvent(null)
-            setFormError(null)
-          }
-          setFormOpen(open)
-        }}
-        onSubmit={handleSubmit}
-      />
-
-      <EventDetailsDialog
-        open={detailsOpen}
-        event={selectedEvent}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedEvent(null)
-          }
-          setDetailsOpen(open)
-        }}
-        onEdit={() => {
-          setFormOpen(true)
-          setDetailsOpen(false)
-        }}
-        onDelete={handleDelete}
-        deleting={deleting}
-      />
-    </section>
-  )
+  return <section className="space-y-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold text-slate-900 dark:text-white">Team Calendar</h2><p className="text-sm text-slate-600 dark:text-slate-400">Schedule and review upcoming team activities.</p><p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Demo interface for Team Management workflow presentation.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"><div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input className="pl-10" placeholder="Search events" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></div><select aria-label="Event Type Filter" className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}><option>All types</option><option>Meeting</option><option>Review</option><option>Presentation</option><option>Testing</option></select><Button className="w-full sm:w-auto"><Plus className="h-4 w-4" />New Event</Button></div></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[['Upcoming Events', '5'], ['Meetings', '2'], ['Reviews', '2'], ['This Month', '4']].map(([label, value]) => <div key={label} className="rounded-xl border bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"><p className="text-sm text-slate-500 dark:text-slate-400">{label}</p><p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{value}</p></div>)}</div><div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"><div className="border-b px-4 py-4 sm:px-6"><h3 className="font-semibold text-slate-900 dark:text-white">Upcoming Events</h3></div><div className="overflow-x-auto"><table className="w-full min-w-[860px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-950 dark:text-slate-400"><tr>{['Event', 'Date', 'Time', 'Location', 'Organizer', 'Type', 'Actions'].map((heading) => <th key={heading} className="px-4 py-3 font-medium sm:px-6">{heading}</th>)}</tr></thead><tbody className="divide-y dark:divide-slate-800">{visibleEvents.map((event) => <tr key={event.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50"><td className="px-4 py-4 font-medium text-slate-900 sm:px-6 dark:text-white">{event.title}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.date}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.time}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.location}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.organizer}</td><td className="px-4 py-4 sm:px-6"><Badge className={typeClass(event.type)}>{event.type}</Badge></td><td className="px-4 py-4 sm:px-6"><Button variant="ghost" size="sm" aria-label={`View ${event.title}`}><MoreHorizontal className="h-4 w-4" /></Button></td></tr>)}{visibleEvents.length === 0 && <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-slate-500">No demo events match your search.</td></tr>}</tbody></table></div></div></section>
 }

@@ -1,192 +1,25 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
+import { MoreHorizontal, Plus, Search } from 'lucide-react'
+import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Search, Plus } from 'lucide-react'
-import { teamApi } from '@/app/dashboard/(g5-platform-operations)/team-management/lib/team-api'
-import { AnnouncementCard } from './announcement-card'
-import { AnnouncementDetailsDialog } from './announcement-details-dialog'
-import { AnnouncementFormDialog } from './announcement-form-dialog'
-import { SectionEmptyState } from './section-empty-state'
-import { SectionErrorState } from './section-error-state'
-import { SectionLoadingState } from './section-loading-state'
-import type { Announcement, TeamMember, UpdateAnnouncementInput } from '@/app/dashboard/(g5-platform-operations)/team-management/types/team-management'
+
+interface DemoAnnouncement { id: string; title: string; author: string; priority: 'High' | 'Medium' | 'Low'; published: string; status: 'Active' | 'Archived' }
+const demoAnnouncements: DemoAnnouncement[] = [
+  { id: 'review', title: 'Week 6 Frontend Review', author: 'Sarah Lee', priority: 'High', published: 'Today', status: 'Active' },
+  { id: 'capital-review', title: 'Capital Facilitation PR Review', author: 'Alex Morgan', priority: 'Medium', published: 'Yesterday', status: 'Active' },
+  { id: 'testing', title: 'Team Management Testing', author: 'Priya Shah', priority: 'Medium', published: '2 days ago', status: 'Active' },
+  { id: 'sprint', title: 'Sprint Planning Update', author: 'Daniel Kim', priority: 'Low', published: '3 days ago', status: 'Archived' },
+]
+
+const priorityClass = (priority: DemoAnnouncement['priority']) => priority === 'High' ? 'border-0 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300' : priority === 'Medium' ? 'border-0 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
 
 export function AnnouncementsSection() {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([])
-  const [members, setMembers] = useState<TeamMember[]>([])
   const [searchQuery, setSearchQuery] = useState('')
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [formOpen, setFormOpen] = useState(false)
-  const [selectedAnnouncement, setSelectedAnnouncement] = useState<Announcement | null>(null)
-  const [detailsOpen, setDetailsOpen] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [formError, setFormError] = useState<string | null>(null)
-  const requestRef = useRef(0)
+  const [priorityFilter, setPriorityFilter] = useState('All priorities')
+  const visibleAnnouncements = useMemo(() => demoAnnouncements.filter((announcement) => announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) && (priorityFilter === 'All priorities' || announcement.priority === priorityFilter)), [priorityFilter, searchQuery])
 
-  const loadAnnouncements = async (query = '') => {
-    const requestId = ++requestRef.current
-    setLoading(true)
-    setError(null)
-    try {
-      const response = await teamApi.announcements.list({ search: query, isActive: true, limit: 50 })
-      if (requestId !== requestRef.current) return
-      setAnnouncements(response.announcements)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load announcements')
-    } finally {
-      if (requestId === requestRef.current) setLoading(false)
-    }
-  }
-
-  const loadMembers = async () => {
-    try {
-      const response = await teamApi.members.list({ limit: 50 })
-      setMembers(response.members)
-    } catch {
-      // ignore member fetch issues for announcement creation
-    }
-  }
-
-  useEffect(() => {
-    loadAnnouncements('')
-    loadMembers()
-  }, [])
-
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      loadAnnouncements(searchQuery)
-    }, 250)
-    return () => window.clearTimeout(timer)
-  }, [searchQuery])
-
-  const visibleAnnouncements = useMemo(() => announcements, [announcements])
-
-  const openCreate = () => {
-    setSelectedAnnouncement(null)
-    setFormError(null)
-    setFormOpen(true)
-  }
-
-  const openDetails = (announcement: Announcement) => {
-    setSelectedAnnouncement(announcement)
-    setDetailsOpen(true)
-  }
-
-  const handleSubmit = async (payload: UpdateAnnouncementInput) => {
-    setFormError(null)
-    try {
-      if (selectedAnnouncement) {
-        const updated = await teamApi.announcements.update(selectedAnnouncement.id, payload)
-        setAnnouncements((current) => current.map((announcement) => (announcement.id === updated.id ? updated : announcement)))
-      } else {
-        const created = await teamApi.announcements.create(payload as any)
-        setAnnouncements((current) => [created, ...current])
-      }
-      setFormOpen(false)
-      setSelectedAnnouncement(null)
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to save announcement')
-      throw err
-    }
-  }
-
-  const handleDelete = async () => {
-    if (!selectedAnnouncement) return
-    setDeleting(true)
-    try {
-      await teamApi.announcements.remove(selectedAnnouncement.id)
-      setAnnouncements((current) => current.filter((announcement) => announcement.id !== selectedAnnouncement.id))
-      setDetailsOpen(false)
-      setSelectedAnnouncement(null)
-    } catch (err) {
-      setFormError(err instanceof Error ? err.message : 'Failed to delete announcement')
-      throw err
-    } finally {
-      setDeleting(false)
-    }
-  }
-
-  if (loading) {
-    return <SectionLoadingState message="Loading announcements…" />
-  }
-
-  if (error) {
-    return <SectionErrorState message={error} onRetry={() => loadAnnouncements(searchQuery)} />
-  }
-
-  return (
-    <section className="space-y-6">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Announcements</h2>
-          <p className="text-sm text-slate-600 dark:text-slate-400">Create and manage announcements across the team.</p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <div className="relative w-full sm:w-[320px]">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <Input
-              className="pl-10"
-              placeholder="Search announcements"
-              value={searchQuery}
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
-          </div>
-          <Button className="w-full sm:w-auto" onClick={openCreate}>
-            <Plus className="h-4 w-4" />
-            New announcement
-          </Button>
-        </div>
-      </div>
-
-      {visibleAnnouncements.length === 0 ? (
-        <SectionEmptyState
-          title="No announcements found"
-          description="Create a new announcement to keep the team informed."
-        />
-      ) : (
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visibleAnnouncements.map((announcement) => (
-            <AnnouncementCard key={announcement.id} announcement={announcement} onClick={() => openDetails(announcement)} />
-          ))}
-        </div>
-      )}
-
-      <AnnouncementFormDialog
-        open={formOpen}
-        announcement={selectedAnnouncement ?? undefined}
-        members={members}
-        loading={false}
-        error={formError ?? undefined}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedAnnouncement(null)
-            setFormError(null)
-          }
-          setFormOpen(open)
-        }}
-        onSubmit={handleSubmit}
-      />
-
-      <AnnouncementDetailsDialog
-        open={detailsOpen}
-        announcement={selectedAnnouncement}
-        onOpenChange={(open) => {
-          if (!open) {
-            setSelectedAnnouncement(null)
-          }
-          setDetailsOpen(open)
-        }}
-        onEdit={() => {
-          setFormOpen(true)
-          setDetailsOpen(false)
-        }}
-        onDelete={handleDelete}
-        deleting={deleting}
-      />
-    </section>
-  )
+  return <section className="space-y-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold text-slate-900 dark:text-white">Team Communication</h2><p className="text-sm text-slate-600 dark:text-slate-400">Announcements and important team updates.</p><p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Demo interface for Team Management workflow presentation.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"><div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input className="pl-10" placeholder="Search announcements" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></div><select aria-label="Priority Filter" className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" value={priorityFilter} onChange={(event) => setPriorityFilter(event.target.value)}><option>All priorities</option><option>High</option><option>Medium</option><option>Low</option></select><Button className="w-full sm:w-auto"><Plus className="h-4 w-4" />New Announcement</Button></div></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[['Active Announcements', '4'], ['High Priority', '1'], ['This Week', '4'], ['Team Updates', '8']].map(([label, value]) => <div key={label} className="rounded-xl border bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"><p className="text-sm text-slate-500 dark:text-slate-400">{label}</p><p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{value}</p></div>)}</div><div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"><div className="border-b px-4 py-4 sm:px-6"><h3 className="font-semibold text-slate-900 dark:text-white">Announcements</h3></div><div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-950 dark:text-slate-400"><tr>{['Title', 'Author', 'Priority', 'Published', 'Status', 'Actions'].map((heading) => <th key={heading} className="px-4 py-3 font-medium sm:px-6">{heading}</th>)}</tr></thead><tbody className="divide-y dark:divide-slate-800">{visibleAnnouncements.map((announcement) => <tr key={announcement.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50"><td className="px-4 py-4 font-medium text-slate-900 sm:px-6 dark:text-white">{announcement.title}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{announcement.author}</td><td className="px-4 py-4 sm:px-6"><Badge className={priorityClass(announcement.priority)}>{announcement.priority}</Badge></td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{announcement.published}</td><td className="px-4 py-4 sm:px-6"><Badge className={announcement.status === 'Active' ? 'border-0 bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300' : 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}>{announcement.status}</Badge></td><td className="px-4 py-4 sm:px-6"><Button variant="ghost" size="sm" aria-label={`View ${announcement.title}`}><MoreHorizontal className="h-4 w-4" /></Button></td></tr>)}{visibleAnnouncements.length === 0 && <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-500">No demo announcements match your search.</td></tr>}</tbody></table></div></div></section>
 }
