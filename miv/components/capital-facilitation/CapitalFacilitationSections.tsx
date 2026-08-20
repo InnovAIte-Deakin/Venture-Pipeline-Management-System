@@ -16,13 +16,20 @@ const statusColors: Record<string, string> = {
   Rejected: "bg-red-100 text-red-800 border-red-200",
 }
 
-export function CapitalSummaryCards({ metrics }: { metrics: CapitalMetrics }) {
-  const cards = [
-    ["Total Capital", formatCurrency(metrics.totalCapital)],
-    ["Active Deals", String(metrics.activeDeals)],
-    ["Success Rate", `${metrics.successRate}%`],
-    ["Avg Deal Size", formatCurrency(metrics.averageDealSize)],
-  ]
+export function CapitalSummaryCards({ metrics, unavailable = false }: { metrics: CapitalMetrics; unavailable?: boolean }) {
+  const cards = unavailable
+    ? [
+        ["Total Capital", "—"],
+        ["Active Deals", "—"],
+        ["Success Rate", "—"],
+        ["Avg Deal Size", "—"],
+      ]
+    : [
+        ["Total Capital", formatCurrency(metrics.totalCapital)],
+        ["Active Deals", String(metrics.activeDeals)],
+        ["Success Rate", `${metrics.successRate}%`],
+        ["Avg Deal Size", formatCurrency(metrics.averageDealSize)],
+      ]
   return <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">{cards.map(([label, value]) => <Card key={label}><CardContent className="p-4"><p className="text-sm text-muted-foreground">{label}</p><p className="text-lg font-semibold break-words">{value}</p></CardContent></Card>)}</div>
 }
 
