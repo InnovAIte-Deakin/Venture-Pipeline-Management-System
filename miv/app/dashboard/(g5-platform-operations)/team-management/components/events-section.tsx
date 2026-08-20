@@ -1,25 +1,118 @@
 "use client"
 
 import { useMemo, useState } from 'react'
-import { MoreHorizontal, Plus, Search } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import { SummaryCard } from '@/app/dashboard/(g5-platform-operations)/team-management/components/summary-card'
+import {
+  calendarWeekSummary,
+  demoCalendarEvents,
+  type CalendarEventType,
+} from '@/lib/team-management/demo-data'
 
-interface DemoEvent { id: string; title: string; date: string; time: string; location: string; organizer: string; type: 'Review' | 'Meeting' | 'Presentation' | 'Testing' }
-const demoEvents: DemoEvent[] = [
-  { id: 'sprint-review', title: 'Frontend Sprint Review', date: '22 Aug 2026', time: '10:00 AM', location: 'Microsoft Teams', organizer: 'Sarah Lee', type: 'Review' },
-  { id: 'team-meeting', title: 'VPMS Team Meeting', date: '24 Aug 2026', time: '2:00 PM', location: 'Online', organizer: 'Alex Morgan', type: 'Meeting' },
-  { id: 'capital-demo', title: 'Capital Facilitation Demo', date: '26 Aug 2026', time: '11:30 AM', location: 'Microsoft Teams', organizer: 'Priya Shah', type: 'Presentation' },
-  { id: 'management-testing', title: 'Team Management Testing', date: '28 Aug 2026', time: '3:00 PM', location: 'Lab', organizer: 'Daniel Kim', type: 'Testing' },
+const typeClass = (type: CalendarEventType) => {
+  switch (type) {
+    case 'Meeting':
+      return 'border-0 bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300'
+    case 'Review':
+      return 'border-0 bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300'
+    case 'Milestone':
+      return 'border-0 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'
+    case 'Presentation':
+      return 'border-0 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
+    case 'Code Review':
+      return 'border-0 bg-purple-50 text-purple-700 dark:bg-purple-950/50 dark:text-purple-300'
+    default:
+      return 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+  }
+}
+
+const typeOptions: Array<'All types' | CalendarEventType> = [
+  'All types',
+  ...Array.from(new Set(demoCalendarEvents.map((event) => event.type))),
 ]
 
-const typeClass = (type: DemoEvent['type']) => type === 'Review' ? 'border-0 bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300' : type === 'Meeting' ? 'border-0 bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300' : type === 'Presentation' ? 'border-0 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
-
 export function EventsSection() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [typeFilter, setTypeFilter] = useState('All types')
-  const visibleEvents = useMemo(() => demoEvents.filter((event) => `${event.title} ${event.organizer} ${event.location}`.toLowerCase().includes(searchQuery.toLowerCase()) && (typeFilter === 'All types' || event.type === typeFilter)), [searchQuery, typeFilter])
+  const [typeFilter, setTypeFilter] = useState<'All types' | CalendarEventType>('All types')
 
-  return <section className="space-y-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold text-slate-900 dark:text-white">Team Calendar</h2><p className="text-sm text-slate-600 dark:text-slate-400">Schedule and review upcoming team activities.</p><p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Demo interface for Team Management workflow presentation.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"><div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input className="pl-10" placeholder="Search events" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></div><select aria-label="Event Type Filter" className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" value={typeFilter} onChange={(event) => setTypeFilter(event.target.value)}><option>All types</option><option>Meeting</option><option>Review</option><option>Presentation</option><option>Testing</option></select><Button className="w-full sm:w-auto"><Plus className="h-4 w-4" />New Event</Button></div></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[['Upcoming Events', '5'], ['Meetings', '2'], ['Reviews', '2'], ['This Month', '4']].map(([label, value]) => <div key={label} className="rounded-xl border bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"><p className="text-sm text-slate-500 dark:text-slate-400">{label}</p><p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{value}</p></div>)}</div><div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"><div className="border-b px-4 py-4 sm:px-6"><h3 className="font-semibold text-slate-900 dark:text-white">Upcoming Events</h3></div><div className="overflow-x-auto"><table className="w-full min-w-[860px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-950 dark:text-slate-400"><tr>{['Event', 'Date', 'Time', 'Location', 'Organizer', 'Type', 'Actions'].map((heading) => <th key={heading} className="px-4 py-3 font-medium sm:px-6">{heading}</th>)}</tr></thead><tbody className="divide-y dark:divide-slate-800">{visibleEvents.map((event) => <tr key={event.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50"><td className="px-4 py-4 font-medium text-slate-900 sm:px-6 dark:text-white">{event.title}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.date}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.time}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.location}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{event.organizer}</td><td className="px-4 py-4 sm:px-6"><Badge className={typeClass(event.type)}>{event.type}</Badge></td><td className="px-4 py-4 sm:px-6"><Button variant="ghost" size="sm" aria-label={`View ${event.title}`}><MoreHorizontal className="h-4 w-4" /></Button></td></tr>)}{visibleEvents.length === 0 && <tr><td colSpan={7} className="px-6 py-12 text-center text-sm text-slate-500">No demo events match your search.</td></tr>}</tbody></table></div></div></section>
+  const visibleEvents = useMemo(
+    () => demoCalendarEvents.filter((event) => typeFilter === 'All types' || event.type === typeFilter),
+    [typeFilter],
+  )
+
+  return (
+    <section className="space-y-6">
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Project Calendar</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          View upcoming meetings, reviews, milestones and project activities.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <SummaryCard label="Meetings" value={calendarWeekSummary.meetings} />
+        <SummaryCard label="Reviews" value={calendarWeekSummary.reviews} />
+        <SummaryCard label="Milestones" value={calendarWeekSummary.milestones} />
+        <SummaryCard label="Presentations" value={calendarWeekSummary.presentations} />
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Upcoming Events</h3>
+          <select
+            aria-label="Filter by Event Type"
+            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 md:w-56 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            value={typeFilter}
+            onChange={(event) => setTypeFilter(event.target.value as 'All types' | CalendarEventType)}
+          >
+            {typeOptions.map((type) => (
+              <option key={type}>{type}</option>
+            ))}
+          </select>
+        </div>
+
+        {visibleEvents.length > 0 ? (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {visibleEvents.map((event) => (
+              <Card key={event.id} className="py-4 sm:py-6">
+                <CardContent className="flex h-full flex-col gap-3 px-4 sm:px-6">
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-slate-900 dark:text-white">{event.title}</p>
+                    <Badge className={typeClass(event.type)}>{event.type}</Badge>
+                  </div>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">{event.time}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-xl border bg-white px-6 py-12 text-center text-sm text-slate-500 shadow-sm dark:border-slate-800 dark:bg-slate-900">
+            No upcoming events.
+          </div>
+        )}
+      </div>
+
+      <div className="rounded-xl border bg-white p-4 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
+        <h3 className="mb-3 font-semibold text-slate-900 dark:text-white">This Week</h3>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Meetings</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">{calendarWeekSummary.meetings}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Reviews</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">{calendarWeekSummary.reviews}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Milestones</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">{calendarWeekSummary.milestones}</p>
+          </div>
+          <div>
+            <p className="text-sm text-slate-500 dark:text-slate-400">Presentations</p>
+            <p className="text-lg font-semibold text-slate-900 dark:text-white">{calendarWeekSummary.presentations}</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }

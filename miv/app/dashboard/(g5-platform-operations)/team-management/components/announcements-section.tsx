@@ -1,25 +1,89 @@
 "use client"
 
 import { useMemo, useState } from 'react'
-import { MoreHorizontal, Plus, Search } from 'lucide-react'
+import { Card, CardContent } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
+import {
+  demoAnnouncements,
+  demoCommunicationUpdates,
+  type DemoAnnouncement,
+} from '@/lib/team-management/demo-data'
 
-interface DemoAnnouncement { id: string; title: string; author: string; priority: 'High' | 'Medium' | 'Low'; published: string; status: 'Active' | 'Archived' }
-const demoAnnouncements: DemoAnnouncement[] = [
-  { id: 'review', title: 'Week 6 Frontend Review', author: 'Sarah Lee', priority: 'High', published: 'Today', status: 'Active' },
-  { id: 'capital-review', title: 'Capital Facilitation PR Review', author: 'Alex Morgan', priority: 'Medium', published: 'Yesterday', status: 'Active' },
-  { id: 'testing', title: 'Team Management Testing', author: 'Priya Shah', priority: 'Medium', published: '2 days ago', status: 'Active' },
-  { id: 'sprint', title: 'Sprint Planning Update', author: 'Daniel Kim', priority: 'Low', published: '3 days ago', status: 'Archived' },
-]
-
-const priorityClass = (priority: DemoAnnouncement['priority']) => priority === 'High' ? 'border-0 bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300' : priority === 'Medium' ? 'border-0 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300' : 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+const announcementStatusClass = (status: DemoAnnouncement['status']) =>
+  status === 'Active'
+    ? 'border-0 bg-emerald-50 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-300'
+    : status === 'Pending'
+      ? 'border-0 bg-amber-50 text-amber-700 dark:bg-amber-950/50 dark:text-amber-300'
+      : 'border-0 bg-blue-50 text-blue-700 dark:bg-blue-950/50 dark:text-blue-300'
 
 export function AnnouncementsSection() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [priorityFilter, setPriorityFilter] = useState('All priorities')
-  const visibleAnnouncements = useMemo(() => demoAnnouncements.filter((announcement) => announcement.title.toLowerCase().includes(searchQuery.toLowerCase()) && (priorityFilter === 'All priorities' || announcement.priority === priorityFilter)), [priorityFilter, searchQuery])
+  const [statusFilter, setStatusFilter] = useState('All statuses')
+  const statusOptions = ['All statuses', ...Array.from(new Set(demoAnnouncements.map((item) => item.status)))]
 
-  return <section className="space-y-6"><div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><h2 className="text-xl font-semibold text-slate-900 dark:text-white">Team Communication</h2><p className="text-sm text-slate-600 dark:text-slate-400">Announcements and important team updates.</p><p className="mt-1 text-xs text-slate-400 dark:text-slate-500">Demo interface for Team Management workflow presentation.</p></div><div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center"><div className="relative w-full sm:w-64"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" /><Input className="pl-10" placeholder="Search announcements" value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} /></div><select aria-label="Priority Filter" className="h-10 rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200" value={priorityFilter} onChange={(event) => setPriorityFilter(event.target.value)}><option>All priorities</option><option>High</option><option>Medium</option><option>Low</option></select><Button className="w-full sm:w-auto"><Plus className="h-4 w-4" />New Announcement</Button></div></div><div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">{[['Active Announcements', '4'], ['High Priority', '1'], ['This Week', '4'], ['Team Updates', '8']].map(([label, value]) => <div key={label} className="rounded-xl border bg-white p-4 shadow-sm dark:border-slate-800 dark:bg-slate-900"><p className="text-sm text-slate-500 dark:text-slate-400">{label}</p><p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">{value}</p></div>)}</div><div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900"><div className="border-b px-4 py-4 sm:px-6"><h3 className="font-semibold text-slate-900 dark:text-white">Announcements</h3></div><div className="overflow-x-auto"><table className="w-full min-w-[720px] text-left text-sm"><thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500 dark:bg-slate-950 dark:text-slate-400"><tr>{['Title', 'Author', 'Priority', 'Published', 'Status', 'Actions'].map((heading) => <th key={heading} className="px-4 py-3 font-medium sm:px-6">{heading}</th>)}</tr></thead><tbody className="divide-y dark:divide-slate-800">{visibleAnnouncements.map((announcement) => <tr key={announcement.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50"><td className="px-4 py-4 font-medium text-slate-900 sm:px-6 dark:text-white">{announcement.title}</td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{announcement.author}</td><td className="px-4 py-4 sm:px-6"><Badge className={priorityClass(announcement.priority)}>{announcement.priority}</Badge></td><td className="px-4 py-4 text-slate-600 sm:px-6 dark:text-slate-300">{announcement.published}</td><td className="px-4 py-4 sm:px-6"><Badge className={announcement.status === 'Active' ? 'border-0 bg-teal-50 text-teal-700 dark:bg-teal-950/50 dark:text-teal-300' : 'border-0 bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}>{announcement.status}</Badge></td><td className="px-4 py-4 sm:px-6"><Button variant="ghost" size="sm" aria-label={`View ${announcement.title}`}><MoreHorizontal className="h-4 w-4" /></Button></td></tr>)}{visibleAnnouncements.length === 0 && <tr><td colSpan={6} className="px-6 py-12 text-center text-sm text-slate-500">No demo announcements match your search.</td></tr>}</tbody></table></div></div></section>
+  const visibleAnnouncements = useMemo(
+    () => demoAnnouncements.filter((item) => statusFilter === 'All statuses' || item.status === statusFilter),
+    [statusFilter],
+  )
+
+  return (
+    <section className="space-y-8">
+      <div>
+        <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Team Communication</h2>
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          Keep track of project discussions, announcements and recent team updates.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Recent Updates</h3>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {demoCommunicationUpdates.map((update) => (
+            <Card key={update.id} className="py-4 sm:py-6">
+              <CardContent className="flex h-full flex-col gap-2 px-4 sm:px-6">
+                <p className="font-semibold text-slate-900 dark:text-white">{update.title}</p>
+                <p className="flex-1 text-sm text-slate-600 dark:text-slate-400">{update.message}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">{update.meta}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-white">Announcements</h3>
+          <select
+            aria-label="Filter by Status"
+            className="h-10 w-full rounded-md border border-slate-200 bg-white px-3 text-sm text-slate-700 md:w-56 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+            value={statusFilter}
+            onChange={(event) => setStatusFilter(event.target.value)}
+          >
+            {statusOptions.map((status) => (
+              <option key={status}>{status}</option>
+            ))}
+          </select>
+        </div>
+
+        <div className="overflow-hidden rounded-xl border bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900">
+          <div className="divide-y dark:divide-slate-800">
+            {visibleAnnouncements.map((announcement) => (
+              <div key={announcement.id} className="flex flex-col gap-2 px-4 py-4 sm:px-6">
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="font-medium text-slate-900 dark:text-white">{announcement.title}</p>
+                  <Badge className={announcementStatusClass(announcement.status)}>{announcement.status}</Badge>
+                </div>
+                <p className="text-sm text-slate-600 dark:text-slate-400">{announcement.message}</p>
+                <p className="text-xs text-slate-400 dark:text-slate-500">
+                  {announcement.author} • {announcement.date}
+                </p>
+              </div>
+            ))}
+            {visibleAnnouncements.length === 0 && (
+              <div className="px-6 py-12 text-center text-sm text-slate-500">No communication updates available.</div>
+            )}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
 }
