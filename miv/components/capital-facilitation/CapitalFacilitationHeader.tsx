@@ -15,10 +15,10 @@ export function CapitalFacilitationHeader({ onAddCapitalRequest, onExportOvervie
       <div className="space-y-2">
         <div className="flex flex-wrap items-center gap-2">
           <h1 className="text-2xl font-semibold break-words">Capital Facilitation</h1>
-          <Badge variant="secondary">Portfolio Funding Overview</Badge>
+          <Badge variant="secondary">Venture Funding & Investment Overview</Badge>
         </div>
         <p className="text-gray-600 dark:text-gray-400">
-          Manage venture capital requirements, investor engagement, funding progress and readiness.
+          Manage venture funding requirements, investor engagement, capital readiness and fundraising progress.
         </p>
       </div>
       <div className="flex flex-wrap gap-2">
@@ -28,7 +28,7 @@ export function CapitalFacilitationHeader({ onAddCapitalRequest, onExportOvervie
         </Button>
         <Button size="sm" onClick={onAddCapitalRequest}>
           <Plus className="mr-2 h-4 w-4" />
-          Add Capital Request
+          New Capital Request
         </Button>
       </div>
     </header>

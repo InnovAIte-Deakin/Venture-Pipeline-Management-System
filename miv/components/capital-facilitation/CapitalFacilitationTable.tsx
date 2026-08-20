@@ -16,7 +16,8 @@ import { Building2 } from "lucide-react"
 
 const statusColors: Record<string, string> = {
   "Investor Ready": "bg-blue-100 text-blue-800 border-blue-200",
-  "In Progress": "bg-yellow-100 text-yellow-800 border-yellow-200",
+  Preparing: "bg-gray-100 text-gray-800 border-gray-200",
+  Fundraising: "bg-yellow-100 text-yellow-800 border-yellow-200",
   "Due Diligence": "bg-purple-100 text-purple-800 border-purple-200",
   Funded: "bg-green-100 text-green-800 border-green-200",
 }
@@ -38,9 +39,9 @@ export function CapitalFacilitationTable({ requests }: CapitalFacilitationTableP
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Venture Capital Overview</CardTitle>
+        <CardTitle>Venture Portfolio</CardTitle>
         <p className="text-sm text-muted-foreground">
-          Track funding requirements, secured capital and investor readiness across the venture portfolio.
+          Funding requirements, secured capital and investor readiness by venture.
         </p>
       </CardHeader>
       <CardContent>

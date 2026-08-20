@@ -94,3 +94,66 @@ export interface CapitalPipelineStageSummary {
   label: string
   value: string
 }
+
+export interface CapitalRequestRecord {
+  id: string
+  ventureName: string
+  requestType: string
+  amountRequested: string
+  fundingStage: string
+  targetClose: string
+  priority: "High" | "Medium" | "Low"
+  status: string
+}
+
+export interface CapitalInvestorRecord {
+  id: string
+  investorName: string
+  investorType: string
+  sectorInterest: string
+  preferredStage: string
+  indicativeInterest: string
+  engagementStatus: string
+}
+
+export interface FundingPipelineStage {
+  label: string
+  value: string
+}
+
+export interface FundingPipelineRecord {
+  id: string
+  ventureName: string
+  currentStage: string
+  nextStep: string
+  fundingTarget: string
+  probability: number
+  status: string
+}
+
+export interface DueDiligenceSummaryCard {
+  label: string
+  value: string
+}
+
+export interface DueDiligenceRecord {
+  id: string
+  ventureName: string
+  financialReview: string
+  legalReview: string
+  businessModel: string
+  impactAssessment: string
+  documentation: string
+  overallStatus: string
+}
+
+export interface InvestmentReadinessRecord {
+  id: string
+  ventureName: string
+  pitchDeck: string
+  financialModel: string
+  dataRoom: string
+  legal: string
+  readinessScore: number
+  status: string
+}
