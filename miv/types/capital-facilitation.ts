@@ -70,3 +70,27 @@ export interface CapitalApiVenture {
 export interface CapitalApiResponse {
   ventures?: CapitalApiVenture[] | null
 }
+
+// Frontend demo record for the Capital Facilitation table (not backend-sourced).
+export interface CapitalFacilitationRecord {
+  id: string
+  ventureName: string
+  fundingStage: string
+  capitalRequired: number
+  capitalSecured: number
+  fundingGap: number
+  progress: number
+  investorReadiness: string
+  status: string
+}
+
+export interface CapitalFacilitationSummaryCard {
+  label: string
+  value: string
+  supportingText: string
+}
+
+export interface CapitalPipelineStageSummary {
+  label: string
+  value: string
+}

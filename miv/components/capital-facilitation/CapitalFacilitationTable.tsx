@@ -11,19 +11,27 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { formatCurrency } from "@/lib/capital-facilitation/transformations"
-import type { CapitalRequest } from "@/types/capital-facilitation"
+import type { CapitalFacilitationRecord } from "@/types/capital-facilitation"
 import { Building2 } from "lucide-react"
 
 const statusColors: Record<string, string> = {
-  Approved: "bg-green-100 text-green-800 border-green-200",
-  "Under Review": "bg-blue-100 text-blue-800 border-blue-200",
-  Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
-  Rejected: "bg-red-100 text-red-800 border-red-200",
+  "Investor Ready": "bg-blue-100 text-blue-800 border-blue-200",
+  "In Progress": "bg-yellow-100 text-yellow-800 border-yellow-200",
+  "Due Diligence": "bg-purple-100 text-purple-800 border-purple-200",
+  Funded: "bg-green-100 text-green-800 border-green-200",
 }
 
+const readinessColors: Record<string, string> = {
+  Ready: "bg-green-100 text-green-800 border-green-200",
+  "In Review": "bg-yellow-100 text-yellow-800 border-yellow-200",
+  Preparing: "bg-gray-100 text-gray-800 border-gray-200",
+}
+
+const formatCurrency = (amount: number): string =>
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", minimumFractionDigits: 0 }).format(amount)
+
 interface CapitalFacilitationTableProps {
-  requests: CapitalRequest[]
+  requests: CapitalFacilitationRecord[]
 }
 
 export function CapitalFacilitationTable({ requests }: CapitalFacilitationTableProps) {
@@ -31,17 +39,22 @@ export function CapitalFacilitationTable({ requests }: CapitalFacilitationTableP
     <Card>
       <CardHeader>
         <CardTitle>Venture Capital Overview</CardTitle>
-        <p className="text-sm text-muted-foreground">Funding stage, capital raised, and investor readiness by venture</p>
+        <p className="text-sm text-muted-foreground">
+          Track funding requirements, secured capital and investor readiness across the venture portfolio.
+        </p>
       </CardHeader>
       <CardContent>
         {requests.length ? (
           <div className="overflow-x-auto">
-            <Table>
+            <Table className="min-w-[64rem]">
               <TableHeader>
                 <TableRow>
                   <TableHead>Venture</TableHead>
                   <TableHead>Funding Stage</TableHead>
-                  <TableHead>Capital Raised</TableHead>
+                  <TableHead>Capital Required</TableHead>
+                  <TableHead>Capital Secured</TableHead>
+                  <TableHead>Funding Gap</TableHead>
+                  <TableHead>Progress</TableHead>
                   <TableHead>Investor Readiness</TableHead>
                   <TableHead>Status</TableHead>
                 </TableRow>
@@ -49,14 +62,21 @@ export function CapitalFacilitationTable({ requests }: CapitalFacilitationTableP
               <TableBody>
                 {requests.map((request) => (
                   <TableRow key={request.id}>
-                    <TableCell className="max-w-[200px] break-words font-medium">{request.venture}</TableCell>
-                    <TableCell>{request.stage}</TableCell>
-                    <TableCell>{formatCurrency(request.amount)}</TableCell>
+                    <TableCell className="max-w-[200px] break-words font-medium">{request.ventureName}</TableCell>
+                    <TableCell>{request.fundingStage}</TableCell>
+                    <TableCell>{formatCurrency(request.capitalRequired)}</TableCell>
+                    <TableCell>{formatCurrency(request.capitalSecured)}</TableCell>
+                    <TableCell>{formatCurrency(request.fundingGap)}</TableCell>
                     <TableCell>
                       <div className="flex min-w-[8rem] items-center gap-2">
                         <Progress value={request.progress} className="h-2 flex-1" />
                         <span className="text-xs text-muted-foreground">{request.progress}%</span>
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      <Badge variant="outline" className={readinessColors[request.investorReadiness] || ""}>
+                        {request.investorReadiness}
+                      </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge variant="outline" className={statusColors[request.status] || ""}>
