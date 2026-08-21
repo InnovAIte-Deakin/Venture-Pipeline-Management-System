@@ -22,29 +22,45 @@ export default function IRISMetricsPage() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [limit, setLimit] = useState(50)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [error, setError] = useState("")
+  const [retryKey, setRetryKey] = useState(0)
 
   useEffect(() => {
     const controller = new AbortController()
     async function search() {
       setLoading(true)
+      setError("")
       try {
-        const url = query.trim().length > 0
-          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}`
-          : `/api/iris/metrics?limit=${limit}`
+       const url = query.trim().length > 0
+          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}&page=${page}`
+          : `/api/iris/metrics?limit=${limit}&page=${page}`
         const res = await fetch(url, { signal: controller.signal })
-        if (res.ok) {
-          const json = await res.json()
-          setItems(json.results || [])
-          setTotal(json.total || (json.results?.length ?? 0))
-        }
-      } catch {}
-      finally {
+        if (!res.ok) {
+        throw new Error(`Request failed with status ${res.status}`)
+      }
+        const json = await res.json()
+setItems(json.results || [])
+setTotal(json.total || (json.results?.length ?? 0))
+setTotalPages(json.totalPages || 1)
+      } catch (error) {
+  if ((error as Error).name !== "AbortError") {
+    setItems([])
+    setTotal(0)
+    setTotalPages(1)
+    setError("Unable to load IRIS metrics. Please try again.")
+  }
+} finally {
         setLoading(false)
       }
     }
     const t = setTimeout(search, 250)
     return () => { controller.abort(); clearTimeout(t) }
-  }, [query, limit])
+ }, [query, limit, page, retryKey])
+  useEffect(() => {
+  setPage(1)
+}, [query, limit])
 
   return (
     <div className="space-y-6">
@@ -83,6 +99,31 @@ export default function IRISMetricsPage() {
                 {loading ? 'Searching…' : `Results: ${items.length}${total ? ` / ${total}` : ''}`}
               </div>
             </div>
+            <div className="flex items-center justify-between gap-3">
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
+    disabled={page <= 1 || loading}
+  >
+    Previous
+  </Button>
+
+  <span className="text-sm text-muted-foreground">
+    Page {page} of {totalPages}
+  </span>
+
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() =>
+      setPage((currentPage) => Math.min(totalPages, currentPage + 1))
+    }
+    disabled={page >= totalPages || loading}
+  >
+    Next
+  </Button>
+</div>
             
             {/* Quick filter buttons */}
             <div className="flex flex-wrap gap-2">
@@ -124,8 +165,8 @@ export default function IRISMetricsPage() {
             </div>
           </div>
 
-          <div className="rounded-md border overflow-hidden">
-            <Table>
+        <div className="hidden md:block rounded-md border overflow-x-auto">
+            <Table className="min-w-[760px]">
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-32">Code</TableHead>
@@ -134,25 +175,134 @@ export default function IRISMetricsPage() {
                   <TableHead className="w-40">Unit</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {items.map((item) => (
-                  <TableRow key={item.code}>
-                    <TableCell className="font-medium">{item.code}</TableCell>
-                    <TableCell>
-                      <div className="font-medium">{item.name}</div>
-                      {item.description && (
-                        <div className="text-xs text-slate-500 line-clamp-2">{item.description}</div>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {item.gedsiSuggestion && <Badge variant="outline">{item.gedsiSuggestion}</Badge>}
-                    </TableCell>
-                    <TableCell>{item.unit || '-'}</TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
+             <TableBody>
+  {loading ? (
+    <TableRow>
+      <TableCell
+        colSpan={4}
+        className="py-10 text-center text-sm text-muted-foreground"
+      >
+        <div className="flex items-center justify-center gap-2">
+          <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+          Loading IRIS metrics...
+        </div>
+      </TableCell>
+    </TableRow>
+  ) : error ? (
+  <TableRow>
+    <TableCell
+      colSpan={4}
+      className="py-10 text-center text-sm text-red-600"
+    >
+      <div className="flex flex-col items-center justify-center gap-3">
+        <span>{error}</span>
+        <Button
+          variant="outline"
+          size="sm"
+         onClick={() => setRetryKey((currentKey) => currentKey + 1)}
+        >
+          Try Again
+        </Button>
+      </div>
+    </TableCell>
+  </TableRow>
+) : items.length === 0 ? (
+    <TableRow>
+      <TableCell
+        colSpan={4}
+        className="py-8 text-center text-sm text-muted-foreground"
+      >
+        No IRIS metrics found for “{query}”.
+      </TableCell>
+    </TableRow>
+  ) : (
+    items.map((item) => (
+      <TableRow key={item.code}>
+        <TableCell className="font-medium">{item.code}</TableCell>
+        <TableCell>
+          <div className="font-medium">{item.name}</div>
+          {item.description && (
+            <div className="text-xs text-slate-500 line-clamp-2">
+              {item.description}
+            </div>
+          )}
+        </TableCell>
+        <TableCell>
+          {item.gedsiSuggestion && (
+            <Badge variant="outline">{item.gedsiSuggestion}</Badge>
+          )}
+        </TableCell>
+        <TableCell>{item.unit || "-"}</TableCell>
+      </TableRow>
+    ))
+  )}
+</TableBody>
             </Table>
           </div>
+          {/* Mobile results */}
+<div className="md:hidden space-y-3">
+  {loading ? (
+    <div className="py-10 text-center text-sm text-muted-foreground">
+      <div className="flex items-center justify-center gap-2">
+        <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+        Loading IRIS metrics...
+      </div>
+    </div>
+  ) : error ? (
+    <div className="rounded-lg border p-6 text-center">
+      <p className="text-sm text-red-600">{error}</p>
+      <Button
+        variant="outline"
+        size="sm"
+        className="mt-3"
+        onClick={() => setRetryKey((currentKey) => currentKey + 1)}
+      >
+        Try Again
+      </Button>
+    </div>
+  ) : items.length === 0 ? (
+    <div className="rounded-lg border p-6 text-center text-sm text-muted-foreground">
+      No IRIS metrics found for “{query}”.
+    </div>
+  ) : (
+    items.map((item) => (
+      <div
+        key={item.code}
+        className="rounded-xl border bg-background p-4 shadow-sm"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">
+              {item.code}
+            </p>
+            <h3 className="mt-1 font-semibold leading-tight">
+              {item.name}
+            </h3>
+          </div>
+
+          {item.gedsiSuggestion && (
+            <Badge variant="outline" className="shrink-0">
+              {item.gedsiSuggestion}
+            </Badge>
+          )}
+        </div>
+
+        {item.description && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            {item.description}
+          </p>
+        )}
+
+        <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
+          <span>Unit</span>
+          <span className="font-medium text-foreground">
+            {item.unit || "—"}
+          </span>
+        </div>
+      </div>
+    ))
+  )}
+</div>
         </CardContent>
       </Card>
     </div>
