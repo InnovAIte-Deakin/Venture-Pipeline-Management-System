@@ -51,7 +51,18 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const q = (searchParams.get('q') || '').trim()
     const code = (searchParams.get('code') || '').trim()
-    const limit = Math.max(1, Math.min(200, parseInt(searchParams.get('limit') || '20')))
+    const requestedLimit = Number.parseInt(searchParams.get('limit') || '20', 10)
+    const requestedPage = Number.parseInt(searchParams.get('page') || '1', 10)
+
+    const limit = Number.isNaN(requestedLimit)
+      ? 20
+      : Math.max(1, Math.min(200, requestedLimit))
+    
+    const page = Number.isNaN(requestedPage)
+      ? 1
+      : Math.max(1, requestedPage)
+    
+    const skip = (page - 1) * limit
 
     if (code) {
       const item = await prisma.iRISMetricCatalog.findFirst({ where: { code } })
@@ -79,6 +90,7 @@ export async function GET(request: NextRequest) {
           { description: { contains: q } }
         ]
       } : {},
+      skip,
       take: limit,
       orderBy: { code: 'asc' }
     })
@@ -106,7 +118,15 @@ export async function GET(request: NextRequest) {
       }
     }) : await prisma.iRISMetricCatalog.count()
 
-    return NextResponse.json({ results: sliced, total })
+    const totalPages = Math.max(1, Math.ceil(total / limit))
+
+return NextResponse.json({
+  results: sliced,
+  total,
+  page,
+  limit,
+  totalPages
+})
   } catch (e) {
     console.error('IRIS metrics search error:', e)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
