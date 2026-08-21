@@ -1,528 +1,526 @@
-'use client';
+"use client"
 
-import { useState, useEffect, useCallback } from 'react';
-import { 
-  Upload, 
-  File, 
-  Search, 
-  Filter, 
-  Download, 
-  Trash2, 
-  Eye,
-  CheckCircle, 
-  AlertCircle, 
-  Clock, 
-  XCircle,
-  User,
+import { useCallback, useEffect, useMemo, useState } from "react"
+import {
+  AlertCircle,
   Building2,
   Calendar,
+  CheckCircle,
+  Clock,
+  Download,
+  File,
   FileText,
   Loader2,
-  RefreshCw
-} from 'lucide-react';
+  RefreshCw,
+  Trash2,
+  User,
+  XCircle,
+} from "lucide-react"
+import { ImpactDocumentFilters } from "./ImpactDocumentFilters"
+import {
+  calculateImpactDocumentStats,
+  deleteImpactDocument,
+  downloadImpactDocument,
+  fetchImpactDocuments,
+  filterImpactDocuments,
+  getImpactDocumentErrorMessage,
+  type ImpactDocument,
+  type ImpactDocumentStatus,
+  type ImpactDocumentStatusFilter,
+  type ImpactDocumentTypeFilter,
+  updateImpactDocumentStatus,
+} from "@/lib/impact-documents"
 
-interface Document {
-  id: string;
-  filename: string;
-  documentType: string;
-  status: 'pending_review' | 'approved' | 'rejected' | 'needs_revision';
-  version: number;
-  filesize: number;
-  mimeType: string;
-  url: string;
-  notes?: string;
-  uploadedBy: {
-    id: string;
-    firstName: string;
-    lastName: string;
-    email: string;
-    role: string;
-  };
-  venture?: {
-    id: string;
-    name: string;
-  };
-  reviewedBy?: {
-    id: string;
-    firstName: string;
-    lastName: string;
-  };
-  reviewedAt?: string;
-  createdAt: string;
-  updatedAt: string;
+type RowAction = "status" | "delete" | "download"
+
+const ACTION_BUTTON_BASE =
+  "inline-flex min-h-8 items-center justify-center rounded px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+
+function formatFileSize(bytes?: number) {
+  if (!bytes || bytes <= 0) return "0 Bytes"
+  const k = 1024
+  const sizes = ["Bytes", "KB", "MB", "GB"]
+  const i = Math.min(Math.floor(Math.log(bytes) / Math.log(k)), sizes.length - 1)
+  return `${Math.round((bytes / Math.pow(k, i)) * 100) / 100} ${sizes[i]}`
 }
 
-const DOCUMENT_TYPES = [
-  'All Types',
-  'Pitch Deck',
-  'Financial Statements', 
-  'Legal Documents',
-  'GEDSI Reports',
-  'Impact Reports',
-  'Other'
-];
+function formatDate(date?: string) {
+  if (!date) return "Unknown"
+  const parsed = new Date(date)
+  if (Number.isNaN(parsed.getTime())) return "Unknown"
+  return parsed.toLocaleDateString()
+}
 
-const STATUS_OPTIONS = [
-  'All Status',
-  'pending_review',
-  'approved', 
-  'rejected',
-  'needs_revision'
-];
+function formatPerson(person: ImpactDocument["uploadedBy"]) {
+  if (!person || typeof person === "string") {
+    return { name: "Unknown uploader", email: "No email available" }
+  }
+
+  const name = [person.firstName, person.lastName].filter(Boolean).join(" ").trim()
+  return {
+    name: name || person.email || "Unknown uploader",
+    email: person.email || "No email available",
+  }
+}
+
+function formatVenture(venture: ImpactDocument["venture"]) {
+  if (!venture || typeof venture === "string") return "No venture"
+  return venture.name || "No venture"
+}
+
+function getStatusBadge(status: ImpactDocumentStatus | string) {
+  const statusConfig = {
+    pending_review: { color: "bg-yellow-100 text-yellow-800", text: "Pending Review", icon: Clock },
+    approved: { color: "bg-green-100 text-green-800", text: "Approved", icon: CheckCircle },
+    rejected: { color: "bg-red-100 text-red-800", text: "Rejected", icon: XCircle },
+    needs_revision: { color: "bg-orange-100 text-orange-800", text: "Needs Revision", icon: AlertCircle },
+    unknown: { color: "bg-gray-100 text-gray-700", text: "Unknown", icon: AlertCircle },
+  }
+  const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.unknown
+  const IconComponent = config.icon
+
+  return (
+    <span className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${config.color}`}>
+      <IconComponent className="mr-1 h-3 w-3" aria-hidden="true" />
+      {config.text}
+    </span>
+  )
+}
+
+interface DocumentActionsProps {
+  document: ImpactDocument
+  pendingAction?: RowAction
+  onStatusUpdate: (documentId: string, status: ImpactDocumentStatus) => void
+  onDelete: (documentId: string) => void
+  onDownload: (documentId: string, filename: string) => void
+}
+
+function DocumentActions({
+  document,
+  pendingAction,
+  onStatusUpdate,
+  onDelete,
+  onDownload,
+}: DocumentActionsProps) {
+  const disabled = Boolean(pendingAction)
+  const isDownloading = pendingAction === "download"
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      <button
+        type="button"
+        onClick={() => onDownload(document.id, document.filename)}
+        disabled={disabled}
+        aria-label={`Download ${document.filename}`}
+        title={`Download ${document.filename}`}
+        className={`${ACTION_BUTTON_BASE} bg-blue-50 text-blue-600 hover:bg-blue-100`}
+      >
+        {isDownloading ? (
+          <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden="true" />
+        ) : (
+          <Download className="mr-1 h-3 w-3" aria-hidden="true" />
+        )}
+        Download
+      </button>
+
+      {document.status === "pending_review" && (
+        <div className="flex items-center gap-1">
+          <button
+            type="button"
+            onClick={() => onStatusUpdate(document.id, "approved")}
+            disabled={disabled}
+            aria-label={`Approve ${document.filename}`}
+            title={`Approve ${document.filename}`}
+            className={`${ACTION_BUTTON_BASE} bg-green-50 text-green-600 hover:bg-green-100`}
+          >
+            <CheckCircle className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onStatusUpdate(document.id, "rejected")}
+            disabled={disabled}
+            aria-label={`Reject ${document.filename}`}
+            title={`Reject ${document.filename}`}
+            className={`${ACTION_BUTTON_BASE} bg-red-50 text-red-600 hover:bg-red-100`}
+          >
+            <XCircle className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => onStatusUpdate(document.id, "needs_revision")}
+            disabled={disabled}
+            aria-label={`Request revision for ${document.filename}`}
+            title={`Request revision for ${document.filename}`}
+            className={`${ACTION_BUTTON_BASE} bg-orange-50 text-orange-600 hover:bg-orange-100`}
+          >
+            <AlertCircle className="h-3.5 w-3.5" aria-hidden="true" />
+          </button>
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={() => onDelete(document.id)}
+        disabled={disabled}
+        aria-label={`Delete ${document.filename}`}
+        title={`Delete ${document.filename}`}
+        className={`${ACTION_BUTTON_BASE} bg-red-50 text-red-600 hover:bg-red-100`}
+      >
+        {pendingAction === "delete" ? (
+          <Loader2 className="h-3.5 w-3.5 animate-spin" aria-hidden="true" />
+        ) : (
+          <Trash2 className="h-3.5 w-3.5" aria-hidden="true" />
+        )}
+      </button>
+    </div>
+  )
+}
 
 export default function ImpactDocumentsPage() {
-  const [documents, setDocuments] = useState<Document[]>([]);
-  const [filteredDocuments, setFilteredDocuments] = useState<Document[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedType, setSelectedType] = useState('All Types');
-  const [selectedStatus, setSelectedStatus] = useState('All Status');
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
-  const [stats, setStats] = useState({
-    total: 0,
-    pending: 0,
-    approved: 0,
-    rejected: 0,
-  });
+  const [documents, setDocuments] = useState<ImpactDocument[]>([])
+  const [loading, setLoading] = useState(true)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedType, setSelectedType] = useState<ImpactDocumentTypeFilter>("All Types")
+  const [selectedStatus, setSelectedStatus] = useState<ImpactDocumentStatusFilter>("All Status")
+  const [error, setError] = useState("")
+  const [success, setSuccess] = useState("")
+  const [pendingActions, setPendingActions] = useState<Record<string, RowAction | undefined>>({})
+
+  const filteredDocuments = useMemo(
+    () => filterImpactDocuments(documents, { searchQuery, selectedType, selectedStatus }),
+    [documents, searchQuery, selectedType, selectedStatus],
+  )
+
+  const stats = useMemo(() => calculateImpactDocumentStats(documents), [documents])
+
+  const setRowAction = useCallback((documentId: string, action?: RowAction) => {
+    setPendingActions((current) => {
+      const next = { ...current }
+      if (action) next[documentId] = action
+      else delete next[documentId]
+      return next
+    })
+  }, [])
 
   const fetchDocuments = useCallback(async () => {
     try {
-      setLoading(true);
-      setError('');
-      
-      const res = await fetch('/backend/api/documents', {
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && data.documents) {
-          setDocuments(data.documents);
-          setFilteredDocuments(data.documents);
-          
-          // Calculate stats
-          const stats = data.documents.reduce((acc: any, doc: Document) => {
-            acc.total++;
-            if (doc.status === 'pending_review') acc.pending++;
-            else if (doc.status === 'approved') acc.approved++;
-            else if (doc.status === 'rejected') acc.rejected++;
-            return acc;
-          }, { total: 0, pending: 0, approved: 0, rejected: 0 });
-          
-          setStats(stats);
-        }
-      } else {
-        const errorData = await res.json();
-        setError(errorData.message || 'Failed to fetch documents');
-      }
+      setLoading(true)
+      setError("")
+      setDocuments(await fetchImpactDocuments())
     } catch (err) {
-      console.error('Failed to fetch documents:', err);
-      setError('Failed to fetch documents');
+      console.error("Failed to fetch documents:", err)
+      setError(getImpactDocumentErrorMessage(err, "Failed to fetch documents."))
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, []);
+  }, [])
 
-  // Filter documents based on search and filters
-  useEffect(() => {
-    let filtered = documents;
-
-    // Search filter
-    if (searchQuery) {
-      filtered = filtered.filter(doc => 
-        doc.filename.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.uploadedBy.firstName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.uploadedBy.lastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.uploadedBy.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doc.venture?.name.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-
-    // Document type filter
-    if (selectedType !== 'All Types') {
-      filtered = filtered.filter(doc => doc.documentType === selectedType);
-    }
-
-    // Status filter
-    if (selectedStatus !== 'All Status') {
-      filtered = filtered.filter(doc => doc.status === selectedStatus);
-    }
-
-    setFilteredDocuments(filtered);
-  }, [documents, searchQuery, selectedType, selectedStatus]);
-
-  const handleStatusUpdate = async (documentId: string, newStatus: string, notes?: string) => {
+  const handleStatusUpdate = async (documentId: string, newStatus: ImpactDocumentStatus) => {
     try {
-      const res = await fetch(`/backend/api/documents/${documentId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ status: newStatus, notes }),
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setSuccess('Document status updated successfully');
-        fetchDocuments(); // Refresh the list
-      } else {
-        setError(data.message || 'Failed to update document status');
-      }
+      setRowAction(documentId, "status")
+      setError("")
+      setSuccess("")
+      await updateImpactDocumentStatus(documentId, newStatus)
+      setSuccess("Document status updated successfully.")
+      await fetchDocuments()
     } catch (err) {
-      console.error('Status update error:', err);
-      setError('An error occurred while updating status');
+      console.error("Status update error:", err)
+      setError(getImpactDocumentErrorMessage(err, "An error occurred while updating status."))
+    } finally {
+      setRowAction(documentId)
     }
-  };
+  }
 
   const handleDelete = async (documentId: string) => {
-    if (!confirm('Are you sure you want to delete this document? This action cannot be undone.')) {
-      return;
+    if (!confirm("Are you sure you want to delete this document? This action cannot be undone.")) {
+      return
     }
 
     try {
-      const res = await fetch(`/backend/api/documents?id=${documentId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        setSuccess('Document deleted successfully');
-        fetchDocuments(); // Refresh the list
-      } else {
-        setError(data.message || 'Failed to delete document');
-      }
+      setRowAction(documentId, "delete")
+      setError("")
+      setSuccess("")
+      await deleteImpactDocument(documentId)
+      setSuccess("Document deleted successfully.")
+      await fetchDocuments()
     } catch (err) {
-      console.error('Delete error:', err);
-      setError('An error occurred while deleting');
+      console.error("Delete error:", err)
+      setError(getImpactDocumentErrorMessage(err, "An error occurred while deleting the document."))
+    } finally {
+      setRowAction(documentId)
     }
-  };
+  }
 
   const handleDownload = async (documentId: string, filename: string) => {
+    let url: string | undefined
+
     try {
-      const res = await fetch(`/backend/api/documents/${documentId}?download=true`, {
-        credentials: 'include',
-      });
-
-      if (res.ok) {
-        const blob = await res.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(a);
-      } else {
-        setError('Failed to download document');
-      }
+      setRowAction(documentId, "download")
+      setError("")
+      setSuccess("")
+      const blob = await downloadImpactDocument(documentId)
+      url = window.URL.createObjectURL(blob)
+      const link = document.createElement("a")
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
     } catch (err) {
-      console.error('Download error:', err);
-      setError('An error occurred while downloading');
+      console.error("Download error:", err)
+      setError(getImpactDocumentErrorMessage(err, "An error occurred while downloading the document."))
+    } finally {
+      if (url) window.URL.revokeObjectURL(url)
+      setRowAction(documentId)
     }
-  };
-
-  const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-  };
-
-  const getStatusBadge = (status: string) => {
-    const statusConfig = {
-      pending_review: { color: 'bg-yellow-100 text-yellow-800', text: 'Pending Review', icon: Clock },
-      approved: { color: 'bg-green-100 text-green-800', text: 'Approved', icon: CheckCircle },
-      rejected: { color: 'bg-red-100 text-red-800', text: 'Rejected', icon: XCircle },
-      needs_revision: { color: 'bg-orange-100 text-orange-800', text: 'Needs Revision', icon: AlertCircle }
-    };
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending_review;
-    const IconComponent = config.icon;
-    
-    return (
-      <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.color}`}>
-        <IconComponent className="w-3 h-3 mr-1" />
-        {config.text}
-      </div>
-    );
-  };
+  }
 
   useEffect(() => {
-    fetchDocuments();
-  }, [fetchDocuments]);
+    fetchDocuments()
+  }, [fetchDocuments])
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <div className="flex justify-between items-start">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">Impact Documents Management</h1>
-              <p className="text-gray-600">Review and manage documents uploaded by venture founders</p>
+    <div className="min-h-screen bg-gray-50 px-4 py-6 sm:py-8">
+      <div className="mx-auto max-w-7xl">
+        <header className="mb-6 sm:mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-start sm:justify-between">
+            <div className="min-w-0">
+              <h1 className="break-words text-2xl font-bold text-gray-900 sm:text-3xl">
+                Impact Documents Management
+              </h1>
+              <p className="mt-2 max-w-2xl text-sm text-gray-600 sm:text-base">
+                Review and manage documents uploaded by venture founders
+              </p>
             </div>
             <button
+              type="button"
               onClick={fetchDocuments}
               disabled={loading}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
-              <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} aria-hidden="true" />
               Refresh
             </button>
           </div>
-        </div>
+        </header>
 
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center">
-              <FileText className="w-8 h-8 text-blue-500 mr-3" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                <p className="text-sm text-gray-600">Total Documents</p>
+        <section className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 sm:grid-cols-2 lg:grid-cols-4" aria-label="Document statistics">
+          {[
+            { label: "Total Documents", value: stats.total, icon: FileText, color: "text-blue-500" },
+            { label: "Pending Review", value: stats.pending, icon: Clock, color: "text-yellow-500" },
+            { label: "Approved", value: stats.approved, icon: CheckCircle, color: "text-green-500" },
+            { label: "Rejected", value: stats.rejected, icon: XCircle, color: "text-red-500" },
+          ].map((stat) => {
+            const Icon = stat.icon
+            return (
+              <div key={stat.label} className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+                <div className="flex min-w-0 items-center">
+                  <Icon className={`mr-3 h-8 w-8 shrink-0 ${stat.color}`} aria-hidden="true" />
+                  <div className="min-w-0">
+                    <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
+                    <p className="break-words text-sm text-gray-600">{stat.label}</p>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center">
-              <Clock className="w-8 h-8 text-yellow-500 mr-3" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.pending}</p>
-                <p className="text-sm text-gray-600">Pending Review</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center">
-              <CheckCircle className="w-8 h-8 text-green-500 mr-3" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.approved}</p>
-                <p className="text-sm text-gray-600">Approved</p>
-              </div>
-            </div>
-          </div>
-          <div className="bg-white rounded-lg shadow-sm p-6 border border-gray-200">
-            <div className="flex items-center">
-              <XCircle className="w-8 h-8 text-red-500 mr-3" />
-              <div>
-                <p className="text-2xl font-bold text-gray-900">{stats.rejected}</p>
-                <p className="text-sm text-gray-600">Rejected</p>
-              </div>
-            </div>
-          </div>
-        </div>
+            )
+          })}
+        </section>
 
-        {/* Alerts */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-            <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5" />
-            <p className="text-red-800">{error}</p>
-            <button onClick={() => setError('')} className="ml-auto">
-              <XCircle className="w-5 h-5 text-red-600" />
+          <div className="mb-6 flex items-start rounded-lg border border-red-200 bg-red-50 p-4" role="alert">
+            <AlertCircle className="mr-3 mt-0.5 h-5 w-5 shrink-0 text-red-600" aria-hidden="true" />
+            <p className="min-w-0 flex-1 break-words text-sm text-red-800 sm:text-base">{error}</p>
+            <button
+              type="button"
+              onClick={() => setError("")}
+              aria-label="Dismiss error"
+              className="ml-3 rounded text-red-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2"
+            >
+              <XCircle className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
-            <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5" />
-            <p className="text-green-800">{success}</p>
-            <button onClick={() => setSuccess('')} className="ml-auto">
-              <XCircle className="w-5 h-5 text-green-600" />
+          <div className="mb-6 flex items-start rounded-lg border border-green-200 bg-green-50 p-4" role="status">
+            <CheckCircle className="mr-3 mt-0.5 h-5 w-5 shrink-0 text-green-600" aria-hidden="true" />
+            <p className="min-w-0 flex-1 break-words text-sm text-green-800 sm:text-base">{success}</p>
+            <button
+              type="button"
+              onClick={() => setSuccess("")}
+              aria-label="Dismiss success message"
+              className="ml-3 rounded text-green-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-green-500 focus-visible:ring-offset-2"
+            >
+              <XCircle className="h-5 w-5" aria-hidden="true" />
             </button>
           </div>
         )}
 
-        {/* Filters */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex flex-col md:flex-row gap-4">
-            <div className="flex-1">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-                <input
-                  type="text"
-                  placeholder="Search by filename, user, or venture..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-            </div>
-            <div className="md:w-48">
-              <select
-                value={selectedType}
-                onChange={(e) => setSelectedType(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {DOCUMENT_TYPES.map(type => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
-            <div className="md:w-48">
-              <select
-                value={selectedStatus}
-                onChange={(e) => setSelectedStatus(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {STATUS_OPTIONS.map(status => (
-                  <option key={status} value={status}>
-                    {status === 'All Status' ? status : status.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        <ImpactDocumentFilters
+          searchQuery={searchQuery}
+          selectedType={selectedType}
+          selectedStatus={selectedStatus}
+          onSearchQueryChange={setSearchQuery}
+          onSelectedTypeChange={setSelectedType}
+          onSelectedStatusChange={setSelectedStatus}
+        />
 
-        {/* Documents List */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900">
+        <section className="overflow-hidden rounded-lg bg-white shadow-sm" aria-labelledby="impact-documents-heading">
+          <div className="border-b border-gray-200 px-4 py-4 sm:px-6">
+            <h2 id="impact-documents-heading" className="text-lg font-semibold text-gray-900">
               Documents ({filteredDocuments.length})
             </h2>
           </div>
-          
+
           {loading ? (
-            <div className="text-center py-12">
-              <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
+            <div className="py-12 text-center">
+              <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-500" aria-hidden="true" />
               <p className="text-gray-500">Loading documents...</p>
             </div>
           ) : filteredDocuments.length === 0 ? (
-            <div className="text-center py-12">
-              <File className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+            <div className="py-12 text-center">
+              <File className="mx-auto mb-4 h-16 w-16 text-gray-300" aria-hidden="true" />
               <p className="text-gray-500">No documents found</p>
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Document
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Uploaded By
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Venture
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Upload Date
-                    </th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {filteredDocuments.map((doc) => (
-                    <tr key={doc.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <File className="w-10 h-10 text-blue-500 mr-3" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {doc.filename}
+            <>
+              <div className="hidden overflow-x-auto md:block">
+                <table className="min-w-[920px] divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="w-[28%] px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Document
+                      </th>
+                      <th className="w-[22%] px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Uploaded By
+                      </th>
+                      <th className="w-[16%] px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Venture
+                      </th>
+                      <th className="w-[14%] px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Status
+                      </th>
+                      <th className="w-[11%] px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Upload Date
+                      </th>
+                      <th className="w-[9%] px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-gray-500">
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200 bg-white">
+                    {filteredDocuments.map((doc) => {
+                      const uploader = formatPerson(doc.uploadedBy)
+                      const venture = formatVenture(doc.venture)
+                      return (
+                        <tr key={doc.id} className="hover:bg-gray-50">
+                          <td className="px-4 py-4 align-top">
+                            <div className="flex min-w-0 items-start">
+                              <File className="mr-3 mt-0.5 h-10 w-10 shrink-0 text-blue-500" aria-hidden="true" />
+                              <div className="min-w-0">
+                                <div className="break-words text-sm font-medium text-gray-900">{doc.filename}</div>
+                                <div className="mt-1 text-xs text-gray-500">
+                                  {doc.documentType} • {formatFileSize(doc.filesize)}
+                                </div>
+                              </div>
                             </div>
-                            <div className="text-xs text-gray-500">
-                              {doc.documentType} • {formatFileSize(doc.filesize)}
+                          </td>
+                          <td className="px-4 py-4 align-top">
+                            <div className="flex min-w-0 items-start">
+                              <User className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
+                              <div className="min-w-0">
+                                <div className="break-words text-sm font-medium text-gray-900">{uploader.name}</div>
+                                <div className="mt-1 break-words text-xs text-gray-500">{uploader.email}</div>
+                              </div>
                             </div>
+                          </td>
+                          <td className="px-4 py-4 align-top">
+                            {venture !== "No venture" ? (
+                              <div className="flex min-w-0 items-start">
+                                <Building2 className="mr-2 mt-0.5 h-5 w-5 shrink-0 text-gray-400" aria-hidden="true" />
+                                <span className="break-words text-sm text-gray-900">{venture}</span>
+                              </div>
+                            ) : (
+                              <span className="text-xs text-gray-500">No venture</span>
+                            )}
+                          </td>
+                          <td className="px-4 py-4 align-top">{getStatusBadge(doc.status)}</td>
+                          <td className="px-4 py-4 align-top">
+                            <div className="flex items-center">
+                              <Calendar className="mr-2 h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+                              <span className="text-sm text-gray-900">{formatDate(doc.createdAt)}</span>
+                            </div>
+                          </td>
+                          <td className="px-4 py-4 align-top text-right">
+                            <DocumentActions
+                              document={doc}
+                              pendingAction={pendingActions[doc.id]}
+                              onStatusUpdate={handleStatusUpdate}
+                              onDelete={handleDelete}
+                              onDownload={handleDownload}
+                            />
+                          </td>
+                        </tr>
+                      )
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="divide-y divide-gray-200 md:hidden">
+                {filteredDocuments.map((doc) => {
+                  const uploader = formatPerson(doc.uploadedBy)
+                  const venture = formatVenture(doc.venture)
+                  return (
+                    <article key={doc.id} className="px-4 py-5">
+                      <div className="mb-3 flex min-w-0 items-start gap-3">
+                        <File className="mt-0.5 h-9 w-9 shrink-0 text-blue-500" aria-hidden="true" />
+                        <div className="min-w-0 flex-1">
+                          <h3 className="break-words text-sm font-semibold text-gray-900">{doc.filename}</h3>
+                          <p className="mt-1 text-xs text-gray-500">
+                            {doc.documentType} • {formatFileSize(doc.filesize)}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="space-y-3 text-sm">
+                        <div className="flex items-start gap-2">
+                          <User className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+                          <div className="min-w-0">
+                            <p className="break-words font-medium text-gray-900">{uploader.name}</p>
+                            <p className="break-words text-xs text-gray-500">{uploader.email}</p>
                           </div>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <User className="w-5 h-5 text-gray-400 mr-2" />
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">
-                              {doc.uploadedBy.firstName} {doc.uploadedBy.lastName}
-                            </div>
-                            <div className="text-xs text-gray-500">
-                              {doc.uploadedBy.email}
-                            </div>
-                          </div>
+                        <div className="flex items-start gap-2">
+                          <Building2 className="mt-0.5 h-4 w-4 shrink-0 text-gray-400" aria-hidden="true" />
+                          <p className="break-words text-gray-900">{venture}</p>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {doc.venture ? (
-                          <div className="flex items-center">
-                            <Building2 className="w-5 h-5 text-gray-400 mr-2" />
-                            <span className="text-sm text-gray-900">{doc.venture.name}</span>
-                          </div>
-                        ) : (
-                          <span className="text-xs text-gray-500">No venture</span>
-                        )}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        {getStatusBadge(doc.status)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="flex items-center">
-                          <Calendar className="w-4 h-4 text-gray-400 mr-2" />
-                          <span className="text-sm text-gray-900">
-                            {new Date(doc.createdAt).toLocaleDateString()}
+                        <div className="flex flex-wrap items-center gap-3">
+                          {getStatusBadge(doc.status)}
+                          <span className="inline-flex items-center text-sm text-gray-900">
+                            <Calendar className="mr-1.5 h-4 w-4 text-gray-400" aria-hidden="true" />
+                            {formatDate(doc.createdAt)}
                           </span>
                         </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <div className="flex items-center justify-end space-x-2">
-                          <button
-                            onClick={() => handleDownload(doc.id, doc.filename)}
-                            className="inline-flex items-center px-3 py-1 bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors text-xs"
-                          >
-                            <Download className="w-3 h-3 mr-1" />
-                            Download
-                          </button>
-                          
-                          {doc.status === 'pending_review' && (
-                            <div className="flex space-x-1">
-                              <button
-                                onClick={() => handleStatusUpdate(doc.id, 'approved')}
-                                className="inline-flex items-center px-2 py-1 bg-green-50 text-green-600 rounded hover:bg-green-100 transition-colors text-xs"
-                              >
-                                <CheckCircle className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(doc.id, 'rejected')}
-                                className="inline-flex items-center px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs"
-                              >
-                                <XCircle className="w-3 h-3" />
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(doc.id, 'needs_revision')}
-                                className="inline-flex items-center px-2 py-1 bg-orange-50 text-orange-600 rounded hover:bg-orange-100 transition-colors text-xs"
-                              >
-                                <AlertCircle className="w-3 h-3" />
-                              </button>
-                            </div>
-                          )}
-                          
-                          <button
-                            onClick={() => handleDelete(doc.id)}
-                            className="inline-flex items-center px-2 py-1 bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors text-xs"
-                          >
-                            <Trash2 className="w-3 h-3" />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                      </div>
+
+                      <div className="mt-4">
+                        <DocumentActions
+                          document={doc}
+                          pendingAction={pendingActions[doc.id]}
+                          onStatusUpdate={handleStatusUpdate}
+                          onDelete={handleDelete}
+                          onDownload={handleDownload}
+                        />
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
+            </>
           )}
-        </div>
+        </section>
       </div>
     </div>
-  );
+  )
 }
