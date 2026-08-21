@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { MobileNav } from "@/components/mobile-nav";
+import { MobileNav } from "@/components/dashboard/navigation/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { Search, Bell, Moon, HelpCircle, Download, User } from "lucide-react";
 import UserSidebar from "@/components/user-dashboard/user-sidebar";

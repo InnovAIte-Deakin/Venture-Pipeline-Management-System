@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 import { z } from 'zod';
 
 // Validation schema
@@ -118,8 +119,13 @@ export async function PUT(
       location: validatedData.location,
       isAllDay: validatedData.isAllDay,
       isRecurring: validatedData.isRecurring,
-      recurrence: validatedData.recurrence,
     };
+
+    if (validatedData.recurrence !== undefined || validatedData.isRecurring === false) {
+      updateData.recurrence = validatedData.isRecurring === false
+        ? Prisma.JsonNull
+        : validatedData.recurrence;
+    }
 
     // Handle attendee updates separately if provided
     if (validatedData.attendeeIds !== undefined) {

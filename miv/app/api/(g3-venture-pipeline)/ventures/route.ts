@@ -174,6 +174,34 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const validatedData = createVentureSchema.parse(body);
 
+    const teamSizeMap: Record<string, number> = {
+      '1-2': 1,
+      '3-5': 3,
+      '6-10': 6,
+      '11-20': 11,
+      '21-50': 21,
+      '50+': 50,
+    };
+
+    if (validatedData.teamSize && !(validatedData.teamSize in teamSizeMap)) {
+      return NextResponse.json(
+        { error: 'Validation error', details: [{ path: ['teamSize'], message: 'Invalid team size range' }] },
+        { status: 400 }
+      );
+    }
+
+    if (validatedData.foundingYear && !/^\d{4}$/.test(validatedData.foundingYear)) {
+      return NextResponse.json(
+        { error: 'Validation error', details: [{ path: ['foundingYear'], message: 'Founding year must be a valid four-digit integer' }] },
+        { status: 400 }
+      );
+    }
+
+    const teamSize = validatedData.teamSize ? teamSizeMap[validatedData.teamSize] : undefined;
+    const foundingYear = validatedData.foundingYear
+      ? Number.parseInt(validatedData.foundingYear, 10)
+      : undefined;
+
     // Get user ID from session
     // For development, use a default user or create one
     let user = await prisma.user.findFirst();
@@ -192,6 +220,8 @@ export async function POST(request: NextRequest) {
       data: {
         ...validatedData,
         founderTypes: JSON.stringify(validatedData.founderTypes),
+        teamSize,
+        foundingYear,
         createdById: user.id,
       } as any,
       include: {
@@ -291,4 +321,4 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     );
   }
-} 
+}

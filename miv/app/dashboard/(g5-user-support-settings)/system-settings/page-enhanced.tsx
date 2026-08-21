@@ -45,6 +45,7 @@ import {
   FileText,
   Clock,
   RotateCcw,
+  BarChart3,
 } from "lucide-react"
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis } from "recharts"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"

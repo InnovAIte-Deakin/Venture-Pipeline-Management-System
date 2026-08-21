@@ -1,9 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL =
+const configuredBackendUrl =
 	process.env.NEXT_PUBLIC_BACKEND_URL ||
 	process.env.PUBLIC_BACKEND_URL ||
 	"http://localhost:3001";
+
+function getBackendUrl(): string {
+	try {
+		const url = new URL(configuredBackendUrl);
+		if (url.hostname === "localhost") {
+			url.hostname = "127.0.0.1";
+		}
+		return url.toString().replace(/\/$/, "");
+	} catch {
+		return configuredBackendUrl.replace(/\/$/, "");
+	}
+}
 
 function getPayloadToken(setCookie: string | null): string | null {
 	if (!setCookie) return null;
@@ -12,16 +24,39 @@ function getPayloadToken(setCookie: string | null): string | null {
 	return match?.[1] ?? null;
 }
 
+async function fetchBackendLogin(body: string, contentType: string): Promise<Response> {
+	const backendUrl = `${getBackendUrl()}/api/auth/login`;
+	let lastError: unknown;
+
+	for (let attempt = 1; attempt <= 3; attempt += 1) {
+		try {
+			return await fetch(backendUrl, {
+				method: "POST",
+				headers: {
+					"Content-Type": contentType,
+					Connection: "close",
+				},
+				body,
+				cache: "no-store",
+			});
+		} catch (error) {
+			lastError = error;
+			if (attempt < 3) {
+				await new Promise((resolve) => setTimeout(resolve, attempt * 250));
+			}
+		}
+	}
+
+	throw lastError;
+}
+
 export async function POST(request: NextRequest) {
 	try {
 		const body = await request.text();
-		const backendResponse = await fetch(`${BACKEND_URL}/api/auth/login`, {
-			method: "POST",
-			headers: {
-				"Content-Type": request.headers.get("content-type") || "application/json",
-			},
+		const backendResponse = await fetchBackendLogin(
 			body,
-		});
+			request.headers.get("content-type") || "application/json"
+		);
 
 		const data = await backendResponse.json().catch(() => ({
 			success: false,
@@ -50,9 +85,10 @@ export async function POST(request: NextRequest) {
 		return NextResponse.json(
 			{
 				success: false,
-				message: "An error occurred during login. Please try again.",
+				message:
+					"Unable to reach the authentication service. Please try again after the backend is ready.",
 			},
-			{ status: 500 }
+			{ status: 502 }
 		);
 	}
 }

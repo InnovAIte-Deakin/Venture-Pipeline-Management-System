@@ -6,14 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Plus, Play, RefreshCw, Zap } from "lucide-react"
-
-type Workflow = {
-  id: string
-  name: string
-  description?: string | null
-  isActive: boolean
-  updatedAt: string
-}
+import type { Workflow } from "./types/workflow"
 
 export default function WorkflowsPage() {
   const [workflows, setWorkflows] = useState<Workflow[]>([])
@@ -36,19 +29,19 @@ export default function WorkflowsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold">Workflow Automation</h1>
           <p className="text-gray-600">Design, build, and manage automated workflows</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Link href="/dashboard/workflows/wizard">
-            <Button>
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <Link href="/dashboard/workflows/wizard" className="w-full sm:w-auto">
+            <Button className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               Create Workflow
             </Button>
           </Link>
-          <Button variant="outline" onClick={load}>
+          <Button variant="outline" onClick={load} className="w-full sm:w-auto">
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
           </Button>
@@ -104,9 +97,10 @@ export default function WorkflowsPage() {
                   </div>
                   
                   {/* Actions */}
-                  <div className="flex items-center gap-2 pt-2">
+                  <div className="flex flex-col gap-2 pt-2 sm:flex-row sm:items-center">
                     <Button 
                       size="sm" 
+                      className="w-full sm:w-auto"
                       onClick={async () => {
                         await fetch('/api/workflows/run', { 
                           method: 'POST', 
@@ -120,7 +114,7 @@ export default function WorkflowsPage() {
                       <Play className="h-3 w-3 mr-1" />
                       Run
                     </Button>
-                    <Button variant="outline" size="sm" asChild>
+                    <Button variant="outline" size="sm" className="w-full sm:w-auto" asChild>
                       <Link href={`/dashboard/workflows/${workflow.id}/builder`}>
                         Edit
                       </Link>

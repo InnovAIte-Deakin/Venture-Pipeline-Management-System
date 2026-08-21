@@ -10,6 +10,9 @@ const uploadDocumentSchema = z.object({
   type: z.enum(['PITCH_DECK', 'FINANCIAL_STATEMENTS', 'BUSINESS_PLAN', 'LEGAL_DOCUMENTS', 'MARKET_RESEARCH', 'TEAM_PROFILE', 'OTHER']).optional(),
 });
 
+type DocumentTypeValue = NonNullable<z.infer<typeof uploadDocumentSchema>['type']>;
+type UploadResult = Record<string, unknown> & { error?: string };
+
 // POST /api/documents/upload - Upload document files
 export async function POST(request: NextRequest) {
   try {
@@ -71,7 +74,7 @@ export async function POST(request: NextRequest) {
       // Directory might already exist, which is fine
     }
 
-    const uploadedDocuments = [];
+    const uploadedDocuments: UploadResult[] = [];
 
     for (const file of files) {
       try {
@@ -87,7 +90,7 @@ export async function POST(request: NextRequest) {
         await writeFile(filePath, buffer);
 
         // Determine document type based on file extension if not specified
-        let docType = validatedData.type || 'OTHER';
+        let docType: DocumentTypeValue = validatedData.type || 'OTHER';
         if (docType === 'OTHER') {
           docType = inferDocumentType(file.name, file.type);
         }
@@ -191,7 +194,7 @@ export async function POST(request: NextRequest) {
 }
 
 // Helper functions
-function inferDocumentType(fileName: string, mimeType: string): string {
+function inferDocumentType(fileName: string, mimeType: string): DocumentTypeValue {
   const extension = fileName.split('.').pop()?.toLowerCase();
   const type = mimeType.toLowerCase();
 

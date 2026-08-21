@@ -1,53 +1,90 @@
-"use client"
+"use client";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { capitalSummaryDemo } from "@/lib/capital-facilitation/demo-data"
-import { CapitalFacilitationHeader } from "@/components/capital-facilitation/CapitalFacilitationHeader"
-import { CapitalSummaryCards } from "@/components/capital-facilitation/CapitalSummaryCards"
-import { CapitalOverview } from "@/components/capital-facilitation/CapitalOverview"
-import { CapitalRequests } from "@/components/capital-facilitation/CapitalRequests"
-import { CapitalInvestors } from "@/components/capital-facilitation/CapitalInvestors"
-import { FundingPipeline } from "@/components/capital-facilitation/FundingPipeline"
-import { DueDiligence } from "@/components/capital-facilitation/DueDiligence"
-import { InvestmentReadiness } from "@/components/capital-facilitation/InvestmentReadiness"
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { AnalyticsTab } from "./components/analytics-tab";
+import { CapitalRequestsTab } from "./components/capital-requests-tab";
+import { InvestorNetworkTab } from "./components/investor-network-tab";
+import { OverviewStats } from "./components/overview-stats";
+import { PageHeader } from "./components/page-header";
+import { useCapitalFacilitation } from "./hooks/use-capital-facilitation";
 
 export default function CapitalFacilitation() {
+  const {
+    capitalRequests,
+    dealPipelineStages,
+    error,
+    fetchCapitalData,
+    fundingTimeline,
+    investorPartners,
+    loading,
+    selectedRequest,
+    setSelectedRequest,
+  } = useCapitalFacilitation();
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="space-y-6 p-4 sm:p-6">
-        <CapitalFacilitationHeader />
-        <CapitalSummaryCards cards={capitalSummaryDemo} />
-        <Tabs defaultValue="overview" className="space-y-4">
-          <div className="overflow-x-auto">
-            <TabsList>
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="requests">Capital Requests</TabsTrigger>
-              <TabsTrigger value="investors">Investors</TabsTrigger>
-              <TabsTrigger value="pipeline">Funding Pipeline</TabsTrigger>
-              <TabsTrigger value="due-diligence">Due Diligence</TabsTrigger>
-              <TabsTrigger value="readiness">Investment Readiness</TabsTrigger>
-            </TabsList>
-          </div>
-          <TabsContent value="overview">
-            <CapitalOverview />
-          </TabsContent>
-          <TabsContent value="requests">
-            <CapitalRequests />
-          </TabsContent>
-          <TabsContent value="investors">
-            <CapitalInvestors />
-          </TabsContent>
-          <TabsContent value="pipeline">
-            <FundingPipeline />
-          </TabsContent>
-          <TabsContent value="due-diligence">
-            <DueDiligence />
-          </TabsContent>
-          <TabsContent value="readiness">
-            <InvestmentReadiness />
-          </TabsContent>
-        </Tabs>
+      <div className="space-y-6 p-6">
+        {loading && (
+          <Card>
+            <CardContent className="p-8">
+              <div className="flex items-center justify-center gap-3">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent" />
+                <span>Loading capital facilitation data from database...</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {error && (
+          <Alert className="border-red-200 bg-red-50 dark:bg-red-950">
+            <AlertCircle className="h-4 w-4 text-red-600" />
+            <AlertDescription>
+              <strong>Error:</strong> {error}
+              <Button
+                variant="link"
+                className="ml-2 h-auto p-0 text-red-600 underline"
+                onClick={() => void fetchCapitalData()}
+              >
+                Retry
+              </Button>
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {!loading && !error && (
+          <>
+            <PageHeader />
+            <OverviewStats capitalRequests={capitalRequests} />
+            <Tabs defaultValue="capital-requests" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="capital-requests">
+                  Capital Requests
+                </TabsTrigger>
+                <TabsTrigger value="investor-network">
+                  Investor Network
+                </TabsTrigger>
+                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+              </TabsList>
+              <CapitalRequestsTab
+                capitalRequests={capitalRequests}
+                dealPipelineStages={dealPipelineStages}
+                selectedRequest={selectedRequest}
+                onSelectRequest={setSelectedRequest}
+              />
+              <InvestorNetworkTab investors={investorPartners} />
+              <AnalyticsTab
+                capitalRequests={capitalRequests}
+                fundingTimeline={fundingTimeline}
+                investorPartners={investorPartners}
+              />
+            </Tabs>
+          </>
+        )}
       </div>
     </div>
-  )
+  );
 }

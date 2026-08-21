@@ -115,6 +115,10 @@
 	* {
 		@apply border-border outline-ring/50;
 	}
+	html,
+	body {
+		overflow-x: hidden;
+	}
 	body {
 		@apply bg-background text-foreground;
 	}
@@ -1741,6 +1745,13 @@ select:focus,
 textarea:focus {
 	outline: 3px solid #3b82f6;
 	outline-offset: 2px;
+}
+
+button.team-management-tab:focus,
+button.team-management-tab:focus-visible {
+	outline: none;
+	outline-offset: 0;
+	box-shadow: none;
 }
 
 /* Reduced motion for users who prefer it */

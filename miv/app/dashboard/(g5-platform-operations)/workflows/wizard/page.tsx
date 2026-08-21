@@ -1,171 +1,20 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { useRouter } from "next/navigation"
 import { 
-  Play, 
-  Clock, 
-  Webhook, 
-  Mail, 
-  Bell, 
-  Database, 
-  FileText, 
-  Users, 
-  Building2,
   CheckCircle,
-  ArrowRight,
   Zap,
-  Timer,
-  Globe,
-  Target,
-  MessageSquare,
-  AlertTriangle,
-  Calendar,
   Plus
 } from "lucide-react"
-
-interface WorkflowTemplate {
-  id: string
-  name: string
-  description: string
-  category: string
-  icon: React.ReactNode
-  definition: any
-  tags: string[]
-}
-
-const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
-  {
-    id: "venture-onboarding",
-    name: "Venture Onboarding",
-    description: "Automatically guide new ventures through intake, screening, and initial assessment",
-    category: "Venture Management",
-    icon: <Building2 className="h-5 w-5" />,
-    tags: ["onboarding", "automation", "assessment"],
-    definition: {
-      trigger: { type: "venture_created" },
-      steps: [
-        { type: "send_welcome_email", config: { template: "venture_welcome" } },
-        { type: "create_tasks", config: { tasks: ["Document Review", "Initial Screening", "GEDSI Assessment"] } },
-        { type: "schedule_meeting", config: { type: "intake_call", daysFromNow: 3 } },
-        { type: "notify_team", config: { message: "New venture requires initial review" } }
-      ]
-    }
-  },
-  {
-    id: "due-diligence-checklist",
-    name: "Due Diligence Automation",
-    description: "Create comprehensive due diligence checklists and track completion",
-    category: "Due Diligence",
-    icon: <CheckCircle className="h-5 w-5" />,
-    tags: ["due-diligence", "checklist", "compliance"],
-    definition: {
-      trigger: { type: "stage_changed", config: { to: "DUE_DILIGENCE" } },
-      steps: [
-        { type: "create_checklist", config: { template: "comprehensive_dd" } },
-        { type: "assign_reviewers", config: { roles: ["legal", "financial", "technical"] } },
-        { type: "set_deadline", config: { daysFromNow: 30 } },
-        { type: "schedule_reminders", config: { frequency: "weekly" } }
-      ]
-    }
-  },
-  {
-    id: "gedsi-monitoring",
-    name: "GEDSI Compliance Monitoring",
-    description: "Monitor GEDSI metrics and alert on compliance issues",
-    category: "Compliance",
-    icon: <Target className="h-5 w-5" />,
-    tags: ["gedsi", "compliance", "monitoring"],
-    definition: {
-      trigger: { type: "schedule", config: { frequency: "weekly" } },
-      steps: [
-        { type: "check_gedsi_metrics", config: { threshold: 70 } },
-        { type: "identify_at_risk", config: { criteria: "score_below_threshold" } },
-        { type: "create_alerts", config: { severity: "medium" } },
-        { type: "notify_managers", config: { include_recommendations: true } }
-      ]
-    }
-  },
-  {
-    id: "investment-pipeline",
-    name: "Investment Pipeline Tracker",
-    description: "Track ventures through investment stages with automated updates",
-    category: "Investment",
-    icon: <ArrowRight className="h-5 w-5" />,
-    tags: ["investment", "pipeline", "tracking"],
-    definition: {
-      trigger: { type: "stage_changed" },
-      steps: [
-        { type: "update_pipeline_status" },
-        { type: "calculate_stage_metrics" },
-        { type: "notify_stakeholders", config: { include_progress: true } },
-        { type: "schedule_review", config: { basedOnStage: true } }
-      ]
-    }
-  },
-  {
-    id: "monthly-reporting",
-    name: "Monthly Impact Reports",
-    description: "Generate and distribute monthly impact and performance reports",
-    category: "Reporting",
-    icon: <FileText className="h-5 w-5" />,
-    tags: ["reporting", "impact", "analytics"],
-    definition: {
-      trigger: { type: "schedule", config: { frequency: "monthly", day: 1 } },
-      steps: [
-        { type: "generate_impact_report" },
-        { type: "compile_gedsi_summary" },
-        { type: "create_visual_dashboard" },
-        { type: "distribute_report", config: { recipients: "stakeholders" } }
-      ]
-    }
-  },
-  {
-    id: "risk-assessment",
-    name: "Risk Assessment Workflow",
-    description: "Automated risk assessment and mitigation planning",
-    category: "Risk Management",
-    icon: <AlertTriangle className="h-5 w-5" />,
-    tags: ["risk", "assessment", "mitigation"],
-    definition: {
-      trigger: { type: "manual" },
-      steps: [
-        { type: "analyze_financial_risk" },
-        { type: "assess_market_risk" },
-        { type: "evaluate_operational_risk" },
-        { type: "create_mitigation_plan" },
-        { type: "schedule_review", config: { frequency: "quarterly" } }
-      ]
-    }
-  }
-]
-
-const TRIGGER_TYPES = [
-  { value: "manual", label: "Manual Trigger", icon: <Play className="h-4 w-4" />, description: "Start manually when needed" },
-  { value: "schedule", label: "Schedule", icon: <Clock className="h-4 w-4" />, description: "Run on a schedule" },
-  { value: "webhook", label: "Webhook", icon: <Webhook className="h-4 w-4" />, description: "Trigger via API call" },
-  { value: "venture_created", label: "Venture Created", icon: <Building2 className="h-4 w-4" />, description: "When a new venture is added" },
-  { value: "stage_changed", label: "Stage Changed", icon: <ArrowRight className="h-4 w-4" />, description: "When venture stage updates" },
-  { value: "metric_updated", label: "Metric Updated", icon: <Target className="h-4 w-4" />, description: "When metrics are updated" }
-]
-
-const ACTION_TYPES = [
-  { value: "send_email", label: "Send Email", icon: <Mail className="h-4 w-4" />, description: "Send email notification" },
-  { value: "create_notification", label: "Create Notification", icon: <Bell className="h-4 w-4" />, description: "Create in-app notification" },
-  { value: "update_database", label: "Update Database", icon: <Database className="h-4 w-4" />, description: "Update venture data" },
-  { value: "generate_document", label: "Generate Document", icon: <FileText className="h-4 w-4" />, description: "Create document from template" },
-  { value: "assign_task", label: "Assign Task", icon: <Users className="h-4 w-4" />, description: "Create and assign tasks" },
-  { value: "schedule_meeting", label: "Schedule Meeting", icon: <Calendar className="h-4 w-4" />, description: "Schedule calendar event" },
-  { value: "send_slack", label: "Send Slack Message", icon: <MessageSquare className="h-4 w-4" />, description: "Send Slack notification" },
-  { value: "webhook_call", label: "Webhook Call", icon: <Globe className="h-4 w-4" />, description: "Make HTTP request" }
-]
+import { ACTION_TYPES, TRIGGER_TYPES, WORKFLOW_TEMPLATES } from "../constants/workflow.constants"
+import type { WorkflowStep, WorkflowTrigger } from "../types/workflow"
 
 export default function WorkflowWizardPage() {
   const router = useRouter()
@@ -175,8 +24,10 @@ export default function WorkflowWizardPage() {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [category, setCategory] = useState("")
-  const [trigger, setTrigger] = useState({ type: "manual", config: {} })
-  const [actions, setActions] = useState([{ type: "send_email", config: { to: "", subject: "", body: "" } }])
+  const [trigger, setTrigger] = useState<WorkflowTrigger>({ type: "manual", config: {} })
+  const [actions, setActions] = useState<WorkflowStep[]>([
+    { type: "send_email", config: { to: "", subject: "", body: "" } },
+  ])
 
   const next = () => setStep(s => Math.min(5, s + 1))
   const back = () => setStep(s => Math.max(1, s - 1))
@@ -210,7 +61,7 @@ export default function WorkflowWizardPage() {
     setActions(prev => [...prev, { type: "send_email", config: {} }])
   }
 
-  const updateAction = (index: number, field: string, value: any) => {
+  const updateAction = <Key extends keyof WorkflowStep>(index: number, field: Key, value: WorkflowStep[Key]) => {
     setActions(prev => prev.map((action, i) => 
       i === index ? { ...action, [field]: value } : action
     ))
@@ -262,23 +113,25 @@ export default function WorkflowWizardPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="mx-auto max-w-4xl space-y-6 px-4 sm:px-0">
       {/* Progress Indicator */}
-      <div className="flex items-center justify-between mb-8">
-        {[1, 2, 3, 4, 5].map((i) => (
-          <div key={i} className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-              i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
-            }`}>
-              {i}
+      <div className="mb-8 overflow-x-auto pb-2">
+        <div className="flex min-w-max items-center justify-between">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="flex items-center">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
+                i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+              }`}>
+                {i}
+              </div>
+              {i < 5 && (
+                <div className={`mx-2 h-0.5 w-8 sm:w-16 ${
+                  i < step ? 'bg-blue-600' : 'bg-gray-200'
+                }`} />
+              )}
             </div>
-            {i < 5 && (
-              <div className={`w-16 h-0.5 mx-2 ${
-                i < step ? 'bg-blue-600' : 'bg-gray-200'
-              }`} />
-            )}
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       <Card>
@@ -337,7 +190,7 @@ export default function WorkflowWizardPage() {
                   >
                     <CardContent className="p-4">
                       <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
-                        {template.icon}
+                        <template.icon className="h-5 w-5" />
                       </div>
                       <h4 className="font-semibold text-center mb-2">{template.name}</h4>
                       <p className="text-sm text-gray-600 text-center mb-3">{template.description}</p>
@@ -411,7 +264,7 @@ export default function WorkflowWizardPage() {
                       <CardContent className="p-4">
                         <div className="flex items-start gap-3">
                           <div className="w-8 h-8 bg-gray-100 rounded-lg flex items-center justify-center">
-                            {triggerType.icon}
+                            <triggerType.icon className="h-4 w-4" />
                           </div>
                           <div>
                             <h4 className="font-medium">{triggerType.label}</h4>
@@ -496,24 +349,24 @@ export default function WorkflowWizardPage() {
               <div className="space-y-4">
                 {actions.map((action, index) => (
                   <Card key={index} className="p-4">
-                    <div className="flex items-start gap-4">
-                      <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center text-sm font-medium">
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-medium">
                         {index + 1}
                       </div>
                       <div className="flex-1 space-y-3">
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                           <Select 
                             value={action.type} 
                             onValueChange={(value) => updateAction(index, 'type', value)}
                           >
-                            <SelectTrigger className="w-64">
+                            <SelectTrigger className="w-full sm:w-64">
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
                               {ACTION_TYPES.map((actionType) => (
                                 <SelectItem key={actionType.value} value={actionType.value}>
                                   <div className="flex items-center gap-2">
-                                    {actionType.icon}
+                                    <actionType.icon className="h-4 w-4" />
                                     {actionType.label}
                                   </div>
                                 </SelectItem>
@@ -525,7 +378,7 @@ export default function WorkflowWizardPage() {
                               variant="ghost" 
                               size="sm" 
                               onClick={() => removeAction(index)}
-                              className="text-red-600 hover:text-red-700"
+                              className="w-full text-red-600 hover:text-red-700 sm:w-auto"
                             >
                               Remove
                             </Button>
@@ -659,5 +512,4 @@ export default function WorkflowWizardPage() {
     </div>
   )
 }
-
 

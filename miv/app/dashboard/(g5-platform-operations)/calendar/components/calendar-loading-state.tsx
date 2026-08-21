@@ -1,0 +1,1 @@
+export function CalendarLoadingState() { return <div className="flex min-h-[50vh] items-center justify-center"><div className="text-center"><div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600" /><p className="text-muted-foreground">Loading calendar...</p></div></div> }
