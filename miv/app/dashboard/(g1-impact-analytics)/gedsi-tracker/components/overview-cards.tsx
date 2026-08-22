@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { GEDSIMetric } from "../hooks/use-gedsi-data" // Updated relative path
+import type { GEDSIMetric } from "../types/gedsi-tracker.types"
 
 export function OverviewCards({ metrics }: { metrics: GEDSIMetric[] }) {
   return (
