@@ -128,7 +128,7 @@ export function DistributionsSection({ distributions, loading = false }: Readonl
 
       {/* Cards View */}
       {viewType === "cards" && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="hidden gap-4 sm:grid md:grid-cols-2">
           {filteredDistributions.map((dist) => (
             <Card key={dist.id}>
               <CardHeader className="pb-3">

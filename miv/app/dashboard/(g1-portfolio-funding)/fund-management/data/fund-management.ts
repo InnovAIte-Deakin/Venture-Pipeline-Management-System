@@ -196,6 +196,7 @@ export const distributions: Distribution[] = [
     withholding: 0.25,
     currency: "USD",
     paymentMethod: "wire",
+    taxReporting: true,
     k1Generated: true,
     recordDate: "2024-01-30",
     exDate: "2024-02-01"
@@ -215,7 +216,8 @@ export const distributions: Distribution[] = [
     source: "Quarterly Revenue Share",
     sourceVentures: ["SaaS Scale-up"],
     taxImplications: "No withholding",
-    paymentMethod: "ACH",
+    paymentMethod: "ach",
+    taxReporting: false,
     k1Generated: false,
     recordDate: "2024-02-20",
     exDate: "2024-02-25"

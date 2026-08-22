@@ -137,7 +137,7 @@ export function LPsSection({ limitedPartners, loading = false }: Readonly<LPsSec
 
       {/* Cards View */}
       {viewType === "cards" && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="hidden gap-4 sm:grid md:grid-cols-2">
           {filteredLPs.map((lp) => (
             <Card
               key={lp.id}
