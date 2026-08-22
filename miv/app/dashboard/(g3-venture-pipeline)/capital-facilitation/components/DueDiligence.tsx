@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { dueDiligenceDemo, dueDiligenceSummaryDemo } from "@/lib/capital-facilitation/demo-data"
+import { dueDiligenceDemo, dueDiligenceSummaryDemo } from "../lib/demo-data"
 
 const statusColors: Record<string, string> = {
   Complete: "bg-green-100 text-green-800 border-green-200",

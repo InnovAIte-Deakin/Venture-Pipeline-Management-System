@@ -3,7 +3,7 @@ import type {
   CapitalRequest,
   CapitalStatus,
   PipelineStage,
-} from "@/types/capital-facilitation"
+} from "../types"
 
 export const getCapitalStatus = (stage: string): CapitalStatus => {
   if (["FUNDED", "SERIES_A", "SERIES_B", "SERIES_C"].includes(stage)) return "Approved"

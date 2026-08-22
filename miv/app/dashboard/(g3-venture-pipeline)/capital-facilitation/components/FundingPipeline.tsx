@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { fundingPipelineDemo, fundingPipelineStagesDemo } from "@/lib/capital-facilitation/demo-data"
+import { fundingPipelineDemo, fundingPipelineStagesDemo } from "../lib/demo-data"
 
 const statusColors: Record<string, string> = {
   "On Track": "bg-blue-100 text-blue-800 border-blue-200",

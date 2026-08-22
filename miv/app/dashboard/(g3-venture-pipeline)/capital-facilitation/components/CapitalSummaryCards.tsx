@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import type { CapitalFacilitationSummaryCard } from "@/types/capital-facilitation"
+import type { CapitalFacilitationSummaryCard } from "../types"
 
 interface CapitalSummaryCardsProps {
   cards: CapitalFacilitationSummaryCard[]

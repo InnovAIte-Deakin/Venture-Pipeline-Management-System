@@ -1,10 +1,10 @@
-import { calculateCapitalProgress, getCapitalStage, getCapitalStatus } from "@/lib/capital-facilitation/calculations"
+import { calculateCapitalProgress, getCapitalStage, getCapitalStatus } from "./calculations"
 import type {
   CapitalApiVenture,
   CapitalDocument,
   CapitalRequest,
   InvestorPartner,
-} from "@/types/capital-facilitation"
+} from "../types"
 
 const investorByStage: Record<string, string> = {
   INTAKE: "Social Impact Ventures",
