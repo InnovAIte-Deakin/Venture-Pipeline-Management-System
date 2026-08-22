@@ -25,11 +25,35 @@ async function postOtp(path: string, body: Record<string, string>, signal?: Abor
   return payload;
 }
 
+async function postPasswordRecovery(path: string, body: Record<string, string>, signal?: AbortSignal) {
+  const response = await fetch(path, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(body),
+    signal,
+  });
+  const payload = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new AuthRequestError(
+      payload?.message || "We could not complete the request. Please try again.",
+      response.status,
+    );
+  }
+  return payload;
+}
+
 export const authClient = {
   verifyCode(email: string, code: string, signal?: AbortSignal) {
     return postOtp("/api/auth/otp/verify", { email, code }, signal);
   },
   resendCode(email: string, signal?: AbortSignal) {
     return postOtp("/api/auth/otp/resend", { email }, signal);
+  },
+  forgotPassword(email: string, signal?: AbortSignal) {
+    return postPasswordRecovery("/backend/api/auth/forgot-password", { email }, signal);
+  },
+  resetPassword(token: string, newPassword: string, signal?: AbortSignal) {
+    return postPasswordRecovery("/backend/api/auth/reset-password", { token, newPassword }, signal);
   },
 };
