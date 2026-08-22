@@ -1,9 +1,9 @@
 "use client"
 
 import { useMemo, useState } from "react"
-import { CapitalFilters } from "@/components/capital-facilitation/CapitalFilters"
-import { CapitalFacilitationTable } from "@/components/capital-facilitation/CapitalFacilitationTable"
-import { capitalVenturesDemo, fundingStageOptions, fundingStatusOptions } from "@/lib/capital-facilitation/demo-data"
+import { CapitalFilters } from "./CapitalFilters"
+import { CapitalFacilitationTable } from "./CapitalFacilitationTable"
+import { capitalVenturesDemo, fundingStageOptions, fundingStatusOptions } from "../lib/demo-data"
 
 const ALL_STAGES = fundingStageOptions[0]
 const ALL_STATUSES = fundingStatusOptions[0]

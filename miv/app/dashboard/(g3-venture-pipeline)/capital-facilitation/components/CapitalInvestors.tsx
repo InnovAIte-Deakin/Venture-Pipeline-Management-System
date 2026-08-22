@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { capitalInvestorsDemo } from "@/lib/capital-facilitation/demo-data"
+import { capitalInvestorsDemo } from "../lib/demo-data"
 
 const engagementColors: Record<string, string> = {
   "Initial Discussion": "bg-gray-100 text-gray-800 border-gray-200",

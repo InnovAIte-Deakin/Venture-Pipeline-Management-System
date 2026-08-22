@@ -49,25 +49,25 @@ export function InvestorNetworkTab({
                   className="transition-shadow hover:shadow-sm"
                 >
                   <CardContent className="p-4">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-blue-700">
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-blue-700">
                         {investor.name.substring(0, 2).toUpperCase()}
                       </div>
-                      <div className="flex-1">
-                        <h3 className="font-medium">{investor.name}</h3>
-                        <p className="text-sm text-muted-foreground">
+                      <div className="min-w-0 flex-1">
+                        <h3 className="break-words font-medium">{investor.name}</h3>
+                        <p className="break-words text-sm text-muted-foreground">
                           {investor.focus}
                         </p>
                         <div className="mt-3 space-y-2 text-sm">
-                          <div className="flex justify-between">
+                          <div className="flex items-start justify-between gap-3">
                             <span className="text-muted-foreground">
                               Total Invested
                             </span>
-                            <span className="font-medium">
+                            <span className="break-words text-right font-medium">
                               {formatCurrency(investor.totalInvested)}
                             </span>
                           </div>
-                          <div className="flex justify-between">
+                          <div className="flex items-start justify-between gap-3">
                             <span className="text-muted-foreground">
                               Active Deals
                             </span>
@@ -75,17 +75,17 @@ export function InvestorNetworkTab({
                               {investor.activeDeals}
                             </span>
                           </div>
-                          <div className="flex justify-between">
+                          <div className="flex items-start justify-between gap-3">
                             <span className="text-muted-foreground">
                               Ticket Size
                             </span>
-                            <span className="font-medium">
+                            <span className="break-words text-right font-medium">
                               {investor.avgTicketSize}
                             </span>
                           </div>
                         </div>
                         <div className="mt-3 border-t pt-3">
-                          <div className="flex gap-2">
+                          <div className="flex flex-col gap-2 sm:flex-row">
                             <Button size="sm" className="flex-1">
                               <Mail className="mr-1 h-4 w-4" />
                               Contact

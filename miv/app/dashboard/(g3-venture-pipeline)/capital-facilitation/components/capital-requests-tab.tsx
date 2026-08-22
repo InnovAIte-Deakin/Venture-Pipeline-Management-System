@@ -49,9 +49,9 @@ function PipelineOverview({
         <CardTitle>Pipeline Overview</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-5">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-5 md:gap-4">
           {empty ? (
-            <div className="col-span-5">
+            <div className="col-span-full">
               <EmptyState
                 icon={DollarSign}
                 message="No capital requests found"
@@ -103,14 +103,14 @@ function RequestList({
                 onClick={() => onSelect(request)}
                 className={`w-full rounded-lg border p-4 text-left transition-colors ${selectedId === request.id ? "border-blue-500 bg-blue-50 dark:bg-blue-950/20" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
               >
-                <div className="mb-3 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-blue-700">
+                <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex min-w-0 items-center gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-blue-700">
                       {request.venture.substring(0, 2).toUpperCase()}
                     </div>
-                    <div>
-                      <h3 className="font-medium">{request.venture}</h3>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0">
+                      <h3 className="break-words font-medium">{request.venture}</h3>
+                      <p className="break-words text-sm text-muted-foreground">
                         {request.investor}
                       </p>
                     </div>
@@ -122,16 +122,16 @@ function RequestList({
                     {request.status}
                   </Badge>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-sm md:grid-cols-4">
+                <div className="grid grid-cols-1 gap-3 text-sm sm:grid-cols-2 md:grid-cols-4 md:gap-4">
                   <div>
                     <p className="text-muted-foreground">Amount</p>
-                    <p className="font-medium">
+                    <p className="break-words font-medium">
                       {formatCurrency(request.amount)}
                     </p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Stage</p>
-                    <p className="font-medium">{request.stage}</p>
+                    <p className="break-words font-medium">{request.stage}</p>
                   </div>
                   <div>
                     <p className="text-muted-foreground">Progress</p>
@@ -145,7 +145,7 @@ function RequestList({
                   </div>
                   <div>
                     <p className="text-muted-foreground">Due Date</p>
-                    <p className="font-medium">{request.expectedDecision}</p>
+                    <p className="break-words font-medium">{request.expectedDecision}</p>
                   </div>
                 </div>
               </button>
@@ -231,7 +231,7 @@ function RequestDetails({ request }: { request: CapitalRequest }) {
             )}
           </div>
           <div className="border-t pt-4">
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <Button className="flex-1">
                 <Upload className="mr-2 h-4 w-4" />
                 Upload Document

@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { formatCurrency } from "@/lib/capital-facilitation/transformations"
-import type { CapitalMetrics, CapitalRequest, InvestorPartner, PipelineStage } from "@/types/capital-facilitation"
+import { formatCurrency } from "../lib/transformations"
+import type { CapitalMetrics, CapitalRequest, InvestorPartner, PipelineStage } from "../types"
 import { Building2, DollarSign, FileText, Mail, MessageSquare, Search, Upload, Users } from "lucide-react"
 
 const statusColors: Record<string, string> = {

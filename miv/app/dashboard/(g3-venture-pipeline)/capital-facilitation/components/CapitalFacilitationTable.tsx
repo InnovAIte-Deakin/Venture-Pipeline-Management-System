@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import type { CapitalFacilitationRecord } from "@/types/capital-facilitation"
+import type { CapitalFacilitationRecord } from "../types"
 import { Building2 } from "lucide-react"
 
 const statusColors: Record<string, string> = {

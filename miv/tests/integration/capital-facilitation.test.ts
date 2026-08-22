@@ -1,8 +1,8 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { calculateCapitalProgress, calculateMetrics, calculatePipelineStages, calculateFundingTimeline } from "../../lib/capital-facilitation/calculations"
-import { transformVentureToCapitalRequest } from "../../lib/capital-facilitation/transformations"
-import type { CapitalRequest } from "../../types/capital-facilitation"
+import { calculateCapitalProgress, calculateMetrics, calculatePipelineStages, calculateFundingTimeline } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/lib/calculations"
+import { transformVentureToCapitalRequest } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/lib/transformations"
+import type { CapitalRequest } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/types"
 
 const request = (overrides: Partial<CapitalRequest> = {}): CapitalRequest => ({
   id: "CAP-1",

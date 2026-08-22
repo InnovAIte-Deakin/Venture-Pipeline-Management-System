@@ -11,7 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { investmentReadinessDemo } from "@/lib/capital-facilitation/demo-data"
+import { investmentReadinessDemo } from "../lib/demo-data"
 
 const readinessCategories = [
   "Pitch Deck",

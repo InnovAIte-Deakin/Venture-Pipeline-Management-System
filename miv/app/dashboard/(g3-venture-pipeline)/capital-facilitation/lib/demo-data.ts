@@ -10,7 +10,7 @@ import type {
   FundingPipelineStage,
   InvestmentReadinessRecord,
   CapitalRequestRecord,
-} from "@/types/capital-facilitation"
+} from "../types"
 
 export const capitalSummaryDemo: CapitalFacilitationSummaryCard[] = [
   { label: "Active Capital Requests", value: "8", supportingText: "Ventures currently seeking funding" },

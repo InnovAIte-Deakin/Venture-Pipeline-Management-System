@@ -27,7 +27,7 @@ export default function CapitalFacilitation() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <div className="space-y-6 p-6">
+      <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
         {loading && (
           <Card>
             <CardContent className="p-8">
@@ -59,15 +59,17 @@ export default function CapitalFacilitation() {
           <>
             <PageHeader />
             <OverviewStats capitalRequests={capitalRequests} />
-            <Tabs defaultValue="capital-requests" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="capital-requests">
+            <Tabs defaultValue="capital-requests" className="space-y-4 sm:space-y-6">
+              <TabsList className="grid h-auto w-full grid-cols-1 gap-1 sm:h-9 sm:grid-cols-3 sm:gap-0">
+                <TabsTrigger value="capital-requests" className="whitespace-normal text-xs sm:whitespace-nowrap sm:text-sm">
                   Capital Requests
                 </TabsTrigger>
-                <TabsTrigger value="investor-network">
+                <TabsTrigger value="investor-network" className="whitespace-normal text-xs sm:whitespace-nowrap sm:text-sm">
                   Investor Network
                 </TabsTrigger>
-                <TabsTrigger value="analytics">Analytics</TabsTrigger>
+                <TabsTrigger value="analytics" className="whitespace-normal text-xs sm:whitespace-nowrap sm:text-sm">
+                  Analytics
+                </TabsTrigger>
               </TabsList>
               <CapitalRequestsTab
                 capitalRequests={capitalRequests}

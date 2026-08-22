@@ -11,12 +11,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { CapitalFilters } from "@/components/capital-facilitation/CapitalFilters"
+import { CapitalFilters } from "./CapitalFilters"
 import {
   capitalRequestsDemo,
   fundingStageOptions,
   requestStatusOptions,
-} from "@/lib/capital-facilitation/demo-data"
+} from "../lib/demo-data"
 import { FileText } from "lucide-react"
 
 const ALL_STAGES = fundingStageOptions[0]
