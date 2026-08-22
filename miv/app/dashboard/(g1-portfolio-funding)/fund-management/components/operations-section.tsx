@@ -202,7 +202,7 @@ export function OperationsSection({ operationTasks, loading = false }: Readonly<
 
       {/* List View */}
       {viewType === "list" && (
-        <Card>
+        <Card className="hidden sm:block">
           <CardHeader>
             <CardTitle>Operations Tasks</CardTitle>
             <CardDescription>{filteredTasks.length} tasks</CardDescription>

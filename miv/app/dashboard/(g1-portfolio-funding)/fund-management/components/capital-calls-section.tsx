@@ -111,7 +111,7 @@ export function CapitalCallsSection({ capitalCalls, loading = false }: Readonly<
 
       {/* Cards View */}
       {viewType === "cards" && (
-        <div className="grid gap-4 md:grid-cols-2">
+        <div className="hidden gap-4 sm:grid md:grid-cols-2">
           {filteredCalls.map((call) => (
             <Card key={call.id}>
               <CardHeader className="pb-3">

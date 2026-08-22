@@ -12,7 +12,7 @@ interface FundMobileCardProps {
 
 export function FundMobileCard({ fund, onView }: Readonly<FundMobileCardProps>) {
   return (
-    <div className="overflow-hidden rounded-[24px] border border-slate-700 bg-slate-900 p-3 shadow-[0_16px_40px_rgba(15,23,42,0.45)]">
+    <div className="overflow-hidden rounded-3xl border border-slate-700 bg-slate-900 p-3 shadow-[0_16px_40px_rgba(15,23,42,0.45)]">
       <div className="mb-3 flex items-center justify-between">
         <span className="text-[10px] font-medium uppercase tracking-[0.18em] text-slate-400">
           Fund overview
@@ -28,7 +28,7 @@ export function FundMobileCard({ fund, onView }: Readonly<FundMobileCardProps>) 
             <p className="truncate text-sm font-semibold text-white">{fund.name}</p>
             <p className="mt-1 text-[11px] text-slate-400">{fund.vintage}</p>
           </div>
-          <Button variant="ghost" size="sm" className="h-8 w-8 flex-shrink-0 rounded-full border border-slate-600 bg-slate-800 p-0 text-slate-300 hover:bg-slate-700">
+          <Button variant="ghost" size="sm" className="h-8 w-8 shrink-0 rounded-full border border-slate-600 bg-slate-800 p-0 text-slate-300 hover:bg-slate-700">
             <MoreVertical className="h-4 w-4" />
           </Button>
         </div>
