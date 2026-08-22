@@ -6,6 +6,10 @@ const PUBLIC_PATHS = [
   '/auth/register',
   '/auth/forgot-password',
   '/auth/reset-password',
+  '/auth/google',
+  '/auth/verify',
+  '/auth/error',
+  '/forbidden',
   '/_next',
   '/favicon.ico',
   '/assets',
@@ -39,8 +43,12 @@ export async function proxy(req: NextRequest) {
     return NextResponse.next()
   }
 
-  // Simple cookie presence check
-  const token = req.cookies.get('payload-token')?.value
+  // Accept both the existing Payload session and the NextAuth session used by
+  // Google sign-in. Authorization still belongs in server/API route logic.
+  const token =
+    req.cookies.get('payload-token')?.value ||
+    req.cookies.get('next-auth.session-token')?.value ||
+    req.cookies.get('__Secure-next-auth.session-token')?.value
   if (token) {
     // Optionally, redirect authenticated users away from auth pages
     if (pathname === '/auth/login' || pathname === '/auth/register') {

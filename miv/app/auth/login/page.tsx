@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { GoogleIcon } from "@/components/auth/google-icon";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -90,6 +91,28 @@ export default function LoginPage() {
         </CardHeader>
 
         <CardContent className="space-y-6">
+          <Button
+            type="button"
+            variant="outline"
+            className="h-11 w-full border-slate-300 bg-white font-medium text-slate-700 hover:bg-slate-50 dark:bg-slate-800"
+            disabled={isLoading}
+            onClick={() => {
+              setIsLoading(true);
+              const next = new URLSearchParams(window.location.search).get("next");
+              const callbackUrl = next?.startsWith("/") && !next.startsWith("//") ? next : "/dashboard";
+              window.location.assign(`/auth/google?callbackUrl=${encodeURIComponent(callbackUrl)}`);
+            }}
+          >
+            <GoogleIcon className="size-5" />
+            Continue with Google
+          </Button>
+
+          <div className="flex items-center gap-3 text-xs uppercase tracking-wider text-slate-400">
+            <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+            or continue with email
+            <span className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <Label
