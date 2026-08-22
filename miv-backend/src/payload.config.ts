@@ -140,7 +140,7 @@ export default buildConfig({
     }
 
     // Ensure sample documents exist for the founder (first-run only, idempotent per file)
-    if (founderId) {
+    if (founderId && !process.env.VITEST) {
       const sampleDocs: Array<{
         fileName: string
         documentType: 'pitch_deck' | 'financial_statements' | 'legal_documents' | 'gedsi_reports'

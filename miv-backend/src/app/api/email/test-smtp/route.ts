@@ -1,17 +1,20 @@
 import { NextResponse } from 'next/server'
 import nodemailer from 'nodemailer'
 export async function GET() {
+  if (process.env.NODE_ENV === 'production') {
+    return new Response(null, { status: 404 })
+  }
   try {
     // Get SMTP configuration
     const smtpHost = process.env.SMTP_HOST
     const smtpPort = parseInt(process.env.SMTP_PORT || '587')
     const smtpUser = process.env.SMTP_USER
     const smtpPass = process.env.SMTP_PASS
-    
+
     console.log('Testing SMTP connection with:')
     console.log('- Host:', smtpHost)
     console.log('- Port:', smtpPort)
-    console.log('- User:', smtpUser)
+    console.log('- User:', smtpUser ? 'SET' : 'MISSING')
     console.log('- Pass:', smtpPass ? 'SET' : 'MISSING')
 
     if (!smtpHost || !smtpUser || !smtpPass) {
@@ -36,8 +39,6 @@ export async function GET() {
         user: smtpUser,
         pass: smtpPass,
       },
-      debug: true, // Enable debug output
-      logger: true // Log information in console
     })
 
     // Test the connection
@@ -60,17 +61,11 @@ export async function GET() {
       success: true,
       message: 'SMTP connection and email sending successful!',
       messageId: result.messageId,
-      configuration: {
-        host: smtpHost,
-        port: smtpPort,
-        user: smtpUser,
-        secure: smtpPort === 465
-      }
     })
 
   } catch (error: any) {
     console.error('SMTP test failed:', error)
-    
+
     return NextResponse.json({
       success: false,
       error: 'SMTP test failed',
