@@ -42,21 +42,22 @@ export async function POST(request: NextRequest) {
         const reqOrigin = request.headers.get('origin')
         const serverUrl = process.env.PAYLOAD_PUBLIC_SERVER_URL || process.env.SERVER_URL || ''
         let sameSite: 'lax' | 'none' = 'lax'
-        try {
-          if (reqOrigin && serverUrl) {
-            const o1 = new URL(reqOrigin)
-            const o2 = new URL(serverUrl)
-            const isSameSite = o1.protocol === o2.protocol && o1.hostname === o2.hostname
-            sameSite = isSameSite ? 'lax' : 'none'
-          } else if (reqOrigin) {
-            // Fallback: if we can't determine server URL, treat different hostnames as cross-site
-            const o1 = new URL(reqOrigin)
-            const o2 = new URL(request.nextUrl.origin)
-            const isSameSite = o1.protocol === o2.protocol && o1.hostname === o2.hostname
-            sameSite = isSameSite ? 'lax' : 'none'
+        if (process.env.NODE_ENV === 'production') {
+          try {
+            if (reqOrigin && serverUrl) {
+              const o1 = new URL(reqOrigin)
+              const o2 = new URL(serverUrl)
+              const isSameSite = o1.protocol === o2.protocol && o1.hostname === o2.hostname
+              sameSite = isSameSite ? 'lax' : 'none'
+            } else if (reqOrigin) {
+              const o1 = new URL(reqOrigin)
+              const o2 = new URL(request.nextUrl.origin)
+              const isSameSite = o1.protocol === o2.protocol && o1.hostname === o2.hostname
+              sameSite = isSameSite ? 'lax' : 'none'
+            }
+          } catch {
+            sameSite = 'none'
           }
-        } catch {
-          sameSite = 'none'
         }
         // Create response with authentication token
         const response = NextResponse.json({
@@ -76,7 +77,7 @@ export async function POST(request: NextRequest) {
         // and the cookie must be Secure in production.
         response.cookies.set('payload-token', result.token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production' || sameSite === 'none',
+          secure: process.env.NODE_ENV === 'production',
           sameSite,
           maxAge: 60 * 60 * 24 * 7, // 7 days
           path: '/',

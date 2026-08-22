@@ -348,7 +348,7 @@ export function VentureIntakeForm() {
     <div className="space-y-8">
 
       {/* Founder Types */}
-      <Card className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
+      <Card className="p-6 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <Heart className="h-5 w-5 text-purple-500" />
@@ -465,7 +465,7 @@ export function VentureIntakeForm() {
       </Card>
 
       {/* Inclusion Focus */}
-      <Card className="p-6 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200">
+      <Card className="p-6 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <Heart className="h-4 w-4 text-green-500" />
@@ -554,7 +554,7 @@ export function VentureIntakeForm() {
       </div>
 
       {/* Challenges */}
-      <Card className="p-6 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 border-orange-200">
+      <Card className="p-6 bg-linear-to-r from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 border-orange-200">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
             <AlertCircle className="h-4 w-4 text-orange-500" />
@@ -637,7 +637,7 @@ export function VentureIntakeForm() {
     <div className="space-y-8">
 
       {/* Operational Readiness */}
-      <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
+      <Card className="p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <FileText className="h-5 w-5 text-blue-500" />
@@ -672,7 +672,7 @@ export function VentureIntakeForm() {
       </Card>
 
       {/* Capital Readiness */}
-      <Card className="p-6 bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
+      <Card className="p-6 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <Award className="h-5 w-5 text-purple-500" />
@@ -720,7 +720,7 @@ export function VentureIntakeForm() {
     <div className="space-y-8">
 
       {/* Washington Group Short Set */}
-      <Card className="p-6 bg-gradient-to-r from-teal-50 to-cyan-50 dark:from-teal-950 dark:to-cyan-950 border-teal-200">
+      <Card className="p-6 bg-linear-to-r from-teal-50 to-cyan-50 dark:from-teal-950 dark:to-cyan-950 border-teal-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <Activity className="h-5 w-5 text-teal-500" />
@@ -763,7 +763,7 @@ export function VentureIntakeForm() {
       </Card>
 
       {/* Disability Inclusion Attributes */}
-      <Card className="p-6 bg-gradient-to-r from-cyan-50 to-blue-50 dark:from-cyan-950 dark:to-blue-950 border-cyan-200">
+      <Card className="p-6 bg-linear-to-r from-cyan-50 to-blue-50 dark:from-cyan-950 dark:to-blue-950 border-cyan-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <Shield className="h-5 w-5 text-cyan-500" />
@@ -828,7 +828,7 @@ export function VentureIntakeForm() {
     <div className="space-y-8">
 
       {/* GEDSI Goals */}
-      <Card className="p-6 bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 border-emerald-200">
+      <Card className="p-6 bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 border-emerald-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <Target className="h-5 w-5 text-emerald-500" />
@@ -878,7 +878,7 @@ export function VentureIntakeForm() {
       </Card>
 
       {/* AI Analysis Info */}
-      <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
+      <Card className="p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
         <div className="flex items-start space-x-3">
           <div className="p-2 bg-blue-500 rounded-full">
             <Sparkles className="h-4 w-4 text-white" />
@@ -893,7 +893,7 @@ export function VentureIntakeForm() {
       </Card>
 
       {/* Supporting Documents */}
-      <Card className="p-6 bg-gradient-to-r from-slate-50 to-gray-50 dark:from-slate-950 dark:to-gray-950 border-slate-200">
+      <Card className="p-6 bg-linear-to-r from-slate-50 to-gray-50 dark:from-slate-950 dark:to-gray-950 border-slate-200">
         <div className="space-y-4">
           <div className="flex items-center space-x-2 mb-4">
             <Upload className="h-5 w-5 text-slate-500" />
@@ -911,13 +911,13 @@ export function VentureIntakeForm() {
             </h4>
             <FileUpload
               acceptedFileTypes={['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.xls', '.xlsx', '.jpg', '.png', '.jpeg']}
-              maxFileSize={10 * 1024 * 1024} // 10MB
+              maxFileSize={10}
               maxFiles={10}
-              onUpload={(files) => {
+              onFilesUploaded={(files) => {
                 console.log('Supporting documents uploaded:', files)
                 // Handle file upload for all supporting documents
               }}
-              placeholder="Upload pitch decks, business plans, financial statements, team bios, certificates..."
+              description="Upload pitch decks, business plans, financial statements, team bios, certificates..."
             />
           </div>
           
@@ -938,7 +938,7 @@ export function VentureIntakeForm() {
       </Alert>
 
       {/* Progress indicator */}
-      <div className="bg-gradient-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 p-4 rounded-lg border border-emerald-200">
+      <div className="bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 p-4 rounded-lg border border-emerald-200">
         <div className="flex items-center justify-between text-sm text-emerald-800 dark:text-emerald-200">
           <span>✅ GEDSI Goals & Impact</span>
           <span>Ready to Submit & Analyze!</span>
@@ -1089,7 +1089,7 @@ export function VentureIntakeForm() {
                 <Button
                   type="submit"
                   disabled={isSubmitting || !isValid}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                  className="bg-linear-to-rrom-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                 >
                   {isSubmitting ? (
                     <>

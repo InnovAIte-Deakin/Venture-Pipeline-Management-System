@@ -8,6 +8,29 @@ interface User {
   role: string
 }
 
+interface ApiUser {
+  id: string
+  email: string
+  name?: string | null
+  firstName?: string | null
+  lastName?: string | null
+  role?: string | null
+}
+
+function normalizeUser(user: ApiUser): User {
+  const nameParts = (user.name || '').trim().split(/\s+/).filter(Boolean)
+  const firstName = user.firstName || nameParts[0] || 'User'
+  const lastName = user.lastName || nameParts.slice(1).join(' ') || ''
+
+  return {
+    id: user.id,
+    email: user.email,
+    firstName,
+    lastName,
+    role: user.role || 'USER',
+  }
+}
+
 interface AuthState {
   user: User | null
   loading: boolean
@@ -27,15 +50,17 @@ export function useAuth() {
 
   const checkAuth = async () => {
     try {
-      const response = await fetch('/backend/api/users', {
+      const response = await fetch('/api/users/me', {
         credentials: 'include',
       })
 
       if (response.ok) {
-        const data = await response.json()
-        if (data.success && data.user) {
+        const data: ApiUser | { success?: boolean; user?: ApiUser } = await response.json()
+        const user = 'user' in data ? data.user : data
+
+        if (user?.id && user.email) {
           setAuthState({
-            user: data.user,
+            user: normalizeUser(user),
             loading: false,
             isAuthenticated: true,
           })
@@ -43,7 +68,7 @@ export function useAuth() {
         }
       }
     } catch (error) {
-      console.error('Auth check failed:', error)
+      console.debug('Auth check skipped:', error)
     }
 
     setAuthState({
@@ -55,7 +80,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await fetch('/backend/api/auth/login', {
+      await fetch('/api/session/login', {
         method: 'DELETE',
         credentials: 'include',
       })
