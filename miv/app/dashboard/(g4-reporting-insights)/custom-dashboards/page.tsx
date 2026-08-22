@@ -1,30 +1,22 @@
-"use client"
+﻿"use client"
 
 import React, { useState, useEffect } from "react"
+import DashboardCard, { type Dashboard } from "@/components/dashboard-card"
+import CreateDashboardDialog, { type NewDashboardForm } from "@/components/create-dashboard-dialog"
+import EditDashboardDialog from "@/components/edit-dashboard-dialog"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Progress } from "@/components/ui/progress"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Textarea } from "@/components/ui/textarea"
-import { Label } from "@/components/ui/label"
-import { Switch } from "@/components/ui/switch"
-import { 
-  BarChart, 
-  Plus, 
-  Settings, 
-  Eye, 
-  Edit, 
-  Trash2,
-  Download,
-  Share2,
+import { useToast } from "@/components/ui/toast"
+import { useAuth } from "@/hooks/useAuth"
+import {
+  BarChart,
+  Plus,
   Copy,
   Grid3X3,
-  PieChart,
-  LineChart,
   TrendingUp,
   Users,
   DollarSign,
@@ -33,32 +25,11 @@ import {
   Calendar,
   Filter,
   Search,
-  MoreHorizontal,
   Star,
   Clock,
-  CheckCircle,
-  X,
-  Sparkles,
-  BarChart3,
-  Heart,
-  Building2,
-  RefreshCw,
-  Save,
-  Layout,
-  Zap
+  Gauge,
 } from "lucide-react"
 
-interface Dashboard {
-  id: string
-  name: string
-  description: string
-  category: string
-  widgets: number
-  lastModified: string
-  isPublic: boolean
-  isFavorite: boolean
-  createdBy: string
-}
 
 interface Widget {
   id: string
@@ -128,13 +99,25 @@ const mockDashboards: Dashboard[] = [
 ]
 
 const widgetTypes = [
-  { type: "chart", name: "Chart", icon: BarChart, description: "Line, bar, or pie charts" },
-  { type: "metric", name: "Metric", icon: Target, description: "Single value with trend" },
-  { type: "table", name: "Table", icon: Grid3X3, description: "Data table with sorting" },
-  { type: "progress", name: "Progress", icon: Progress, description: "Progress bars and gauges" },
-  { type: "list", name: "List", icon: Activity, description: "Simple list of items" },
-  { type: "calendar", name: "Calendar", icon: Calendar, description: "Calendar view" }
+  { type: "chart", name: "Chart", icon: BarChart, description: "Line, bar, or pie charts", color: "blue" },
+  { type: "metric", name: "Metric", icon: Target, description: "Single value with trend", color: "red" },
+  { type: "table", name: "Table", icon: Grid3X3, description: "Data table with sorting", color: "purple" },
+  { type: "progress", name: "Progress", icon: Gauge, description: "Progress bars and gauges", color: "amber" },
+  { type: "list", name: "List", icon: Activity, description: "Simple list of items", color: "green" },
+  { type: "calendar", name: "Calendar", icon: Calendar, description: "Calendar view", color: "pink" }
 ]
+
+// Tailwind needs full, literal class strings to detect them at build time —
+// dynamic template strings like `bg-${color}-100` are invisible to it, so
+// every combination we might use is spelled out here instead.
+const widgetColorClasses: Record<string, { border: string; iconBg: string; iconText: string }> = {
+  blue:   { border: "border-t-blue-400",   iconBg: "bg-blue-100",   iconText: "text-blue-600" },
+  red:    { border: "border-t-red-400",    iconBg: "bg-red-100",    iconText: "text-red-600" },
+  purple: { border: "border-t-purple-400", iconBg: "bg-purple-100", iconText: "text-purple-600" },
+  amber:  { border: "border-t-amber-400",  iconBg: "bg-amber-100",  iconText: "text-amber-600" },
+  green:  { border: "border-t-green-400",  iconBg: "bg-green-100",  iconText: "text-green-600" },
+  pink:   { border: "border-t-pink-400",   iconBg: "bg-pink-100",   iconText: "text-pink-600" },
+}
 
 const categories = [
   "Pipeline",
@@ -147,6 +130,8 @@ const categories = [
 ]
 
 export default function CustomDashboardsPage() {
+  const { addToast } = useToast()
+  const { user } = useAuth();
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedCategory, setSelectedCategory] = useState("all")
   const [selectedView, setSelectedView] = useState("all")
@@ -159,7 +144,7 @@ export default function CustomDashboardsPage() {
   const [portfolioData, setPortfolioData] = useState<any>(null)
   
   // New dashboard form state
-  const [newDashboard, setNewDashboard] = useState({
+  const [newDashboard, setNewDashboard] = useState<NewDashboardForm>({
     name: "",
     description: "",
     category: "Custom",
@@ -177,7 +162,7 @@ export default function CustomDashboardsPage() {
       setIsLoading(true)
       setError(null)
       
-      const response = await fetch('/api/custom-dashboards')
+      const response = await fetch(`/api/custom-dashboards?userId=${user?.id ?? 'cmsfgffh10000iqc0wuumq74r'}`)
       if (!response.ok) {
         throw new Error(`Failed to fetch dashboards: ${response.status} ${response.statusText}`)
       }
@@ -185,9 +170,9 @@ export default function CustomDashboardsPage() {
       const data = await response.json()
       setDashboards(data.dashboards || [])
       
-      console.log(`✅ Successfully loaded ${data.dashboards?.length || 0} custom dashboards`)
+      console.log(`Successfully loaded ${data.dashboards?.length || 0} custom dashboards`)
     } catch (err) {
-      console.error('❌ Error fetching dashboards:', err)
+      console.error('Error fetching dashboards:', err)
       const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred'
       setError(`Failed to load dashboards: ${errorMessage}`)
       
@@ -215,28 +200,7 @@ export default function CustomDashboardsPage() {
     }
   }
 
-  const handleCreateDashboard = async () => {
-    if (!newDashboard.name.trim()) return
-
-    setIsLoading(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const dashboard: Dashboard = {
-      id: `DASH-${Date.now()}`,
-      name: newDashboard.name,
-      description: newDashboard.description,
-      category: newDashboard.category,
-      widgets: 0,
-      lastModified: "Just now",
-      isPublic: newDashboard.isPublic,
-      isFavorite: false,
-      createdBy: "You"
-    }
-
-    setDashboards(prev => [dashboard, ...prev])
-    setIsCreating(false)
+  const resetNewDashboardForm = () => {
     setNewDashboard({
       name: "",
       description: "",
@@ -244,7 +208,45 @@ export default function CustomDashboardsPage() {
       isPublic: false,
       widgets: []
     })
-    setIsLoading(false)
+  }
+
+  const handleCreateDashboard = async () => {
+    if (!newDashboard.name.trim()) return
+
+    setIsLoading(true)
+    try {
+      const response = await fetch('/api/custom-dashboards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: newDashboard.name,
+          description: newDashboard.description,
+          category: newDashboard.category,
+          isPublic: newDashboard.isPublic,
+          widgets: newDashboard.widgets,
+          createdById: user?.id ?? "cmsfgffh10000iqc0wuumq74r",
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to create dashboard: ${response.status}`)
+      }
+
+      const { dashboard } = await response.json()
+      setDashboards(prev => [dashboard, ...prev])
+      setIsCreating(false)
+      resetNewDashboardForm()
+      addToast({ title: "Dashboard created", type: "success" })
+    } catch (err) {
+      console.error('Error creating dashboard:', err)
+      addToast({
+        title: "Couldn't create dashboard",
+        description: err instanceof Error ? err.message : "Please try again",
+        type: "error",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleEditDashboard = (dashboard: Dashboard) => {
@@ -263,83 +265,175 @@ export default function CustomDashboardsPage() {
     if (!selectedDashboard || !newDashboard.name.trim()) return
 
     setIsLoading(true)
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    setDashboards(prev => prev.map(d => 
-      d.id === selectedDashboard.id 
-        ? { ...d, ...newDashboard, lastModified: "Just now" }
-        : d
-    ))
-    
-    setIsEditing(false)
-    setSelectedDashboard(null)
-    setNewDashboard({
-      name: "",
-      description: "",
-      category: "Custom",
-      isPublic: false,
-      widgets: []
-    })
-    setIsLoading(false)
+    try {
+      const response = await fetch('/api/custom-dashboards', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: selectedDashboard.id,
+          name: newDashboard.name,
+          description: newDashboard.description,
+          category: newDashboard.category,
+          isPublic: newDashboard.isPublic,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to update dashboard: ${response.status}`)
+      }
+
+      const { dashboard } = await response.json()
+      setDashboards(prev => prev.map(d => (d.id === dashboard.id ? dashboard : d)))
+      setIsEditing(false)
+      setSelectedDashboard(null)
+      resetNewDashboardForm()
+      addToast({ title: "Dashboard updated", type: "success" })
+    } catch (err) {
+      console.error('Error updating dashboard:', err)
+      addToast({
+        title: "Couldn't update dashboard",
+        description: err instanceof Error ? err.message : "Please try again",
+        type: "error",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const handleDeleteDashboard = async (dashboardId: string) => {
     if (!confirm("Are you sure you want to delete this dashboard?")) return
 
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    setDashboards(prev => prev.filter(d => d.id !== dashboardId))
-    setIsLoading(false)
+    try {
+      const response = await fetch(`/api/custom-dashboards?id=${encodeURIComponent(dashboardId)}`, {
+        method: 'DELETE',
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete dashboard: ${response.status}`)
+      }
+
+      setDashboards(prev => prev.filter(d => d.id !== dashboardId))
+      addToast({ title: "Dashboard deleted", type: "success" })
+    } catch (err) {
+      console.error('Error deleting dashboard:', err)
+      addToast({
+        title: "Couldn't delete dashboard",
+        description: err instanceof Error ? err.message : "Please try again",
+        type: "error",
+      })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const handleToggleFavorite = (dashboardId: string) => {
-    setDashboards(prev => prev.map(d => 
+  const handleToggleFavorite = async (dashboardId: string) => {
+    const target = dashboards.find(d => d.id === dashboardId)
+    if (!target) return
+
+    // Optimistic update
+    setDashboards(prev => prev.map(d =>
       d.id === dashboardId ? { ...d, isFavorite: !d.isFavorite } : d
     ))
+
+    try {
+      const response = await fetch('/api/custom-dashboards', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: dashboardId, isFavorite: !target.isFavorite }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to update favorite: ${response.status}`)
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err)
+      // Roll back on failure
+      setDashboards(prev => prev.map(d =>
+        d.id === dashboardId ? { ...d, isFavorite: target.isFavorite } : d
+      ))
+      addToast({ title: "Couldn't update favorite", type: "error" })
+    }
   }
 
   const handleDuplicateDashboard = async (dashboard: Dashboard) => {
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 500))
-    
-    const duplicatedDashboard: Dashboard = {
-      ...dashboard,
-      id: `DASH-${Date.now()}`,
-      name: `${dashboard.name} (Copy)`,
-      lastModified: "Just now",
-      createdBy: "You"
+    try {
+      const response = await fetch('/api/custom-dashboards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `${dashboard.name} (Copy)`,
+          description: dashboard.description,
+          category: dashboard.category,
+          isPublic: false,
+          widgets: [],
+          createdById: user?.id ?? "cmsfgffh10000iqc0wuumq74r",
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Failed to duplicate dashboard: ${response.status}`)
+      }
+
+      const { dashboard: duplicated } = await response.json()
+      setDashboards(prev => [duplicated, ...prev])
+      addToast({ title: "Dashboard duplicated", type: "success" })
+    } catch (err) {
+      console.error('Error duplicating dashboard:', err)
+      addToast({ title: "Couldn't duplicate dashboard", type: "error" })
+    } finally {
+      setIsLoading(false)
     }
-    
-    setDashboards(prev => [duplicatedDashboard, ...prev])
-    setIsLoading(false)
   }
 
   const handleUseTemplate = async (templateName: string, widgetCount: number) => {
     setIsLoading(true)
-    await new Promise(resolve => setTimeout(resolve, 1000))
-    
-    const dashboard: Dashboard = {
-      id: `DASH-${Date.now()}`,
-      name: `My ${templateName}`,
-      description: `Custom ${templateName.toLowerCase()} dashboard created from template`,
-      category: templateName.includes('Portfolio') ? 'Portfolio' : 
-                templateName.includes('Pipeline') ? 'Pipeline' :
-                templateName.includes('GEDSI') ? 'Impact' : 'Custom',
-      widgets: widgetCount,
-      lastModified: "Just now",
-      isPublic: false,
-      isFavorite: true,
-      createdBy: "You"
-    }
+    try {
+      const category = templateName.includes('Portfolio') ? 'Portfolio' :
+        templateName.includes('Pipeline') ? 'Pipeline' :
+        templateName.includes('GEDSI') ? 'Impact' : 'Custom'
 
-    setDashboards(prev => [dashboard, ...prev])
-    setIsLoading(false)
-    
-    // Show success message
-    alert(`${templateName} dashboard created successfully!`)
+      const placeholderWidgets = Array.from({ length: widgetCount }, (_, i) => ({
+        id: `widget-${i + 1}`,
+        type: 'placeholder',
+      }))
+
+      const createRes = await fetch('/api/custom-dashboards', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: `My ${templateName}`,
+          description: `Custom ${templateName.toLowerCase()} dashboard created from template`,
+          category,
+          isPublic: false,
+          widgets: placeholderWidgets,
+          createdById: user?.id ?? "cmsfgffh10000iqc0wuumq74r",
+        }),
+      })
+
+      if (!createRes.ok) {
+        throw new Error(`Failed to create dashboard: ${createRes.status}`)
+      }
+
+      const { dashboard } = await createRes.json()
+
+      // Templates start favorited
+      const favRes = await fetch('/api/custom-dashboards', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: dashboard.id, isFavorite: true }),
+      })
+      const finalDashboard = favRes.ok ? (await favRes.json()).dashboard : dashboard
+
+      setDashboards(prev => [finalDashboard, ...prev])
+      addToast({ title: `${templateName} dashboard created successfully!`, type: "success" })
+    } catch (err) {
+      console.error('Error creating dashboard from template:', err)
+      addToast({ title: "Couldn't create dashboard from template", type: "error" })
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   const filteredDashboards = dashboards.filter(dashboard => {
@@ -357,25 +451,32 @@ export default function CustomDashboardsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Custom Dashboards</h1>
-          <p className="text-muted-foreground">
-            Create and manage your personalized dashboards
-          </p>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-purple-600">
+            <Grid3X3 className="h-5 w-5 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Custom Dashboards</h1>
+            <p className="text-muted-foreground">
+              Create and manage your personalized dashboards
+            </p>
+          </div>
         </div>
-        <Button onClick={() => setIsCreating(true)}>
+        <Button onClick={() => setIsCreating(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           Create Dashboard
         </Button>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+        <Card className="border-t-4 border-t-blue-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Dashboards</CardTitle>
-            <BarChart className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+              <BarChart className="h-4 w-4 text-blue-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{dashboards.length}</div>
@@ -384,10 +485,12 @@ export default function CustomDashboardsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-purple-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Widgets</CardTitle>
-            <Grid3X3 className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
+              <Grid3X3 className="h-4 w-4 text-purple-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -398,10 +501,12 @@ export default function CustomDashboardsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-amber-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Favorites</CardTitle>
-            <Star className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
+              <Star className="h-4 w-4 text-amber-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -412,10 +517,12 @@ export default function CustomDashboardsPage() {
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="border-t-4 border-t-green-500 transition-shadow hover:shadow-md">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Recently Updated</CardTitle>
-            <Clock className="h-4 w-4 text-muted-foreground" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
+              <Clock className="h-4 w-4 text-green-600" />
+            </div>
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
@@ -446,7 +553,7 @@ export default function CustomDashboardsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Search</label>
                   <div className="relative">
@@ -492,110 +599,16 @@ export default function CustomDashboardsPage() {
           </Card>
 
           {/* Dashboards Grid */}
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filteredDashboards.map((dashboard) => (
-              <Card key={dashboard.id} className="relative group hover:shadow-lg transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <CardTitle className="text-lg">{dashboard.name}</CardTitle>
-                        {dashboard.isFavorite && (
-                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                        )}
-                        {dashboard.isPublic && (
-                          <Badge variant="outline" className="text-xs">Public</Badge>
-                        )}
-                      </div>
-                      <CardDescription className="text-sm">
-                        {dashboard.description}
-                      </CardDescription>
-                    </div>
-                    <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                      <div className="flex items-center gap-1">
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleToggleFavorite(dashboard.id)
-                          }}
-                        >
-                          <Star className={`h-4 w-4 ${dashboard.isFavorite ? 'text-yellow-500 fill-current' : ''}`} />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDuplicateDashboard(dashboard)
-                          }}
-                        >
-                          <Copy className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            handleDeleteDashboard(dashboard.id)
-                          }}
-                        >
-                          <Trash2 className="h-4 w-4 text-red-500" />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Widgets</span>
-                      <span className="font-medium">{dashboard.widgets}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Category</span>
-                      <Badge variant="secondary" className="text-xs">{dashboard.category}</Badge>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Last modified</span>
-                      <span className="text-muted-foreground">{dashboard.lastModified}</span>
-                    </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Created by</span>
-                      <span className="text-muted-foreground">{dashboard.createdBy}</span>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 pt-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => alert(`Opening dashboard: ${dashboard.name}`)}
-                      >
-                        <Eye className="mr-2 h-4 w-4" />
-                        View
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        className="flex-1"
-                        onClick={() => handleEditDashboard(dashboard)}
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => alert(`Sharing options for: ${dashboard.name}`)}
-                      >
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <DashboardCard
+  key={dashboard.id}
+  dashboard={dashboard}
+  handleToggleFavorite={handleToggleFavorite}
+  handleDuplicateDashboard={handleDuplicateDashboard}
+  handleDeleteDashboard={handleDeleteDashboard}
+  handleEditDashboard={handleEditDashboard}
+/>
             ))}
           </div>
         </TabsContent>
@@ -609,11 +622,13 @@ export default function CustomDashboardsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                <Card className="cursor-pointer border-t-4 border-t-blue-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <BarChart className="h-5 w-5 text-blue-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
+                        <BarChart className="h-5 w-5 text-blue-600" />
+                      </div>
                       <CardTitle className="text-base">Pipeline Overview</CardTitle>
                     </div>
                   </CardHeader>
@@ -628,10 +643,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-green-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-green-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
+                        <TrendingUp className="h-5 w-5 text-green-600" />
+                      </div>
                       <CardTitle className="text-base">Portfolio Performance</CardTitle>
                     </div>
                   </CardHeader>
@@ -646,10 +663,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-purple-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Users className="h-5 w-5 text-purple-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100">
+                        <Users className="h-5 w-5 text-purple-600" />
+                      </div>
                       <CardTitle className="text-base">GEDSI Impact</CardTitle>
                     </div>
                   </CardHeader>
@@ -664,10 +683,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-orange-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Activity className="h-5 w-5 text-orange-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-100">
+                        <Activity className="h-5 w-5 text-orange-600" />
+                      </div>
                       <CardTitle className="text-base">Due Diligence</CardTitle>
                     </div>
                   </CardHeader>
@@ -682,10 +703,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-green-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <DollarSign className="h-5 w-5 text-green-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
+                        <DollarSign className="h-5 w-5 text-green-600" />
+                      </div>
                       <CardTitle className="text-base">Financial Overview</CardTitle>
                     </div>
                   </CardHeader>
@@ -700,10 +723,12 @@ export default function CustomDashboardsPage() {
                   </CardContent>
                 </Card>
 
-                <Card className="cursor-pointer hover:shadow-md transition-shadow">
+                <Card className="cursor-pointer border-t-4 border-t-red-400 transition-shadow hover:shadow-md">
                   <CardHeader className="pb-3">
                     <div className="flex items-center gap-2">
-                      <Target className="h-5 w-5 text-red-600" />
+                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100">
+                        <Target className="h-5 w-5 text-red-600" />
+                      </div>
                       <CardTitle className="text-base">Team Performance</CardTitle>
                     </div>
                   </CardHeader>
@@ -731,12 +756,14 @@ export default function CustomDashboardsPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {widgetTypes.map((widget) => (
-                  <Card key={widget.type} className="cursor-pointer hover:shadow-md transition-shadow">
+                  <Card key={widget.type} className={`cursor-pointer border-t-4 ${widgetColorClasses[widget.color].border} transition-shadow hover:shadow-md`}>
                     <CardHeader className="pb-3">
                       <div className="flex items-center gap-2">
-                        <widget.icon className="h-5 w-5 text-blue-600" />
+                        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${widgetColorClasses[widget.color].iconBg}`}>
+                          <widget.icon className={`h-5 w-5 ${widgetColorClasses[widget.color].iconText}`} />
+                        </div>
                         <CardTitle className="text-base">{widget.name}</CardTitle>
                       </div>
                     </CardHeader>
@@ -744,7 +771,17 @@ export default function CustomDashboardsPage() {
                       <p className="text-sm text-muted-foreground mb-3">
                         {widget.description}
                       </p>
-                      <Button size="sm" variant="outline" className="w-full">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full"
+                        onClick={() =>
+                          addToast({
+                            title: `To add a ${widget.name} widget, open a dashboard and use Manage Widgets`,
+                            type: "info",
+                          })
+                        }
+                      >
                         Add Widget
                       </Button>
                     </CardContent>
@@ -756,265 +793,26 @@ export default function CustomDashboardsPage() {
         </TabsContent>
       </Tabs>
 
-      {/* Create Dashboard Dialog */}
-      <Dialog open={isCreating} onOpenChange={setIsCreating}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Plus className="h-5 w-5" />
-              Create New Dashboard
-            </DialogTitle>
-            <DialogDescription>
-              Create a custom dashboard to track your key metrics and KPIs
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="dashboard-name">Dashboard Name</Label>
-              <Input
-                id="dashboard-name"
-                placeholder="Enter dashboard name..."
-                value={newDashboard.name}
-                onChange={(e) => setNewDashboard(prev => ({ ...prev, name: e.target.value }))}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="dashboard-description">Description</Label>
-              <Textarea
-                id="dashboard-description"
-                placeholder="Describe what this dashboard will track..."
-                value={newDashboard.description}
-                onChange={(e) => setNewDashboard(prev => ({ ...prev, description: e.target.value }))}
-                rows={3}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="dashboard-category">Category</Label>
-                <Select
-                  value={newDashboard.category}
-                  onValueChange={(value) => setNewDashboard(prev => ({ ...prev, category: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="dashboard-public">Visibility</Label>
-                <div className="flex items-center space-x-2 h-10">
-                  <Switch
-                    id="dashboard-public"
-                    checked={newDashboard.isPublic}
-                    onCheckedChange={(checked) => setNewDashboard(prev => ({ ...prev, isPublic: checked }))}
-                  />
-                  <Label htmlFor="dashboard-public" className="text-sm">
-                    {newDashboard.isPublic ? "Public" : "Private"}
-                  </Label>
-                </div>
-              </div>
-            </div>
-            
-            {/* Quick Start Options */}
-            <div className="space-y-3">
-              <Label>Quick Start Options</Label>
-              <div className="grid grid-cols-2 gap-3">
-                <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setNewDashboard(prev => ({ ...prev, category: "Portfolio" }))}>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <TrendingUp className="h-8 w-8 text-green-600" />
-                    <div>
-                      <div className="font-medium text-sm">Portfolio Focus</div>
-                      <div className="text-xs text-muted-foreground">Track investments & returns</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setNewDashboard(prev => ({ ...prev, category: "Impact" }))}>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <Heart className="h-8 w-8 text-pink-600" />
-                    <div>
-                      <div className="font-medium text-sm">Impact Focus</div>
-                      <div className="text-xs text-muted-foreground">Track GEDSI & social impact</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setNewDashboard(prev => ({ ...prev, category: "Pipeline" }))}>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <BarChart3 className="h-8 w-8 text-blue-600" />
-                    <div>
-                      <div className="font-medium text-sm">Pipeline Focus</div>
-                      <div className="text-xs text-muted-foreground">Track deal flow & stages</div>
-                    </div>
-                  </CardContent>
-                </Card>
-                
-                <Card className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800" onClick={() => setNewDashboard(prev => ({ ...prev, category: "Operations" }))}>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <Activity className="h-8 w-8 text-orange-600" />
-                    <div>
-                      <div className="font-medium text-sm">Operations Focus</div>
-                      <div className="text-xs text-muted-foreground">Track team & processes</div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-          
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Sparkles className="h-4 w-4" />
-              You can add widgets after creating the dashboard
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => setIsCreating(false)}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleCreateDashboard} 
-                disabled={!newDashboard.name.trim() || isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Creating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Create Dashboard
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <CreateDashboardDialog
+        open={isCreating}
+        onOpenChange={setIsCreating}
+        categories={categories}
+        newDashboard={newDashboard}
+        setNewDashboard={setNewDashboard}
+        onCreate={handleCreateDashboard}
+        isLoading={isLoading}
+      />
 
-      {/* Edit Dashboard Dialog */}
-      <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit className="h-5 w-5" />
-              Edit Dashboard
-            </DialogTitle>
-            <DialogDescription>
-              Update your dashboard settings and configuration
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-6 py-4">
-            <div className="space-y-2">
-              <Label htmlFor="edit-dashboard-name">Dashboard Name</Label>
-              <Input
-                id="edit-dashboard-name"
-                placeholder="Enter dashboard name..."
-                value={newDashboard.name}
-                onChange={(e) => setNewDashboard(prev => ({ ...prev, name: e.target.value }))}
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="edit-dashboard-description">Description</Label>
-              <Textarea
-                id="edit-dashboard-description"
-                placeholder="Describe what this dashboard tracks..."
-                value={newDashboard.description}
-                onChange={(e) => setNewDashboard(prev => ({ ...prev, description: e.target.value }))}
-                rows={3}
-              />
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="edit-dashboard-category">Category</Label>
-                <Select
-                  value={newDashboard.category}
-                  onValueChange={(value) => setNewDashboard(prev => ({ ...prev, category: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map(category => (
-                      <SelectItem key={category} value={category}>{category}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="edit-dashboard-public">Visibility</Label>
-                <div className="flex items-center space-x-2 h-10">
-                  <Switch
-                    id="edit-dashboard-public"
-                    checked={newDashboard.isPublic}
-                    onCheckedChange={(checked) => setNewDashboard(prev => ({ ...prev, isPublic: checked }))}
-                  />
-                  <Label htmlFor="edit-dashboard-public" className="text-sm">
-                    {newDashboard.isPublic ? "Public" : "Private"}
-                  </Label>
-                </div>
-              </div>
-            </div>
-            
-            {selectedDashboard && (
-              <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
-                <div className="flex items-center gap-2 mb-2">
-                  <Layout className="h-4 w-4 text-blue-600" />
-                  <span className="font-medium text-sm">Current Dashboard Info</span>
-                </div>
-                <div className="text-sm text-muted-foreground space-y-1">
-                  <div>Widgets: {selectedDashboard.widgets}</div>
-                  <div>Created: {selectedDashboard.lastModified}</div>
-                  <div>Created by: {selectedDashboard.createdBy}</div>
-                </div>
-              </div>
-            )}
-          </div>
-          
-          <div className="flex items-center justify-between pt-4 border-t">
-            <div className="flex items-center gap-2">
-              <Button variant="outline" size="sm" onClick={() => alert("Widget management coming soon!")}>
-                <Zap className="h-4 w-4 mr-1" />
-                Manage Widgets
-              </Button>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button variant="outline" onClick={() => setIsEditing(false)}>
-                Cancel
-              </Button>
-              <Button 
-                onClick={handleUpdateDashboard} 
-                disabled={!newDashboard.name.trim() || isLoading}
-              >
-                {isLoading ? (
-                  <>
-                    <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                    Updating...
-                  </>
-                ) : (
-                  <>
-                    <Save className="mr-2 h-4 w-4" />
-                    Update Dashboard
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <EditDashboardDialog
+        open={isEditing}
+        onOpenChange={setIsEditing}
+        categories={categories}
+        newDashboard={newDashboard}
+        setNewDashboard={setNewDashboard}
+        selectedDashboard={selectedDashboard}
+        onUpdate={handleUpdateDashboard}
+        isLoading={isLoading}
+      />
     </div>
   )
-} 
+}
