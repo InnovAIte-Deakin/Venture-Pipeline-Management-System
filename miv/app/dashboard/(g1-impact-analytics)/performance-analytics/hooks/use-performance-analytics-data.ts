@@ -1,23 +1,12 @@
-// hooks/use-performance-analytics-data.ts
+// app/dashboard/(g1-impact-analytics)/performance-analytics/hooks/use-performance-analytics-data.ts
 //
-// Extracted from app/dashboard/(g1-impact-analytics)/performance-analytics/page.tsx
 // T19 - Refactor and Improve Performance Analytics
-//
-// Isolates: the 4 API calls, loading state, the 30s real-time polling
-// interval, and period-based refetching. No behaviour changed — this is
-// the same logic, just pulled into its own hook so it can be tested and
-// reasoned about on its own ("Test polling behaviour" checklist item).
 
 import { useEffect, useState } from "react"
-import type { AnalyticsData } from "@/lib/performance-analytics-calculations"
+import type { AnalyticsData } from "../types"
 
 export function usePerformanceAnalyticsData() {
-  const [data, setData] = useState<AnalyticsData>({
-    ventures: [],
-    gedsiMetrics: [],
-    users: [],
-    analytics: null
-  })
+  const [data, setData] = useState<AnalyticsData>({ ventures: [], gedsiMetrics: [], users: [], analytics: null })
   const [loading, setLoading] = useState(true)
   const [selectedPeriod, setSelectedPeriod] = useState("30d")
   const [realTimeEnabled, setRealTimeEnabled] = useState(false)
@@ -31,14 +20,10 @@ export function usePerformanceAnalyticsData() {
         fetch('/api/users?limit=100'),
         fetch(`/api/analytics?period=${selectedPeriod}`).catch(() => ({ ok: false }))
       ])
-
       const [venturesData, gedsiData, usersData, analyticsData] = await Promise.all([
-        venturesRes.json(),
-        gedsiRes.json(),
-        usersRes.json(),
+        venturesRes.json(), gedsiRes.json(), usersRes.json(),
         analyticsRes.ok && 'json' in analyticsRes ? analyticsRes.json() : {}
       ])
-
       setData({
         ventures: venturesData.ventures || [],
         gedsiMetrics: gedsiData.metrics || [],
@@ -56,25 +41,12 @@ export function usePerformanceAnalyticsData() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPeriod])
 
-  // Real-time data refresh
   useEffect(() => {
     if (!realTimeEnabled) return
-
-    const interval = setInterval(() => {
-      loadAnalyticsData()
-    }, 30000) // Refresh every 30 seconds
-
+    const interval = setInterval(() => { loadAnalyticsData() }, 30000)
     return () => clearInterval(interval)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [realTimeEnabled, selectedPeriod])
 
-  return {
-    data,
-    loading,
-    selectedPeriod,
-    setSelectedPeriod,
-    realTimeEnabled,
-    setRealTimeEnabled,
-    loadAnalyticsData,
-  }
+  return { data, loading, selectedPeriod, setSelectedPeriod, realTimeEnabled, setRealTimeEnabled, loadAnalyticsData }
 }
