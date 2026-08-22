@@ -1,8 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Filter } from 'lucide-react'
-import { Venture } from "../hooks/use-gedsi-data" // Updated relative path
+import { Filter } from "lucide-react"
+import type { Venture } from "../types/gedsi-tracker.types"
 
 interface FiltersBarProps {
   ventures: Venture[]
