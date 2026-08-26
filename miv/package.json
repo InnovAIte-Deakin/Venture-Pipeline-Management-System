@@ -9,6 +9,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test:integration": "tsx --test tests/integration/*.test.ts",
+    "test:int": "vitest run --config ./vitest.config.mts",
+    "test:watch": "vitest --config ./vitest.config.mts",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
@@ -76,7 +78,8 @@
     "tailwindcss": "^4.1.11",
     "tsx": "^4.23.1",
     "typescript": "^5",
-    "typescript-eslint": "^8.65.0"
+    "typescript-eslint": "^8.65.0",
+    "vitest": "^4.1.10"
   },
   "overrides": {
     "brace-expansion": "^5.0.8",
