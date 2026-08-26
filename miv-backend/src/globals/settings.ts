@@ -1,10 +1,13 @@
 import type { GlobalConfig } from 'payload'
+import { isAuthenticated, adminOnly } from '@/access/roles'
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
   access: {
-    read: () => true,
-    update: ({ req }) => Boolean(req.user && req.user.role !== 'founder'),
+    // Was public read + any-non-founder update (A8) — legacy `user` could flip
+    // enableESign / enableSlack. Now auth-only read, admin-only write.
+    read: isAuthenticated,
+    update: adminOnly,
   },
   fields: [
     { name: 'enableSlack', type: 'checkbox', defaultValue: false },
