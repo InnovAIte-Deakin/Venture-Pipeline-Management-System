@@ -80,7 +80,7 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await fetch('/api/session/login', {
+      await fetch('/backend/api/auth/login', {
         method: 'DELETE',
         credentials: 'include',
       })

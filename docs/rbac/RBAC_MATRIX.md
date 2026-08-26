@@ -158,7 +158,7 @@ Because of §0, this table is where app authorization actually lives. **Current 
 | g4-reporting-insights | ai/analyze-venture, ai/gedsi-insights, custom-dashboards | none | TBD |
 | g5-platform-operations | team/members(+announcements/events/projects), calendar, workflows | none; team/members writes role via Zod enum(8) | TBD |
 | g5-user-support-settings | users, users/me, users/ventures, session/login, notifications, search, auth/{id} | none | TBD |
-| **Backend (miv-backend)** | auth/*, users, users/change-password, documents(+/{id}), intake/submit, reports/impact-users, sytem-settings/* | change-password verifies cookie; rest via Local API | TBD |
+| **Backend (miv-backend)** | auth/*, users, users/change-password, documents(+/{id}), intake/submit, reports/impact-users, system-settings/* | change-password verifies cookie; rest via Local API | TBD |
 
 **Frontend route gate:** #57 **deleted `miv/middleware.ts`** and replaced it with `lib/dashboard-navigation.ts` (nav config, no auth). There is now **no middleware anywhere in `miv`** — nothing checks a cookie or role before a dashboard route renders (**A10**).
 
