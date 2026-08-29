@@ -423,7 +423,7 @@ async function main() {
 
   // Seed IRIS metric catalog from JSON
   try {
-    const catalogPath = path.join(process.cwd(), 'lib', 'iris-catalog.json')
+    const catalogPath = path.join(__dirname, '..', 'lib', 'iris-catalog.json')
     if (fs.existsSync(catalogPath)) {
       const raw = fs.readFileSync(catalogPath, 'utf-8')
       const parsed = JSON.parse(raw)
@@ -482,7 +482,7 @@ async function main() {
         console.warn('⚠️ IRIS catalog JSON parsed but produced 0 records.')
       }
     } else {
-      console.warn('⚠️ IRIS catalog JSON not found at lib/iris-catalog.json')
+      console.warn(`⚠️ IRIS catalog JSON not found at ${catalogPath}`)
     }
   } catch (err) {
     console.error('❌ Failed to seed IRIS catalog:', err)
