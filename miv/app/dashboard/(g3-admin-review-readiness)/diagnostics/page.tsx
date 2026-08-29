@@ -1,4 +1,4 @@
-import ReadinessTracker from "@/components/readiness-tracker";
+import ReadinessTracker from "@/components/diagnostics/readiness-tracker";
 
 export default function DiagnosticsPage() {
 	return (
