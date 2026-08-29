@@ -26,6 +26,7 @@ export const Ventures: CollectionConfig = {
       name: 'founders',
       type: 'array',
       label: 'Founders',
+      maxRows: 2,
       fields: [
         { name: 'email', type: 'email', required: true },
         { name: 'role', type: 'text', required: true },
@@ -57,6 +58,45 @@ export const Ventures: CollectionConfig = {
         create: fieldAdminOrAnalyst,
         read: fieldAdminOrAnalyst,
         update: fieldAdminOrAnalyst,
+      },
+    },
+  ],
+
+  endpoints: [
+    {
+      path: '/light',
+      method: 'get',
+      handler: async (req) => {
+        const limit = Number(req.query.limit) || 5
+        const page = Number(req.query.page) || 1
+        const sector = req.query.sector as string | undefined
+        const city = req.query.city as string | undefined
+
+        const where: any = {}
+
+        if (sector) {
+          where.sector = { equals: sector }
+        }
+
+        if (city) {
+          where.city = { equals: city }
+        }
+
+        const data = await req.payload.find({
+          collection: 'ventures',
+          limit,
+          page,
+          depth: 0,
+          where,
+          select: {
+            name: true,
+            country: true,
+            city: true,
+            sector: true,
+          },
+        })
+
+        return Response.json(data)
       },
     },
   ],
