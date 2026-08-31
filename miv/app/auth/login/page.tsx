@@ -52,10 +52,17 @@ export default function LoginPage() {
         throw new Error(msg);
       }
 
-      // Redirect to dashboard on success
-      console.log("login response", responseBody);
+      // Redirect on success. Honour the proxy's ?next= deep link when it's a safe
+      // same-site relative path; otherwise fall back to the role-based landing page.
       if (responseBody?.success && responseBody?.user) {
-        if (
+        const nextParam = new URLSearchParams(window.location.search).get("next");
+        const safeNext =
+          nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+            ? nextParam
+            : null;
+        if (safeNext) {
+          window.location.href = safeNext;
+        } else if (
           responseBody.user.role === "user" ||
           responseBody.user.role === "founder"
         ) {
