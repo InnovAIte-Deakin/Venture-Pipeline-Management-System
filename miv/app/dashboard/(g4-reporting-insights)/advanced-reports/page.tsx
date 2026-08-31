@@ -11,6 +11,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 // import { DatePicker } from "@/components/ui/date-picker" // TODO: Implement date picker
 import { Checkbox } from "@/components/ui/checkbox"
 import { Label } from "@/components/ui/label"
+import { ReportPreview } from "./components/report-preview"
+import { ReportsLibrary } from "./components/reports-library"
+import type { Report } from "./components/report-types"
 // import { Separator } from "@/components/ui/separator" // TODO: Create separator component if needed
 import {
   BarChart,
@@ -33,7 +36,6 @@ import {
   FileText,
   Download,
   Share2,
-  Filter,
   Calendar,
   TrendingUp,
   Users,
@@ -45,13 +47,11 @@ import {
   LineChart as LineChartIcon,
   AreaChart as AreaChartIcon,
   Settings,
-  Eye,
   Plus,
   Trash2,
   Edit,
   Save,
   RefreshCw,
-  Search,
   ChevronDown,
   ChevronUp,
   CheckCircle,
@@ -59,23 +59,6 @@ import {
   Pause,
   Zap
 } from "lucide-react"
-
-interface Report {
-  id: string
-  name: string
-  type: string
-  description: string
-  lastGenerated: string
-  status: 'draft' | 'published' | 'archived'
-  metrics: string[]
-  filters: Record<string, any>
-  schedule?: string
-  isScheduled?: boolean
-  scheduleFrequency?: 'daily' | 'weekly' | 'monthly' | 'quarterly'
-  nextRun?: string
-  recipients?: string[]
-  autoGenerate?: boolean
-}
 
 interface Dashboard {
   id: string
@@ -94,6 +77,27 @@ interface Widget {
   data: any
   position: { x: number; y: number; w: number; h: number }
   config: Record<string, any>
+}
+
+interface VentureRecord {
+  fundingRaised?: number
+  sector?: string
+  stage?: string
+  investmentCategory?: string
+}
+
+interface GEDSIMetricRecord {
+  status?: string
+  category?: string
+}
+
+interface UserRecord {
+  lastLogin?: string
+  role?: string
+}
+
+interface WorkflowRecord {
+  status?: string
 }
 
 const reportTypes = [
@@ -198,7 +202,7 @@ export default function AdvancedReportsPage() {
   const [users, setUsers] = useState<any[]>([])
   const [selectedReportType, setSelectedReportType] = useState('')
   const [selectedChartType, setSelectedChartType] = useState('')
-  const [dateRange, setDateRange] = useState<{ from: Date; to: Date } | null>(null)
+  const [dateRange, setDateRange] = useState<{ from?: Date; to?: Date } | null>(null)
   const [selectedMetrics, setSelectedMetrics] = useState<string[]>([])
   const [selectedFilters, setSelectedFilters] = useState<Record<string, any>>({})
   const [reportName, setReportName] = useState('')
@@ -207,6 +211,8 @@ export default function AdvancedReportsPage() {
   const [activeTab, setActiveTab] = useState('reports')
   const [searchQuery, setSearchQuery] = useState('')
   const [statusFilter, setStatusFilter] = useState<string>('all')
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
+  const [reportsError, setReportsError] = useState<string | null>(null)
   const [isScheduled, setIsScheduled] = useState(false)
   const [scheduleFrequency, setScheduleFrequency] = useState<'daily' | 'weekly' | 'monthly' | 'quarterly'>('weekly')
   const [reportRecipients, setReportRecipients] = useState<string[]>([])
@@ -221,6 +227,7 @@ export default function AdvancedReportsPage() {
   const fetchData = async () => {
     try {
       setLoading(true)
+      setReportsError(null)
       
       // Fetch data from multiple APIs to generate comprehensive reports
       const [venturesRes, gedsiRes, usersRes, analyticsRes, workflowsRes] = await Promise.all([
@@ -238,11 +245,11 @@ export default function AdvancedReportsPage() {
       const analyticsData = analyticsRes.ok ? await analyticsRes.json() : { analytics: [] }
       const workflowsData = workflowsRes.ok ? await workflowsRes.json() : { workflows: [] }
 
-      const venturesArray = venturesData.ventures || []
-      const gedsiMetricsArray = gedsiData.metrics || []
-      const usersArray = usersData.users || []
-      const analytics = analyticsData.analytics || []
-      const workflows = workflowsData.workflows || []
+      const venturesArray = (venturesData.ventures || []) as VentureRecord[]
+      const gedsiMetricsArray = (gedsiData.metrics || []) as GEDSIMetricRecord[]
+      const usersArray = (usersData.users || []) as UserRecord[]
+      const analytics = (analyticsData.analytics || []) as unknown[]
+      const workflows = (workflowsData.workflows || []) as WorkflowRecord[]
       
       // Set state variables for component use
       setVentures(venturesArray)
@@ -251,7 +258,7 @@ export default function AdvancedReportsPage() {
 
       // Calculate comprehensive metrics for better reports
       const totalFunding = venturesArray.reduce((sum, v) => sum + (v.fundingRaised || 0), 0)
-      const fundedVentures = venturesArray.filter(v => v.fundingRaised > 0)
+      const fundedVentures = venturesArray.filter(v => (v.fundingRaised ?? 0) > 0)
       const avgFunding = fundedVentures.length > 0 ? totalFunding / fundedVentures.length : 0
       const verifiedGedsiMetrics = gedsiMetricsArray.filter(m => m.status === 'VERIFIED')
       const activeWorkflows = workflows.filter(w => w.status === 'ACTIVE')
@@ -261,9 +268,9 @@ export default function AdvancedReportsPage() {
       const generatedReports: Report[] = [
         {
           id: '1',
-          name: `Venture Performance Report (${ventures.length} ventures)`,
+          name: `Venture Performance Report (${venturesArray.length} ventures)`,
           type: 'venture-performance',
-          description: `Comprehensive analysis of ${ventures.length} ventures in the portfolio with detailed performance metrics`,
+          description: `Comprehensive analysis of ${venturesArray.length} ventures in the portfolio with detailed performance metrics`,
           lastGenerated: new Date().toISOString(),
           status: 'published',
           metrics: ['Total Ventures', 'Funding Amount', 'Success Rate', 'GEDSI Compliance', 'Portfolio Diversity'],
@@ -271,29 +278,29 @@ export default function AdvancedReportsPage() {
             dateRange: 'Current', 
             sector: 'all', 
             stage: 'all',
-            totalVentures: ventures.length,
+            totalVentures: venturesArray.length,
             fundedVentures: fundedVentures.length,
             totalFunding: totalFunding,
             avgFunding: avgFunding,
-            sectors: [...new Set(ventures.map(v => v.sector).filter(Boolean))],
-            stages: [...new Set(ventures.map(v => v.stage).filter(Boolean))]
+            sectors: [...new Set(venturesArray.map(v => v.sector).filter(Boolean))],
+            stages: [...new Set(venturesArray.map(v => v.stage).filter(Boolean))]
           }
         },
         {
           id: '2',
-          name: `GEDSI Impact Assessment (${gedsiMetrics.length} metrics)`,
+          name: `GEDSI Impact Assessment (${gedsiMetricsArray.length} metrics)`,
           type: 'gedsi-impact',
-          description: `Detailed GEDSI metrics analysis across ${gedsiMetrics.length} tracked metrics with ${verifiedGedsiMetrics.length} verified`,
+          description: `Detailed GEDSI metrics analysis across ${gedsiMetricsArray.length} tracked metrics with ${verifiedGedsiMetrics.length} verified`,
           lastGenerated: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
           status: 'published',
           metrics: ['Gender Distribution', 'Equity Metrics', 'Disability Inclusion', 'Social Impact', 'Verification Rate'],
           filters: { 
             dateRange: '2024', 
             region: 'all',
-            totalMetrics: gedsiMetrics.length,
+            totalMetrics: gedsiMetricsArray.length,
             verifiedMetrics: verifiedGedsiMetrics.length,
-            verificationRate: gedsiMetrics.length > 0 ? (verifiedGedsiMetrics.length / gedsiMetrics.length) * 100 : 0,
-            categories: [...new Set(gedsiMetrics.map(m => m.category).filter(Boolean))]
+            verificationRate: gedsiMetricsArray.length > 0 ? (verifiedGedsiMetrics.length / gedsiMetricsArray.length) * 100 : 0,
+            categories: [...new Set(gedsiMetricsArray.map(m => m.category).filter(Boolean))]
           }
         },
         {
@@ -334,16 +341,16 @@ export default function AdvancedReportsPage() {
           id: '5',
           name: 'User Activity & Engagement Report',
           type: 'user-analytics',
-          description: `User engagement analysis across ${users.length} active users with platform usage metrics`,
+          description: `User engagement analysis across ${usersArray.length} active users with platform usage metrics`,
           lastGenerated: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
           status: 'published',
           metrics: ['Active Users', 'Login Frequency', 'Feature Usage', 'User Satisfaction'],
           filters: { 
             dateRange: '30d', 
             userRole: 'all',
-            totalUsers: users.length,
-            activeUsers: users.filter(u => u.lastLogin && new Date(u.lastLogin) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length,
-            userRoles: [...new Set(users.map(u => u.role).filter(Boolean))]
+            totalUsers: usersArray.length,
+            activeUsers: usersArray.filter(u => u.lastLogin && new Date(u.lastLogin) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)).length,
+            userRoles: [...new Set(usersArray.map(u => u.role).filter(Boolean))]
           }
         }
       ]
@@ -400,18 +407,8 @@ export default function AdvancedReportsPage() {
       console.log(`✅ Successfully generated ${generatedReports.length} reports from database data`)
     } catch (error) {
       console.error('❌ Error fetching data for reports:', error)
-      
-      // Fallback to basic reports if API fails
-      setReports([{
-        id: 'error-1',
-        name: 'Error Loading Reports',
-        type: 'system-error',
-        description: 'Unable to load reports from database',
-        lastGenerated: new Date().toISOString(),
-        status: 'draft',
-        metrics: [],
-        filters: {}
-      }])
+      setReports([])
+      setReportsError('The report data services are currently unavailable. Please try again later.')
       setDashboards([])
     } finally {
       setLoading(false)
@@ -620,17 +617,6 @@ export default function AdvancedReportsPage() {
     })
   }
 
-  const filteredReports = reports.filter(report => {
-    const matchesSearch = !searchQuery || 
-      report.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      report.type.toLowerCase().includes(searchQuery.toLowerCase())
-    
-    const matchesStatus = statusFilter === 'all' || report.status === statusFilter
-    
-    return matchesSearch && matchesStatus
-  })
-
   const availableMetrics = [
     'Total Ventures', 'Funding Amount', 'Success Rate', 'GEDSI Compliance', 'Portfolio Diversity',
     'Gender Distribution', 'Equity Metrics', 'Disability Inclusion', 'Social Impact', 'Verification Rate',
@@ -656,7 +642,7 @@ export default function AdvancedReportsPage() {
     e.preventDefault()
   }
 
-  const handleDrop = (e: React.DragEvent, targetPosition: { x: number; y: number }) => {
+  const handleDrop = (e: React.DragEvent, targetPosition: Widget['position']) => {
     e.preventDefault()
     if (!draggedWidget) return
 
@@ -694,6 +680,16 @@ export default function AdvancedReportsPage() {
           <span>Loading reports...</span>
         </div>
       </div>
+    )
+  }
+
+  if (selectedReport) {
+    return (
+      <ReportPreview
+        report={selectedReport}
+        onBack={() => setSelectedReport(null)}
+        onExport={exportReport}
+      />
     )
   }
 
@@ -891,7 +887,7 @@ export default function AdvancedReportsPage() {
 
       {/* Main Content */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid h-auto w-full grid-cols-2 gap-1 sm:grid-cols-4">
           <TabsTrigger value="reports">Reports</TabsTrigger>
           <TabsTrigger value="scheduled">Scheduled</TabsTrigger>
           <TabsTrigger value="dashboards">Dashboards</TabsTrigger>
@@ -899,131 +895,16 @@ export default function AdvancedReportsPage() {
         </TabsList>
 
         <TabsContent value="reports" className="space-y-6">
-          {/* Search and Filter Bar */}
-          <Card>
-            <CardContent className="pt-6">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-                    <Input
-                      placeholder="Search reports by name, description, or type..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <div className="flex gap-2">
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-40">
-                      <SelectValue placeholder="Filter by status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Status</SelectItem>
-                      <SelectItem value="published">Published</SelectItem>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button variant="outline" size="sm">
-                    <Filter className="h-4 w-4 mr-2" />
-                    More Filters
-                  </Button>
-                </div>
-              </div>
-              <div className="mt-4 flex items-center justify-between text-sm text-gray-600">
-                <span>Showing {filteredReports.length} of {reports.length} reports</span>
-                <div className="flex items-center gap-4">
-                  <Button variant="ghost" size="sm" onClick={() => { setSearchQuery(''); setStatusFilter('all') }}>
-                    Clear Filters
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Reports List */}
-          <div className="grid gap-4">
-            {filteredReports.map(report => (
-              <Card key={report.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <CardTitle className="flex items-center space-x-2">
-                        <FileText className="h-5 w-5" />
-                        <span>{report.name}</span>
-                        <Badge variant={report.status === 'published' ? 'default' : 'secondary'}>
-                          {report.status}
-                        </Badge>
-                        {report.isScheduled && (
-                          <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {report.scheduleFrequency}
-                          </Badge>
-                        )}
-                      </CardTitle>
-                      <CardDescription>
-                        {report.description} • Last generated {formatDate(report.lastGenerated)}
-                        {report.isScheduled && report.nextRun && (
-                          <span className="block mt-1 text-xs text-blue-600">
-                            Next run: {formatDate(report.nextRun)}
-                            {report.recipients && report.recipients.length > 0 && (
-                              <span> • {report.recipients.length} recipient{report.recipients.length !== 1 ? 's' : ''}</span>
-                            )}
-                          </span>
-                        )}
-                      </CardDescription>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Button variant="outline" size="sm" title="View Report">
-                        <Eye className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" title="Export PDF" onClick={() => exportReport(report.id, 'pdf')}>
-                        <Download className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" title="Export Excel" onClick={() => exportReport(report.id, 'excel')}>
-                        <FileText className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" title="Export CSV" onClick={() => exportReport(report.id, 'csv')}>
-                        <BarChart3 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" title="Share Report">
-                        <Share2 className="h-4 w-4" />
-                      </Button>
-                      <Button variant="outline" size="sm" title="Edit Report">
-                        <Edit className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">Metrics Included</h4>
-                      <div className="flex flex-wrap gap-2">
-                        {report.metrics.map(metric => (
-                          <Badge key={metric} variant="outline">
-                            {metric}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <h4 className="font-semibold mb-2">Filters Applied</h4>
-                      <div className="text-sm text-muted-foreground">
-                        {Object.entries(report.filters).map(([key, value]) => (
-                          <div key={key}>
-                            <strong>{key}:</strong> {JSON.stringify(value)}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <ReportsLibrary
+            reports={reports}
+            searchQuery={searchQuery}
+            statusFilter={statusFilter}
+            error={reportsError}
+            onSearchChange={setSearchQuery}
+            onStatusChange={setStatusFilter}
+            onPreview={setSelectedReport}
+            onExport={exportReport}
+          />
         </TabsContent>
 
         <TabsContent value="scheduled" className="space-y-6">
@@ -1391,4 +1272,4 @@ export default function AdvancedReportsPage() {
       </Tabs>
     </div>
   )
-} 
+}
