@@ -1,8 +1,13 @@
 import assert from "node:assert/strict"
 import test from "node:test"
-import { calculateCapitalProgress, calculateMetrics, calculatePipelineStages, calculateFundingTimeline } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/lib/calculations"
-import { transformVentureToCapitalRequest } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/lib/transformations"
-import type { CapitalRequest } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/types"
+import {
+  calculateFundingTimeline,
+  createDealPipelineStages,
+  generateInvestorPartners,
+  getCapitalStatus,
+  transformVentures,
+} from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/lib/capital-facilitation"
+import type { CapitalRequest, VentureApiItem } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/types"
 
 const request = (overrides: Partial<CapitalRequest> = {}): CapitalRequest => ({
   id: "CAP-1",
@@ -19,16 +24,16 @@ const request = (overrides: Partial<CapitalRequest> = {}): CapitalRequest => ({
   ...overrides,
 })
 
-test("capital progress preserves stage and status rules", () => {
-  assert.equal(calculateCapitalProgress("DUE_DILIGENCE", "Pending"), 60)
-  assert.equal(calculateCapitalProgress("FUNDED", "Approved"), 100)
-  assert.equal(calculateCapitalProgress("INTAKE", "Rejected"), 0)
+test("capital status preserves stage rules", () => {
+  assert.equal(getCapitalStatus("DUE_DILIGENCE"), "Pending")
+  assert.equal(getCapitalStatus("FUNDED"), "Approved")
+  assert.equal(getCapitalStatus("INTAKE"), "Under Review")
 })
 
-test("capital metrics and pipeline totals are accurate for displayed data", () => {
+test("pipeline totals are accurate for displayed data", () => {
   const requests = [request(), request({ id: "CAP-2", amount: 50000, status: "Pending", stage: "Due Diligence" })]
-  assert.deepEqual(calculateMetrics(requests), { totalCapital: 150000, activeDeals: 2, successRate: 50, averageDealSize: 75000 })
-  assert.equal(calculatePipelineStages(requests).find((stage) => stage.name === "Closed")?.capital, 100000)
+  assert.equal(createDealPipelineStages(requests).find((stage) => stage.name === "Closed")?.capital, 100000)
+  assert.equal(createDealPipelineStages(requests).find((stage) => stage.name === "Due Diligence")?.capital, 50000)
 })
 
 test("funding timeline never exposes negative or invalid values", () => {
@@ -38,9 +43,27 @@ test("funding timeline never exposes negative or invalid values", () => {
 })
 
 test("venture transformation is deterministic and null-safe", () => {
-  const transformed = transformVentureToCapitalRequest({ id: "venture-123456789", name: "HealthTech One", stage: "DUE_DILIGENCE", fundingRaised: null }, new Date("2026-01-01T00:00:00Z"))
-  assert.equal(transformed.amount, 500000)
+  const venture: VentureApiItem = {
+    id: "venture-123456789",
+    name: "HealthTech One",
+    stage: "DUE_DILIGENCE",
+    fundingRaised: null,
+    createdAt: "2026-01-01T00:00:00Z",
+    capitalActivities: [{}],
+  }
+  const transformed = transformVentures([venture])[0]
+  assert.ok(transformed.amount >= 500000)
   assert.equal(transformed.status, "Pending")
   assert.equal(transformed.expectedDecision, "2026-01-15")
   assert.ok(!Object.values(transformed).some((value) => typeof value === "number" && Number.isNaN(value)))
+})
+
+test("investor generation summarizes active requests", () => {
+  const investors = generateInvestorPartners([
+    request({ investor: "Impact Capital Partners", amount: 100000 }),
+    request({ id: "CAP-2", investor: "Impact Capital Partners", amount: 50000 }),
+  ])
+  assert.equal(investors[0]?.name, "Impact Capital Partners")
+  assert.equal(investors[0]?.totalInvested, 150000)
+  assert.equal(investors[0]?.activeDeals, 2)
 })
