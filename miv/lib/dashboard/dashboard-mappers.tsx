@@ -41,7 +41,7 @@ export function buildDashboardMetrics(
         change: 0,
         changeType: "neutral",
         icon: <Building2 className="h-6 w-6 text-white" />,
-        color: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg",
+        color: "bg-linear-to-br from-blue-500 to-blue-600 shadow-lg",
         subtitle: "Active in pipeline",
       },
       {
@@ -50,7 +50,7 @@ export function buildDashboardMetrics(
         change: 0,
         changeType: "neutral",
         icon: <DollarSign className="h-6 w-6 text-white" />,
-        color: "bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg",
+        color: "bg-linear-to-br from-emerald-500 to-emerald-600 shadow-lg",
         subtitle: "This quarter",
       },
       {
@@ -59,7 +59,7 @@ export function buildDashboardMetrics(
         change: 0,
         changeType: "neutral",
         icon: <UserCheck className="h-6 w-6 text-white" />,
-        color: "bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg",
+        color: "bg-linear-to-br from-purple-500 to-purple-600 shadow-lg",
         subtitle: "Average score",
       },
       {
@@ -68,7 +68,7 @@ export function buildDashboardMetrics(
         change: 0,
         changeType: "neutral",
         icon: <Target className="h-6 w-6 text-white" />,
-        color: "bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg",
+        color: "bg-linear-to-br from-orange-500 to-orange-600 shadow-lg",
         subtitle: "Deal completion",
       },
     ]
@@ -90,7 +90,7 @@ export function buildDashboardMetrics(
       change: 0,
       changeType: totalVentures > 0 ? "increase" : "neutral",
       icon: <Building2 className="h-6 w-6 text-white" />,
-      color: "bg-gradient-to-br from-blue-500 to-blue-600 shadow-lg",
+      color: "bg-linear-to-br from-blue-500 to-blue-600 shadow-lg",
       subtitle: "Active in pipeline",
     },
     {
@@ -99,7 +99,7 @@ export function buildDashboardMetrics(
       change: 0,
       changeType: totalCapital > 0 ? "increase" : "neutral",
       icon: <DollarSign className="h-6 w-6 text-white" />,
-      color: "bg-gradient-to-br from-emerald-500 to-emerald-600 shadow-lg",
+      color: "bg-linear-to-br from-emerald-500 to-emerald-600 shadow-lg",
       subtitle: "This quarter",
     },
     {
@@ -108,7 +108,7 @@ export function buildDashboardMetrics(
       change: 0,
       changeType: gedsiAnalytics.averageGedsiScore > 0 ? "increase" : "neutral",
       icon: <UserCheck className="h-6 w-6 text-white" />,
-      color: "bg-gradient-to-br from-purple-500 to-purple-600 shadow-lg",
+      color: "bg-linear-to-br from-purple-500 to-purple-600 shadow-lg",
       subtitle: "Average score",
     },
     {
@@ -117,7 +117,7 @@ export function buildDashboardMetrics(
       change: 0,
       changeType: successRate > 0 ? "increase" : "neutral",
       icon: <Target className="h-6 w-6 text-white" />,
-      color: "bg-gradient-to-br from-orange-500 to-orange-600 shadow-lg",
+      color: "bg-linear-to-br from-orange-500 to-orange-600 shadow-lg",
       subtitle: "Deal completion",
     },
   ]

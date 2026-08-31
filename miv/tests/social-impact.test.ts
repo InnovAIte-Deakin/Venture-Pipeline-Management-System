@@ -1,9 +1,9 @@
 import assert from "node:assert/strict"
 import { describe, it } from "node:test"
-import { aggregateSocialImpact } from "../app/dashboard/(g1-impact-analytics)/social-impact/social-impact/lib/social-impact-calculations"
-import { filterVentures } from "../app/dashboard/(g1-impact-analytics)/social-impact/social-impact/lib/social-impact-filters"
-import { requestSocialImpactData } from "../app/dashboard/(g1-impact-analytics)/social-impact/hooks/use-social-impact-data"
-import type { SocialImpactVenture } from "../app/dashboard/(g1-impact-analytics)/social-impact/types/social-impact"
+import { aggregateSocialImpact } from "../app/dashboard/(impact-gedsi)/social-impact/lib/social-impact-calculations"
+import { filterVentures } from "../app/dashboard/(impact-gedsi)/social-impact/lib/social-impact-filters"
+import { requestSocialImpactData } from "../app/dashboard/(impact-gedsi)/social-impact/hooks/use-social-impact-data"
+import type { SocialImpactVenture } from "../app/dashboard/(impact-gedsi)/social-impact/types/social-impact"
 
 const ventures: SocialImpactVenture[] = [
   { id: "1", name: "Alpha Health", sector: "HealthTech", location: "Melbourne, AU", stage: "SEED", status: "ACTIVE", teamSize: 5, inclusionFocus: "Women", founderTypes: "[]", totalBeneficiaries: 100, jobsCreated: 10, womenEmpowered: 60, disabilityInclusive: null, youthEngaged: 20 },

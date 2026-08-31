@@ -6,8 +6,8 @@ import {
   generateInvestorPartners,
   getCapitalStatus,
   transformVentures,
-} from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/lib/capital-facilitation"
-import type { CapitalRequest, VentureApiItem } from "../../app/dashboard/(g3-venture-pipeline)/capital-facilitation/types"
+} from "../../app/dashboard/(capital-management)/capital-facilitation/lib/capital-facilitation"
+import type { CapitalRequest, VentureApiItem } from "../../app/dashboard/(capital-management)/capital-facilitation/types"
 
 const request = (overrides: Partial<CapitalRequest> = {}): CapitalRequest => ({
   id: "CAP-1",

@@ -150,14 +150,11 @@ Because of §0, this table is where app authorization actually lives. **Current 
 
 | Route group (miv frontend) | Example routes | Current enforcement | Target |
 |---|---|---|---|
-| g1-impact-analytics | analytics, calculations, gedsi-metrics, iris/metrics | none | TBD |
-| g1-portfolio-funding | fund-management | none | TBD |
-| g2-founder-documents | documents(+/{id}/upload/analytics), emails/stg-reminder, emails/weekly-update | none; emails branch on legacy enum | TBD |
-| g2-founder-submission | add-venture-details | none | TBD |
-| g3-venture-pipeline | ventures(+/{id}/gedsi) | none | TBD |
-| g4-reporting-insights | ai/analyze-venture, ai/gedsi-insights, custom-dashboards | none | TBD |
-| g5-platform-operations | team/members(+announcements/events/projects), calendar, workflows | none; team/members writes role via Zod enum(8) | TBD |
-| g5-user-support-settings | users, users/me, users/ventures, session/login, notifications, search, auth/{id} | none | TBD |
+| pipeline-management | add-venture-details, ventures(+/{id}/gedsi) | none | TBD |
+| analytics-insights | ai/analyze-venture, ai/gedsi-insights, custom-dashboards | none | TBD |
+| capital-management | fund-management | none | TBD |
+| impact-gedsi | analytics, calculations, gedsi-metrics, iris/metrics | none | TBD |
+| operations | auth/{id}, calendar, documents(+/{id}/upload/analytics), emails/stg-reminder, emails/weekly-update, notifications, search, session/login, team/members(+announcements/events/projects), users, users/me, users/ventures, workflows | none; emails branch on legacy enum and team/members writes role via Zod enum(8) | TBD |
 | **Backend (miv-backend)** | auth/*, users, users/change-password, documents(+/{id}), intake/submit, reports/impact-users, sytem-settings/* | change-password verifies cookie; rest via Local API | TBD |
 
 **Frontend route gate:** #57 **deleted `miv/middleware.ts`** and replaced it with `lib/dashboard-navigation.ts` (nav config, no auth). There is now **no middleware anywhere in `miv`** — nothing checks a cookie or role before a dashboard route renders (**A10**).

@@ -57,7 +57,7 @@ export default function ImpactDashboard() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 p-6">
+    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
         {/* Top Section - Quick Suggestions & Notifications */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -72,7 +72,7 @@ export default function ImpactDashboard() {
                 <Link
                   key={idx}
                   href={action.href}
-                  className="w-full px-4 py-3 bg-gradient-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-lg font-medium transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-sm"
+                  className="w-full px-4 py-3 bg-linear-to-r from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-700 text-white rounded-lg font-medium transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2 shadow-sm"
                 >
                   <action.icon className="w-4 h-4" />
                   {action.label}
@@ -93,7 +93,7 @@ export default function ImpactDashboard() {
                   key={idx}
                   className="p-3 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm text-gray-700 flex items-start gap-2"
                 >
-                  <span className="text-base flex-shrink-0">{notif.icon}</span>
+                  <span className="text-base shrink-0">{notif.icon}</span>
                   <span className="leading-relaxed">{notif.text}</span>
                 </div>
               ))}
@@ -110,7 +110,7 @@ export default function ImpactDashboard() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Venture Card */}
-            <div className="border-2 border-teal-500 rounded-xl p-6 bg-gradient-to-br from-teal-50 to-white">
+            <div className="border-2 border-teal-500 rounded-xl p-6 bg-linear-to-br from-teal-50 to-white">
               <div className="flex justify-between items-start mb-4">
                 <div>
                   <h3 className="text-2xl font-bold text-gray-800">
@@ -129,7 +129,7 @@ export default function ImpactDashboard() {
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-green-400 to-green-500"
+                      className="h-full bg-linear-to-r from-green-400 to-green-500"
                       style={{ width: "60%" }}
                     ></div>
                   </div>
@@ -141,7 +141,7 @@ export default function ImpactDashboard() {
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-pink-400 to-pink-500"
+                      className="h-full bg-linear-to-r from-pink-400 to-pink-500"
                       style={{ width: "70%" }}
                     ></div>
                   </div>
@@ -153,7 +153,7 @@ export default function ImpactDashboard() {
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-cyan-400 to-cyan-500"
+                      className="h-full bg-linear-to-r from-cyan-400 to-cyan-500"
                       style={{ width: "40%" }}
                     ></div>
                   </div>
@@ -165,7 +165,7 @@ export default function ImpactDashboard() {
                   </div>
                   <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-gradient-to-r from-blue-400 to-blue-500"
+                      className="h-full bg-linear-to-r from-blue-400 to-blue-500"
                       style={{ width: "25%" }}
                     ></div>
                   </div>
@@ -204,7 +204,7 @@ export default function ImpactDashboard() {
 
           {/* KPI Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <div className="bg-gradient-to-br from-teal-50 to-green-50 rounded-xl p-6 border border-teal-100">
+            <div className="bg-linear-to-br from-teal-50 to-green-50 rounded-xl p-6 border border-teal-100">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 bg-teal-100 rounded-lg flex items-center justify-center">
                   <TrendingUp className="w-6 h-6 text-teal-600" />
@@ -219,7 +219,7 @@ export default function ImpactDashboard() {
               <p className="text-4xl font-bold text-gray-800">15.2%</p>
             </div>
 
-            <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
+            <div className="bg-linear-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-100">
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                   <Clock className="w-6 h-6 text-blue-600" />
@@ -295,7 +295,7 @@ export default function ImpactDashboard() {
                 ].map((item, idx) => (
                   <div key={idx} className="flex-1 flex flex-col items-center">
                     <div
-                      className="w-full bg-gradient-to-t from-red-400 to-red-500 rounded-t-lg transition-all hover:from-red-500 hover:to-red-600"
+                      className="w-full bg-linear-to-t from-red-400 to-red-500 rounded-t-lg transition-all hover:from-red-500 hover:to-red-600"
                       style={{ height: `${(item.value / 12) * 100}%` }}
                     ></div>
                     <p className="text-xs text-gray-600 mt-2 text-center transform -rotate-45 origin-top-left whitespace-nowrap">

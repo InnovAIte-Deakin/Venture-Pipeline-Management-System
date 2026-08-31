@@ -500,7 +500,7 @@ export function AnalyticsDashboard({
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h1 className="break-words text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent sm:text-3xl">{title}</h1>
+          <h1 className="break-words text-2xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent sm:text-3xl">{title}</h1>
           <p className="text-slate-600 font-medium">Real-time insights and performance metrics</p>
         </div>
         
@@ -546,13 +546,13 @@ export function AnalyticsDashboard({
       {widgetConfig.keyMetrics && (
       <div className={`grid ${layoutMode === 'compact' ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} ${layoutMode === 'wide' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-3 sm:gap-6`}>
         {metrics.map((metric, index) => (
-          <Card key={index} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br from-white to-gray-50/50">
+          <Card key={index} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 bg-linear-to-br from-white to-gray-50/50">
             <CardContent className="p-4 sm:p-6">
               <div className="flex min-w-0 items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-600 mb-1">{metric.title}</p>
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <p className="break-words text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent sm:text-3xl">{metric.value}</p>
+                    <p className="break-words text-2xl font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent sm:text-3xl">{metric.value}</p>
                     {metric.change !== 0 && (
                       <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getChangeColor(metric.changeType)} ${metric.changeType === 'increase' ? 'bg-emerald-50' : 'bg-red-50'}`}>
                         {getChangeIcon(metric.changeType)}

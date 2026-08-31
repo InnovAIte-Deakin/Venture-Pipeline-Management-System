@@ -5,7 +5,7 @@ import Link from "next/link";
 import { MobileNav } from "@/components/dashboard/navigation/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { Search, Bell, Moon, HelpCircle, Download, User } from "lucide-react";
-import UserSidebar from "@/components/user-dashboard/user-sidebar";
+import UserSidebar from "./components/user-sidebar";
 
 interface UserData {
   firstName: string;
@@ -85,7 +85,7 @@ export default function UserDashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 transition-colors duration-300">
+    <div className="flex min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 transition-colors duration-300">
       {/* Desktop Sidebar */}
       <div>
         <UserSidebar />
@@ -98,7 +98,7 @@ export default function UserDashboardLayout({
             <div className="flex items-center justify-between gap-6">
               {/* Left Section - Logo and Status */}
               <div className="flex items-center gap-4">
-                <h1 className="text-2xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent whitespace-nowrap">
+                <h1 className="text-2xl font-bold bg-linear-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent whitespace-nowrap">
                   Venture Pipeline 
                 </h1>
                 <div className="flex items-center gap-2 px-3 py-1 bg-green-50 rounded-full">
@@ -129,7 +129,7 @@ export default function UserDashboardLayout({
                   <HelpCircle className="w-6 h-6 text-gray-600" />
                 </button>
                 {/* User Avatar */}
-                <Link href="/user-dashboard/profile" className="w-10 h-10 bg-gradient-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold hover:shadow-lg transition-shadow">
+                <Link href="/user-dashboard/profile" className="w-10 h-10 bg-linear-to-br from-teal-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold hover:shadow-lg transition-shadow">
                   {userData ? (userData.firstName.charAt(0) + userData.lastName.charAt(0)).toUpperCase() : ''}
                 </Link>
               </div>

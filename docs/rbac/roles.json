@@ -60,8 +60,8 @@
     ],
     "loadBearingUsages": {
       "user_cannot_be_deleted": "miv/app/auth/login/page.tsx branches on `role === 'user'` to pick the landing page. #57 fixed the target (user + founder both go to /user-dashboard) but the branch still reads the value, so deleting `user` breaks login routing.",
-      "enum_drives_email_content": "VENTURE_MANAGER / GEDSI_ANALYST / CAPITAL_FACILITATOR gate email body content across ~10 conditionals in miv/app/api/(g2-founder-documents)/emails/stg-reminder and weekly-update.",
-      "enum_drives_team_management": "miv/app/api/(g5-platform-operations)/team/members/route.ts hardcodes all 8 enum values in a Zod enum and writes the selected role; miv/app/dashboard/(g5-platform-operations)/team-management/page.tsx is the assignment UI. Renaming to snake_case changes behaviour in these routes."
+      "enum_drives_email_content": "VENTURE_MANAGER / GEDSI_ANALYST / CAPITAL_FACILITATOR gate email body content across ~10 conditionals in miv/app/api/(operations)/emails/stg-reminder and weekly-update.",
+      "enum_drives_team_management": "miv/app/api/(operations)/team/members/route.ts hardcodes all 8 enum values in a Zod enum and writes the selected role; miv/app/dashboard/(operations)/team-management/page.tsx is the assignment UI. Renaming to snake_case changes behaviour in these routes."
     }
   },
   "adoption": {

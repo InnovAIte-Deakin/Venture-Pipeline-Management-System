@@ -47,7 +47,7 @@ export default function DiagnosticsDetailPage() {
           <div className="flex items-start justify-between">
             <div className="flex items-start gap-6">
               {/* Avatar */}
-              <div className="w-28 h-28 bg-teal-400 rounded-2xl flex items-center justify-center text-white font-bold text-4xl flex-shrink-0">
+              <div className="w-28 h-28 bg-teal-400 rounded-2xl flex items-center justify-center text-white font-bold text-4xl shrink-0">
                 {ventureData.initials}
               </div>
 

@@ -44,6 +44,8 @@
 
 :root {
 	--radius: 0.625rem;
+	--font-geist-sans: Arial, Helvetica, sans-serif;
+	--font-geist-mono: "Courier New", Courier, monospace;
 	--background: oklch(1 0 0);
 	--foreground: oklch(0.145 0 0);
 	--card: oklch(1 0 0);
@@ -1610,7 +1612,7 @@ img {
 	color: #ededed;
 }
 
-.dark-mode .bg-gradient-to-b {
+.dark-mode .bg-linear-to-b {
 	background: #0f172a !important;
 }
 
@@ -1704,7 +1706,7 @@ img {
 }
 
 /* Preserve hero title gradient - keep it as is */
-.dark-mode .bg-gradient-to-r.from-blue-400.via-purple-400.to-pink-400 {
+.dark-mode .bg-linear-to-r.from-blue-400.via-purple-400.to-pink-400 {
 	color: transparent !important;
 }
 
