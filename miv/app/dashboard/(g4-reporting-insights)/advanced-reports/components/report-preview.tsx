@@ -32,13 +32,21 @@ function displayValue(value: unknown) {
 
 export function ReportPreview({ report, onBack, onExport }: ReportPreviewProps) {
   const shareReport = async () => {
+  try {
     const shareData = { title: report.name, text: report.description }
+
     if (navigator.share) {
       await navigator.share(shareData)
       return
     }
+
     await navigator.clipboard.writeText(`${report.name}\n${report.description}`)
+    alert('Report details copied to clipboard.')
+  } catch (error) {
+    console.error('Failed to share report:', error)
+    alert('Unable to share this report right now.')
   }
+}
 
   return (
     <div className="space-y-6">
@@ -96,8 +104,11 @@ export function ReportPreview({ report, onBack, onExport }: ReportPreviewProps) 
             </h2>
             <div className="rounded-lg border bg-muted/30 p-4 sm:p-6">
               <p className="leading-7 text-muted-foreground">
-                This preview summarises the selected report configuration and impact metrics. Final values depend on the connected venture, GEDSI, user, analytics, and workflow data sources.
-              </p>
+                 This {report.type.replace(/-/g, " ")} report includes {report.metrics.length} selected
+                {report.metrics.length === 1 ? " metric" : " metrics"} and reflects the current report
+                configuration and applied filters. Final values depend on the connected venture, GEDSI,
+                user, analytics, and workflow data sources.
+</p>
             </div>
           </section>
 

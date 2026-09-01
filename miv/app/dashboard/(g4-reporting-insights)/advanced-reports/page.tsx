@@ -501,16 +501,13 @@ export default function AdvancedReportsPage() {
       let content: string
 
       switch (format) {
-        case 'pdf':
-          filename = `${report.name.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`
-          mimeType = 'application/pdf'
-          content = JSON.stringify(exportData, null, 2) // In real app, generate PDF
-          break
+         case 'pdf':
+          alert('PDF export is currently a frontend prototype and will be connected to document generation during backend integration.')
+          return
+
         case 'excel':
-          filename = `${report.name.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`
-          mimeType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-          content = JSON.stringify(exportData, null, 2) // In real app, generate Excel
-          break
+          alert('Excel export is currently a frontend prototype and will be connected to document generation during backend integration.')
+          return
         case 'csv':
           filename = `${report.name.replace(/[^a-zA-Z0-9]/g, '_')}.csv`
           mimeType = 'text/csv'
