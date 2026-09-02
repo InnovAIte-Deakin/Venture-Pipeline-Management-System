@@ -15,6 +15,7 @@ interface MobileReportListProps {
   statusFilter: ReportStatusFilter
   onStatusFilterChange: (value: ReportStatusFilter) => void
   onClearFilters: () => void
+  onPreview: (report: Report) => void
   onExport: (reportId: string, format: ExportFormat) => Promise<void>
 }
 
@@ -30,8 +31,9 @@ export function MobileReportList({
   searchQuery,
   onSearchQueryChange,
   statusFilter,
-  onStatusFilterChange,
+    onStatusFilterChange,
   onClearFilters,
+  onPreview,
   onExport,
 }: MobileReportListProps) {
   const [exportTarget, setExportTarget] = useState<Report | null>(null)
@@ -49,7 +51,12 @@ export function MobileReportList({
 
       <div className="space-y-4">
         {filteredReports.map((report) => (
-          <MobileReportCard key={report.id} report={report} onExportClick={setExportTarget} />
+          <MobileReportCard
+        key={report.id}
+        report={report}
+        onPreview={onPreview}
+        onExportClick={setExportTarget}
+/>
         ))}
       </div>
 

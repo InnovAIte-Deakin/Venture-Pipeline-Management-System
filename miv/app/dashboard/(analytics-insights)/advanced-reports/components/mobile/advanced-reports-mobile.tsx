@@ -7,6 +7,7 @@ import { MobileReportList } from "./mobile-report-list"
 import { MobileScheduledList } from "./mobile-scheduled-list"
 import { MobileDashboardList } from "./mobile-dashboard-list"
 import { MobileAnalytics } from "./mobile-analytics"
+import { ReportPreview } from "../report-preview"
 import { filterReports } from "../../lib/report-filters"
 import type {
   Dashboard,
@@ -33,14 +34,25 @@ export function AdvancedReportsMobile({ reports, dashboards, ventures, gedsiMetr
   const [activeTab, setActiveTab] = useState("reports")
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>("all")
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
 
   const filteredReports = filterReports(reports, { searchQuery, statusFilter })
 
   const handleExport = async (reportId: string, format: ExportFormat) => {
-    await reportBuilder.exportReport(reportId, format)
-  }
+  await reportBuilder.exportReport(reportId, format)
+}
 
+if (selectedReport) {
   return (
+    <ReportPreview
+      report={selectedReport}
+      onBack={() => setSelectedReport(null)}
+      onExport={handleExport}
+    />
+  )
+}
+
+return (
     <div className="space-y-6">
       <MobileReportBuilder builder={reportBuilder} onGenerated={() => setActiveTab("reports")} />
 
@@ -54,18 +66,19 @@ export function AdvancedReportsMobile({ reports, dashboards, ventures, gedsiMetr
 
         <TabsContent value="reports" className="space-y-4">
           <MobileReportList
-            reports={reports}
-            filteredReports={filteredReports}
-            searchQuery={searchQuery}
-            onSearchQueryChange={setSearchQuery}
-            statusFilter={statusFilter}
-            onStatusFilterChange={setStatusFilter}
-            onClearFilters={() => {
-              setSearchQuery("")
-              setStatusFilter("all")
-            }}
-            onExport={handleExport}
-          />
+  reports={reports}
+  filteredReports={filteredReports}
+  searchQuery={searchQuery}
+  onSearchQueryChange={setSearchQuery}
+  statusFilter={statusFilter}
+  onStatusFilterChange={setStatusFilter}
+  onClearFilters={() => {
+    setSearchQuery("")
+    setStatusFilter("all")
+  }}
+  onPreview={setSelectedReport}
+  onExport={handleExport}
+/>
         </TabsContent>
 
         <TabsContent value="scheduled" className="space-y-4">

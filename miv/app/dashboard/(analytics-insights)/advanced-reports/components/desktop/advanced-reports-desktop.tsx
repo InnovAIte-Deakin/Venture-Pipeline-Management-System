@@ -7,6 +7,7 @@ import { DesktopReportsList } from "./desktop-reports-list"
 import { DesktopScheduledList } from "./desktop-scheduled-list"
 import { DesktopDashboardBuilder } from "./desktop-dashboard-builder"
 import { DesktopAnalytics } from "./desktop-analytics"
+import { ReportPreview } from "../report-preview"
 import { filterReports } from "../../lib/report-filters"
 import type {
   Dashboard,
@@ -33,12 +34,22 @@ export function AdvancedReportsDesktop({ reports, dashboards, ventures, gedsiMet
   const [activeTab, setActiveTab] = useState("reports")
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<ReportStatusFilter>("all")
+  const [selectedReport, setSelectedReport] = useState<Report | null>(null)
 
   const filteredReports = filterReports(reports, { searchQuery, statusFilter })
 
   const handleExport = (reportId: string, format: ExportFormat) => {
     void reportBuilder.exportReport(reportId, format)
   }
+  if (selectedReport) {
+  return (
+    <ReportPreview
+      report={selectedReport}
+      onBack={() => setSelectedReport(null)}
+      onExport={handleExport}
+    />
+  )
+}
 
   return (
     <div className="space-y-6">
@@ -64,6 +75,7 @@ export function AdvancedReportsDesktop({ reports, dashboards, ventures, gedsiMet
               setSearchQuery("")
               setStatusFilter("all")
             }}
+            onPreview={setSelectedReport}
             onExport={handleExport}
           />
         </TabsContent>

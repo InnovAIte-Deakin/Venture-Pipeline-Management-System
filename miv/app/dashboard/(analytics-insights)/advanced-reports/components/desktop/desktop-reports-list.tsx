@@ -15,6 +15,7 @@ interface DesktopReportsListProps {
   statusFilter: ReportStatusFilter
   onStatusFilterChange: (value: ReportStatusFilter) => void
   onClearFilters: () => void
+  onPreview: (report: Report) => void
   onExport: (reportId: string, format: ExportFormat) => void
 }
 
@@ -32,6 +33,7 @@ export function DesktopReportsList({
   statusFilter,
   onStatusFilterChange,
   onClearFilters,
+  onPreview,
   onExport,
 }: DesktopReportsListProps) {
   return (
@@ -83,7 +85,7 @@ export function DesktopReportsList({
                   </CardDescription>
                 </div>
                 <div className="flex items-center space-x-2">
-                  <Button variant="outline" size="sm" title="View Report" aria-label="View Report">
+                  <Button variant="outline" size="sm" title="View Report" aria-label="View Report" onClick={() => onPreview(report)}>
                     <Eye className="h-4 w-4" aria-hidden="true" />
                   </Button>
                   <Button variant="outline" size="sm" title="Export PDF" aria-label="Export as PDF" onClick={() => onExport(report.id, "pdf")}>

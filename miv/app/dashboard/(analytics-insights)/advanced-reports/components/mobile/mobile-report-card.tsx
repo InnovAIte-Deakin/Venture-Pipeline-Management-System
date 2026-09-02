@@ -7,6 +7,7 @@ import type { Report } from "../../types/advanced-reports.types"
 
 interface MobileReportCardProps {
   report: Report
+  onPreview: (report: Report) => void
   onExportClick: (report: Report) => void
 }
 
@@ -15,7 +16,7 @@ interface MobileReportCardProps {
  * button that opens `ExportReportDialog` (format picker); View/Share/Edit
  * stay as a compact icon row and remain decorative, matching desktop.
  */
-export function MobileReportCard({ report, onExportClick }: MobileReportCardProps) {
+export function MobileReportCard({ report, onPreview, onExportClick }: MobileReportCardProps) {
   return (
     <Card>
       <CardHeader className="space-y-2">
@@ -53,7 +54,12 @@ export function MobileReportCard({ report, onExportClick }: MobileReportCardProp
             <Download className="mr-2 h-4 w-4" aria-hidden="true" />
             Export
           </Button>
-          <Button variant="outline" size="sm" aria-label="View Report">
+          <Button
+          variant="outline"
+          size="sm"
+          aria-label="View Report"
+          onClick={() => onPreview(report)}
+>
             <Eye className="h-4 w-4" aria-hidden="true" />
           </Button>
           <Button variant="outline" size="sm" aria-label="Share Report">
