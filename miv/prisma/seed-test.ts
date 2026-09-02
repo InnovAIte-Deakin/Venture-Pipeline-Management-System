@@ -102,9 +102,8 @@ async function main() {
       stgGoals: ['SDG7', 'SDG10'],
       gedsiGoals: ['OI.1', 'OI.2'],
       stage: 'SCREENING',
-      createdById: admin.id,
+      createdById: testUser.id,
       assignedToId: ventureMgr.id,
-      documentsMetadata: { pitchDeck: true },
       tags: ['pilot', 'energy'],
       intakeDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 1 month ago
       screeningDate: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000), // 25 days ago
@@ -1146,6 +1145,12 @@ async function main() {
         type: 'STG_REMINDER',
         title: 'Metric Update Reminder',
         message: 'Please update GEDSI metrics for assigned ventures.',
+      },
+      {
+        userId: testUser.id,
+        type: 'WELCOME',
+        title: 'Welcome to MIV Platform!',
+        message: 'Your account has been successfully created.',
       },
     ],
   })

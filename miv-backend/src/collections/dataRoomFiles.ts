@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { isAuthenticated, adminOnly, adminOrAnalyst } from '@/access/roles'
+import { founderVentureScopedRead } from '@/access/scoping'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -8,10 +10,12 @@ const dirname = path.dirname(filename)
 export const DataRoomFiles: CollectionConfig = {
   slug: 'dataRoomFiles',
   access: {
-    read: ({ req }) => Boolean(req.user),
-    create: ({ req }) => Boolean(req.user),
-    update: ({ req }) => Boolean(req.user),
-    delete: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    // Financial/registration PDFs — founder sees only their venture's (matrix §2 / A4).
+    read: founderVentureScopedRead('venture'),
+    create: isAuthenticated,
+    // Was any-authenticated (A5) — now staff only.
+    update: adminOrAnalyst,
+    delete: adminOnly,
   },
   upload: {
     staticDir: path.resolve(dirname, '../../uploads/dataroom'),
