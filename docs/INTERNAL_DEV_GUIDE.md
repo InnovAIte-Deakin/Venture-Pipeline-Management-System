@@ -153,8 +153,62 @@ http://localhost:3000
 
 ---
 
-## 9. Maintenance Notes
+## 9. Troubleshooting
+### Prisma P1000 Authentication Failed
+#### Issue
+
+During local development, developers may encounter the following error when running:
+
+```bash
+npm run db:push
+```
+
+```
+Error: P1000: Authentication failed against database server
+```
+
+#### Cause
+
+This issue may occur if a local PostgreSQL service is already running on port **5432**. In this case, Prisma attempts to connect to the local PostgreSQL instance instead of the PostgreSQL Docker container used by the VPMS project.
+
+#### Resolution
+
+1. Check which process is using port 5432:
+
+```cmd
+netstat -ano | findstr :5432
+```
+
+2. If a local PostgreSQL service is running, identify the service:
+
+```cmd
+sc query type= service | findstr /I postgres
+```
+
+3. Stop the local PostgreSQL service (example):
+
+```cmd
+net stop postgresql-x64-18
+```
+
+4. Verify that only the Docker PostgreSQL container is listening on port 5432:
+
+```cmd
+netstat -ano | findstr :5432
+```
+
+5. Run the Prisma setup commands again:
+
+```bash
+npm run db:push
+npm run db:seed
+```
+
+If successful, the database schema will be synchronised and the development data will be seeded successfully.
+
+## 10 Maintenance Notes
 
 * Payload CMS collections and access rules are defined in backend config
 * Prisma schema changes require migrations
 * Update documentation when system behaviour changes
+
