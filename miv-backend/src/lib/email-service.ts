@@ -350,7 +350,6 @@ Mekong Inclusive Ventures | Building Inclusive Futures
   }
 
   // Intake notification email sending method
-
   async sendIntakeNotificationEmail(data: IntakeNotificationEmailData): Promise<boolean> {
     if (!this.isConfigured()) {
       console.warn('Email service not configured...skipping intake notification email')
@@ -373,6 +372,39 @@ Mekong Inclusive Ventures | Building Inclusive Futures
       return true
     } catch (error) {
       console.error('Failed to send intake notification email:', error)
+      return false
+    }
+  }
+
+  // Admin notification email sending method
+   async sendAdminNotificationEmail(data: AdminNotificationEmailData): Promise<boolean> {
+    if (!this.isConfigured()) {
+      console.warn('Email service not configured...skipping admin notification email')
+      return false
+    }
+
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL
+    if (!adminEmail) {
+      console.warn('ADMIN_NOTIFICATION_EMAIL not set...skipping admin notification email')
+      return false
+    }
+
+    try {
+      console.log(`Sending admin notification email to ${adminEmail}`)
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: adminEmail,
+        subject: `New Intake Submitted, ${data.ventureName}`,
+        text: this.generateAdminNotificationText(data),
+        html: this.generateAdminNotificationHTML(data),
+      }
+
+      const result = await this.transporter!.sendMail(mailOptions)
+      console.log('Admin notification email sent successfully:', result.messageId)
+      return true
+    } catch (error) {
+      console.error('Failed to send admin notification email:', error)
       return false
     }
   }
@@ -472,4 +504,4 @@ Mekong Inclusive Ventures | Building Inclusive Futures
 export const emailService = new EmailService()
 
 // Export types
-export type { WelcomeEmailData, IntakeNotificationEmailData, TestEmailData }
+export type { WelcomeEmailData, IntakeNotificationEmailData, AdminNotificationEmailData, TestEmailData }
