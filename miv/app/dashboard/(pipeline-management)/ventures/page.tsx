@@ -1,492 +1,427 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-  Building2,
-  Search,
-  Filter,
-  Plus,
-  Eye,
-  Edit,
-  MoreHorizontal,
-  Users,
-  DollarSign,
-  Target,
-  MapPin,
-  Calendar,
-  RefreshCw,
-  Download,
-  AlertCircle
-} from "lucide-react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import { AlertCircle, Building2, Calendar, Download, Edit, Eye, MapPin, Plus, RefreshCw, Target, Users } from "lucide-react"
+import type { LucideIcon } from "lucide-react"
 
-interface Venture {
-  id: string
-  name: string
-  description?: string | null
-  pitchSummary?: string | null
-  sector?: string | null
-  location?: string | null
-  stage?: string | null
-  status?: string | null
-  fundingAmount?: number | null
-  fundingRaised?: number | null
-  teamSize?: number | string | null
-  foundedYear?: number | null
-  foundingYear?: number | null
-  gedsiScore?: number | null
-  createdAt: string
-  updatedAt: string
+import { VentureFilters } from "./VentureFilters"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import {
+  asText,
+  filterVentures,
+  formatCurrency,
+  formatLabel,
+  getFundingAmount,
+  getGedsiScore,
+  getFoundedYear,
+  getTeamSize,
+  getUniqueSectors,
+  getVentureDetailsPath,
+  getVentureDescription,
+  requestVentures,
+  summarizeVentures,
+  type VentureFiltersState,
+  type VentureRecord,
+} from "@/lib/ventures"
+
+const defaultFilters: VentureFiltersState = {
+  search: "",
+  status: "all",
+  stage: "all",
+  sector: "all",
 }
 
-interface VenturesApiResponse {
-  ventures?: Venture[]
+const getStageColor = (stage: string) => {
+  const colors: Record<string, string> = {
+    INTAKE: "bg-sky-100 text-sky-800",
+    SCREENING: "bg-amber-100 text-amber-800",
+    DUE_DILIGENCE: "bg-indigo-100 text-indigo-800",
+    INVESTMENT_READY: "bg-emerald-100 text-emerald-800",
+    FUNDED: "bg-green-100 text-green-800",
+    EXITED: "bg-gray-100 text-gray-800",
+    SEED: "bg-cyan-100 text-cyan-800",
+    SERIES_A: "bg-blue-100 text-blue-800",
+    SERIES_B: "bg-violet-100 text-violet-800",
+    SERIES_C: "bg-purple-100 text-purple-800",
+  }
+
+  return colors[stage] || "bg-gray-100 text-gray-800"
+}
+
+const getStatusColor = (status: string) => {
+  const colors: Record<string, string> = {
+    ACTIVE: "bg-green-100 text-green-800",
+    INACTIVE: "bg-gray-100 text-gray-800",
+    ARCHIVED: "bg-slate-100 text-slate-800",
+  }
+
+  return colors[status] || "bg-gray-100 text-gray-800"
 }
 
 export default function VenturesPage() {
-  const router = useRouter()
-  const [ventures, setVentures] = useState<Venture[]>([])
+  const [ventures, setVentures] = useState<VentureRecord[]>([])
+  const [filters, setFilters] = useState<VentureFiltersState>(defaultFilters)
   const [loading, setLoading] = useState(true)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [stageFilter, setStageFilter] = useState("all")
-  const [sectorFilter, setSectorFilter] = useState("all")
-
-  // Fetch ventures data
-  useEffect(() => {
-    const fetchVentures = async () => {
-      try {
-        setLoading(true)
-        const response = await fetch('/api/ventures')
-        if (response.ok) {
-          const data: Venture[] | VenturesApiResponse = await response.json()
-          setVentures(Array.isArray(data) ? data : data.ventures ?? [])
-        } else {
-          // Handle API error
-          setError('Failed to fetch ventures from database')
-          setVentures([])
-        }
-      } catch (error) {
-        console.error('Failed to fetch ventures:', error)
-        setError('Database connection failed')
-        setVentures([])
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchVentures()
-  }, [])
-
-  // Error state for failed API calls
+  const [refreshing, setRefreshing] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const getStageColor = (stage: string) => {
-    const colors: { [key: string]: string } = {
-      'IDEA': 'bg-blue-100 text-blue-800',
-      'VALIDATION': 'bg-yellow-100 text-yellow-800',
-      'EARLY_GROWTH': 'bg-green-100 text-green-800',
-      'SCALE_UP': 'bg-purple-100 text-purple-800',
-      'MATURE': 'bg-gray-100 text-gray-800'
+  const loadVentures = useCallback(async ({ refresh = false } = {}) => {
+    try {
+      if (refresh) {
+        setRefreshing(true)
+      } else {
+        setLoading(true)
+      }
+      setError(null)
+
+      const data = await requestVentures()
+      setVentures(data.ventures)
+    } catch (requestError) {
+      const message = requestError instanceof Error ? requestError.message : "Unable to load ventures."
+      setError(message)
+      setVentures([])
+    } finally {
+      setLoading(false)
+      setRefreshing(false)
     }
-    return colors[stage] || 'bg-gray-100 text-gray-800'
-  }
+  }, [])
 
-  const getStatusColor = (status: string) => {
-    const colors: { [key: string]: string } = {
-      'ACTIVE': 'bg-green-100 text-green-800',
-      'INACTIVE': 'bg-gray-100 text-gray-800',
-      'SUSPENDED': 'bg-red-100 text-red-800',
-      'ARCHIVED': 'bg-gray-100 text-gray-800'
-    }
-    return colors[status] || 'bg-gray-100 text-gray-800'
-  }
+  useEffect(() => {
+    void loadVentures()
+  }, [loadVentures])
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
-    }).format(amount)
-  }
-
-  const handleViewVenture = (ventureId: string) => {
-    router.push(`/dashboard/ventures/${ventureId}`)
-  }
-
-  const asText = (value: string | null | undefined, fallback = "Not specified") =>
-    value?.trim() || fallback
-
-  const getVentureDescription = (venture: Venture) =>
-    asText(venture.description || venture.pitchSummary, "")
-
-  const getFundingAmount = (venture: Venture) =>
-    Number(venture.fundingAmount ?? venture.fundingRaised ?? 0)
-
-  const getTeamSize = (venture: Venture) => Number(venture.teamSize ?? 0)
-
-  const getFoundedYear = (venture: Venture) =>
-    venture.foundedYear ?? venture.foundingYear ?? "N/A"
-
-  const getGedsiScore = (venture: Venture) =>
-    Math.max(0, Math.min(100, Number(venture.gedsiScore ?? 0)))
-
-  // Filter ventures based on search and filters
-  const filteredVentures = ventures.filter(venture => {
-    const normalizedSearch = searchQuery.toLowerCase()
-    const name = asText(venture.name, "").toLowerCase()
-    const description = getVentureDescription(venture).toLowerCase()
-    const sector = asText(venture.sector, "").toLowerCase()
-    const status = asText(venture.status, "")
-    const stage = asText(venture.stage, "")
-    const matchesSearch = name.includes(normalizedSearch) ||
-                         description.includes(normalizedSearch) ||
-                         sector.includes(normalizedSearch)
-    
-    const matchesStatus = statusFilter === "all" || status === statusFilter
-    const matchesStage = stageFilter === "all" || stage === stageFilter
-    const matchesSector = sectorFilter === "all" || sector === sectorFilter.toLowerCase()
-    
-    return matchesSearch && matchesStatus && matchesStage && matchesSector
-  })
+  const filteredVentures = useMemo(() => filterVentures(ventures, filters), [ventures, filters])
+  const summary = useMemo(() => summarizeVentures(ventures), [ventures])
+  const sectors = useMemo(() => getUniqueSectors(ventures), [ventures])
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <main className="flex min-h-screen items-center justify-center p-6">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-600" aria-hidden="true" />
           <p className="text-gray-600">Loading ventures...</p>
         </div>
-      </div>
+      </main>
     )
   }
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Ventures</h1>
-          <p className="text-gray-600 mt-1">Manage and track all ventures in the pipeline</p>
+    <main className="space-y-6">
+      <header className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <h1 className="break-words text-2xl font-bold text-gray-900 sm:text-3xl">Ventures</h1>
+          <p className="mt-1 text-sm text-gray-600 sm:text-base">Manage and track all ventures in the pipeline</p>
         </div>
-        <div className="flex items-center space-x-3">
-          <Button variant="outline" size="sm">
-            <Download className="h-4 w-4 mr-2" />
+        <div className="flex w-full flex-col gap-2 sm:flex-row sm:flex-wrap md:w-auto md:justify-end">
+          <Button type="button" variant="outline" size="sm" className="w-full sm:w-auto" disabled>
+            <Download className="h-4 w-4" aria-hidden="true" />
             Export
           </Button>
-          <Button variant="outline" size="sm">
-            <RefreshCw className="h-4 w-4 mr-2" />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full sm:w-auto"
+            onClick={() => void loadVentures({ refresh: true })}
+            disabled={refreshing}
+          >
+            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} aria-hidden="true" />
             Refresh
           </Button>
-          <Link href="/dashboard/venture-intake">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
+          <Button asChild className="w-full sm:w-auto">
+            <Link href="/dashboard/venture-intake">
+              <Plus className="h-4 w-4" aria-hidden="true" />
               Add Venture
-            </Button>
+            </Link>
+          </Button>
+        </div>
+      </header>
+
+      {error && <VenturesError message={error} onRetry={() => void loadVentures()} />}
+
+      {!error && ventures.length === 0 && <EmptyVentures />}
+
+      {!error && ventures.length > 0 && (
+        <>
+          <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Venture statistics">
+            <StatCard icon={Building2} iconClassName="text-blue-500" label="Total Ventures" value={summary.totalVentures.toString()} />
+            <StatCard icon={Download} iconClassName="text-green-500" label="Total Funding" value={formatCurrency(summary.totalFunding)} />
+            <StatCard icon={Users} iconClassName="text-purple-500" label="Total Team Members" value={summary.totalTeamMembers.toString()} />
+            <StatCard icon={Target} iconClassName="text-orange-500" label="Avg GEDSI Score" value={`${summary.averageGedsiScore}%`} />
+          </section>
+
+          <VentureFilters
+            filters={filters}
+            sectors={sectors}
+            resultCount={filteredVentures.length}
+            totalCount={ventures.length}
+            onChange={setFilters}
+          />
+
+          <Card>
+            <CardHeader>
+              <CardTitle>All Ventures ({filteredVentures.length})</CardTitle>
+              <CardDescription>Open a venture to view detailed pipeline information</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="hidden md:block">
+                <div className="overflow-x-auto rounded-md border">
+                  <Table className="min-w-[920px]">
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[260px]">Venture</TableHead>
+                        <TableHead>Stage</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead>Location</TableHead>
+                        <TableHead>Funding</TableHead>
+                        <TableHead className="w-[150px]">GEDSI Score</TableHead>
+                        <TableHead>Team Size</TableHead>
+                        <TableHead>Founded</TableHead>
+                        <TableHead className="text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {filteredVentures.map((venture) => (
+                        <VentureTableRow key={venture.id} venture={venture} />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+
+              <div className="space-y-3 md:hidden">
+                {filteredVentures.map((venture) => (
+                  <VentureMobileItem key={venture.id} venture={venture} />
+                ))}
+              </div>
+
+              {filteredVentures.length === 0 && (
+                <div className="py-8 text-center">
+                  <Building2 className="mx-auto mb-4 h-12 w-12 text-gray-400" aria-hidden="true" />
+                  <p className="text-gray-500">No ventures found matching your criteria</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
+      )}
+    </main>
+  )
+}
+
+function StatCard({
+  icon: Icon,
+  iconClassName,
+  label,
+  value,
+}: {
+  icon: LucideIcon
+  iconClassName: string
+  label: string
+  value: string
+}) {
+  return (
+    <Card>
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex min-w-0 items-center gap-3">
+          <Icon className={`h-5 w-5 shrink-0 ${iconClassName}`} aria-hidden="true" />
+          <div className="min-w-0">
+            <p className="text-sm text-gray-600">{label}</p>
+            <p className="break-words text-xl font-bold sm:text-2xl">{value}</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function VenturesError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <Card className="border-red-200 bg-red-50">
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex min-w-0 items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-red-500" aria-hidden="true" />
+            <div className="min-w-0">
+              <p className="font-medium text-red-800">Unable to load ventures</p>
+              <p className="break-words text-sm text-red-600">{message}</p>
+            </div>
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={onRetry} className="w-full sm:w-auto">
+            Retry
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  )
+}
+
+function EmptyVentures() {
+  return (
+    <Card>
+      <CardContent className="p-8 text-center sm:p-12">
+        <Building2 className="mx-auto mb-4 h-14 w-14 text-muted-foreground sm:h-16 sm:w-16" aria-hidden="true" />
+        <h2 className="mb-2 text-lg font-semibold sm:text-xl">No Ventures Found</h2>
+        <p className="mx-auto mb-6 max-w-md text-sm text-muted-foreground sm:text-base">
+          Start building your portfolio by adding your first venture to the pipeline.
+        </p>
+        <Button asChild>
+          <Link href="/dashboard/venture-intake">
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            Add First Venture
           </Link>
+        </Button>
+      </CardContent>
+    </Card>
+  )
+}
+
+function VentureTableRow({ venture }: { venture: VentureRecord }) {
+  const stage = asText(venture.stage, "UNKNOWN")
+  const status = asText(venture.status, "UNKNOWN")
+  const gedsiScore = getGedsiScore(venture)
+
+  return (
+    <TableRow className="hover:bg-gray-50">
+      <TableCell>
+        <VentureIdentity venture={venture} />
+      </TableCell>
+      <TableCell>
+        <Badge className={getStageColor(stage)}>{formatLabel(stage)}</Badge>
+      </TableCell>
+      <TableCell>
+        <Badge className={getStatusColor(status)}>{formatLabel(status)}</Badge>
+      </TableCell>
+      <TableCell>
+        <IconText icon={MapPin} text={asText(venture.location)} />
+      </TableCell>
+      <TableCell className="font-medium">{formatCurrency(getFundingAmount(venture))}</TableCell>
+      <TableCell>
+        <GedsiMeter score={gedsiScore} />
+      </TableCell>
+      <TableCell>
+        <IconText icon={Users} text={getTeamSize(venture).toString()} />
+      </TableCell>
+      <TableCell>
+        <IconText icon={Calendar} text={String(getFoundedYear(venture))} />
+      </TableCell>
+      <TableCell>
+        <div className="flex justify-end gap-1">
+          <Button asChild variant="ghost" size="icon" aria-label={`View details for ${venture.name}`}>
+            <Link href={getVentureDetailsPath(venture.id)}>
+              <Eye className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </Button>
+          <Button asChild variant="ghost" size="icon" aria-label={`Edit ${venture.name}`}>
+            <Link href={`${getVentureDetailsPath(venture.id)}?mode=edit`}>
+              <Edit className="h-4 w-4" aria-hidden="true" />
+            </Link>
+          </Button>
+        </div>
+      </TableCell>
+    </TableRow>
+  )
+}
+
+function VentureMobileItem({ venture }: { venture: VentureRecord }) {
+  const stage = asText(venture.stage, "UNKNOWN")
+  const status = asText(venture.status, "UNKNOWN")
+  const description = getVentureDescription(venture)
+
+  return (
+    <article className="rounded-md border p-4">
+      <div className="flex min-w-0 items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100">
+          <Building2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h3 className="break-words font-medium text-gray-900">{venture.name}</h3>
+          <p className="text-sm text-gray-500">{asText(venture.sector)}</p>
         </div>
       </div>
+      {description && <p className="mt-3 line-clamp-2 break-words text-sm text-gray-600">{description}</p>}
+      <div className="mt-4 flex flex-wrap gap-2">
+        <Badge className={getStageColor(stage)}>{formatLabel(stage)}</Badge>
+        <Badge className={getStatusColor(status)}>{formatLabel(status)}</Badge>
+      </div>
+      <dl className="mt-4 grid grid-cols-1 gap-3 text-sm sm:grid-cols-2">
+        <DetailItem label="Location" value={asText(venture.location)} />
+        <DetailItem label="Funding" value={formatCurrency(getFundingAmount(venture))} />
+        <DetailItem label="Team Size" value={getTeamSize(venture).toString()} />
+        <DetailItem label="Founded" value={String(getFoundedYear(venture))} />
+      </dl>
+      <div className="mt-4">
+        <GedsiMeter score={getGedsiScore(venture)} />
+      </div>
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row">
+        <Button asChild variant="outline" size="sm" className="w-full">
+          <Link href={getVentureDetailsPath(venture.id)}>
+            <Eye className="h-4 w-4" aria-hidden="true" />
+            View
+          </Link>
+        </Button>
+        <Button asChild variant="outline" size="sm" className="w-full">
+          <Link href={`${getVentureDetailsPath(venture.id)}?mode=edit`}>
+            <Edit className="h-4 w-4" aria-hidden="true" />
+            Edit
+          </Link>
+        </Button>
+      </div>
+    </article>
+  )
+}
 
-      {/* Error State */}
-      {error && (
-        <Card className="border-red-200 bg-red-50">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-2">
-              <AlertCircle className="h-5 w-5 text-red-500" />
-              <div>
-                <p className="font-medium text-red-800">Database Connection Error</p>
-                <p className="text-sm text-red-600">{error}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+function VentureIdentity({ venture }: { venture: VentureRecord }) {
+  return (
+    <div className="flex min-w-0 items-center gap-3">
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100">
+        <Building2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
+      </div>
+      <div className="min-w-0">
+        <Link href={getVentureDetailsPath(venture.id)} className="font-medium text-gray-900 underline-offset-4 hover:underline">
+          {venture.name}
+        </Link>
+        <p className="truncate text-sm text-gray-500">{asText(venture.sector)}</p>
+      </div>
+    </div>
+  )
+}
 
-      {/* Empty State */}
-      {!loading && !error && ventures.length === 0 && (
-        <Card>
-          <CardContent className="p-12 text-center">
-            <Building2 className="h-16 w-16 mx-auto text-muted-foreground mb-4" />
-            <h3 className="text-xl font-semibold mb-2">No Ventures Found</h3>
-            <p className="text-muted-foreground mb-6">
-              Start building your portfolio by adding your first venture to the pipeline.
-            </p>
-            <Button onClick={() => window.location.href = '/dashboard/venture-intake'}>
-              <Plus className="h-4 w-4 mr-2" />
-              Add First Venture
-            </Button>
-          </CardContent>
-        </Card>
-      )}
+function IconText({ icon: Icon, text }: { icon: LucideIcon; text: string }) {
+  return (
+    <div className="flex min-w-0 items-center gap-1">
+      <Icon className="h-3 w-3 shrink-0 text-gray-400" aria-hidden="true" />
+      <span className="truncate text-sm">{text}</span>
+    </div>
+  )
+}
 
-      {/* Stats Cards - Only show when we have data */}
-      {!loading && !error && ventures.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Building2 className="h-5 w-5 text-blue-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Ventures</p>
-                  <p className="text-2xl font-bold">{ventures.length}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <DollarSign className="h-5 w-5 text-green-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Funding</p>
-                  <p className="text-2xl font-bold">
-                    {formatCurrency(ventures.reduce((sum, v) => sum + getFundingAmount(v), 0))}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5 text-purple-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Total Team Members</p>
-                  <p className="text-2xl font-bold">
-                    {ventures.reduce((sum, v) => sum + getTeamSize(v), 0)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center space-x-2">
-                <Target className="h-5 w-5 text-orange-500" />
-                <div>
-                  <p className="text-sm text-gray-600">Avg GEDSI Score</p>
-                  <p className="text-2xl font-bold">
-                    {ventures.length > 0 ? Math.round(ventures.reduce((sum, v) => sum + getGedsiScore(v), 0) / ventures.length) : 0}%
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      )}
+function DetailItem({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0">
+      <dt className="text-xs font-medium uppercase text-gray-500">{label}</dt>
+      <dd className="break-words font-medium text-gray-900">{value}</dd>
+    </div>
+  )
+}
 
-      {/* Filters */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Filter Ventures</CardTitle>
-          <CardDescription>Search and filter ventures by various criteria</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search ventures..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-9"
-              />
-            </div>
-            <Select value={statusFilter} onValueChange={setStatusFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Status</SelectItem>
-                <SelectItem value="ACTIVE">Active</SelectItem>
-                <SelectItem value="INACTIVE">Inactive</SelectItem>
-                <SelectItem value="SUSPENDED">Suspended</SelectItem>
-                <SelectItem value="ARCHIVED">Archived</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={stageFilter} onValueChange={setStageFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Stages" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Stages</SelectItem>
-                <SelectItem value="IDEA">Idea</SelectItem>
-                <SelectItem value="VALIDATION">Validation</SelectItem>
-                <SelectItem value="EARLY_GROWTH">Early Growth</SelectItem>
-                <SelectItem value="SCALE_UP">Scale Up</SelectItem>
-                <SelectItem value="MATURE">Mature</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={sectorFilter} onValueChange={setSectorFilter}>
-              <SelectTrigger>
-                <SelectValue placeholder="All Sectors" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Sectors</SelectItem>
-                <SelectItem value="cleantech">CleanTech</SelectItem>
-                <SelectItem value="agriculture">Agriculture</SelectItem>
-                <SelectItem value="fintech">FinTech</SelectItem>
-                <SelectItem value="healthcare">Healthcare</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+function GedsiMeter({ score }: { score: number }) {
+  const color =
+    score >= 80
+      ? "[&_[data-slot=progress-indicator]]:bg-green-500"
+      : score >= 60
+        ? "[&_[data-slot=progress-indicator]]:bg-yellow-500"
+        : "[&_[data-slot=progress-indicator]]:bg-red-500"
 
-      {/* Ventures Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>All Ventures ({filteredVentures.length})</CardTitle>
-          <CardDescription>Click on any venture to view detailed information</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Venture</TableHead>
-                  <TableHead>Stage</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead>Location</TableHead>
-                  <TableHead>Funding</TableHead>
-                  <TableHead>GEDSI Score</TableHead>
-                  <TableHead>Team Size</TableHead>
-                  <TableHead>Founded</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredVentures.map((venture) => {
-                  const stage = asText(venture.stage, "UNKNOWN")
-                  const status = asText(venture.status, "UNKNOWN")
-                  const gedsiScore = getGedsiScore(venture)
-
-                  return (
-                    <TableRow
-                      key={venture.id}
-                      className="cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleViewVenture(venture.id)}
-                    >
-                      <TableCell>
-                        <div className="flex items-center space-x-3">
-                          <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                            <Building2 className="h-5 w-5 text-blue-600" />
-                          </div>
-                          <div>
-                            <p className="font-medium text-gray-900">{venture.name}</p>
-                            <p className="text-sm text-gray-500">{asText(venture.sector)}</p>
-                          </div>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStageColor(stage)}>
-                          {stage.replaceAll('_', ' ')}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(status)}>
-                          {status}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-1">
-                          <MapPin className="h-3 w-3 text-gray-400" />
-                          <span className="text-sm">{asText(venture.location)}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="font-medium">
-                        {formatCurrency(getFundingAmount(venture))}
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-2">
-                          <div className="w-16 bg-gray-200 rounded-full h-2">
-                            <div
-                              className={`h-2 rounded-full ${
-                                gedsiScore >= 80 ? 'bg-green-500' :
-                                gedsiScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'
-                              }`}
-                              style={{ width: `${gedsiScore}%` }}
-                            ></div>
-                          </div>
-                          <span className="text-sm font-medium">{gedsiScore}%</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-1">
-                          <Users className="h-3 w-3 text-gray-400" />
-                          <span className="text-sm">{getTeamSize(venture)}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        <div className="flex items-center space-x-1">
-                          <Calendar className="h-3 w-3 text-gray-400" />
-                          <span className="text-sm">{getFoundedYear(venture)}</span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0" onClick={(e) => e.stopPropagation()}>
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={(e) => {
-                              e.stopPropagation()
-                              handleViewVenture(venture.id)
-                            }}>
-                              <Eye className="h-4 w-4 mr-2" />
-                              View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={(e) => e.stopPropagation()}>
-                              <Edit className="h-4 w-4 mr-2" />
-                              Edit Venture
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  )
-                })}
-              </TableBody>
-            </Table>
-          </div>
-          
-          {filteredVentures.length === 0 && (
-            <div className="text-center py-8">
-              <Building2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-500">No ventures found matching your criteria</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+  return (
+    <div className="flex min-w-[110px] items-center gap-2">
+      <Progress value={score} className={`h-2 ${color}`} aria-label={`GEDSI score ${score}%`} />
+      <span className="w-10 text-sm font-medium">{score}%</span>
     </div>
   )
 }
