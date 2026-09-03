@@ -8,7 +8,7 @@ import {
   type ImpactDocumentTypeFilter,
 } from "@/lib/impact-documents"
 
-interface ImpactDocumentFiltersProps {
+interface DocumentFiltersProps {
   searchQuery: string
   selectedType: ImpactDocumentTypeFilter
   selectedStatus: ImpactDocumentStatusFilter
@@ -22,14 +22,14 @@ function formatStatusLabel(status: string): string {
   return status.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase())
 }
 
-export function ImpactDocumentFilters({
+export function DocumentFilters({
   searchQuery,
   selectedType,
   selectedStatus,
   onSearchQueryChange,
   onSelectedTypeChange,
   onSelectedStatusChange,
-}: ImpactDocumentFiltersProps) {
+}: DocumentFiltersProps) {
   return (
     <section className="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-6 sm:mb-8" aria-label="Document filters">
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_12rem_12rem]">

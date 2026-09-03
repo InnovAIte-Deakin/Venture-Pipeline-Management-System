@@ -1,68 +1,4 @@
-export const DOCUMENT_TYPES = [
-  "All Types",
-  "Pitch Deck",
-  "Financial Statements",
-  "Legal Documents",
-  "GEDSI Reports",
-  "Impact Reports",
-  "Other",
-] as const
-
-export const STATUS_OPTIONS = [
-  "All Status",
-  "pending_review",
-  "approved",
-  "rejected",
-  "needs_revision",
-] as const
-
-export type ImpactDocumentStatus = Exclude<(typeof STATUS_OPTIONS)[number], "All Status">
-export type ImpactDocumentTypeFilter = (typeof DOCUMENT_TYPES)[number]
-export type ImpactDocumentStatusFilter = (typeof STATUS_OPTIONS)[number]
-
-export interface ImpactDocumentPerson {
-  id?: string
-  firstName?: string | null
-  lastName?: string | null
-  email?: string | null
-  role?: string | null
-}
-
-export interface ImpactDocumentVenture {
-  id?: string
-  name?: string | null
-}
-
-export interface ImpactDocument {
-  id: string
-  filename: string
-  documentType: string
-  status: ImpactDocumentStatus
-  version?: number
-  filesize?: number
-  mimeType?: string
-  url?: string
-  notes?: string | null
-  uploadedBy?: ImpactDocumentPerson | string | null
-  venture?: ImpactDocumentVenture | string | null
-  reviewedBy?: ImpactDocumentPerson | string | null
-  reviewedAt?: string | null
-  createdAt: string
-  updatedAt?: string
-}
-
-export interface ImpactDocumentStats {
-  total: number
-  pending: number
-  approved: number
-  rejected: number
-}
-
-export interface ImpactDocumentFilters {
-  searchQuery: string
-  selectedType: ImpactDocumentTypeFilter
-  selectedStatus: ImpactDocumentStatusFilter
-}
+import type { DocumentListPayload, ImpactDocument, ImpactDocumentStatus, MutationPayload } from "./types"
 
 type Fetcher = typeof fetch
 
@@ -70,15 +6,6 @@ interface ApiSuccess<T> {
   success: true
   data: T
   message?: string
-}
-
-interface DocumentListPayload {
-  documents: ImpactDocument[]
-}
-
-interface MutationPayload {
-  message?: string
-  document?: Partial<ImpactDocument>
 }
 
 export class ImpactDocumentsApiError extends Error {
@@ -232,53 +159,4 @@ export async function downloadImpactDocument(documentId: string, fetcher: Fetche
   }
 
   return response.blob()
-}
-
-export function calculateImpactDocumentStats(documents: ImpactDocument[]): ImpactDocumentStats {
-  return documents.reduce<ImpactDocumentStats>(
-    (stats, document) => {
-      stats.total += 1
-      if (document.status === "pending_review") stats.pending += 1
-      if (document.status === "approved") stats.approved += 1
-      if (document.status === "rejected") stats.rejected += 1
-      return stats
-    },
-    { total: 0, pending: 0, approved: 0, rejected: 0 },
-  )
-}
-
-function getPersonSearchText(person: ImpactDocument["uploadedBy"]): string {
-  if (!person || typeof person === "string") return ""
-  return [person.firstName, person.lastName, person.email].filter(Boolean).join(" ")
-}
-
-function getVentureSearchText(venture: ImpactDocument["venture"]): string {
-  if (!venture || typeof venture === "string") return ""
-  return venture.name || ""
-}
-
-export function filterImpactDocuments(
-  documents: ImpactDocument[],
-  filters: ImpactDocumentFilters,
-): ImpactDocument[] {
-  const query = filters.searchQuery.trim().toLowerCase()
-
-  return documents.filter((document) => {
-    const matchesSearch =
-      !query ||
-      [
-        document.filename,
-        document.documentType,
-        getPersonSearchText(document.uploadedBy),
-        getVentureSearchText(document.venture),
-      ]
-        .join(" ")
-        .toLowerCase()
-        .includes(query)
-
-    const matchesType = filters.selectedType === "All Types" || document.documentType === filters.selectedType
-    const matchesStatus = filters.selectedStatus === "All Status" || document.status === filters.selectedStatus
-
-    return matchesSearch && matchesType && matchesStatus
-  })
 }
