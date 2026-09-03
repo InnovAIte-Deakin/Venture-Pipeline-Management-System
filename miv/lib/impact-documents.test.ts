@@ -7,9 +7,12 @@ import {
   downloadImpactDocument,
   fetchImpactDocuments,
   filterImpactDocuments,
+  formatImpactDocumentFileSize,
+  formatImpactDocumentUploader,
+  formatImpactDocumentVenture,
   updateImpactDocumentStatus,
   type ImpactDocument,
-} from "./impact-documents"
+} from "./impact-documents/index"
 
 function jsonResponse(body: unknown, init?: ResponseInit) {
   return new Response(JSON.stringify(body), {
@@ -91,6 +94,17 @@ describe("impact document filters and stats", () => {
       pending: 1,
       approved: 1,
       rejected: 1,
+    })
+  })
+})
+
+describe("impact document display formatters", () => {
+  it("formats file sizes and missing relationship data consistently", () => {
+    assert.equal(formatImpactDocumentFileSize(2048), "2 KB")
+    assert.equal(formatImpactDocumentVenture(null), "No venture")
+    assert.deepEqual(formatImpactDocumentUploader("user-1"), {
+      name: "Unknown uploader",
+      email: "No email available",
     })
   })
 })
