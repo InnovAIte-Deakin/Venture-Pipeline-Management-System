@@ -17,6 +17,14 @@ interface IntakeNotificationEmailData {
   country?: string
 }
 
+// This interface defines the structure of the data required for a AdminNotificationEmailData
+interface AdminNotificationEmailData {
+  ventureName: string
+  founderName: string
+  founderEmail: string
+  country?: string
+}
+
 interface TestEmailData {
   userEmail: string
   userName: string
