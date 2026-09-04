@@ -4,30 +4,17 @@ import React, { useState, useEffect } from "react"
 import DashboardCard, { type Dashboard } from "@/components/dashboard-card"
 import CreateDashboardDialog, { type NewDashboardForm } from "@/components/create-dashboard-dialog"
 import EditDashboardDialog from "@/components/edit-dashboard-dialog"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import DashboardStats from "@/components/custom-dashboards/dashboard-stats"
+import DashboardFilters from "@/components/custom-dashboards/dashboard-filters"
+import DashboardTemplates from "@/components/custom-dashboards/dashboard-templates"
+import DashboardWidgetLibrary from "@/components/custom-dashboards/dashboard-widget-library"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/toast"
 import { useAuth } from "@/hooks/useAuth"
 import {
-  BarChart,
   Plus,
-  Copy,
   Grid3X3,
-  TrendingUp,
-  Users,
-  DollarSign,
-  Target,
-  Activity,
-  Calendar,
-  Filter,
-  Search,
-  Star,
-  Clock,
-  Gauge,
 } from "lucide-react"
 
 
@@ -97,27 +84,6 @@ const mockDashboards: Dashboard[] = [
     createdBy: "Alex Rodriguez"
   }
 ]
-
-const widgetTypes = [
-  { type: "chart", name: "Chart", icon: BarChart, description: "Line, bar, or pie charts", color: "blue" },
-  { type: "metric", name: "Metric", icon: Target, description: "Single value with trend", color: "red" },
-  { type: "table", name: "Table", icon: Grid3X3, description: "Data table with sorting", color: "purple" },
-  { type: "progress", name: "Progress", icon: Gauge, description: "Progress bars and gauges", color: "amber" },
-  { type: "list", name: "List", icon: Activity, description: "Simple list of items", color: "green" },
-  { type: "calendar", name: "Calendar", icon: Calendar, description: "Calendar view", color: "pink" }
-]
-
-// Tailwind needs full, literal class strings to detect them at build time —
-// dynamic template strings like `bg-${color}-100` are invisible to it, so
-// every combination we might use is spelled out here instead.
-const widgetColorClasses: Record<string, { border: string; iconBg: string; iconText: string }> = {
-  blue:   { border: "border-t-blue-400",   iconBg: "bg-blue-100",   iconText: "text-blue-600" },
-  red:    { border: "border-t-red-400",    iconBg: "bg-red-100",    iconText: "text-red-600" },
-  purple: { border: "border-t-purple-400", iconBg: "bg-purple-100", iconText: "text-purple-600" },
-  amber:  { border: "border-t-amber-400",  iconBg: "bg-amber-100",  iconText: "text-amber-600" },
-  green:  { border: "border-t-green-400",  iconBg: "bg-green-100",  iconText: "text-green-600" },
-  pink:   { border: "border-t-pink-400",   iconBg: "bg-pink-100",   iconText: "text-pink-600" },
-}
 
 const categories = [
   "Pipeline",
@@ -470,70 +436,7 @@ export default function CustomDashboardsPage() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
-        <Card className="border-t-4 border-t-blue-500 transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Dashboards</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-              <BarChart className="h-4 w-4 text-blue-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{dashboards.length}</div>
-            <p className="text-xs text-muted-foreground">
-              {dashboards.filter(d => d.isPublic).length} public, {dashboards.filter(d => !d.isPublic).length} private
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-t-4 border-t-purple-500 transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Total Widgets</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-100">
-              <Grid3X3 className="h-4 w-4 text-purple-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {dashboards.reduce((sum, d) => sum + d.widgets, 0)}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              Average {dashboards.length > 0 ? Math.round(dashboards.reduce((sum, d) => sum + d.widgets, 0) / dashboards.length) : 0} per dashboard
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-t-4 border-t-amber-500 transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Favorites</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100">
-              <Star className="h-4 w-4 text-amber-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {dashboards.filter(d => d.isFavorite).length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              {dashboards.length > 0 ? ((dashboards.filter(d => d.isFavorite).length / dashboards.length) * 100).toFixed(1) : 0}% of total
-            </p>
-          </CardContent>
-        </Card>
-        <Card className="border-t-4 border-t-green-500 transition-shadow hover:shadow-md">
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Recently Updated</CardTitle>
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-green-100">
-              <Clock className="h-4 w-4 text-green-600" />
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {dashboards.filter(d => d.lastModified.includes("hour") || d.lastModified.includes("day") || d.lastModified.includes("Just now")).length}
-            </div>
-            <p className="text-xs text-muted-foreground">
-              In the last 24 hours
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <DashboardStats dashboards={dashboards} />
 
       {/* Main Content */}
       <Tabs defaultValue="dashboards" className="space-y-4">
@@ -545,58 +448,15 @@ export default function CustomDashboardsPage() {
 
         <TabsContent value="dashboards" className="space-y-4">
           {/* Filters */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Filter className="h-5 w-5" />
-                Filters & Search
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Search</label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search dashboards..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">Category</label>
-                  <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All categories</SelectItem>
-                      {categories.map(category => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-sm font-medium">View</label>
-                  <Select value={selectedView} onValueChange={setSelectedView}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="All views" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All dashboards</SelectItem>
-                      <SelectItem value="favorites">Favorites</SelectItem>
-                      <SelectItem value="public">Public</SelectItem>
-                      <SelectItem value="private">Private</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <DashboardFilters
+            searchTerm={searchTerm}
+            selectedCategory={selectedCategory}
+            selectedView={selectedView}
+            categories={categories}
+            onSearchChange={setSearchTerm}
+            onCategoryChange={setSelectedCategory}
+            onViewChange={setSelectedView}
+          />
 
           {/* Dashboards Grid */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -614,182 +474,18 @@ export default function CustomDashboardsPage() {
         </TabsContent>
 
         <TabsContent value="templates" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Dashboard Templates</CardTitle>
-              <CardDescription>
-                Pre-built dashboard templates to get you started quickly
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <Card className="cursor-pointer border-t-4 border-t-blue-400 transition-shadow hover:shadow-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-100">
-                        <BarChart className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <CardTitle className="text-base">Pipeline Overview</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Complete pipeline tracking with deal flow metrics
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">8 widgets</Badge>
-                      <Button size="sm" onClick={() => handleUseTemplate("Pipeline Overview", 8)}>Use Template</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer border-t-4 border-t-green-400 transition-shadow hover:shadow-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
-                        <TrendingUp className="h-5 w-5 text-green-600" />
-                      </div>
-                      <CardTitle className="text-base">Portfolio Performance</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Portfolio tracking with IRR and performance metrics
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">12 widgets</Badge>
-                      <Button size="sm" onClick={() => handleUseTemplate("Portfolio Performance", 12)}>Use Template</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer border-t-4 border-t-purple-400 transition-shadow hover:shadow-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-purple-100">
-                        <Users className="h-5 w-5 text-purple-600" />
-                      </div>
-                      <CardTitle className="text-base">GEDSI Impact</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Gender equality and social impact tracking
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">6 widgets</Badge>
-                      <Button size="sm" onClick={() => handleUseTemplate("GEDSI Impact", 6)}>Use Template</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer border-t-4 border-t-orange-400 transition-shadow hover:shadow-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-orange-100">
-                        <Activity className="h-5 w-5 text-orange-600" />
-                      </div>
-                      <CardTitle className="text-base">Due Diligence</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Due diligence process tracking and management
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">10 widgets</Badge>
-                      <Button size="sm" onClick={() => handleUseTemplate("Due Diligence", 10)}>Use Template</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer border-t-4 border-t-green-400 transition-shadow hover:shadow-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-green-100">
-                        <DollarSign className="h-5 w-5 text-green-600" />
-                      </div>
-                      <CardTitle className="text-base">Financial Overview</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Financial metrics and investment tracking
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">9 widgets</Badge>
-                      <Button size="sm" onClick={() => handleUseTemplate("Financial Overview", 9)}>Use Template</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card className="cursor-pointer border-t-4 border-t-red-400 transition-shadow hover:shadow-md">
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2">
-                      <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-red-100">
-                        <Target className="h-5 w-5 text-red-600" />
-                      </div>
-                      <CardTitle className="text-base">Team Performance</CardTitle>
-                    </div>
-                  </CardHeader>
-                  <CardContent className="pt-0">
-                    <p className="text-sm text-muted-foreground mb-3">
-                      Team productivity and performance metrics
-                    </p>
-                    <div className="flex items-center justify-between">
-                      <Badge variant="outline" className="text-xs">7 widgets</Badge>
-                      <Button size="sm" onClick={() => handleUseTemplate("Team Performance", 7)}>Use Template</Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </CardContent>
-          </Card>
+          <DashboardTemplates onUseTemplate={handleUseTemplate} />
         </TabsContent>
 
         <TabsContent value="widgets" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Widget Library</CardTitle>
-              <CardDescription>
-                Available widgets to add to your dashboards
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {widgetTypes.map((widget) => (
-                  <Card key={widget.type} className={`cursor-pointer border-t-4 ${widgetColorClasses[widget.color].border} transition-shadow hover:shadow-md`}>
-                    <CardHeader className="pb-3">
-                      <div className="flex items-center gap-2">
-                        <div className={`flex h-9 w-9 items-center justify-center rounded-lg ${widgetColorClasses[widget.color].iconBg}`}>
-                          <widget.icon className={`h-5 w-5 ${widgetColorClasses[widget.color].iconText}`} />
-                        </div>
-                        <CardTitle className="text-base">{widget.name}</CardTitle>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-0">
-                      <p className="text-sm text-muted-foreground mb-3">
-                        {widget.description}
-                      </p>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() =>
-                          addToast({
-                            title: `To add a ${widget.name} widget, open a dashboard and use Manage Widgets`,
-                            type: "info",
-                          })
-                        }
-                      >
-                        Add Widget
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
+          <DashboardWidgetLibrary
+            onAddWidget={(widgetName) =>
+              addToast({
+                title: `To add a ${widgetName} widget, open a dashboard and use Manage Widgets`,
+                type: "info",
+              })
+            }
+          />
         </TabsContent>
       </Tabs>
 
