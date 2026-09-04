@@ -168,7 +168,21 @@ SMTP_FROM_EMAIL =
 
 > End-to-end testing through the actual intake submission form is currently not possible because of a separate issue with venture creation, which is explained in the Common Issues section.
 
-## 9. Common Issues
+## 9. Admin Notification Email Configuration
+* In addition to the founder confirmation email, an internal notification is sent to the admin email address whenever a new intake is submitted. 
+* This uses the same email service.
+
+### Environment Variables
+ADMIN_NOTIFICATION_EMAIL=
+
+* If the admin email is not set, the admin notification is skipped and the founder confirmation email is still sent. A warning is logged instead.
+* For local development, use the same test inbox address already configured for SMTP testing, such as Mailtrap or Ethereal Email.
+
+### To Test Locally
+* The existing test route at src/app/api/email/test-intake/route.ts also triggers this email.
+* Sending a POST request to this route should result in two separate emails arriving in the configured test inbox such as the founder confirmation email and the admin notification.
+
+## 10. Common Issues
 
 * Frontend not loading → ensure `npm run dev` is running in `miv`
 * Backend unavailable → ensure Docker containers are running
@@ -179,7 +193,7 @@ The full intake submission is currently affected by a separate venture creation 
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 ### Prisma P1000 Authentication Failed
 #### Issue
 
@@ -224,7 +238,7 @@ npm run db:seed
 ```
 
 If successful, the database schema will be synchronised and the development data will be seeded successfully.
-## 11. Maintenance Notes
+## 12. Maintenance Notes
 
 * Payload CMS collections and access rules are defined in backend config
 * Prisma schema changes require migrations

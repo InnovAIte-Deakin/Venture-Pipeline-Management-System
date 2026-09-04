@@ -20,13 +20,15 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
   let ventureId = (doc as any).venture
   // If no venture linked, create one
   if (!ventureId) {
-    const venture = await payload.create({ collection: 'ventures' as any, data: {
-      name_en: (doc as any).ventureName_en,
-      name_km: (doc as any).ventureName_km,
-      country: (doc as any).country,
-      triageTrack: (doc as any).triageTrack || 'unassigned',
-      triageRationale: (doc as any).triageRationale,
-    } })
+    const venture = await payload.create({
+      collection: 'ventures' as any, data: {
+        name_en: (doc as any).ventureName_en,
+        name_km: (doc as any).ventureName_km,
+        country: (doc as any).country,
+        triageTrack: (doc as any).triageTrack || 'unassigned',
+        triageRationale: (doc as any).triageRationale,
+      }
+    })
     ventureId = venture.id
     await payload.update({ collection: 'onboardingIntakes' as any, id: (doc as any).id, data: { venture: ventureId } })
   }
@@ -39,9 +41,11 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
     await payload.create({ collection: 'agreements' as any, data: { venture: ventureId, type: 'MOU', status: 'not_requested' } })
   }
   // Activity log
-  await payload.create({ collection: 'activityLogs' as any, data: {
-    action: 'intake.created', entity: 'onboardingIntakes', entityId: String((doc as any).id), timestamp: new Date().toISOString(),
-  } })
+  await payload.create({
+    collection: 'activityLogs' as any, data: {
+      action: 'intake.created', entity: 'onboardingIntakes', entityId: String((doc as any).id), timestamp: new Date().toISOString(),
+    }
+  })
 
   // COMPLETED: Implement intake notification emails using the new Nodemailer email service
   // Email notification for intake submissions
@@ -51,6 +55,8 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
 
   for (const founder of ventureFounders) {
     if (founder?.email) {
+
+      // Send intake notification email to the founder
       await emailService.sendIntakeNotificationEmail({
         founderEmail: founder.email,
         founderName: founder.fullName || 'founder',
@@ -59,4 +65,12 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
       })
     }
   }
+
+  // Send Admin notification email
+  await emailService.sendAdminNotificationEmail({
+    ventureName: (venture as any)?.name || 'Unnamed venture',
+    founderName: ventureFounders[0]?.fullName || 'Unknown founder',
+    founderEmail: ventureFounders[0]?.email || 'unknown',
+    country: (venture as any)?.country,
+  })
 }
