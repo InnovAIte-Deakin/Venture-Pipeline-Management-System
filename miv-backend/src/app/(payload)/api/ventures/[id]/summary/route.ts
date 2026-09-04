@@ -32,7 +32,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
     // 3. Clone and apply visibility filtering for non-staff (founder owners)
     const resVenture = { ...venture }
-    let resIntake = intake ? { ...intake } : null
+    const resIntake = intake ? { ...intake } : null
 
     if (!isStaff) {
       // Redact triage track and rationale
