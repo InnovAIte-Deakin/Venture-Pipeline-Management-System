@@ -32,6 +32,12 @@ This was investigated against PR #57, which is the most recent PR to substantial
 
 5. **Asymmetric risk.** If the backend upgrade goes wrong, it affects the CMS, all content data, and the admin panel every team member depends on daily. If the frontend revert goes wrong, it's contained to one app, and we already have a working Next 15 baseline to fall back to (miv-backend proves Next 15 + Payload works reliably).
 
+## Note on target patch version
+
+Next.js's actively-patched maintenance line for the 15.x series has moved to `15.5.x` (currently `15.5.24`, addressing critical vulnerabilities as recently as August 2026). However, Payload explicitly does not support `15.5.x`–`16.1.x` — its supported ranges skip from `15.4.11–15.4.x` straight to `16.2.6+`. `15.4.x` appears to no longer receive new patches.
+
+We are targeting `15.4.11` anyway, since staying within Payload's officially supported range is the entire premise of this decision — picking an unsupported Next version to chase security patches would undermine the reasoning above and risk exactly the kind of instability we're trying to avoid. This is a known, accepted tradeoff, not an oversight: **revisit this once Payload extends support past `16.1.x` to a wider Next 15 range, or once we're ready to make the larger Payload 3.73.0+ / Next 16.2.6+ jump.**
+
 ## Consequences
 
 - `miv`'s `package.json` `next` dependency moves from `^16.2.1` to a Next 15.x version. Any Next 16-specific APIs or config used in `miv` since the (undocumented) upgrade will need to be identified and reverted or polyfilled.
