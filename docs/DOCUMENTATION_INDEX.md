@@ -31,6 +31,12 @@ This folder contains the consolidated and finalised documentation for the VPMS p
 - **[Canonical Role List](./rbac/roles.json)**  
   Single source of truth for role names both apps must reference (founder, admin, miv_analyst; mentor/investor deferred).
 
+### 7. Governance & Decisions
+- **[ADR-0001: Documents/DataRoomFiles Consolidation](./adr/ADR-0001-documents-dataroomfiles-consolidation.md)**  
+  Architecture decision record for consolidating the `documents` and `dataRoomFiles` collections. Currently unsigned/proposed.
+- **[Phase 0 Consolidation Plan](./planning/phase-0-consolidation-plan.md)**  
+  Decision log, field inventory, enum reconciliation, computed-status analysis, and migration/rollback plan for the consolidation above.
+
 ## 📌 Notes
 - This documentation reflects the **current MVP implementation**.
 - Advanced AI features and enterprise compliance are considered **future scope**.
