@@ -10,6 +10,8 @@ This guide explains how to set up, run, and maintain the Venture Pipeline Manage
 
 All instructions reflect the **current, official implementation provided by the development team** and are aligned with the project README.
 
+> **Prerequisite — read this first:** VPMS's backend depends on Docker (running MongoDB and PostgreSQL as containers) and will not work without it. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running before attempting any setup steps below. Skipping this is the single most common cause of "nothing works" for new contributors.
+
 ---
 
 ## 2. Repository Structure
@@ -174,8 +176,9 @@ SMTP_FROM_EMAIL =
 * Backend unavailable → ensure Docker containers are running
 * Login issues → verify NextAuth environment variables
 * Document upload errors → check file size/type restrictions
-* Intake email not working → check that the required SMTP settings are correctly added in the .env file.
-The full intake submission is currently affected by a separate venture creation issue, which is not related to the email setup.
+* `npm i` fails on Windows with a `lightningcss-linux-x64-gnu` error → known platform-detection issue in this repo. Easiest fix is WSL2; otherwise delete `node_modules`/`package-lock.json` and run `npm i --no-optional`.
+* Payload CMS admin login (`venture.manager@miv.org`) doesn't work → this account isn't actually seeded, despite docs/seed output suggesting otherwise. Use the VPMS test accounts above to confirm your setup instead.
+* Intake email not working → check that the required SMTP settings are correctly added in the .env file. The full intake submission is currently affected by a separate venture creation issue, which is not related to the email setup.
 
 ---
 
@@ -229,4 +232,3 @@ If successful, the database schema will be synchronised and the development data
 * Payload CMS collections and access rules are defined in backend config
 * Prisma schema changes require migrations
 * Update documentation when system behaviour changes
-

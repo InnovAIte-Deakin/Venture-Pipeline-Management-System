@@ -87,16 +87,20 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. Create Impact Applicant user
-    const user = await payload.create({
+      const user = await payload.create({
       collection: "users",
       data: {
         first_name: firstName,
         last_name: lastName,
         email: email.toLowerCase(),
         password,
+
         role: "founder",
+
       },
     });
+    // TODO: ventureName, positionInVenture, phone, countryCode are collected
+    // but have no home yet on the users collection — revisit (maybe Founder record?) 
 
     // 3. (Optional) Send welcome email, but don't fail the request if this errors
     // try {
