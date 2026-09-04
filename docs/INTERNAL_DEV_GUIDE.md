@@ -138,7 +138,9 @@ http://localhost:3000
 
 ## 7. Environment Configuration
 
-* Environment variables are defined in `.env` and `.env.example`
+* `.env` files are not tracked (removed from the repo in #78, ignored via `.gitignore`). Create your own copy from the template: `cp .env.example .env` in `miv-backend/` (and in `miv/`), then fill in the values
+* `PAYLOAD_SECRET` must be identical in `miv/.env` and `miv-backend/.env` since #78 — the frontend proxy verifies the session token with it
+* To test e-mail locally, put your own SMTP credentials (e.g. a Gmail app password) in the `SMTP_*` variables of `miv-backend/.env`
 * Secrets must not be committed to version control
 * Values may differ between development and production
 
