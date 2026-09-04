@@ -49,11 +49,11 @@ function getScreenTitle(pathname: string) {
   return activeItem?.title ?? "Dashboard";
 }
 
-export function MobileNav() {
+export function MobileNav({ title }: { title?: string } = {}) {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [showMore, setShowMore] = useState(false);
-  const screenTitle = getScreenTitle(pathname);
+  const screenTitle = title ?? getScreenTitle(pathname);
   const isMoreActive = dashboardDesktopNavigationItems.some((item) => {
     if (item.href && isDashboardRouteActive(pathname, item.href)) {
       return true;

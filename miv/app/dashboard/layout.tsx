@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
 import { MobileNav } from "@/components/mobile-nav";
 import { Breadcrumb } from "@/components/breadcrumb";
+import { DashboardStateShell } from "@/components/dashboard/dashboard-state-shell";
 
 export default function DashboardLayout({
 	children,
@@ -25,14 +26,7 @@ export default function DashboardLayout({
 	}, []);
 
 	if (loading) {
-		return (
-			<div className="flex items-center justify-center min-h-screen">
-				<div className="flex items-center space-x-2">
-					<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-					<span className="text-gray-600">Loading...</span>
-				</div>
-			</div>
-		);
+		return <DashboardStateShell kind="loading" />;
 	}
 
 	if (!isAuthenticated) {
