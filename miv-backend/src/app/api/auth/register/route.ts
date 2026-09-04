@@ -7,8 +7,7 @@ const RegisterSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
-  // password: z.string().min(4, "Password must be at least 4 characters"),
-  password: z.string(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 
   ventureName: z.string().optional(),
   positionInVenture: z.string().optional(),
@@ -95,7 +94,9 @@ export async function POST(req: NextRequest) {
         last_name: lastName,
         email: email.toLowerCase(),
         password,
-        role: "user",
+
+        role: "founder",
+
       },
     });
     // TODO: ventureName, positionInVenture, phone, countryCode are collected

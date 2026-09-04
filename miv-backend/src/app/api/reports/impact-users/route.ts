@@ -132,6 +132,7 @@ export async function PATCH(request: NextRequest) {
     }
 
     const body = await request.json()
+
     const validation = ProfileUpdateSchema.safeParse(body)
     if (!validation.success) {
       return NextResponse.json(

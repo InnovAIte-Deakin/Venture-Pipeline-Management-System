@@ -1,13 +1,16 @@
 import type { CollectionConfig } from 'payload'
+import { isAuthenticated, adminOnly } from '@/access/roles'
+import { ownerScoped } from '@/access/scoping'
 
 export const UserSettings: CollectionConfig = {
   slug: 'user-settings',
   admin: { useAsTitle: 'id' },
   access: {
-    read: ({ req }) => !!req.user,
-    create: ({ req }) => !!req.user,
-    update: ({ req }) => !!req.user,
-    delete: ({ req }) => req.user?.role === 'admin',
+    // Was any-user-reads/updates-any-user (A5) — now owner-scoped via the `user` field.
+    read: ownerScoped('user'),
+    create: isAuthenticated,
+    update: ownerScoped('user'),
+    delete: adminOnly,
   },
   fields: [
     {

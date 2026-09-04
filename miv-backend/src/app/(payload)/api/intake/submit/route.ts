@@ -148,40 +148,47 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET method to retrieve submission status (optional)
-export async function GET(request: NextRequest) {
-  const searchParams = request.nextUrl.searchParams
-  const intakeId = searchParams.get('id')
-
-  if (!intakeId) {
-    return NextResponse.json(
-      { error: 'Intake ID is required' },
-      { status: 400 }
-    )
-  }
-
+export async function GET(req: Request) {
+  const payload = await getPayload({ config })
   try {
-    const payload = await getPayload({ config })
-    const intake = await payload.findByID({
-      collection: 'onboardingIntakes',
-      id: intakeId,
-      select: {
-        id: true,
-        venture: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    })
+    const { searchParams } = new URL(req.url)
+    const id = searchParams.get('id')
+    if (!id) {
+      return Response.json({ error: 'Missing id parameter' }, { status: 400 })
+    }
 
-    return NextResponse.json({
+    const { user } = await payload.auth({ headers: req.headers })
+    if (!user) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const isStaff = user.role === 'admin' || user.role === 'miv_analyst'
+    
+    // Find the intake
+    const intake = await (payload as any).findByID({ collection: 'onboardingIntakes', id })
+    if (!intake) {
+      return Response.json({ error: 'Intake not found' }, { status: 404 })
+    }
+
+    // Owner check: if founder, verify their email matches one of the founders in the intake
+    if (!isStaff) {
+      const isOwner = intake.founders?.some((f: any) => f.email === user.email)
+      if (!isOwner) {
+        return Response.json({ error: 'Forbidden' }, { status: 403 })
+      }
+    }
+
+    return Response.json({
       success: true,
-      data: intake,
+      data: {
+        intakeId: id,
+        status: 'submitted',
+        submissionDate: intake.createdAt
+      }
     })
-  } catch (error) {
-    console.error('Failed to fetch intake:', error)
-    return NextResponse.json(
-      { success: false, error: 'Failed to fetch intake status' },
-      { status: 500 }
-    )
+  } catch (e: any) {
+    console.error('GET intake error:', e)
+    const isNotFound = e.name === 'CastError' || e.message?.toLowerCase().includes('not found') || e.status === 404
+    return Response.json({ error: e.message ?? 'Internal error' }, { status: isNotFound ? 404 : 500 })
   }
 }
