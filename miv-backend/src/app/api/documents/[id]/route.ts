@@ -239,6 +239,7 @@ export async function PATCH(
       id,
       data: updateData,
       depth: 1,
+      overrideAccess: true,
     })
 
     return NextResponse.json({
@@ -262,13 +263,14 @@ export async function PATCH(
         updatedAt: document.updatedAt,
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update document error:', error)
     return NextResponse.json(
       {
         success: false,
         error: 'Failed to update document',
-        message: 'An error occurred while updating the document.',
+        message: error?.message || 'An error occurred while updating the document.',
+        details: error?.errors || error?.data || undefined,
       },
       { status: 500 }
     )

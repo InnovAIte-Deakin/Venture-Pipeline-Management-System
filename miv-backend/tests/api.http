@@ -1,5 +1,7 @@
+@baseUrl = http://localhost:3001
+
 ### Submit Intake (with Email Notifications)
-POST http://localhost:3000/api/intake/submit
+POST {{baseUrl}}/api/intake/submit
 Content-Type: application/json
 
 {
@@ -69,11 +71,11 @@ GET http://localhost:3000/api/intake/submit?id=REPLACE_INTAKE_ID
 ### =========================================================================
 
 ### 1. List Documents (§6.1)
-GET http://localhost:3000/api/documents
+GET {{baseUrl}}/api/documents
 Cookie: payload-token=REPLACE_TOKEN
 
 ### 2. Upload Document (§6.2 - multipart/form-data)
-POST http://localhost:3000/api/documents
+POST {{baseUrl}}/api/documents
 Cookie: payload-token=REPLACE_TOKEN
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
@@ -93,7 +95,7 @@ Content-Type: application/pdf
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### 3. Upload Document with Invalid Type (Should return 400)
-POST http://localhost:3000/api/documents
+POST {{baseUrl}}/api/documents
 Cookie: payload-token=REPLACE_TOKEN
 Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
 
@@ -109,15 +111,15 @@ Content-Type: application/pdf
 ------WebKitFormBoundary7MA4YWxkTrZu0gW--
 
 ### 4. Get Document Metadata (§6.4)
-GET http://localhost:3000/api/documents/REPLACE_DOC_ID
+GET {{baseUrl}}/api/documents/REPLACE_DOC_ID
 Cookie: payload-token=REPLACE_TOKEN
 
 ### 5. Download Document (§6.4)
-GET http://localhost:3000/api/documents/REPLACE_DOC_ID?download=true
+GET {{baseUrl}}/api/documents/REPLACE_DOC_ID?download=true
 Cookie: payload-token=REPLACE_TOKEN
 
 ### 6. Review Document (§6.5 - Staff only: admin or miv_analyst)
-PATCH http://localhost:3000/api/documents/REPLACE_DOC_ID
+PATCH {{baseUrl}}/api/documents/REPLACE_DOC_ID
 Cookie: payload-token=REPLACE_TOKEN
 Content-Type: application/json
 
@@ -127,5 +129,5 @@ Content-Type: application/json
 }
 
 ### 7. Delete Document (§6.3)
-DELETE http://localhost:3000/api/documents?id=REPLACE_DOC_ID
+DELETE {{baseUrl}}/api/documents?id=REPLACE_DOC_ID
 Cookie: payload-token=REPLACE_TOKEN
