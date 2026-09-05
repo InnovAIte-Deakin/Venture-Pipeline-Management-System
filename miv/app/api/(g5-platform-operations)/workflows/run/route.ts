@@ -191,7 +191,7 @@ async function executeCreateNotification(config: any, input: any, workflow: any)
       data: {
         title,
         message,
-        type: 'WORKFLOW',
+        type: 'SYSTEM_UPDATE',
         userId: workflow.createdById,
         metadata: {
           workflowId: workflow.id,

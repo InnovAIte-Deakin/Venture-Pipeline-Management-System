@@ -46,19 +46,19 @@ export function OverviewStats({ capitalRequests }: OverviewStatsProps) {
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-3 sm:grid-cols-2 md:gap-4 lg:grid-cols-4">
       {stats.map(({ label, value, icon: Icon, className }) => (
         <Card key={label}>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
               <div
-                className={`flex h-8 w-8 items-center justify-center rounded-md ${className}`}
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-md ${className}`}
               >
                 <Icon className="h-4 w-4" />
               </div>
-              <div>
+              <div className="min-w-0">
                 <p className="text-sm text-muted-foreground">{label}</p>
-                <p className="text-lg font-semibold">{value}</p>
+                <p className="break-words text-lg font-semibold">{value}</p>
               </div>
             </div>
           </CardContent>

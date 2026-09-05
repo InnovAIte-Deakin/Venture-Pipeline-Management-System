@@ -1,7 +1,10 @@
 "use client"
 
-import { GEDSITracker } from "@/components/gedsi-tracker"
+import { GedsiTrackerContent } from "./components/gedsi-tracker-content"
+import { useGedsiData } from "./hooks/use-gedsi-data"
 
 export default function GEDSITrackerPage() {
-  return <GEDSITracker />
+  const gedsiTracker = useGedsiData()
+
+  return <GedsiTrackerContent state={gedsiTracker} />
 }

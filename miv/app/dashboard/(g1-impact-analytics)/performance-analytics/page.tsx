@@ -43,7 +43,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, BarChart, Bar, Cell
 import { useMemo, useState } from "react"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
-import { usePerformanceAnalyticsData } from "@/hooks/use-performance-analytics-data"
+import { usePerformanceAnalyticsData } from "@/app/dashboard/(g1-impact-analytics)/performance-analytics/hooks/use-performance-analytics-data"
 import {
   type AnalyticsData,
   calculateAvgTimeToFunding,

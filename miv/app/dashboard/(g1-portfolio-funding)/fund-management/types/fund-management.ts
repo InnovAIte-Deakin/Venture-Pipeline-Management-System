@@ -1,22 +1,25 @@
-export type FundStatus = "fundraising" | "active" | "closed" | "winding_down" | "liquidated"
+export type FundStatus =
+  | "fundraising"
+  | "active"
+  | "closed"
+  | "winding_down"
+  | "liquidated"
 
 export type FundType = "venture" | "growth" | "buyout" | "impact" | "debt"
 
-export type PartnerType = "pension" | "endowment" | "foundation" | "insurance" | "sovereign" | "family_office" | "fund_of_funds" | "corporate" | "individual"
-
-export type PartnerStatus = "active" | "defaulted" | "transferred" | "withdrawn"
-
-export type RiskRating = "low" | "medium" | "high"
-
-export type KycStatus = "approved" | "pending" | "expired"
+export type LPType =
+  | "pension"
+  | "endowment"
+  | "foundation"
+  | "insurance"
+  | "sovereign"
+  | "family_office"
+  | "fund_of_funds"
+  | "corporate"
+  | "individual"
 
 export type CapitalCallStatus = "pending" | "in_progress" | "completed" | "overdue"
-
 export type DistributionStatus = "announced" | "paid" | "pending" | "processing"
-
-export type DistributionType = "dividend" | "exit" | "refinancing" | "return_of_capital" | "other"
-
-export type TransactionType = "capital_call" | "distribution" | "expense" | "fee" | "interest" | "fx"
 
 export interface Fund {
   id: string
@@ -60,7 +63,7 @@ export interface Fund {
 export interface LimitedPartner {
   id: string
   name: string
-  type: PartnerType
+  type: LPType
   commitment: string
   called: string
   distributed: string
@@ -73,12 +76,12 @@ export interface LimitedPartner {
   contactPerson: string
   email: string
   phone: string
-  status: PartnerStatus
+  status: "active" | "defaulted" | "transferred" | "withdrawn"
   investmentDate: string
   lastCapitalCall: string
   lastDistribution: string
-  riskRating: RiskRating
-  kycStatus: KycStatus
+  riskRating: "low" | "medium" | "high"
+  kycStatus: "approved" | "pending" | "expired"
   accredited: boolean
 }
 
@@ -93,16 +96,16 @@ export interface CapitalCall {
   lpsResponded: number
   totalLps: number
   lastUpdate: string
-  purpose: string
-  investments: string[]
-  expenses: string
-  interestRate: number
-  gracePeriod: string
-  defaultPenalty: number
-  wireInstructions: boolean
-  noticeDate: string
-  remindersSent: number
-  documentsGenerated: boolean
+  purpose?: string
+  investments?: string[]
+  expenses?: string
+  interestRate?: number
+  gracePeriod?: string
+  defaultPenalty?: number
+  wireInstructions?: boolean
+  noticeDate?: string
+  remindersSent?: number
+  documentsGenerated?: boolean
 }
 
 export interface Distribution {
@@ -112,34 +115,39 @@ export interface Distribution {
   distributionNumber: string
   amount: string
   date: string
-  type: DistributionType
+  type: "dividend" | "exit" | "refinancing" | "return_of_capital" | "other"
   status: DistributionStatus
   lpsPaid: number
   totalLps: number
   lastUpdate: string
-  source: string
+  source?: string
   sourceVentures?: string[]
-  taxImplications: string
-  withholding: number
-  currency: string
-  exchangeRate: number
-  paymentMethod: "wire" | "check" | "ach"
-  taxReporting: boolean
-  k1Generated: boolean
-  recordDate: string
-  exDate: string
+  taxImplications?: string
+  withholding?: number
+  currency?: string
+  exchangeRate?: number
+  paymentMethod?: "wire" | "check" | "ach"
+  taxReporting?: boolean
+  k1Generated?: boolean
+  recordDate?: string
+  exDate?: string
 }
 
-export interface Transaction {
+export interface OperationTask {
   id: string
-  fundId: string
-  type: TransactionType
-  amount: string
-  date: string
-  description: string
-  status: "pending" | "completed" | "failed" | "cancelled"
-  reference: string
-  counterparty: string
-  currency: string
-  exchangeRate: number
+  title: string
+  type?: string
+  priority?: "HIGH" | "MEDIUM" | "LOW"
+  dueDate?: string
+  assignee?: { name: string }
+}
+
+export interface FundManagementPayload {
+  funds: Fund[]
+  limitedPartners: LimitedPartner[]
+  capitalCalls: CapitalCall[]
+  distributions: Distribution[]
+  operationTasks: OperationTask[]
+  reports: Array<{ id: string; name: string; type?: string; generatedAt?: string }>
+  ventures?: Array<{ id: string; name: string; documents?: any[] }>
 }

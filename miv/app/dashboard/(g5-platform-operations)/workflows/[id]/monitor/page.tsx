@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { useParams } from "next/navigation"
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
@@ -18,32 +18,10 @@ import {
   Activity,
   TrendingUp,
   AlertTriangle,
-  Calendar,
-  Eye,
-  Download,
-  Filter
+  Eye
 } from "lucide-react"
-
-interface WorkflowRun {
-  id: string
-  status: 'PENDING' | 'RUNNING' | 'SUCCEEDED' | 'FAILED'
-  input: any
-  output: any
-  errorMessage?: string
-  startedAt: string
-  finishedAt?: string
-  workflow: {
-    name: string
-  }
-}
-
-interface Workflow {
-  id: string
-  name: string
-  description?: string
-  isActive: boolean
-  definition: any
-}
+import type { Workflow, WorkflowRun } from "../../types/workflow"
+import { formatDuration, getRunStats } from "../../lib/workflow-utils"
 
 export default function WorkflowMonitorPage() {
   const params = useParams()
@@ -52,7 +30,7 @@ export default function WorkflowMonitorPage() {
   const [loading, setLoading] = useState(true)
   const [selectedRun, setSelectedRun] = useState<WorkflowRun | null>(null)
 
-  const load = async () => {
+  const load = useCallback(async () => {
     setLoading(true)
     try {
       const [workflowRes, runsRes] = await Promise.all([
@@ -73,7 +51,7 @@ export default function WorkflowMonitorPage() {
       console.error('Error loading workflow monitoring data:', error)
     }
     setLoading(false)
-  }
+  }, [params.id])
 
   const runWorkflow = async () => {
     try {
@@ -93,31 +71,6 @@ export default function WorkflowMonitorPage() {
       console.error('Error running workflow:', error)
       alert('Failed to start workflow run')
     }
-  }
-
-  const getRunStats = () => {
-    const total = runs.length
-    const succeeded = runs.filter(r => r.status === 'SUCCEEDED').length
-    const failed = runs.filter(r => r.status === 'FAILED').length
-    const running = runs.filter(r => r.status === 'RUNNING').length
-    const successRate = total > 0 ? Math.round((succeeded / total) * 100) : 0
-    
-    // Calculate average duration for completed runs
-    const completedRuns = runs.filter(r => r.finishedAt)
-    const avgDuration = completedRuns.length > 0 
-      ? completedRuns.reduce((sum, run) => {
-          const duration = new Date(run.finishedAt!).getTime() - new Date(run.startedAt).getTime()
-          return sum + duration
-        }, 0) / completedRuns.length
-      : 0
-
-    return { total, succeeded, failed, running, successRate, avgDuration }
-  }
-
-  const formatDuration = (ms: number) => {
-    if (ms < 1000) return `${ms}ms`
-    if (ms < 60000) return `${Math.round(ms / 1000)}s`
-    return `${Math.round(ms / 60000)}m`
   }
 
   const getStatusIcon = (status: string) => {
@@ -148,7 +101,7 @@ export default function WorkflowMonitorPage() {
 
   useEffect(() => { 
     if (params.id) load() 
-  }, [params.id])
+  }, [params.id, load])
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
@@ -164,15 +117,15 @@ export default function WorkflowMonitorPage() {
     </div>
   )
 
-  const stats = getRunStats()
+  const stats = getRunStats(runs)
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-4">
-          <Link href="/dashboard/workflows">
-            <Button variant="outline" size="sm">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <Link href="/dashboard/workflows" className="w-full sm:w-auto">
+            <Button variant="outline" size="sm" className="w-full sm:w-auto">
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Workflows
             </Button>
@@ -182,7 +135,7 @@ export default function WorkflowMonitorPage() {
             <p className="text-gray-600">Workflow Monitoring & Analytics</p>
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Badge variant={workflow.isActive ? "default" : "secondary"}>
             {workflow.isActive ? "Active" : "Inactive"}
           </Badge>
@@ -198,7 +151,7 @@ export default function WorkflowMonitorPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
@@ -249,7 +202,7 @@ export default function WorkflowMonitorPage() {
               <Clock className="h-5 w-5 text-purple-600" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Avg Duration</p>
-                <p className="text-2xl font-bold">{formatDuration(stats.avgDuration)}</p>
+                <p className="text-2xl font-bold">{formatDuration(stats.averageDuration)}</p>
               </div>
             </div>
           </CardContent>
@@ -290,7 +243,7 @@ export default function WorkflowMonitorPage() {
                         }`}
                         onClick={() => setSelectedRun(run)}
                       >
-                        <div className="flex items-center justify-between">
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div className="flex items-center gap-3">
                             {getStatusIcon(run.status)}
                             <div>
@@ -308,7 +261,7 @@ export default function WorkflowMonitorPage() {
                               </p>
                             </div>
                           </div>
-                          <div className="text-right text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 sm:text-right">
                             {run.finishedAt && (
                               <p>Duration: {formatDuration(duration)}</p>
                             )}

@@ -1747,6 +1747,13 @@ textarea:focus {
 	outline-offset: 2px;
 }
 
+button.team-management-tab:focus,
+button.team-management-tab:focus-visible {
+	outline: none;
+	outline-offset: 0;
+	box-shadow: none;
+}
+
 /* Reduced motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
 	*,
