@@ -63,3 +63,69 @@ Content-Type: application/json
 
 ### Check Intake Status (with Email Logs)
 GET http://localhost:3000/api/intake/submit?id=REPLACE_INTAKE_ID
+
+### =========================================================================
+### Document Endpoints (API Contract v1 §6)
+### =========================================================================
+
+### 1. List Documents (§6.1)
+GET http://localhost:3000/api/documents
+Cookie: payload-token=REPLACE_TOKEN
+
+### 2. Upload Document (§6.2 - multipart/form-data)
+POST http://localhost:3000/api/documents
+Cookie: payload-token=REPLACE_TOKEN
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="documentType"
+
+Pitch Deck
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="notes"
+
+Q3 Investor Pitch Deck
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="pitch_deck.pdf"
+Content-Type: application/pdf
+
+< ./doc.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 3. Upload Document with Invalid Type (Should return 400)
+POST http://localhost:3000/api/documents
+Cookie: payload-token=REPLACE_TOKEN
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="documentType"
+
+invalid_type_test
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.pdf"
+Content-Type: application/pdf
+
+< ./doc.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### 4. Get Document Metadata (§6.4)
+GET http://localhost:3000/api/documents/REPLACE_DOC_ID
+Cookie: payload-token=REPLACE_TOKEN
+
+### 5. Download Document (§6.4)
+GET http://localhost:3000/api/documents/REPLACE_DOC_ID?download=true
+Cookie: payload-token=REPLACE_TOKEN
+
+### 6. Review Document (§6.5 - Staff only: admin or miv_analyst)
+PATCH http://localhost:3000/api/documents/REPLACE_DOC_ID
+Cookie: payload-token=REPLACE_TOKEN
+Content-Type: application/json
+
+{
+  "status": "approved",
+  "notes": "Reviewed and verified against requirements."
+}
+
+### 7. Delete Document (§6.3)
+DELETE http://localhost:3000/api/documents?id=REPLACE_DOC_ID
+Cookie: payload-token=REPLACE_TOKEN

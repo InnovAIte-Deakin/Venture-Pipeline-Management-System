@@ -9,6 +9,19 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const uploadsDir = path.resolve(dirname, '../../../../../uploads/documents')
 
+// Helper function to convert backend document type to display name
+function getDisplayDocumentType(backendType: string): string {
+  const typeMap: Record<string, string> = {
+    'pitch_deck': 'Pitch Deck',
+    'financial_statements': 'Financial Statements',
+    'legal_documents': 'Legal Documents',
+    'gedsi_reports': 'GEDSI Reports',
+    'impact_reports': 'Impact Reports',
+    'other': 'Other',
+  }
+  return typeMap[backendType] || backendType
+}
+
 // GET /api/documents/[id] - Get a specific document or download it
 export async function GET(
   request: NextRequest,
@@ -118,17 +131,17 @@ export async function GET(
       document: {
         id: document.id,
         filename: document.filename,
-        documentType: document.documentType,
+        documentType: getDisplayDocumentType(document.documentType as string),
         status: document.status,
         version: document.version,
         filesize: document.filesize,
         mimeType: document.mimeType,
         url: document.url,
-        notes: document.notes,
+        notes: document.notes || null,
         uploadedBy: document.uploadedBy,
-        venture: document.venture,
-        reviewedBy: document.reviewedBy,
-        reviewedAt: document.reviewedAt,
+        venture: document.venture || null,
+        reviewedBy: document.reviewedBy || null,
+        reviewedAt: document.reviewedAt || null,
         createdAt: document.createdAt,
         updatedAt: document.updatedAt,
       },
@@ -225,6 +238,7 @@ export async function PATCH(
       collection: 'documents',
       id,
       data: updateData,
+      depth: 1,
     })
 
     return NextResponse.json({
@@ -233,11 +247,18 @@ export async function PATCH(
       document: {
         id: document.id,
         filename: document.filename,
-        documentType: document.documentType,
+        documentType: getDisplayDocumentType(document.documentType as string),
         status: document.status,
-        notes: document.notes,
-        reviewedBy: document.reviewedBy,
-        reviewedAt: document.reviewedAt,
+        version: document.version,
+        filesize: document.filesize,
+        mimeType: document.mimeType,
+        url: document.url,
+        notes: document.notes || null,
+        uploadedBy: document.uploadedBy,
+        venture: document.venture || null,
+        reviewedBy: document.reviewedBy || null,
+        reviewedAt: document.reviewedAt || null,
+        createdAt: document.createdAt,
         updatedAt: document.updatedAt,
       },
     })

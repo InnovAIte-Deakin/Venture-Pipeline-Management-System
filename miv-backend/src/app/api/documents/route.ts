@@ -171,10 +171,31 @@ export async function POST(request: NextRequest) {
       'Legal Documents': 'legal_documents',
       'GEDSI Reports': 'gedsi_reports',
       'Impact Reports': 'impact_reports',
-      'Other': 'other'
+      'Other': 'other',
     }
-    
+
     const documentType = documentTypeMap[documentTypeRaw] || documentTypeRaw.toLowerCase().replace(/\s+/g, '_')
+
+    const validDocumentTypes = [
+      'pitch_deck',
+      'financial_statements',
+      'legal_documents',
+      'gedsi_reports',
+      'impact_reports',
+      'other',
+    ]
+
+    if (!validDocumentTypes.includes(documentType)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid document type',
+          message:
+            'Document type must be one of: Pitch Deck, Financial Statements, Legal Documents, GEDSI Reports, Impact Reports, Other.',
+        },
+        { status: 400 }
+      )
+    }
 
     // Validate file size (max 10MB)
     const maxSize = 10 * 1024 * 1024 // 10MB
@@ -245,18 +266,35 @@ export async function POST(request: NextRequest) {
       filePath,
     })
 
+    // Retrieve the created document with depth: 1 so relationships (uploadedBy, venture) are populated
+    const createdDoc = await payload.findByID({
+      collection: 'documents',
+      id: document.id,
+      depth: 1,
+      user,
+    })
+
+    const docToReturn = createdDoc || document
+
     return NextResponse.json({
       success: true,
       message: 'Document uploaded successfully',
       document: {
-        id: document.id,
-        filename: document.filename,
-        documentType: getDisplayDocumentType(document.documentType as string),
-        status: document.status,
-        version: document.version,
-        filesize: document.filesize,
-        url: document.url,
-        createdAt: document.createdAt,
+        id: docToReturn.id,
+        filename: docToReturn.filename,
+        documentType: getDisplayDocumentType(docToReturn.documentType as string),
+        status: docToReturn.status,
+        version: docToReturn.version,
+        filesize: docToReturn.filesize,
+        mimeType: docToReturn.mimeType,
+        url: docToReturn.url,
+        notes: docToReturn.notes || null,
+        uploadedBy: docToReturn.uploadedBy,
+        venture: docToReturn.venture || null,
+        reviewedBy: docToReturn.reviewedBy || null,
+        reviewedAt: docToReturn.reviewedAt || null,
+        createdAt: docToReturn.createdAt,
+        updatedAt: docToReturn.updatedAt,
       },
     })
   } catch (error) {
@@ -363,7 +401,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Document deleted successfully',
+      message: 'Document deleted',
     })
   } catch (error) {
     console.error('Delete document error:', error)
