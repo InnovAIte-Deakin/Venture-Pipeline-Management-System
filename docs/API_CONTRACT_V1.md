@@ -637,7 +637,7 @@ Response 200:
 ```
 
 Implementation bug worth fixing: this route learns who the caller is by making a server side fetch to /api/users/me, but it does not forward the caller's cookies on that fetch, so the identity lookup cannot actually see the session. The fix is to call getServerSession(authOptions) directly, passing the auth options in. Note that the gedsi route, while it does enforce auth, calls getServerSession() bare with no authOptions, which is why it cannot see custom session fields. Jeevan's version, which passes authOptions, is the pattern to copy.
-## 6. Document endpoints
+## 6. Document endpoints (VERIFIED - 05 August 2026)
 
 ### 6.1 GET /api/documents
 
@@ -821,3 +821,4 @@ Already decided by the contract owner and recorded above: founder venture reads 
 | 26 July 2026 | v1 draft 2 | Checkpoints 1 and 2 completed: full request and response shapes for analytics, custom dashboards, notifications, venture CRUD, GEDSI metrics and my ventures. Added new findings: random numbers in analytics trends, notifications open to everyone, and the cookie forwarding bug in /api/users/ventures |
 | 31 July 2026 | v1 draft 4 | Reverified against main at f3297d1 after the route group restructure. Login mismatch confirmed resolved via the new /api/session/login proxy, documented in 2.6 with a pattern decision added to section 9. Register and logout callers confirmed still broken. New urgent finding: the page auth middleware was renamed to proxy.ts and no longer runs. Noted the archived development routes as closed attack surface |
 | 31 July 2026 | v1 draft 3 | Pre publication amendments from review: corrected the getServerSession guidance in 5.7 to require authOptions, escalated the role mapping in 1.3 to a sprint review decision, recorded the founder read decision in 5.5, added four security items (analyst self promotion via role writes, create anyone on the Users collection, no rate limiting on auth routes, committed credentials), blocked the 3.1 rename pending the create lockdown, surfaced the register role minting difference, and added section 9 for decisions, moving the change log to section 10 |
+| 05 August 2026 | v1.1 | Document endpoints (§6.1 - §6.5) verified against backend implementation and aligned. Upload and review responses now return full document schema and mapped display documentType. Validated documentType input in upload handler. |
