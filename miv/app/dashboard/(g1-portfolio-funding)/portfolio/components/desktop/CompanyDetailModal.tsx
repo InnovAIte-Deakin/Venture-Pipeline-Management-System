@@ -132,7 +132,7 @@ export function CompanyDetailModal({ company, onClose, onTakeAction }: CompanyDe
             <CardContent>
               {company.gedsiMetrics && company.gedsiMetrics.length > 0 ? (
                 <div className="space-y-3">
-                  {company.gedsiMetrics.slice(0, 6).map((metric: any, index: number) => (
+                  {company.gedsiMetrics.slice(0, 6).map((metric, index) => (
                     <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
                       <div>
                         <div className="font-medium">{metric.code || `Metric ${index + 1}`}</div>

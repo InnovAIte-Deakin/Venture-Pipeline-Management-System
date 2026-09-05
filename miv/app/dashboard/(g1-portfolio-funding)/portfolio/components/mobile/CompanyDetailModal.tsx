@@ -102,7 +102,7 @@ export function CompanyDetailModal({ company, onClose, onTakeAction }: CompanyDe
             <div className={sectionLabel}>GEDSI Metrics</div>
             {company.gedsiMetrics && company.gedsiMetrics.length > 0 ? (
               <div className="space-y-2">
-                {company.gedsiMetrics.slice(0, 6).map((metric: any, index: number) => (
+                {company.gedsiMetrics.slice(0, 6).map((metric, index) => (
                   <div key={index} className={sectionCard + " flex items-center justify-between"}>
                     <div>
                       <div className="text-xs font-medium text-[#2C2C2A]">{metric.code || `Metric ${index + 1}`}</div>
