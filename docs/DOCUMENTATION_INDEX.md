@@ -25,6 +25,8 @@ This folder contains the consolidated and finalised documentation for the VPMS p
 - **[Internal Developer Guide](./INTERNAL_DEV_GUIDE.md)**  
   Setup, configuration, authentication, and development notes.
 
+- **[API Contract v1](./API_CONTRACT_V1.md)**
+
 ### 6. Architecture Decision Records
 - **[ADR-001: Dual Database and Authentication Assessment](./adr/ADR-001-Dual-Database-and-Authentication-Assessment.md)**
   Assessment of the dual PostgreSQL/MongoDB and authentication setup.
