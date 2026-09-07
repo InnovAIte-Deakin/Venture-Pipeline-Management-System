@@ -1,22 +1,26 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
 import { initialReadinessItems } from "./readiness-data";
 import { ReadinessChecklist } from "./readiness-checklist";
 import { ReadinessSummary } from "./readiness-summary";
+import type { ReadinessItem } from "./types";
+import { calculateReadinessProgress } from "./readiness-utils";
 
-export default function ReadinessTracker() {
-	const [items, setItems] = useState(initialReadinessItems);
+type ReadinessTrackerProps = {
+	initialItems?: ReadinessItem[];
+};
 
-	const completedCount = useMemo(
-		() => items.filter((item) => item.complete).length,
-		[items],
-	);
+export default function ReadinessTracker({
+	initialItems = initialReadinessItems,
+}: ReadinessTrackerProps) {
+	const [items, setItems] = useState(initialItems);
 
-	const progress = Math.round((completedCount / items.length) * 100);
+	const { completedCount, totalCount, progress } =
+		calculateReadinessProgress(items);
 
 	function handleItemCheckedChange(itemId: string, checked: boolean) {
 		setItems((currentItems) =>
@@ -30,7 +34,7 @@ export default function ReadinessTracker() {
 		<Card className="overflow-hidden border-slate-200 bg-[#f6f8f8] shadow-sm">
 			<ReadinessSummary
 				completedCount={completedCount}
-				totalCount={items.length}
+				totalCount={totalCount}
 				progress={progress}
 			/>
 

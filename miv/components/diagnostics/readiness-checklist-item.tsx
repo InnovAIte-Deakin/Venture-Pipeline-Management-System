@@ -42,7 +42,7 @@ export function ReadinessChecklistItem({
 			</label>
 
 			<div className="ml-auto flex shrink-0 items-center gap-2 pt-0.5 sm:pt-0">
-				<span className="hidden sm:inline">
+				<span>
 					{item.complete ? (
 						<Badge className="gap-1 bg-teal-50 text-[#087f7a] hover:bg-teal-50">
 							<CheckCircle2 className="size-3.5" aria-hidden="true" />
