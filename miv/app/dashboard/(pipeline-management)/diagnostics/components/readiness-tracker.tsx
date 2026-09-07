@@ -4,11 +4,11 @@ import { useState } from "react";
 
 import { Card, CardContent } from "@/components/ui/card";
 
-import { initialReadinessItems } from "./readiness-data";
 import { ReadinessChecklist } from "./readiness-checklist";
 import { ReadinessSummary } from "./readiness-summary";
-import type { ReadinessItem } from "./types";
-import { calculateReadinessProgress } from "./readiness-utils";
+import { initialReadinessItems } from "../data/readiness-data";
+import { calculateReadinessProgress } from "../lib/readiness-utils";
+import type { ReadinessItem } from "../types/readiness";
 
 type ReadinessTrackerProps = {
 	initialItems?: ReadinessItem[];

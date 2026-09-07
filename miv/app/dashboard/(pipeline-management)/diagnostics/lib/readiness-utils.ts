@@ -1,4 +1,4 @@
-import type { ReadinessItem } from "./types";
+import type { ReadinessItem } from "../types/readiness";
 
 export function calculateReadinessProgress(items: ReadinessItem[]) {
 	const completedCount = items.filter((item) => item.complete).length;

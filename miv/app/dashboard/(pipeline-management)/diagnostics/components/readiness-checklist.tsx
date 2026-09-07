@@ -1,5 +1,5 @@
 import { ReadinessChecklistItem } from "./readiness-checklist-item";
-import type { ReadinessItem } from "./types";
+import type { ReadinessItem } from "../types/readiness";
 
 type ReadinessChecklistProps = {
 	items: ReadinessItem[];
@@ -12,9 +12,9 @@ export function ReadinessChecklist({
 }: ReadinessChecklistProps) {
 	return (
 		<ul
-	className="overflow-hidden rounded-lg border border-slate-200"
-	aria-label="Readiness checklist"
->
+			className="overflow-hidden rounded-lg border border-slate-200"
+			aria-label="Readiness checklist"
+		>
 			{items.map((item) => (
 				<ReadinessChecklistItem
 					key={item.id}

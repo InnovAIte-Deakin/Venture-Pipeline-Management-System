@@ -1,4 +1,4 @@
-import type { ReadinessItem } from "./types";
+import type { ReadinessItem } from "../types/readiness";
 
 export const initialReadinessItems: ReadinessItem[] = [
 	{
