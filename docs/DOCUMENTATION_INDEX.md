@@ -25,11 +25,9 @@ This folder contains the consolidated and finalised documentation for the VPMS p
 - **[Internal Developer Guide](./INTERNAL_DEV_GUIDE.md)**  
   Setup, configuration, authentication, and development notes.
 
-### 6. Security & Access Control
-- **[RBAC Matrix](./rbac/RBAC_MATRIX.md)**  
-  Canonical roles × collections × fields × routes, anomaly register, and adoption sequence. Audited against #57.
-- **[Canonical Role List](./rbac/roles.json)**  
-  Single source of truth for role names both apps must reference (founder, admin, miv_analyst; mentor/investor deferred).
+- **[API Contract v1](./API_CONTRACT_V1.md)**
+
+- **[ADR-001 – Dual Database and Authentication Assessment](./adr/ADR-001-Dual-Database-and-Authentication-Assessment.md)**
 
 ## 📌 Notes
 - This documentation reflects the **current MVP implementation**.
