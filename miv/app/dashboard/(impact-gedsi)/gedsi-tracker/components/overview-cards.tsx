@@ -25,8 +25,8 @@ export function OverviewCards({ metrics }: { metrics: GEDSIMetric[] }) {
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">Disability Inclusion</div>
           </div>
-          <div className="text-center p-4 bg-cyan-50 dark:bg-cyan-900/20 rounded-lg border-l-4 border-l-cyan-500">
-            <div className="text-2xl font-bold text-cyan-600 dark:text-cyan-400">
+          <div className="text-center p-4 bg-primary/10 dark:bg-cyan-900/20 rounded-lg border-l-4 border-l-primary">
+            <div className="text-2xl font-bold text-primary dark:text-primary">
               {Math.round(metrics.filter(m => m.category === 'Social Inclusion').length > 0 ? 
                 (metrics.filter(m => m.category === 'Social Inclusion' && m.status === 'Verified').length / 
                  metrics.filter(m => m.category === 'Social Inclusion').length) * 100 : 0)}%
@@ -41,8 +41,8 @@ export function OverviewCards({ metrics }: { metrics: GEDSIMetric[] }) {
             </div>
             <div className="text-sm text-slate-600 dark:text-slate-400">Cross-cutting</div>
           </div>
-          <div className="text-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border-l-4 border-l-blue-500">
-            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+          <div className="text-center p-4 bg-primary/10 dark:bg-blue-900/20 rounded-lg border-l-4 border-l-primary">
+            <div className="text-2xl font-bold text-primary dark:text-primary">
               {Math.round(metrics.length > 0 ? 
                 (metrics.filter(m => m.status === 'Verified').length / metrics.length) * 100 : 0)}%
             </div>

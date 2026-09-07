@@ -45,7 +45,7 @@ export function PerformanceAnalyticsDesktop({
   sectorPerformance, gedsiCategoryPerformance,
 }: PerformanceAnalyticsDesktopProps) {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -79,7 +79,7 @@ export function PerformanceAnalyticsDesktop({
               <RefreshCw className="h-4 w-4 mr-1" />
               Refresh
             </Button>
-            <Button className="bg-blue-600 hover:bg-blue-700">
+            <Button className="bg-primary hover:bg-primary">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
@@ -200,9 +200,9 @@ export function PerformanceAnalyticsDesktop({
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-                      <div className="flex items-center gap-2"><Eye className="h-4 w-4 text-blue-600" /><span className="text-sm font-medium">Daily Active Users</span></div>
-                      <span className="text-lg font-bold text-blue-600">{data.users.length}</span>
+                    <div className="flex items-center justify-between p-3 bg-primary/10 rounded-lg">
+                      <div className="flex items-center gap-2"><Eye className="h-4 w-4 text-primary" /><span className="text-sm font-medium">Daily Active Users</span></div>
+                      <span className="text-lg font-bold text-primary">{data.users.length}</span>
                     </div>
                     <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
                       <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-green-600" /><span className="text-sm font-medium">Avg Session Duration</span></div>
@@ -224,9 +224,9 @@ export function PerformanceAnalyticsDesktop({
 
           <TabsContent value="insights" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+              <Card className="bg-background ">
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><Lightbulb className="h-5 w-5 text-blue-600" />AI-Powered Insights</CardTitle>
+                  <CardTitle className="flex items-center gap-2"><Lightbulb className="h-5 w-5 text-primary" />AI-Powered Insights</CardTitle>
                   <CardDescription>Intelligent recommendations based on your data</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -255,7 +255,7 @@ export function PerformanceAnalyticsDesktop({
                 </CardContent>
               </Card>
 
-              <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+              <Card className="bg-background ">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2"><TrendingUp className="h-5 w-5 text-purple-600" />Predictive Analytics</CardTitle>
                   <CardDescription>Forecasts and predictions based on current trends</CardDescription>
@@ -304,7 +304,7 @@ export function PerformanceAnalyticsDesktop({
                           <div className="space-y-2">
                             {generateOptimizationOpportunities(data).map((opportunity, index) => (
                               <div key={index} className="flex items-center gap-2 text-sm">
-                                <Target className="h-3 w-3 text-blue-600" />
+                                <Target className="h-3 w-3 text-primary" />
                                 <span>{opportunity}</span>
                               </div>
                             ))}
@@ -319,14 +319,14 @@ export function PerformanceAnalyticsDesktop({
           </TabsContent>
         </Tabs>
 
-        <Card className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20">
+        <Card className="bg-background ">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2"><BarChart3 className="h-5 w-5 text-blue-600" />Advanced Analytics & Reporting</CardTitle>
+            <CardTitle className="flex items-center gap-2"><BarChart3 className="h-5 w-5 text-primary" />Advanced Analytics & Reporting</CardTitle>
             <CardDescription>Unlock deeper insights with custom reports, predictive models, and advanced visualizations</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Button className="h-16 flex flex-col items-center justify-center gap-1 bg-blue-600 hover:bg-blue-700"><Download className="h-5 w-5" /><span className="text-sm">Custom Report</span></Button>
+              <Button className="h-16 flex flex-col items-center justify-center gap-1 bg-primary hover:bg-primary"><Download className="h-5 w-5" /><span className="text-sm">Custom Report</span></Button>
               <Button variant="outline" className="h-16 flex flex-col items-center justify-center gap-1"><Lightbulb className="h-5 w-5" /><span className="text-sm">AI Insights</span></Button>
               <Button variant="outline" className="h-16 flex flex-col items-center justify-center gap-1"><Share className="h-5 w-5" /><span className="text-sm">Share Dashboard</span></Button>
               <Button variant="outline" className="h-16 flex flex-col items-center justify-center gap-1"><Settings className="h-5 w-5" /><span className="text-sm">Configure</span></Button>

@@ -51,7 +51,7 @@ export const ANALYTICS_SECTORS = [
 
 export const STATUS_CLASSES: Record<CapitalRequestStatus, string> = {
   Approved: "bg-green-100 text-green-800 border-green-200",
-  "Under Review": "bg-blue-100 text-blue-800 border-blue-200",
+  "Under Review": "bg-primary/10 text-primary border-primary",
   Pending: "bg-yellow-100 text-yellow-800 border-yellow-200",
   Rejected: "bg-red-100 text-red-800 border-red-200",
 };

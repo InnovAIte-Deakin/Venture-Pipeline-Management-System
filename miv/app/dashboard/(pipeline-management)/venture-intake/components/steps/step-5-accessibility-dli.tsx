@@ -13,7 +13,7 @@ export function Step5AccessibilityDli({ register, setValue, watchedValues, error
   <div className="space-y-8">
 
     {/* Washington Group Short Set */}
-    <Card className="p-6 bg-linear-to-r from-teal-50 to-cyan-50 dark:from-teal-950 dark:to-cyan-950 border-teal-200">
+    <Card className="p-6 bg-background border-teal-200">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
           <Activity aria-hidden="true" className="h-5 w-5 text-teal-500" />
@@ -56,10 +56,10 @@ export function Step5AccessibilityDli({ register, setValue, watchedValues, error
     </Card>
 
     {/* Disability Inclusion Attributes */}
-    <Card className="p-6 bg-linear-to-r from-cyan-50 to-blue-50 dark:from-cyan-950 dark:to-blue-950 border-cyan-200">
+    <Card className="p-6 bg-background border-primary">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
-          <Shield aria-hidden="true" className="h-5 w-5 text-cyan-500" />
+          <Shield aria-hidden="true" className="h-5 w-5 text-primary" />
           <Label className="font-semibold text-lg">Disability Inclusion Attributes</Label>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -79,7 +79,7 @@ export function Step5AccessibilityDli({ register, setValue, watchedValues, error
                     setValue(`disabilityInclusion.${item.key}` as any, checked as boolean)
                   }}
                 />
-                <item.icon aria-hidden="true" className="h-4 w-4 text-cyan-500" />
+                <item.icon aria-hidden="true" className="h-4 w-4 text-primary" />
                 <Label htmlFor={item.key} className="flex min-h-11 flex-1 cursor-pointer items-center text-sm">{item.label}</Label>
               </div>
             </Card>

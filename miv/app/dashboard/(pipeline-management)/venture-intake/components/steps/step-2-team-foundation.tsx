@@ -14,7 +14,7 @@ export function Step2TeamFoundation({ register, setValue, watchedValues, errors 
   <div className="space-y-8">
 
     {/* Founder Types */}
-    <Card className="p-6 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
+    <Card className="p-6 bg-background border-purple-200">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
           <Heart aria-hidden="true" className="h-5 w-5 text-purple-500" />
@@ -61,7 +61,7 @@ export function Step2TeamFoundation({ register, setValue, watchedValues, errors 
       <Card className="p-4 hover:shadow-md transition-shadow">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Users aria-hidden="true" className="h-4 w-4 text-blue-500" />
+            <Users aria-hidden="true" className="h-4 w-4 text-primary" />
             <Label htmlFor="teamSize" className="font-medium">Team Size <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <Select onValueChange={(value) => setValue('teamSize', value)}>
@@ -70,7 +70,7 @@ export function Step2TeamFoundation({ register, setValue, watchedValues, errors 
               aria-required="true"
               aria-invalid={Boolean(errors.teamSize)}
               aria-describedby={errors.teamSize ? 'team-size-error' : undefined}
-              className="border-0 focus:ring-2 focus:ring-blue-500"
+              className="border-0 focus:ring-2 focus:ring-ring"
             >
               <SelectValue placeholder="How many team members?" />
             </SelectTrigger>
@@ -108,10 +108,10 @@ export function Step2TeamFoundation({ register, setValue, watchedValues, errors 
     </div>
 
     {/* Pitch Summary */}
-    <Card className="p-6 border-dashed border-2 hover:border-blue-400 transition-colors">
+    <Card className="p-6 border-dashed border-2 hover:border-primary transition-colors">
       <div className="space-y-2">
         <div className="flex items-center space-x-2">
-          <MessageSquare aria-hidden="true" className="h-4 w-4 text-blue-500" />
+          <MessageSquare aria-hidden="true" className="h-4 w-4 text-primary" />
           <Label htmlFor="pitchSummary" className="font-medium">Pitch Summary <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
         </div>
         <p className="text-sm text-gray-500 mb-3">Tell us about your venture's mission and value proposition</p>
@@ -123,14 +123,14 @@ export function Step2TeamFoundation({ register, setValue, watchedValues, errors 
           {...register('pitchSummary')}
           placeholder="We are solving [problem] for [target audience] by providing [solution]. Our unique approach is..."
           rows={4}
-          className="border-0 focus:ring-2 focus:ring-blue-500 resize-none"
+          className="border-0 focus:ring-2 focus:ring-ring resize-none"
         />
         {errors.pitchSummary && <FieldError id="pitch-summary-error" message={errors.pitchSummary.message} />}
       </div>
     </Card>
 
     {/* Inclusion Focus */}
-    <Card className="p-6 bg-linear-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 border-green-200">
+    <Card className="p-6 bg-background border-green-200">
       <div className="space-y-2">
         <div className="flex items-center space-x-2">
           <Heart aria-hidden="true" className="h-4 w-4 text-green-500" />

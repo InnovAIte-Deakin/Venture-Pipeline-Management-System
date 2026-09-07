@@ -28,13 +28,13 @@ export function DesktopReportGenerator({ builder }: DesktopReportGeneratorProps)
   const { configuration } = builder
 
   return (
-    <Card className="border-2 border-blue-100 bg-linear-to-r from-blue-50 to-indigo-50">
+    <Card className="border-2 border-primary bg-background ">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2 text-blue-900">
+        <CardTitle className="flex items-center space-x-2 text-primary">
           <FileText className="h-5 w-5" aria-hidden="true" />
           <span>Quick Report Generator</span>
         </CardTitle>
-        <CardDescription className="text-blue-700">
+        <CardDescription className="text-primary">
           Create comprehensive reports with custom parameters, metrics, and visualizations
         </CardDescription>
       </CardHeader>
@@ -158,7 +158,7 @@ export function DesktopReportGenerator({ builder }: DesktopReportGeneratorProps)
             <Calendar className="mr-2 h-4 w-4" aria-hidden="true" />
             {configuration.isScheduled ? `Scheduled: ${configuration.scheduleFrequency}` : "Schedule Report…"}
           </Button>
-          <Button onClick={builder.generateReport} disabled={!builder.isValid} className="bg-blue-600 px-8 text-white hover:bg-blue-700" size="lg">
+          <Button onClick={builder.generateReport} disabled={!builder.isValid} className="bg-primary px-8 text-white hover:bg-primary" size="lg">
             <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
             Generate Report
           </Button>

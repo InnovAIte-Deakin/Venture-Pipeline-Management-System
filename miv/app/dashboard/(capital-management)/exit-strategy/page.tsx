@@ -331,7 +331,7 @@ export default function ExitStrategyPage() {
 
   const getExitTypeBadge = (type: string) => {
     switch (type) {
-      case "ipo": return <Badge variant="outline" className="bg-blue-100 text-blue-800">IPO</Badge>
+      case "ipo": return <Badge variant="outline" className="bg-primary/10 text-primary">IPO</Badge>
       case "m&a": return <Badge variant="outline" className="bg-green-100 text-green-800">M&A</Badge>
       case "secondary": return <Badge variant="outline" className="bg-purple-100 text-purple-800">Secondary</Badge>
       case "buyout": return <Badge variant="outline" className="bg-orange-100 text-orange-800">Buyout</Badge>
@@ -342,7 +342,7 @@ export default function ExitStrategyPage() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "planning": return <Badge variant="outline" className="bg-blue-100 text-blue-800">Planning</Badge>
+      case "planning": return <Badge variant="outline" className="bg-primary/10 text-primary">Planning</Badge>
       case "preparation": return <Badge variant="secondary" className="bg-yellow-100 text-yellow-800">Preparation</Badge>
       case "execution": return <Badge variant="default" className="bg-green-100 text-green-800">Execution</Badge>
       case "completed": return <Badge variant="default" className="bg-green-600 text-white">Completed</Badge>
@@ -353,7 +353,7 @@ export default function ExitStrategyPage() {
 
   const getProbabilityBadge = (probability: number) => {
     if (probability >= 80) return <Badge variant="default" className="bg-green-100 text-green-800">High</Badge>
-    if (probability >= 60) return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Medium</Badge>
+    if (probability >= 60) return <Badge variant="secondary" className="bg-primary/10 text-primary">Medium</Badge>
     return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Low</Badge>
   }
 
@@ -549,12 +549,12 @@ export default function ExitStrategyPage() {
                           </div>
                           <div className="text-sm text-green-600">12-15 months • 52% IRR</div>
                         </div>
-                        <div className="p-3 bg-blue-50 rounded-lg">
+                        <div className="p-3 bg-primary/10 rounded-lg">
                           <div className="flex justify-between items-center">
-                            <span className="font-medium text-blue-800">Base Case (50%)</span>
-                            <span className="font-bold text-blue-700">$45.2M</span>
+                            <span className="font-medium text-primary">Base Case (50%)</span>
+                            <span className="font-bold text-primary">$45.2M</span>
                           </div>
-                          <div className="text-sm text-blue-600">18-24 months • 38% IRR</div>
+                          <div className="text-sm text-primary">18-24 months • 38% IRR</div>
                         </div>
                         <div className="p-3 bg-yellow-50 rounded-lg">
                           <div className="flex justify-between items-center">
@@ -725,7 +725,7 @@ export default function ExitStrategyPage() {
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-blue-600">{avgReadinessScore.toFixed(0)}%</div>
+            <div className="text-2xl font-bold text-primary">{avgReadinessScore.toFixed(0)}%</div>
             <p className="text-xs text-muted-foreground">
               Average preparation
             </p>
@@ -890,7 +890,7 @@ export default function ExitStrategyPage() {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
                             {strategy.leadPartner ? strategy.leadPartner.split(' ').map(n => n[0]).join('') : 'PM'}
                           </div>
                           <span className="text-sm">{strategy.leadPartner || 'Portfolio Manager'}</span>
@@ -1055,18 +1055,18 @@ export default function ExitStrategyPage() {
                     </div>
 
                     {/* Realistic Scenario */}
-                    <div className="p-3 border rounded-lg bg-blue-50">
+                    <div className="p-3 border rounded-lg bg-primary/10">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
-                          <Target className="h-4 w-4 text-blue-600" />
-                          <span className="font-medium text-blue-800">Realistic</span>
+                          <Target className="h-4 w-4 text-primary" />
+                          <span className="font-medium text-primary">Realistic</span>
                         </div>
-                        <Badge variant="outline" className="bg-blue-100 text-blue-700">
+                        <Badge variant="outline" className="bg-primary/10 text-primary">
                           {strategy.scenarios.realistic.probability}%
                         </Badge>
                       </div>
-                      <div className="text-lg font-bold text-blue-700">{strategy.scenarios.realistic.value}</div>
-                      <div className="text-sm text-blue-600">{strategy.scenarios.realistic.timeline}</div>
+                      <div className="text-lg font-bold text-primary">{strategy.scenarios.realistic.value}</div>
+                      <div className="text-sm text-primary">{strategy.scenarios.realistic.timeline}</div>
                     </div>
 
                     {/* Pessimistic Scenario */}
@@ -1111,10 +1111,10 @@ export default function ExitStrategyPage() {
                   <Badge variant="default" className="bg-green-100 text-green-800 mt-2">Favorable</Badge>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
-                  <div className="text-2xl font-bold text-blue-600">📈</div>
+                  <div className="text-2xl font-bold text-primary">📈</div>
                   <div className="font-medium">IPO Market</div>
                   <div className="text-sm text-muted-foreground">Strong Activity</div>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-800 mt-2">Active</Badge>
+                  <Badge variant="secondary" className="bg-primary/10 text-primary mt-2">Active</Badge>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <div className="text-2xl font-bold text-purple-600">🤝</div>
@@ -1257,7 +1257,7 @@ export default function ExitStrategyPage() {
                             <div className="flex items-center gap-3">
                               <div className={`w-3 h-3 rounded-full ${
                                 phase.status === 'completed' ? 'bg-green-500' :
-                                phase.status === 'active' ? 'bg-blue-500' : 'bg-gray-300'
+                                phase.status === 'active' ? 'bg-primary' : 'bg-gray-300'
                               }`}></div>
                               <span className="text-sm">{phase.phase}</span>
                             </div>
@@ -1270,7 +1270,7 @@ export default function ExitStrategyPage() {
                                 phase.status === 'active' ? 'secondary' : 'outline'
                               } className={
                                 phase.status === 'completed' ? 'bg-green-100 text-green-800' :
-                                phase.status === 'active' ? 'bg-blue-100 text-blue-800' : ''
+                                phase.status === 'active' ? 'bg-primary/10 text-primary' : ''
                               }>
                                 {phase.status}
                               </Badge>
@@ -1322,7 +1322,7 @@ export default function ExitStrategyPage() {
                     <div className="space-y-2">
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
                             H
                           </div>
                           <div>
@@ -1341,7 +1341,7 @@ export default function ExitStrategyPage() {
                       
                       <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-xs font-medium text-blue-600">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-xs font-medium text-primary">
                             H
                           </div>
                           <div>
@@ -1354,7 +1354,7 @@ export default function ExitStrategyPage() {
                             <div className="text-sm font-medium">Legal Team</div>
                             <div className="text-xs text-muted-foreground">2024-09-30</div>
                           </div>
-                          <Badge variant="secondary" className="bg-blue-100 text-blue-800">In Progress</Badge>
+                          <Badge variant="secondary" className="bg-primary/10 text-primary">In Progress</Badge>
                         </div>
                       </div>
                     </div>
@@ -1383,7 +1383,7 @@ export default function ExitStrategyPage() {
                     .map((strategy, index) => (
                       <div key={strategy.id} className="flex items-center justify-between p-3 border rounded-lg">
                         <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-600">
+                          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
                             {index + 1}
                           </div>
                           <div>

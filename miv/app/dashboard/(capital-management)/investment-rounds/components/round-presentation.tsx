@@ -4,21 +4,21 @@ import type { RiskLevel, RoundStatus } from "@/app/dashboard/(capital-management
 
 export function gedsiScoreClass(score: number) {
   if (score >= 90) return "text-green-600"
-  if (score >= 80) return "text-blue-600"
+  if (score >= 80) return "text-primary"
   if (score >= 70) return "text-yellow-600"
   return "text-red-600"
 }
 
 export function StatusIcon({ status }: { status: RoundStatus }) {
   if (status === "closed") return <CheckCircle className="h-4 w-4 text-green-500" />
-  if (status === "closing") return <Clock className="h-4 w-4 text-blue-500" />
+  if (status === "closing") return <Clock className="h-4 w-4 text-primary" />
   if (status === "open") return <AlertTriangle className="h-4 w-4 text-yellow-500" />
   return <XCircle className="h-4 w-4 text-red-500" />
 }
 
 export function StatusBadge({ status }: { status: RoundStatus }) {
   if (status === "closed") return <Badge className="bg-green-100 text-green-800">Closed</Badge>
-  if (status === "closing") return <Badge variant="secondary" className="bg-blue-100 text-blue-800">Closing</Badge>
+  if (status === "closing") return <Badge variant="secondary" className="bg-primary/10 text-primary">Closing</Badge>
   if (status === "open") return <Badge variant="outline" className="bg-yellow-100 text-yellow-800">Open</Badge>
   return <Badge variant="destructive">Cancelled</Badge>
 }

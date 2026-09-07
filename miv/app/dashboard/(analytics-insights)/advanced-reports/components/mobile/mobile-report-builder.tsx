@@ -44,13 +44,13 @@ export function MobileReportBuilder({ builder, onGenerated }: MobileReportBuilde
   const selectedReportTypeOption = REPORT_TYPES.find((t) => t.value === configuration.selectedReportType)
 
   return (
-    <Card className="border-2 border-blue-100 bg-linear-to-r from-blue-50 to-indigo-50">
+    <Card className="border-2 border-primary bg-background ">
       <CardHeader>
-        <CardTitle className="flex items-center space-x-2 text-blue-900">
+        <CardTitle className="flex items-center space-x-2 text-primary">
           <FileText className="h-5 w-5" aria-hidden="true" />
           <span>Quick Report Generator</span>
         </CardTitle>
-        <CardDescription className="text-blue-700">
+        <CardDescription className="text-primary">
           Step {step + 1} of {STEPS.length}: {STEPS[step]}
         </CardDescription>
       </CardHeader>
@@ -196,7 +196,7 @@ export function MobileReportBuilder({ builder, onGenerated }: MobileReportBuilde
         {step === 4 && (
           <div className="space-y-4 text-center">
             <p className="text-sm text-muted-foreground">Ready to generate your report with the settings above.</p>
-            <Button onClick={handleGenerate} disabled={!builder.isValid} className="w-full bg-blue-600 text-white hover:bg-blue-700" size="lg">
+            <Button onClick={handleGenerate} disabled={!builder.isValid} className="w-full bg-primary text-white hover:bg-primary" size="lg">
               <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
               Generate Report
             </Button>

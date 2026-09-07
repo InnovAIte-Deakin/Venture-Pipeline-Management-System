@@ -103,7 +103,7 @@ export function AccessibilitySettingsForm({
         <Button
           onClick={onAccessibilityUpdate}
           disabled={accessibilitySaveStatus === "saving"}
-          className="bg-teal-600 hover:bg-teal-700"
+          className="bg-primary hover:bg-primary"
         >
           <SaveStatusContent
             status={accessibilitySaveStatus}

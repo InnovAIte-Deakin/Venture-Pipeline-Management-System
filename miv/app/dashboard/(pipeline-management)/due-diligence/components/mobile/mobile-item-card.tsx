@@ -64,7 +64,7 @@ export function MobileItemCard({
 
         <div className="grid gap-3 text-sm">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-medium text-blue-600 dark:text-blue-300 shrink-0">
+            <div className="w-7 h-7 rounded-full bg-primary/10 dark:bg-blue-900 flex items-center justify-center text-xs font-medium text-primary dark:text-primary shrink-0">
               {item.assignedTo.split(" ").map((name) => name[0]).join("")}
             </div>
             <div className="min-w-0">

@@ -27,7 +27,7 @@ export function OverviewStats({ capitalRequests }: OverviewStatsProps) {
       value: capitalRequests.filter((request) => request.status !== "Rejected")
         .length,
       icon: Activity,
-      className: "bg-blue-100 text-blue-600",
+      className: "bg-primary/10 text-primary",
     },
     {
       label: "Success Rate",

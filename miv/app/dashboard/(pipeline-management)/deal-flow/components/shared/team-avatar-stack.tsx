@@ -20,7 +20,7 @@ export function TeamAvatarStack({ team, size = "sm" }: TeamAvatarStackProps) {
       {visibleTeam.map((member) => (
         <div
           key={member}
-          className={`${avatarSize} rounded-full border-2 border-white bg-blue-100 flex items-center justify-center font-medium text-blue-600`}
+          className={`${avatarSize} rounded-full border-2 border-white bg-primary/10 flex items-center justify-center font-medium text-primary`}
           title={member}
         >
           {getInitials(member)}

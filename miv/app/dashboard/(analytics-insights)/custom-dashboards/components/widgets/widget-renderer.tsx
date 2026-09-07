@@ -21,7 +21,7 @@ export default function WidgetRenderer({ widget, onEdit, onRemove }: WidgetRende
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-2 min-w-0">
-            {Icon && <Icon className="h-4 w-4 text-blue-600 shrink-0" />}
+            {Icon && <Icon className="h-4 w-4 text-primary shrink-0" />}
             <CardTitle className="text-sm truncate">{widget.title}</CardTitle>
           </div>
           <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">

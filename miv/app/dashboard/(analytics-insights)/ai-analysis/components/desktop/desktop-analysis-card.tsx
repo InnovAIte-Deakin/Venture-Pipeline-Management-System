@@ -88,7 +88,7 @@ export function DesktopAnalysisCard({ analysis }: { analysis: AIAnalysis }) {
                     key={insight}
                     className="flex items-start gap-2 text-sm text-muted-foreground"
                   >
-                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500" />
+                    <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                     <span>{insight}</span>
                   </li>
                 ))}

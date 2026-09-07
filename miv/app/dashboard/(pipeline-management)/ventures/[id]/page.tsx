@@ -232,7 +232,7 @@ export default function VentureDetailPage() {
 
   const getStageColor = (stage: string) => {
     const colors: { [key: string]: string } = {
-      'IDEA': 'bg-blue-100 text-blue-800',
+      'IDEA': 'bg-primary/10 text-primary',
       'VALIDATION': 'bg-yellow-100 text-yellow-800',
       'EARLY_GROWTH': 'bg-green-100 text-green-800',
       'SCALE_UP': 'bg-purple-100 text-purple-800',
@@ -254,7 +254,7 @@ export default function VentureDetailPage() {
   const getGEDSICategoryColor = (category: string) => {
     const colors: { [key: string]: string } = {
       'GENDER': 'bg-pink-100 text-pink-800',
-      'EQUITY': 'bg-blue-100 text-blue-800',
+      'EQUITY': 'bg-primary/10 text-primary',
       'DISABILITY': 'bg-purple-100 text-purple-800',
       'SOCIAL_INCLUSION': 'bg-green-100 text-green-800'
     }
@@ -298,7 +298,7 @@ export default function VentureDetailPage() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
           <p className="text-gray-600">Loading venture details...</p>
         </div>
       </div>
@@ -408,7 +408,7 @@ export default function VentureDetailPage() {
                 <Card>
                   <CardContent className="p-4">
                     <div className="flex items-center space-x-2">
-                      <Users className="h-5 w-5 text-blue-500" />
+                      <Users className="h-5 w-5 text-primary" />
                       <div>
                         <p className="text-sm text-gray-600">Team Size</p>
                         <p className="text-lg font-semibold">{venture.teamSize}</p>
@@ -467,7 +467,7 @@ export default function VentureDetailPage() {
                     </div>
                     <div className="flex items-center space-x-3">
                       <Globe className="h-4 w-4 text-gray-400" />
-                      <a href={venture.website} target="_blank" rel="noopener noreferrer" className="text-sm text-blue-600 hover:underline">
+                      <a href={venture.website} target="_blank" rel="noopener noreferrer" className="text-sm text-primary hover:underline">
                         {venture.website}
                       </a>
                     </div>
@@ -527,9 +527,9 @@ export default function VentureDetailPage() {
                         <div className="space-y-4">
                           {/* Key Scores */}
                           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div className="text-center p-3 bg-blue-50 rounded-lg">
-                              <div className="text-lg font-bold text-blue-600">{getVentureGEDSIScore(venture) || 'N/A'}%</div>
-                              <div className="text-xs text-blue-800">GEDSI Score</div>
+                            <div className="text-center p-3 bg-primary/10 rounded-lg">
+                              <div className="text-lg font-bold text-primary">{getVentureGEDSIScore(venture) || 'N/A'}%</div>
+                              <div className="text-xs text-primary">GEDSI Score</div>
                             </div>
                             <div className="text-center p-3 bg-green-50 rounded-lg">
                               <div className="text-lg font-bold text-green-600">{aiData.impactScore || 'N/A'}%</div>
@@ -552,9 +552,9 @@ export default function VentureDetailPage() {
 
                           {/* AI Recommendation */}
                           {aiData.recommendation && (
-                            <div className="p-4 bg-blue-50 rounded-lg">
-                              <h4 className="font-semibold text-blue-900 mb-2">AI Recommendation</h4>
-                              <p className="text-sm text-blue-800">{aiData.recommendation}</p>
+                            <div className="p-4 bg-primary/10 rounded-lg">
+                              <h4 className="font-semibold text-primary mb-2">AI Recommendation</h4>
+                              <p className="text-sm text-primary">{aiData.recommendation}</p>
                             </div>
                           )}
 
@@ -635,7 +635,7 @@ export default function VentureDetailPage() {
                   <div className="space-y-3">
                     {venture.activities.slice(0, 3).map((activity) => (
                       <div key={activity.id} className="flex items-start space-x-3">
-                        <div className="shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                        <div className="shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                           {getActivityIcon(activity.type)}
                         </div>
                         <div className="flex-1 min-w-0">
@@ -762,7 +762,7 @@ export default function VentureDetailPage() {
               <div className="space-y-4">
                 {venture.activities.map((activity) => (
                   <div key={activity.id} className="flex items-start space-x-4">
-                    <div className="shrink-0 w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                    <div className="shrink-0 w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
                       {getActivityIcon(activity.type)}
                     </div>
                     <div className="flex-1 min-w-0">

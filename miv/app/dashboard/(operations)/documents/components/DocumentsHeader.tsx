@@ -44,8 +44,8 @@ export default function DocumentsHeader({
         {analytics && (
           <div className="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-5 py-3 shadow-sm">
 
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-              <FileText className="h-5 w-5 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+              <FileText className="h-5 w-5 text-primary" />
             </div>
 
             <div>

@@ -116,11 +116,11 @@ export function GedsiTrackerTabs({ state }: { state: GedsiTrackerState }) {
       </TabsContent>
 
       <TabsContent value="washington-group" className="space-y-6">
-        <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-0 shadow-lg">
+        <Card className="bg-background border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Shield className="h-5 w-5 text-blue-600" />
-              <span className="bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              <Shield className="h-5 w-5 text-primary" />
+              <span className="text-foreground">
                 Washington Group Short Set
               </span>
             </CardTitle>
@@ -130,7 +130,7 @@ export function GedsiTrackerTabs({ state }: { state: GedsiTrackerState }) {
           </CardHeader>
           <CardContent>
             <div className="space-y-6">
-              <Alert className="border-l-4 border-l-blue-500 bg-blue-50">
+              <Alert className="border-l-4 border-l-primary bg-primary/10">
                 <Info className="h-4 w-4" />
                 <AlertDescription>
                   The Washington Group Short Set provides internationally comparable disability data following UN
@@ -197,13 +197,13 @@ export function GedsiTrackerTabs({ state }: { state: GedsiTrackerState }) {
                     <ImplementationProgress
                       label="UN Compliance"
                       badge="Compliant"
-                      badgeClass="bg-blue-600 text-white"
+                      badgeClass="bg-primary text-white"
                       value={100}
                       description="Fully aligned with CRPD Article 31 requirements"
                     />
                   </div>
 
-                  <Button className="w-full bg-black text-white hover:bg-neutral-800">
+                  <Button className="w-full">
                     <Plus className="mr-2 h-4 w-4" />
                     Implement WG-SS Assessment
                   </Button>

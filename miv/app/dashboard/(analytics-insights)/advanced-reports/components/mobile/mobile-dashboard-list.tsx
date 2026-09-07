@@ -64,7 +64,7 @@ export function MobileDashboardList({ dashboards, builder }: MobileDashboardList
                       key={widget.id}
                       type="button"
                       onClick={() => builder.addWidgetByTap(widget.id)}
-                      className="flex flex-col items-center rounded-lg border-2 border-dashed border-gray-300 p-3 text-center transition-colors hover:border-blue-400 hover:bg-blue-50"
+                      className="flex flex-col items-center rounded-lg border-2 border-dashed border-gray-300 p-3 text-center transition-colors hover:border-primary hover:bg-primary/10"
                     >
                       <Icon className="mb-2 h-6 w-6 text-gray-500" aria-hidden="true" />
                       <span className="text-xs font-medium">{widget.title}</span>

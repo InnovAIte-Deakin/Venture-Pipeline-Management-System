@@ -98,11 +98,11 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
 
       {/* AI-Powered Sustainability Intelligence */}
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-linear-to-br from-green-50 via-blue-50 to-purple-50 border-0 shadow-lg">
+        <Card className="bg-background border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Brain className="h-5 w-5 text-green-600" />
-              <span className="bg-linear-to-r from-green-600 to-blue-600 bg-clip-text text-transparent">
+              <span className="text-foreground">
                 AI Carbon Intelligence
               </span>
             </CardTitle>
@@ -129,8 +129,8 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
 
               <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
                 <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Brain className="h-4 w-4 text-blue-600" />
+                  <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Brain className="h-4 w-4 text-primary" />
                   </div>
                   <div>
                     <p className="font-medium">Predictive Net Zero Date</p>
@@ -139,7 +139,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-blue-600 text-white">2027</Badge>
+                <Badge className="bg-primary text-white">2027</Badge>
               </div>
 
               <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
@@ -162,11 +162,11 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
           </CardContent>
         </Card>
 
-        <Card className="bg-linear-to-br from-cyan-50 via-teal-50 to-green-50 border-0 shadow-lg">
+        <Card className="bg-background border-0 shadow-lg">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Layers className="h-5 w-5 text-cyan-600" />
-              <span className="bg-linear-to-r from-cyan-600 to-teal-600 bg-clip-text text-transparent">
+              <Layers className="h-5 w-5 text-primary" />
+              <span className="text-foreground">
                 Circular Economy Hub
               </span>
             </CardTitle>
@@ -178,7 +178,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-3">
                 <div className="text-center p-3 bg-white/80 rounded-lg">
-                  <div className="text-2xl font-bold text-cyan-600">
+                  <div className="text-2xl font-bold text-primary">
                     {regenerativeData.circularityIndex}%
                   </div>
                   <div className="text-xs text-muted-foreground">
@@ -283,12 +283,12 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
 
         <TabsContent value="digital-twin" className="space-y-4">
           {/* Digital Twin Visualization */}
-          <Card className="bg-linear-to-br from-slate-50 to-gray-100 border-0 shadow-xl">
+          <Card className="bg-background border-0 shadow-xl">
             <CardHeader>
               <div className="flex items-center justify-between">
                 <div>
                   <CardTitle className="flex items-center gap-2">
-                    <Cpu className="h-5 w-5 text-blue-600" />
+                    <Cpu className="h-5 w-5 text-primary" />
                     Portfolio Digital Twin
                   </CardTitle>
                   <CardDescription>
@@ -312,7 +312,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
                 <div className="grid gap-4 md:grid-cols-3">
                   <div className="p-4 border rounded-lg bg-white/50">
                     <div className="flex items-center space-x-2 mb-2">
-                      <Satellite className="h-4 w-4 text-blue-600" />
+                      <Satellite className="h-4 w-4 text-primary" />
                       <span className="font-medium">Satellite Monitoring</span>
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -360,10 +360,10 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
         <TabsContent value="circular-economy" className="space-y-4">
           {/* Circular Economy Dashboard */}
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-linear-to-br from-blue-50 to-cyan-50 border-0 shadow-lg">
+            <Card className="bg-background border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Infinity className="h-5 w-5 text-blue-600" />
+                  <Infinity className="h-5 w-5 text-primary" />
                   Waste-to-Value Streams
                 </CardTitle>
                 <CardDescription>
@@ -420,8 +420,8 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
                           </div>
                         </div>
                         <div className="grid grid-cols-3 gap-2 text-center">
-                          <div className="p-2 bg-blue-50 rounded">
-                            <div className="text-sm font-semibold text-blue-600">
+                          <div className="p-2 bg-primary/10 rounded">
+                            <div className="text-sm font-semibold text-primary">
                               {ventureMetrics?.circularityScore || 65}%
                             </div>
                             <div className="text-xs text-muted-foreground">
@@ -457,7 +457,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-0 shadow-lg">
+            <Card className="bg-background border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Recycle className="h-5 w-5 text-green-600" />
@@ -476,7 +476,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
 
         <TabsContent value="nature-solutions" className="space-y-4">
           {/* Nature-Based Solutions */}
-          <Card className="bg-linear-to-br from-green-50 to-emerald-50 border-0 shadow-lg">
+          <Card className="bg-background border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <TreePine className="h-5 w-5 text-green-600" />
@@ -550,7 +550,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
 
         <TabsContent value="carbon-intelligence" className="space-y-4">
           {/* AI Carbon Intelligence */}
-          <Card className="bg-linear-to-br from-indigo-50 to-purple-50 border-0 shadow-lg">
+          <Card className="bg-background border-0 shadow-lg">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Brain className="h-5 w-5 text-indigo-600" />
@@ -591,13 +591,13 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
                     </div>
                   </div>
                   <div className="text-center p-4 bg-white/80 rounded-lg">
-                    <div className="text-2xl font-bold text-blue-600">
+                    <div className="text-2xl font-bold text-primary">
                       {carbonCredits}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       Credits Earned
                     </div>
-                    <div className="text-xs text-blue-600">
+                    <div className="text-xs text-primary">
                       Verified & Projected
                     </div>
                   </div>
@@ -612,7 +612,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
         <TabsContent value="regenerative" className="space-y-4">
           {/* Regenerative Impact */}
           <div className="grid gap-6 md:grid-cols-2">
-            <Card className="bg-linear-to-br from-emerald-50 to-green-50 border-0 shadow-lg">
+            <Card className="bg-background border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Leaf className="h-5 w-5 text-emerald-600" />
@@ -651,7 +651,7 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
                       </div>
                     </div>
                     <div className="text-center p-3 bg-white/80 rounded">
-                      <div className="text-lg font-semibold text-blue-600">
+                      <div className="text-lg font-semibold text-primary">
                         {regenerativeData.biodiversityScore}
                       </div>
                       <div className="text-xs text-muted-foreground">
@@ -663,10 +663,10 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
               </CardContent>
             </Card>
 
-            <Card className="bg-linear-to-br from-blue-50 to-indigo-50 border-0 shadow-lg">
+            <Card className="bg-background border-0 shadow-lg">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Award className="h-5 w-5 text-blue-600" />
+                  <Award className="h-5 w-5 text-primary" />
                   Impact Achievements
                 </CardTitle>
                 <CardDescription>
@@ -687,10 +687,10 @@ export function SustainabilityDesktop(props: SustainabilityViewProps) {
 
                   <div className="flex items-center justify-between p-3 bg-white/80 rounded-lg">
                     <div className="flex items-center space-x-3">
-                      <Droplets className="h-5 w-5 text-blue-600" />
+                      <Droplets className="h-5 w-5 text-primary" />
                       <span className="font-medium">Water Conservation</span>
                     </div>
-                    <Badge className="bg-blue-600 text-white">
+                    <Badge className="bg-primary text-white">
                       {(
                         ventures.reduce(
                           (sum, v) => sum + (v.teamSize || 5) * 150,

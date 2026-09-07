@@ -21,7 +21,7 @@ export function FundDetailDialog({ fund, open, onOpenChange }: Readonly<FundDeta
       case "active":
         return "bg-green-100 text-green-800"
       case "fundraising":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "closed":
         return "bg-gray-100 text-gray-800"
       case "winding_down":
@@ -65,7 +65,7 @@ export function FundDetailDialog({ fund, open, onOpenChange }: Readonly<FundDeta
                       <p className="text-xs text-muted-foreground">Fund Size</p>
                       <p className="text-lg font-semibold">{fund.size}</p>
                     </div>
-                    <DollarSign className="h-6 w-6 text-blue-500 opacity-20" />
+                    <DollarSign className="h-6 w-6 text-primary opacity-20" />
                   </div>
                 </CardContent>
               </Card>

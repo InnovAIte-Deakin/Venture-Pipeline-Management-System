@@ -120,13 +120,13 @@ export default function WorkflowWizardPage() {
           {[1, 2, 3, 4, 5].map((i) => (
             <div key={i} className="flex items-center">
               <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium ${
-                i <= step ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-600'
+                i <= step ? 'bg-primary text-white' : 'bg-gray-200 text-gray-600'
               }`}>
                 {i}
               </div>
               {i < 5 && (
                 <div className={`mx-2 h-0.5 w-8 sm:w-16 ${
-                  i < step ? 'bg-blue-600' : 'bg-gray-200'
+                  i < step ? 'bg-primary' : 'bg-gray-200'
                 }`} />
               )}
             </div>
@@ -160,7 +160,7 @@ export default function WorkflowWizardPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <Card 
                   className={`cursor-pointer transition-all hover:shadow-md ${
-                    selectedTemplate === null ? 'ring-2 ring-blue-500' : 'hover:ring-1 hover:ring-gray-300'
+                    selectedTemplate === null ? 'ring-2 ring-ring' : 'hover:ring-1 hover:ring-gray-300'
                   }`}
                   onClick={() => {
                     setSelectedTemplate(null)
@@ -184,12 +184,12 @@ export default function WorkflowWizardPage() {
                   <Card 
                     key={template.id}
                     className={`cursor-pointer transition-all hover:shadow-md ${
-                      selectedTemplate === template.id ? 'ring-2 ring-blue-500' : 'hover:ring-1 hover:ring-gray-300'
+                      selectedTemplate === template.id ? 'ring-2 ring-ring' : 'hover:ring-1 hover:ring-gray-300'
                     }`}
                     onClick={() => selectTemplate(template.id)}
                   >
                     <CardContent className="p-4">
-                      <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                      <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mx-auto mb-3">
                         <template.icon className="h-5 w-5" />
                       </div>
                       <h4 className="font-semibold text-center mb-2">{template.name}</h4>
@@ -257,7 +257,7 @@ export default function WorkflowWizardPage() {
                     <Card 
                       key={triggerType.value}
                       className={`cursor-pointer transition-all ${
-                        trigger.type === triggerType.value ? 'ring-2 ring-blue-500 bg-blue-50' : 'hover:shadow-md'
+                        trigger.type === triggerType.value ? 'ring-2 ring-ring bg-primary/10' : 'hover:shadow-md'
                       }`}
                       onClick={() => setTrigger({ type: triggerType.value, config: {} })}
                     >
@@ -350,7 +350,7 @@ export default function WorkflowWizardPage() {
                 {actions.map((action, index) => (
                   <Card key={index} className="p-4">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
-                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-medium">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-medium">
                         {index + 1}
                       </div>
                       <div className="flex-1 space-y-3">
@@ -480,12 +480,12 @@ export default function WorkflowWizardPage() {
                 </div>
               </div>
 
-              <div className="bg-blue-50 p-4 rounded-lg">
+              <div className="bg-primary/10 p-4 rounded-lg">
                 <div className="flex items-start gap-3">
-                  <CheckCircle className="h-5 w-5 text-blue-600 mt-0.5" />
+                  <CheckCircle className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <h4 className="font-medium text-blue-900">Ready to Create</h4>
-                    <p className="text-blue-700 text-sm">Your workflow is configured and ready to be created. You can further customize it in the builder after creation.</p>
+                    <h4 className="font-medium text-primary">Ready to Create</h4>
+                    <p className="text-primary text-sm">Your workflow is configured and ready to be created. You can further customize it in the builder after creation.</p>
                   </div>
                 </div>
               </div>

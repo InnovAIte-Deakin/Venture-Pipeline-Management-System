@@ -36,7 +36,7 @@ export function ReportsDocumentsSection({
     if (!type) return "bg-slate-100 text-slate-800"
     switch (type.toLowerCase()) {
       case "performance":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "compliance":
         return "bg-purple-100 text-purple-800"
       case "k-1":
@@ -98,7 +98,7 @@ export function ReportsDocumentsSection({
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <FileText className="h-5 w-5 text-blue-500" />
+                      <FileText className="h-5 w-5 text-primary" />
                       <CardTitle className="text-base">{report.name}</CardTitle>
                     </div>
                     {report.type && (

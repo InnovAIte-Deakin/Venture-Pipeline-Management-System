@@ -40,8 +40,8 @@ const dashboardTemplates: DashboardTemplate[] = [
     widgetCount: 8,
     icon: BarChart,
     borderClass: "border-t-blue-400",
-    iconBackgroundClass: "bg-blue-100",
-    iconClass: "text-blue-600",
+    iconBackgroundClass: "bg-primary/10",
+    iconClass: "text-primary",
   },
   {
     name: "Portfolio Performance",

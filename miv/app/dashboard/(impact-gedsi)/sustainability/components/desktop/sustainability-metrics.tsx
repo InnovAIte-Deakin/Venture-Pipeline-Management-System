@@ -70,7 +70,7 @@ export function DesktopSustainabilityMetrics({
         value={carbonOffset}
         description="tCO2e sequestered through portfolio"
         icon={TreePine}
-        cardClassName="border-l-green-500 bg-linear-to-br from-green-50 to-emerald-50"
+        cardClassName="border-l-green-500 bg-background "
         titleClassName="text-green-800"
         valueClassName="text-green-700"
         descriptionClassName="text-green-600"
@@ -82,11 +82,11 @@ export function DesktopSustainabilityMetrics({
         value={`${circularityIndex}%`}
         description="Waste-to-value conversion rate"
         icon={Infinity}
-        cardClassName="border-l-blue-500 bg-linear-to-br from-blue-50 to-cyan-50"
-        titleClassName="text-blue-800"
-        valueClassName="text-blue-700"
-        descriptionClassName="text-blue-600"
-        iconClassName="text-blue-600"
+        cardClassName="border-l-primary bg-background "
+        titleClassName="text-primary"
+        valueClassName="text-primary"
+        descriptionClassName="text-primary"
+        iconClassName="text-primary"
       />
 
       <MetricCard
@@ -94,7 +94,7 @@ export function DesktopSustainabilityMetrics({
         value={biodiversityScore}
         description="Nature-positive impact index"
         icon={Waves}
-        cardClassName="border-l-purple-500 bg-linear-to-br from-purple-50 to-violet-50"
+        cardClassName="border-l-purple-500 bg-background "
         titleClassName="text-purple-800"
         valueClassName="text-purple-700"
         descriptionClassName="text-purple-600"
@@ -106,7 +106,7 @@ export function DesktopSustainabilityMetrics({
         value={carbonCredits}
         description="Verified carbon credits earned"
         icon={Award}
-        cardClassName="border-l-orange-500 bg-linear-to-br from-orange-50 to-amber-50"
+        cardClassName="border-l-orange-500 bg-background "
         titleClassName="text-orange-800"
         valueClassName="text-orange-700"
         descriptionClassName="text-orange-600"
@@ -118,7 +118,7 @@ export function DesktopSustainabilityMetrics({
         value={`${regenerativeVentures}/${totalVentures}`}
         description="Portfolio transformation rate"
         icon={Satellite}
-        cardClassName="border-l-teal-500 bg-linear-to-br from-teal-50 to-cyan-50"
+        cardClassName="border-l-teal-500 bg-background "
         titleClassName="text-teal-800"
         valueClassName="text-teal-700"
         descriptionClassName="text-teal-600"

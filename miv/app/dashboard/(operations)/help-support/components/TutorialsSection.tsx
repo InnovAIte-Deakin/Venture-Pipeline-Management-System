@@ -15,7 +15,7 @@ const tutorials: Tutorial[] = [
     id: "getting-started",
     title: "Getting Started",
     description: "Learn the basics of navigating the platform and setting up your account",
-    iconClassName: "text-blue-600",
+    iconClassName: "text-primary",
     href: "/dashboard",
   },
   {

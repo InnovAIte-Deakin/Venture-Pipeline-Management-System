@@ -29,8 +29,8 @@ export default function QuickActionsGrid({
       >
         <CardContent className="pt-6">
           <div className="flex items-center space-x-3">
-            <div className="p-2 bg-blue-100 rounded-lg">
-              <BookOpen className="h-5 w-5 text-blue-600" />
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <BookOpen className="h-5 w-5 text-primary" />
             </div>
             <div>
               <h3 className="font-semibold">Documentation</h3>

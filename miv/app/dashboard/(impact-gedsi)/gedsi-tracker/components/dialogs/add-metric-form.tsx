@@ -194,7 +194,7 @@ export function AddMetricForm({
       </div>
 
       <div className="flex justify-end">
-        <Button type="submit" className="bg-black text-white hover:bg-neutral-800">
+        <Button type="submit">
           Add Metric
         </Button>
       </div>

@@ -75,7 +75,7 @@ export function ActionDialog({ company, onClose, onExecuteAction }: ActionDialog
           {/* Standard Actions */}
           <div>
             <h3 className="font-semibold mb-3 flex items-center gap-2">
-              <Zap className="h-4 w-4 text-blue-500" />
+              <Zap className="h-4 w-4 text-primary" />
               Available Actions
             </h3>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -103,7 +103,7 @@ export function ActionDialog({ company, onClose, onExecuteAction }: ActionDialog
                 onClick={() => onExecuteAction("Schedule Board Review", company)}
               >
                 <div className="flex items-start gap-3">
-                  <Calendar className="h-5 w-5 text-blue-500 mt-0.5" />
+                  <Calendar className="h-5 w-5 text-primary mt-0.5" />
                   <div>
                     <div className="font-medium">Schedule Board Review</div>
                     <div className="text-xs text-muted-foreground">

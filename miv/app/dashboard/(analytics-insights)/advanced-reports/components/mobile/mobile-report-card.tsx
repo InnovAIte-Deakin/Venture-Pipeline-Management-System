@@ -26,7 +26,7 @@ export function MobileReportCard({ report, onExportClick }: MobileReportCardProp
         <div className="flex flex-wrap gap-2">
           <Badge variant={report.status === "published" ? "default" : "secondary"}>{report.status}</Badge>
           {report.isScheduled && (
-            <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
+            <Badge variant="outline" className="border-primary bg-primary/10 text-primary">
               <Calendar className="mr-1 h-3 w-3" aria-hidden="true" />
               {report.scheduleFrequency}
             </Badge>
@@ -35,7 +35,7 @@ export function MobileReportCard({ report, onExportClick }: MobileReportCardProp
         <CardDescription>
           {report.description}
           <span className="mt-1 block text-xs">Last generated {formatDate(report.lastGenerated)}</span>
-          {report.isScheduled && report.nextRun && <span className="mt-1 block text-xs text-blue-600">Next run: {formatDate(report.nextRun)}</span>}
+          {report.isScheduled && report.nextRun && <span className="mt-1 block text-xs text-primary">Next run: {formatDate(report.nextRun)}</span>}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-3">

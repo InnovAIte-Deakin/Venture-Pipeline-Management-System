@@ -29,8 +29,8 @@ export function ItemEditDialog({ open, onOpenChange, selectedItem }: ItemEditDia
 
         {selectedItem && (
           <div className="space-y-6 py-4">
-            <Alert className="border-blue-200 bg-blue-50 dark:bg-blue-950">
-              <AlertCircle className="h-4 w-4 text-blue-600" />
+            <Alert className="border-primary bg-primary/10 dark:bg-blue-950">
+              <AlertCircle className="h-4 w-4 text-primary" />
               <AlertDescription>
                 <strong>Demo Mode:</strong> This is a demonstration. In production, this would update the actual due diligence records.
               </AlertDescription>

@@ -8,19 +8,21 @@ interface LogoProps {
 
 export function Logo({ size = "md", className = "" }: LogoProps) {
   const sizeClasses = {
-    sm: "w-8 h-8",
-    md: "w-12 h-12", 
-    lg: "w-16 h-16",
-    xl: "w-20 h-20"
+    sm: "h-8 w-24",
+    md: "h-12 w-36",
+    lg: "h-16 w-48",
+    xl: "h-20 w-60"
   }
 
   return (
-    <div className={`${sizeClasses[size]} ${className} relative`}>
+    <div className={`${sizeClasses[size]} ${className} shrink-0 overflow-hidden rounded-md bg-white`}>
       <Image
-        src="/download.png"
+        src="/logo.png"
         alt="MIV Logo"
-        fill
-        className="object-contain"
+        width={240}
+        height={80}
+        sizes="(max-width: 768px) 96px, 144px"
+        className="h-full w-full object-contain p-1"
         priority
       />
     </div>

@@ -97,7 +97,7 @@ export function ReportsSection({ generatingReport, openReportConfig }: ReportsSe
             </Button>
           </div>
 
-          <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
+          <div className="mt-6 p-4 bg-primary/10 dark:bg-blue-950 rounded-lg">
             <h4 className="font-medium mb-2 flex items-center gap-2">
               <Download className="h-4 w-4" />
               Report Generation

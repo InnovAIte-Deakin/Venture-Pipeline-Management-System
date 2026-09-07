@@ -10,10 +10,10 @@ export function Step4ReadinessAssessment({ register, setValue, watchedValues, er
   <div className="space-y-8">
 
     {/* Operational Readiness */}
-    <Card className="p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
+    <Card className="p-6 bg-background border-primary">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
-          <FileText aria-hidden="true" className="h-5 w-5 text-blue-500" />
+          <FileText aria-hidden="true" className="h-5 w-5 text-primary" />
           <h3 className="text-lg font-semibold">Operational Readiness</h3>
         </div>
         <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
@@ -35,7 +35,7 @@ export function Step4ReadinessAssessment({ register, setValue, watchedValues, er
                     setValue(`operationalReadiness.${item.key}` as any, checked as boolean)
                   }}
                 />
-                <item.icon aria-hidden="true" className="h-4 w-4 text-blue-500" />
+                <item.icon aria-hidden="true" className="h-4 w-4 text-primary" />
                 <Label htmlFor={item.key} className="flex min-h-11 flex-1 cursor-pointer items-center">{item.label}</Label>
               </div>
             </Card>
@@ -45,7 +45,7 @@ export function Step4ReadinessAssessment({ register, setValue, watchedValues, er
     </Card>
 
     {/* Capital Readiness */}
-    <Card className="p-6 bg-linear-to-r from-purple-50 to-pink-50 dark:from-purple-950 dark:to-pink-950 border-purple-200">
+    <Card className="p-6 bg-background border-purple-200">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
           <Award aria-hidden="true" className="h-5 w-5 text-purple-500" />

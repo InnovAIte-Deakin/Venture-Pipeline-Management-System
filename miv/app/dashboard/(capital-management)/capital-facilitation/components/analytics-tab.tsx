@@ -67,7 +67,7 @@ export function AnalyticsTab({
                   className="flex items-center justify-between gap-3"
                 >
                   <div className="flex min-w-0 items-center gap-2">
-                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-blue-100 text-xs font-medium">
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-medium">
                       {index + 1}
                     </div>
                     <span className="wrap-break-word text-sm">{investor.name}</span>

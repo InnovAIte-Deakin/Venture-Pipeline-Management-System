@@ -47,7 +47,7 @@ export function LPsSection({ limitedPartners, loading = false }: Readonly<LPsSec
       case "defaulted":
         return "bg-red-100 text-red-800"
       case "transferred":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "withdrawn":
         return "bg-gray-100 text-gray-800"
       default:
@@ -177,7 +177,7 @@ export function LPsSection({ limitedPartners, loading = false }: Readonly<LPsSec
                     KYC: {lp.kycStatus}
                   </Badge>
                   {lp.accredited && (
-                    <Badge variant="outline" className="bg-blue-100 text-blue-800">
+                    <Badge variant="outline" className="bg-primary/10 text-primary">
                       Accredited
                     </Badge>
                   )}

@@ -73,13 +73,13 @@ export function AnalyticsTab({
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center">
-              <Building2 className="h-5 w-5 mr-2 text-blue-600" />
+              <Building2 className="h-5 w-5 mr-2 text-primary" />
               Venture Distribution
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <div className="text-3xl font-bold text-blue-600">{ventures.length}</div>
+              <div className="text-3xl font-bold text-primary">{ventures.length}</div>
               <div className="text-sm text-gray-600">Active ventures in pipeline</div>
               <div className="space-y-2">
                 {Object.entries(summary.stageDistribution).map(([stage, count]) => (

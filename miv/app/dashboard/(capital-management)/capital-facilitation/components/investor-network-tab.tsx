@@ -50,7 +50,7 @@ export function InvestorNetworkTab({
                 >
                   <CardContent className="p-4">
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-blue-700">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
                         {investor.name.substring(0, 2).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">

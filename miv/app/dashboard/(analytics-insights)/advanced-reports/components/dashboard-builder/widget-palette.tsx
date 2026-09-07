@@ -24,7 +24,7 @@ export function WidgetPalette({ onDragStart }: WidgetPaletteProps) {
               key={widget.id}
               draggable
               onDragStart={() => onDragStart(widget.id)}
-              className="cursor-move rounded-lg border-2 border-dashed border-gray-300 p-3 transition-colors hover:border-blue-400 hover:bg-blue-50"
+              className="cursor-move rounded-lg border-2 border-dashed border-gray-300 p-3 transition-colors hover:border-primary hover:bg-primary/10"
             >
               <div className="flex flex-col items-center text-center">
                 <Icon className="mb-2 h-6 w-6 text-gray-500" aria-hidden="true" />

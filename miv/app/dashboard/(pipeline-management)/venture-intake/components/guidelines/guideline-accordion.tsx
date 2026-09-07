@@ -64,11 +64,11 @@ export function GuidelineAccordion({
                 aria-expanded={expanded}
                 aria-controls={panelId}
                 onClick={() => setExpandedId(expanded ? null : section.id)}
-                className="flex min-h-11 w-full min-w-0 items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-inset dark:hover:bg-slate-900 sm:px-5"
+                className="flex min-h-11 w-full min-w-0 items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset dark:hover:bg-slate-900 sm:px-5"
               >
                 <SectionIcon
                   aria-hidden="true"
-                  className="h-5 w-5 shrink-0 text-blue-600 dark:text-blue-400"
+                  className="h-5 w-5 shrink-0 text-primary dark:text-primary"
                 />
                 <span className="min-w-0 flex-1">
                   <span className="block break-words font-semibold text-gray-900 dark:text-white">
@@ -78,7 +78,7 @@ export function GuidelineAccordion({
                     {section.description}
                   </span>
                 </span>
-                <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-blue-700 dark:text-blue-300">
+                <span className="flex shrink-0 items-center gap-1 text-sm font-medium text-primary dark:text-primary">
                   <span>{expanded ? collapseLabel : expandLabel}</span>
                   <ChevronDown
                     aria-hidden="true"
@@ -115,7 +115,7 @@ export function GuidelineAccordion({
                             {' '}
                             <a
                               href={entry.href}
-                              className="font-medium text-blue-700 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 dark:text-blue-300"
+                              className="font-medium text-primary underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring dark:text-primary"
                             >
                               {entry.linkLabel}
                             </a>

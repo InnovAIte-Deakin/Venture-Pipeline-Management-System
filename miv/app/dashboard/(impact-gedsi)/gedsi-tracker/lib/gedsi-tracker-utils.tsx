@@ -38,7 +38,7 @@ export function getStatusColor(status: GedsiMetricStatus) {
     case "Verified":
       return "bg-green-100 text-green-800 border-green-200"
     case "In Progress":
-      return "bg-blue-100 text-blue-800 border-blue-200"
+      return "bg-primary/10 text-primary border-primary"
     case "Overdue":
       return "bg-red-100 text-red-800 border-red-200"
     default:

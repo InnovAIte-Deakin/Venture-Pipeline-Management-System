@@ -126,7 +126,7 @@ export const WORKFLOW_TEMPLATES: WorkflowTemplate[] = [
 
 export const TRIGGER_TYPES: WorkflowOption[] = [
   { value: "manual", label: "Manual Trigger", icon: Play, description: "Start manually when needed", color: "bg-green-100 text-green-700" },
-  { value: "schedule", label: "Schedule", icon: Clock, description: "Run on a schedule", color: "bg-blue-100 text-blue-700" },
+  { value: "schedule", label: "Schedule", icon: Clock, description: "Run on a schedule", color: "bg-primary/10 text-primary" },
   { value: "webhook", label: "Webhook", icon: Webhook, description: "Trigger via API call", color: "bg-purple-100 text-purple-700" },
   { value: "venture_created", label: "Venture Created", icon: Building2, description: "When a new venture is added", color: "bg-orange-100 text-orange-700" },
   { value: "stage_changed", label: "Stage Changed", icon: ArrowRight, description: "When venture stage updates", color: "bg-yellow-100 text-yellow-700" },
@@ -135,7 +135,7 @@ export const TRIGGER_TYPES: WorkflowOption[] = [
 
 export const ACTION_TYPES: WorkflowOption[] = [
   { value: "send_email", label: "Send Email", icon: Mail, description: "Send email notification", color: "bg-red-100 text-red-700" },
-  { value: "create_notification", label: "Create Notification", icon: Bell, description: "Create in-app notification", color: "bg-blue-100 text-blue-700" },
+  { value: "create_notification", label: "Create Notification", icon: Bell, description: "Create in-app notification", color: "bg-primary/10 text-primary" },
   { value: "update_database", label: "Update Database", icon: Database, description: "Update venture data", color: "bg-green-100 text-green-700" },
   { value: "generate_document", label: "Generate Document", icon: FileText, description: "Create document from template", color: "bg-purple-100 text-purple-700" },
   { value: "assign_task", label: "Assign Task", icon: Users, description: "Create and assign tasks", color: "bg-orange-100 text-orange-700" },

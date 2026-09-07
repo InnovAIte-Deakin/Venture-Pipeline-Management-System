@@ -84,10 +84,10 @@ export default function ManageWidgetsDialog({
                     <button
                       key={item.type}
                       onClick={() => handleAddFromLibrary(item.type)}
-                      className="flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left hover:border-blue-400 hover:bg-blue-50/50 transition-colors"
+                      className="flex flex-col items-start gap-1.5 rounded-lg border p-3 text-left hover:border-primary hover:bg-primary/10/50 transition-colors"
                     >
                       <div className="flex items-center justify-between w-full">
-                        <Icon className="h-4 w-4 text-blue-600" />
+                        <Icon className="h-4 w-4 text-primary" />
                         <Plus className="h-3.5 w-3.5 text-muted-foreground" />
                       </div>
                       <span className="text-xs font-medium">{item.name}</span>

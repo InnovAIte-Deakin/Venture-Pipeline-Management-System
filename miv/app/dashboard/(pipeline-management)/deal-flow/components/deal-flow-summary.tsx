@@ -35,7 +35,7 @@ export function DealFlowSummary({ summary, variant = "full" }: DealFlowSummaryPr
             <p className="text-xs text-muted-foreground">Average: ${averageValue}M per deal</p>
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-pink-500 bg-linear-to-r from-pink-50 to-white dark:from-pink-950/20 dark:to-background">
+        <Card className="border-l-4 border-l-pink-500 bg-background ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-pink-700 dark:text-pink-300">GEDSI Score</CardTitle>
             <Heart className="h-4 w-4 text-pink-500" aria-hidden="true" />
@@ -51,7 +51,7 @@ export function DealFlowSummary({ summary, variant = "full" }: DealFlowSummaryPr
             <Progress value={summary.avgGedsiScore} className="mt-2 h-2" />
           </CardContent>
         </Card>
-        <Card className="border-l-4 border-l-green-500 bg-linear-to-r from-green-50 to-white dark:from-green-950/20 dark:to-background">
+        <Card className="border-l-4 border-l-green-500 bg-background ">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium text-green-700 dark:text-green-300">Impact Score</CardTitle>
             <Globe className="h-4 w-4 text-green-500" aria-hidden="true" />
@@ -71,7 +71,7 @@ export function DealFlowSummary({ summary, variant = "full" }: DealFlowSummaryPr
 
       {variant === "full" && (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <MetricCard title="Jobs Created" value={summary.totalJobsCreated} icon={<Users className="h-4 w-4 text-blue-500" aria-hidden="true" />} />
+          <MetricCard title="Jobs Created" value={summary.totalJobsCreated} icon={<Users className="h-4 w-4 text-primary" aria-hidden="true" />} />
           <MetricCard title="Communities" value={summary.totalCommunitiesServed} icon={<Globe className="h-4 w-4 text-green-500" aria-hidden="true" />} />
           <MetricCard title="Women-Led" value={summary.womenLedDeals} subtitle={`${summary.totalDeals > 0 ? ((summary.womenLedDeals / summary.totalDeals) * 100).toFixed(1) : "0"}% of portfolio`} icon={<Heart className="h-4 w-4 text-pink-500" aria-hidden="true" />} />
           <MetricCard title="Disability Inclusive" value={summary.disabilityInclusiveDeals} subtitle={`${summary.totalDeals > 0 ? ((summary.disabilityInclusiveDeals / summary.totalDeals) * 100).toFixed(1) : "0"}% of portfolio`} icon={<Shield className="h-4 w-4 text-purple-500" aria-hidden="true" />} />

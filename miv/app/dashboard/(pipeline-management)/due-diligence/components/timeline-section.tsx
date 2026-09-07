@@ -25,7 +25,7 @@ export function TimelineSection({ filteredItems }: TimelineSectionProps) {
               <div key={item.id} className="flex items-start gap-4">
                 <div className={`w-3 h-3 rounded-full mt-2 shrink-0 ${
                   item.status === "completed" ? "bg-green-500" :
-                  item.status === "in_progress" ? "bg-blue-500" :
+                  item.status === "in_progress" ? "bg-primary" :
                   isOverdue ? "bg-red-500" : "bg-gray-300"
                 }`} />
                 <div className="flex-1 space-y-2 min-w-0">

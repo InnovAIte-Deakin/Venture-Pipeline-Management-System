@@ -27,7 +27,7 @@ export function usePerformanceAnalyticsDerived(data: AnalyticsData) {
 
     return [
       { title: "Venture Success Rate", value: conversionRate, unit: "%", change: 2.1, trend: "up", icon: Target, color: "text-emerald-600", bgColor: "bg-emerald-50", description: "Ventures that reached funding stage" },
-      { title: "Capital Facilitated", value: (totalCapital / 1000000).toFixed(1), unit: "M", change: 0.8, trend: "up", icon: DollarSign, color: "text-blue-600", bgColor: "bg-blue-50", description: "Total funding raised by ventures" },
+      { title: "Capital Facilitated", value: (totalCapital / 1000000).toFixed(1), unit: "M", change: 0.8, trend: "up", icon: DollarSign, color: "text-primary", bgColor: "bg-primary/10", description: "Total funding raised by ventures" },
       { title: "GEDSI Compliance", value: gedsiCompliance, unit: "%", change: 5.2, trend: "up", icon: UserCheck, color: "text-purple-600", bgColor: "bg-purple-50", description: "Average GEDSI metric completion" },
       { title: "Active Users", value: activeUsers, unit: "", change: 12, trend: "up", icon: Users, color: "text-orange-600", bgColor: "bg-orange-50", description: "Currently active platform users" },
       { title: "Avg Time to Funding", value: calculateAvgTimeToFunding(data.ventures), unit: " days", change: calculateTimeToFundingChange(data.ventures), trend: calculateTimeToFundingChange(data.ventures) < 0 ? "down" : "up", icon: Clock, color: "text-teal-600", bgColor: "bg-teal-50", description: "Average time from intake to funding" },

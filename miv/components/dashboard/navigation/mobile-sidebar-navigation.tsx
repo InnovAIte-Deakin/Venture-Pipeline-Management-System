@@ -67,13 +67,13 @@ export function MobileSidebarNavigation({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="left"
-        className="w-[min(100vw,360px)] overflow-y-auto bg-white p-0 text-slate-900"
+        className="w-[min(100vw,360px)] overflow-y-auto bg-background p-0 text-foreground"
       >
         <SheetHeader className="sr-only">
           <SheetTitle>Mobile dashboard sidebar</SheetTitle>
         </SheetHeader>
 
-        <div className="min-h-full border-r border-slate-200 pb-8">
+        <div className="min-h-full border-r border-border pb-8">
           <div className="relative flex justify-center px-5 pb-5 pt-10">
             <Logo size="xl" className="h-24 w-24" />
           </div>
@@ -98,13 +98,13 @@ export function MobileSidebarNavigation({
               variant="secondary"
               onClick={() => setShowMore(!showMore)}
               aria-expanded={showMore}
-              className="mt-3 h-8 w-full rounded-md bg-slate-200 text-xs font-semibold text-slate-600 hover:bg-slate-300"
+              className="mt-3 h-8 w-full rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               {showMore ? "See less" : "See more"}
             </Button>
 
             {showMore && (
-              <div className="mt-4 space-y-4 border-t border-slate-200 pt-4">
+              <div className="mt-4 space-y-4 border-t border-border pt-4">
                 {dashboardDesktopNavigationItems.map((item) => (
                   <MobileNavGroup
                     key={item.title}
@@ -117,46 +117,46 @@ export function MobileSidebarNavigation({
             )}
           </nav>
 
-          <div className="mt-4 border-t border-slate-300">
+          <div className="mt-4 border-t border-border">
             <SidebarUtilityLink
               icon={Phone}
               label="Help & Support"
               href="/dashboard/help-support"
               onNavigate={handleNavigate}
-              className="border-b border-slate-300"
+              className="border-b border-border"
             />
             <SidebarUtilityLink
               icon={Settings}
               label="Settings & Privacy"
               href="/dashboard/system-settings"
               onNavigate={handleNavigate}
-              className="border-b border-slate-300"
+              className="border-b border-border"
             />
           </div>
 
           <div className="px-10 py-4">
             <Button
               type="button"
-              className="h-10 w-full rounded-md bg-red-300 text-xs font-semibold text-slate-600 hover:bg-red-300"
+              className="h-10 w-full rounded-md bg-destructive text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
             >
               <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
               Log Out
             </Button>
             <Button
               type="button"
-              className="mt-3 h-10 w-full rounded-md bg-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-300"
+              className="mt-3 h-10 w-full rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <Lock className="mr-2 h-4 w-4" aria-hidden="true" />
               Lock App
             </Button>
           </div>
 
-          <address className="px-8 text-center text-xs not-italic leading-5 text-slate-500">
-            <p className="font-medium text-slate-600">Contact Details</p>
+          <address className="px-8 text-center text-xs not-italic leading-5 text-muted-foreground">
+            <p className="font-medium text-foreground">Contact Details</p>
             {contactDetails.map((line) => (
               <p key={line}>{line}</p>
             ))}
-            <p className="mt-4 font-medium text-slate-600">Phone Number</p>
+            <p className="mt-4 font-medium text-foreground">Phone Number</p>
             <p>+855 17 350 544</p>
           </address>
         </div>
@@ -178,16 +178,16 @@ function MobileNavTile({
 }) {
   const Icon = item.icon;
   const className = cn(
-    "flex min-h-20 flex-col items-start justify-between rounded-md border-2 p-3 text-left text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+    "flex min-h-20 flex-col items-start justify-between rounded-md border-2 p-3 text-left text-sm font-semibold shadow-sm transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
     active
-      ? "border-blue-500 bg-blue-50 text-blue-700"
-      : "border-slate-400 bg-white text-slate-600 hover:bg-slate-50",
+      ? "border-primary bg-primary/10 text-primary"
+      : "border-border bg-background text-muted-foreground hover:bg-primary/10 hover:text-primary",
   );
 
   if (!item.href) {
     return (
       <button type="button" className={className} disabled>
-        <Icon className="h-8 w-8 text-slate-950" aria-hidden="true" />
+        <Icon className="h-8 w-8 text-foreground" aria-hidden="true" />
         <span>{label}</span>
       </button>
     );
@@ -200,7 +200,7 @@ function MobileNavTile({
       aria-current={active ? "page" : undefined}
       className={className}
     >
-      <Icon className="h-8 w-8 text-slate-950" aria-hidden="true" />
+      <Icon className="h-8 w-8 text-foreground" aria-hidden="true" />
       <span>{label}</span>
     </Link>
   );
@@ -228,11 +228,11 @@ function MobileNavGroup({
         type="button"
         onClick={() => setExpanded(!expanded)}
         aria-expanded={expanded}
-        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-semibold text-slate-700 hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-semibold text-foreground hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-ring"
       >
-        <Icon className="h-5 w-5 text-slate-950" aria-hidden="true" />
+        <Icon className="h-5 w-5 text-foreground" aria-hidden="true" />
         <span className="flex-1">{item.title}</span>
-        <span className="text-xs text-slate-500">{expanded ? "Less" : "More"}</span>
+        <span className="text-xs text-muted-foreground">{expanded ? "Less" : "More"}</span>
       </button>
       {expanded && (
         <div className="mt-1 space-y-1 pl-5">
@@ -262,10 +262,10 @@ function MobileNavRow({
   const Icon = item.icon;
   const active = item.href ? isDashboardRouteActive(pathname, item.href) : false;
   const className = cn(
-    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500",
+    "flex w-full items-center gap-3 rounded-md px-3 py-2 text-left text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring",
     active
-      ? "bg-blue-50 text-blue-700"
-      : "text-slate-600 hover:bg-slate-100 hover:text-slate-950",
+      ? "bg-primary/10 text-primary"
+      : "text-muted-foreground hover:bg-primary/10 hover:text-primary",
   );
 
   if (!item.href) {
@@ -308,11 +308,11 @@ function SidebarUtilityLink({
       href={href}
       onClick={onNavigate}
       className={cn(
-        "flex h-11 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-slate-600 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-500",
+        "flex h-11 w-full items-center gap-3 px-4 text-left text-sm font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary focus:outline-none focus:ring-2 focus:ring-ring",
         className,
       )}
     >
-      <Icon className="h-5 w-5 text-slate-950" aria-hidden="true" />
+      <Icon className="h-5 w-5 text-foreground" aria-hidden="true" />
       {label}
     </Link>
   );

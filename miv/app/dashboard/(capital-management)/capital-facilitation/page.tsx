@@ -26,7 +26,7 @@ export default function CapitalFacilitation() {
   } = useCapitalFacilitation();
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="space-y-4 p-4 sm:space-y-6 sm:p-6">
         {loading && (
           <Card>

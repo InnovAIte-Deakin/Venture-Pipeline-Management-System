@@ -221,10 +221,10 @@ export default function DocumentUploadPage() {
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending_review: { color: 'bg-yellow-100 text-yellow-800', text: 'Pending Review' },
-      approved: { color: 'bg-green-100 text-green-800', text: 'Approved' },
-      rejected: { color: 'bg-red-100 text-red-800', text: 'Rejected' },
-      needs_revision: { color: 'bg-red-100 text-red-800', text: 'Needs Revision' }
+      pending_review: { color: 'bg-warning/10 text-warning', text: 'Pending Review' },
+      approved: { color: 'bg-success/10 text-success', text: 'Approved' },
+      rejected: { color: 'bg-secondary/10 text-secondary', text: 'Rejected' },
+      needs_revision: { color: 'bg-secondary/10 text-secondary', text: 'Needs Revision' }
     };
     const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending_review;
     return (
@@ -241,48 +241,48 @@ export default function DocumentUploadPage() {
     }, [fetchDocuments])
   
   return (
-    <div className="min-h-screen bg-gray-50 py-8 px-4">
+    <div className="min-h-screen bg-background py-8 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Document Upload</h1>
-          <p className="text-gray-600">Upload and manage your venture documents securely</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Document Upload</h1>
+          <p className="text-muted-foreground">Upload and manage your venture documents securely</p>
         </div>
 
         {/* Alerts */}
         {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg flex items-start">
-            <AlertCircle className="w-5 h-5 text-red-600 mr-3 mt-0.5" />
-            <p className="text-red-800">{error}</p>
+          <div className="mb-6 p-4 bg-secondary/10 border border-secondary/20 rounded-lg flex items-start">
+            <AlertCircle className="w-5 h-5 text-secondary mr-3 mt-0.5" />
+            <p className="text-secondary">{error}</p>
             <button onClick={() => setError('')} className="ml-auto">
-              <X className="w-5 h-5 text-red-600" />
+              <X className="w-5 h-5 text-secondary" />
             </button>
           </div>
         )}
 
         {success && (
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg flex items-start">
-            <CheckCircle className="w-5 h-5 text-green-600 mr-3 mt-0.5" />
-            <p className="text-green-800">{success}</p>
+          <div className="mb-6 p-4 bg-success/10 border border-success/20 rounded-lg flex items-start">
+            <CheckCircle className="w-5 h-5 text-success mr-3 mt-0.5" />
+            <p className="text-success">{success}</p>
             <button onClick={() => setSuccess('')} className="ml-auto">
-              <X className="w-5 h-5 text-green-600" />
+              <X className="w-5 h-5 text-success" />
             </button>
           </div>
         )}
 
         {/* Upload Section */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-6 mb-8">
           <h2 className="text-xl font-semibold mb-4">Upload New Document</h2>
           
           {/* Document Type Selector */}
           <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Document Type *
             </label>
             <select
               value={selectedType}
               onChange={(e) => setSelectedType(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-2 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent"
               disabled={uploading}
             >
               <option value="">Select document type...</option>
@@ -297,9 +297,9 @@ export default function DocumentUploadPage() {
                 checked={localOnly}
                 onChange={(e) => setLocalOnly(e.target.checked)}
                 disabled={uploading}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                className="h-4 w-4 text-primary focus:ring-ring border-input rounded"
               />
-              <label htmlFor="localOnly" className="text-sm text-gray-600">
+              <label htmlFor="localOnly" className="text-sm text-muted-foreground">
                 Save locally only (no upload to server)
               </label>
             </div> */}
@@ -308,7 +308,7 @@ export default function DocumentUploadPage() {
           {/* Drag and Drop Area */}
           <div
             className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-              dragActive ? 'border-blue-500 bg-blue-50' : 'border-gray-300 bg-gray-50'
+              dragActive ? 'border-primary bg-primary/5' : 'border-border bg-muted/30'
             } ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
             onDragEnter={handleDrag}
             onDragLeave={handleDrag}
@@ -326,30 +326,30 @@ export default function DocumentUploadPage() {
             
             {uploading ? (
               <div className="flex flex-col items-center">
-                <Loader2 className="w-12 h-12 text-blue-500 animate-spin mb-4" />
-                <p className="text-gray-700 font-medium mb-2">Uploading...</p>
-                <div className="w-64 bg-gray-200 rounded-full h-2 mb-2">
+                <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
+                <p className="text-foreground font-medium mb-2">Uploading...</p>
+                <div className="w-64 bg-muted rounded-full h-2 mb-2">
                   <div
-                    className="bg-blue-500 h-2 rounded-full transition-all"
+                    className="bg-primary h-2 rounded-full transition-all"
                     style={{ width: `${uploadProgress}%` }}
                   />
                 </div>
-                <p className="text-sm text-gray-600">{uploadProgress}%</p>
+                <p className="text-sm text-muted-foreground">{uploadProgress}%</p>
               </div>
             ) : (
               <>
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-700 font-medium mb-2">
+                <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                <p className="text-foreground font-medium mb-2">
                   Drag and drop your file here, or
                 </p>
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={!selectedType}
-                  className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+                  className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Browse Files
                 </button>
-                <p className="text-sm text-gray-500 mt-3">
+                <p className="text-sm text-muted-foreground mt-3">
                   Supported: PDF, Word, Excel, PowerPoint (Max 10MB)
                 </p>
               </>
@@ -358,33 +358,33 @@ export default function DocumentUploadPage() {
         </div>
 
         {/* Documents List */}
-        <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="bg-card rounded-lg shadow-sm border border-border p-6">
           <h2 className="text-xl font-semibold mb-4">Your Documents</h2>
           
           {loading ? (
             <div className="text-center py-12">
-              <Loader2 className="w-8 h-8 text-blue-500 animate-spin mx-auto mb-4" />
-              <p className="text-gray-500">Loading documents...</p>
+              <Loader2 className="w-8 h-8 text-primary animate-spin mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading documents...</p>
             </div>
           ) : documents.length === 0 ? (
             <div className="text-center py-12">
-              <File className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">No documents uploaded yet</p>
+              <File className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+              <p className="text-muted-foreground">No documents uploaded yet</p>
             </div>
           ) : (
             <div className="space-y-3">
               {documents.map((doc) => (
                 <div
                   key={doc.id}
-                  className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  className="border border-border rounded-lg p-4 hover:bg-muted/50 transition-colors"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex items-start space-x-3 flex-1">
-                      <File className="w-10 h-10 text-blue-500 shrink-0" />
+                      <File className="w-10 h-10 text-primary shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 truncate">{doc.filename}</h3>
-                        <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-gray-600">
-                          <span className="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs">
+                        <h3 className="font-medium text-foreground truncate">{doc.filename}</h3>
+                        <div className="flex flex-wrap items-center gap-2 mt-1 text-sm text-muted-foreground">
+                          <span className="bg-primary/10 text-primary px-2 py-0.5 rounded text-xs">
                             {doc.documentType}
                           </span>
                           <span>•</span>
@@ -402,14 +402,14 @@ export default function DocumentUploadPage() {
                     <div className="flex items-center space-x-2 ml-4">
                       <button
                         onClick={() => handleDownload(doc.id, doc.filename)}
-                        className="px-3 py-1.5 text-sm bg-blue-50 text-blue-600 rounded hover:bg-blue-100 transition-colors flex items-center gap-1"
+                        className="px-3 py-1.5 text-sm bg-primary/10 text-primary rounded hover:bg-primary/20 transition-colors flex items-center gap-1"
                       >
                         <Download className="w-4 h-4" />
                         Download
                       </button>
                       <button
                         onClick={() => handleDelete(doc.id)}
-                        className="px-3 py-1.5 text-sm bg-red-50 text-red-600 rounded hover:bg-red-100 transition-colors flex items-center gap-1"
+                        className="px-3 py-1.5 text-sm bg-secondary/10 text-secondary rounded hover:bg-secondary/20 transition-colors flex items-center gap-1"
                       >
                         <Trash2 className="w-4 h-4" />
                         Delete

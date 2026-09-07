@@ -139,7 +139,7 @@ export default function NotificationsPage() {
       case 'error':
         return <AlertCircle className="h-5 w-5 text-red-500" aria-hidden="true" />
       default:
-        return <Bell className="h-5 w-5 text-blue-500" aria-hidden="true" />
+        return <Bell className="h-5 w-5 text-primary" aria-hidden="true" />
     }
   }
 
@@ -152,7 +152,7 @@ export default function NotificationsPage() {
       case 'error':
         return 'bg-red-100 text-red-800'
       default:
-        return 'bg-blue-100 text-blue-800'
+        return 'bg-primary/10 text-primary'
     }
   }
 
@@ -282,7 +282,7 @@ export default function NotificationsPage() {
             <Card
               key={notification.id}
               role="listitem"
-              className={`${!notification.isRead ? 'border-blue-200 bg-blue-50' : ''}`}
+              className={`${!notification.isRead ? 'border-primary bg-primary/10' : ''}`}
             >
               <CardContent className="p-6">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -299,7 +299,7 @@ export default function NotificationsPage() {
                           {notification.type}
                         </Badge>
                         {!notification.isRead && (
-                          <Badge variant="outline" className="bg-blue-100 text-blue-800">
+                          <Badge variant="outline" className="bg-primary/10 text-primary">
                             New
                           </Badge>
                         )}
@@ -345,7 +345,7 @@ export default function NotificationsPage() {
               <div className="text-sm text-gray-600">Total</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-2xl font-bold text-primary">
                 {notifications.filter(n => !n.isRead).length}
               </div>
               <div className="text-sm text-gray-600">Unread</div>

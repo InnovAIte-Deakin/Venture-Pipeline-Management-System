@@ -51,12 +51,12 @@ export function generateNatureProjects(ventures: Venture[]) {
       description: "Biodiversity protection initiatives",
       status: "Monitoring",
       metrics: `${hectaresEquivalent} hectares equivalent • ${speciesImpact} species impact`,
-      borderColor: "border-l-blue-500",
-      bgColor: "bg-blue-50",
-      textColor: "text-blue-800",
-      descColor: "text-blue-700",
-      badgeColor: "bg-blue-600",
-      metricColor: "text-blue-600",
+      borderColor: "border-l-primary",
+      bgColor: "bg-primary/10",
+      textColor: "text-primary",
+      descColor: "text-primary",
+      badgeColor: "bg-primary",
+      metricColor: "text-primary",
     });
   }
 

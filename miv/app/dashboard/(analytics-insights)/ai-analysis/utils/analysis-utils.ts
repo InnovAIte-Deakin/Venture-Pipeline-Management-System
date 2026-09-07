@@ -160,7 +160,7 @@ export function getStatusClass(status: AnalysisStatus) {
     case "completed":
       return "bg-green-100 text-green-800"
     case "processing":
-      return "bg-blue-100 text-blue-800"
+      return "bg-primary/10 text-primary"
     case "pending":
       return "bg-yellow-100 text-yellow-800"
     case "failed":

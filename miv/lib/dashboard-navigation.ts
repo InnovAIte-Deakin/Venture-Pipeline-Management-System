@@ -16,12 +16,12 @@ import {
   Heart,
   HelpCircle,
   House,
+  Menu,
   Plus,
   Rocket,
   Settings,
   Shield,
   TrendingUp,
-  User,
   Users,
 } from "lucide-react";
 
@@ -234,9 +234,8 @@ export const dashboardMobileBottomItems: DashboardNavItem[] = [
     icon: Bell,
   },
   {
-    title: "Account",
-    href: "/dashboard/team-management",
-    icon: User,
+    title: "More",
+    icon: Menu,
   },
 ];
 

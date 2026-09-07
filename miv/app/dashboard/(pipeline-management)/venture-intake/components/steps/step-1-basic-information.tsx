@@ -15,10 +15,10 @@ export function Step1BasicInformation({ register, setValue, watchedValues, error
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Venture Name */}
       <div className="md:col-span-2">
-        <Card className="p-4 border-dashed border-2 hover:border-blue-400 transition-colors">
+        <Card className="p-4 border-dashed border-2 hover:border-primary transition-colors">
           <div className="space-y-2">
             <div className="flex items-center space-x-2">
-              <Building2 aria-hidden="true" className="h-4 w-4 text-blue-500" />
+              <Building2 aria-hidden="true" className="h-4 w-4 text-primary" />
               <Label htmlFor="name" className="font-medium">Venture Name <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
             </div>
             <Input
@@ -28,7 +28,7 @@ export function Step1BasicInformation({ register, setValue, watchedValues, error
               aria-describedby={errors.name ? 'name-error' : undefined}
               {...register('name')}
               placeholder="e.g., EcoFarm Solutions"
-              className="border-0 text-lg font-medium focus:ring-2 focus:ring-blue-500"
+              className="border-0 text-lg font-medium focus:ring-2 focus:ring-ring"
             />
             {errors.name && <FieldError id="name-error" message={errors.name.message} />}
           </div>
@@ -88,7 +88,7 @@ export function Step1BasicInformation({ register, setValue, watchedValues, error
       <Card className="p-4 hover:shadow-md transition-shadow">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Mail aria-hidden="true" className="h-4 w-4 text-blue-500" />
+            <Mail aria-hidden="true" className="h-4 w-4 text-primary" />
             <Label htmlFor="contactEmail" className="font-medium">Contact Email <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <Input
@@ -99,7 +99,7 @@ export function Step1BasicInformation({ register, setValue, watchedValues, error
             aria-describedby={errors.contactEmail ? 'contact-email-error' : undefined}
             {...register('contactEmail')}
             placeholder="founder@yourventure.com"
-            className="border-0 focus:ring-2 focus:ring-blue-500"
+            className="border-0 focus:ring-2 focus:ring-ring"
           />
           {errors.contactEmail && <FieldError id="contact-email-error" message={errors.contactEmail.message} />}
         </div>

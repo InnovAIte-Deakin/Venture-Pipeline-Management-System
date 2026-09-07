@@ -9,7 +9,7 @@ export function StatusIcon({ status }: { status: DealStatus }) {
     case "paused":
       return <Clock className="h-4 w-4 text-yellow-500" aria-hidden="true" />
     case "closed":
-      return <CheckCircle className="h-4 w-4 text-blue-500" aria-hidden="true" />
+      return <CheckCircle className="h-4 w-4 text-primary" aria-hidden="true" />
     case "lost":
       return <XCircle className="h-4 w-4 text-red-500" aria-hidden="true" />
     default:
@@ -29,7 +29,7 @@ export function StatusBadge({ status }: { status: DealStatus }) {
       )
     case "closed":
       return (
-        <Badge variant="outline" className="bg-blue-100 text-blue-800">
+        <Badge variant="outline" className="bg-primary/10 text-primary">
           Closed
         </Badge>
       )

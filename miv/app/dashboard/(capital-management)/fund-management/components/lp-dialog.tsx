@@ -19,7 +19,7 @@ export function LPDialog({ open, selectedLP, onOpenChange }: Readonly<LPDialogPr
       <DialogContent className="max-w-3xl">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-medium">
+            <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary font-medium">
               {selectedLP.name.split(' ').map(n => n[0]).join('').substring(0, 2)}
             </div>
             {selectedLP.name}

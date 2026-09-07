@@ -206,7 +206,7 @@ export default function WorkflowBuilderPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
   )
 
@@ -482,7 +482,7 @@ export default function WorkflowBuilderPage() {
                         <div className="flex items-center gap-2">
                           {run.status === 'SUCCEEDED' && <CheckCircle className="h-4 w-4 text-green-500" />}
                           {run.status === 'FAILED' && <XCircle className="h-4 w-4 text-red-500" />}
-                          {run.status === 'RUNNING' && <RotateCcw className="h-4 w-4 text-blue-500 animate-spin" />}
+                          {run.status === 'RUNNING' && <RotateCcw className="h-4 w-4 text-primary animate-spin" />}
                           <span className="text-sm">{run.status}</span>
                         </div>
                         <span className="text-xs text-gray-500">
@@ -553,7 +553,7 @@ export default function WorkflowBuilderPage() {
                 <div
                   key={node.id}
                   className={`absolute bg-white border-2 rounded-lg shadow-sm cursor-move transition-all ${
-                    isSelected ? 'border-blue-500 shadow-lg' : 'border-gray-300 hover:border-gray-400'
+                    isSelected ? 'border-primary shadow-lg' : 'border-gray-300 hover:border-gray-400'
                   }`}
                   style={{
                     left: node.position.x,

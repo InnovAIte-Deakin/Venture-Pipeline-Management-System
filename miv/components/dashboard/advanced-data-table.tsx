@@ -250,7 +250,7 @@ export function AdvancedDataTable({
               placeholder="Search..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 focus:border-blue-500 focus:ring-blue-500"
+              className="pl-10 focus:border-primary focus:ring-ring"
             />
           </div>
         )}
@@ -335,7 +335,7 @@ export function AdvancedDataTable({
               paginatedData.map((row, index) => (
                 <TableRow 
                   key={index}
-                  className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''} ${selectedRows.has(index) ? 'bg-blue-50' : ''}`}
+                  className={`${onRowClick ? 'cursor-pointer hover:bg-gray-50' : ''} ${selectedRows.has(index) ? 'bg-primary/10' : ''}`}
                   onClick={() => onRowClick?.(row)}
                 >
                   {selectable && (

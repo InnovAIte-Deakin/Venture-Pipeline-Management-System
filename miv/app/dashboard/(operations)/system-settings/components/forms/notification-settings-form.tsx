@@ -29,30 +29,39 @@ export function NotificationSettingsForm({
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="email-alerts">Email Alerts</Label>
+        <div className="flex items-center justify-between gap-4">
+          <Label htmlFor="email-alerts" className="min-w-0 leading-snug">
+            Email Alerts
+          </Label>
           <Switch
             id="email-alerts"
+            className="shrink-0"
             checked={notificationSettings.emailAlerts}
             onCheckedChange={(checked) =>
               onNotificationSettingsChange({ ...notificationSettings, emailAlerts: checked })
             }
           />
         </div>
-        <div className="flex items-center justify-between">
-          <Label htmlFor="in-app-notifications">In-App Notifications</Label>
+        <div className="flex items-center justify-between gap-4">
+          <Label htmlFor="in-app-notifications" className="min-w-0 leading-snug">
+            In-App Notifications
+          </Label>
           <Switch
             id="in-app-notifications"
+            className="shrink-0"
             checked={notificationSettings.inAppNotifications}
             onCheckedChange={(checked) =>
               onNotificationSettingsChange({ ...notificationSettings, inAppNotifications: checked })
             }
           />
         </div>
-        <div className="flex items-center justify-between">
-          <Label htmlFor="push-notifications">Push Notifications</Label>
+        <div className="flex items-center justify-between gap-4">
+          <Label htmlFor="push-notifications" className="min-w-0 leading-snug">
+            Push Notifications
+          </Label>
           <Switch
             id="push-notifications"
+            className="shrink-0"
             checked={notificationSettings.pushNotifications}
             onCheckedChange={(checked) =>
               onNotificationSettingsChange({ ...notificationSettings, pushNotifications: checked })
@@ -83,7 +92,7 @@ export function NotificationSettingsForm({
         <Button
           onClick={onNotificationUpdate}
           disabled={notificationSaveStatus === "saving"}
-          className="bg-teal-600 hover:bg-teal-700"
+          className="bg-primary hover:bg-primary"
         >
           <SaveStatusContent
             status={notificationSaveStatus}

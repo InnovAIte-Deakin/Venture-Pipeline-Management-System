@@ -91,7 +91,7 @@ export default function DashboardCard({
     <>
       <Card className="relative group overflow-hidden hover:shadow-lg transition-shadow">
         {/* Category accent bar — quick visual identity, part of the UI redesign pass */}
-        <div className="absolute inset-x-0 top-0 h-1 bg-linear-to-r from-primary/70 to-primary/30" />
+        <div className="absolute inset-x-0 top-0 h-1 bg-background " />
 
         <CardHeader className="pb-3 pt-5">
           <div className="flex items-start justify-between gap-2">
@@ -248,7 +248,7 @@ export default function DashboardCard({
 
             <div className="rounded-lg border bg-muted/40 p-4 space-y-2">
               <div className="flex items-center gap-2 font-medium text-sm">
-                <LayoutDashboard className="h-4 w-4 text-blue-600" />
+                <LayoutDashboard className="h-4 w-4 text-primary" />
                 Dashboard Info
               </div>
               <div className="text-sm text-muted-foreground space-y-1">

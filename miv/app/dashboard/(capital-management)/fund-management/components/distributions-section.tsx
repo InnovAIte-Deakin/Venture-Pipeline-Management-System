@@ -34,7 +34,7 @@ export function DistributionsSection({ distributions, loading = false }: Readonl
   const getStatusColor = (status: string) => {
     switch (status) {
       case "announced":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "pending":
         return "bg-yellow-100 text-yellow-800"
       case "processing":
@@ -53,7 +53,7 @@ export function DistributionsSection({ distributions, loading = false }: Readonl
       case "dividend":
         return "bg-green-100 text-green-800"
       case "refinancing":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "return_of_capital":
         return "bg-purple-100 text-purple-800"
       case "other":
@@ -143,7 +143,7 @@ export function DistributionsSection({ distributions, loading = false }: Readonl
                 </div>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="bg-linear-to-br from-slate-50 to-slate-100 p-3 rounded-lg">
+                <div className="bg-background p-3 rounded-lg">
                   <p className="text-xs text-muted-foreground mb-1">Distribution Amount</p>
                   <p className="text-2xl font-bold text-emerald-600">{dist.amount}</p>
                 </div>

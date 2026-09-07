@@ -46,7 +46,7 @@ export function DesktopCompletedAnalysis({
             <ul className="space-y-2">
               {analysis.insights.map((insight) => (
                 <li key={insight} className="flex items-start gap-2 text-sm">
-                  <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
+                  <Lightbulb className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <span>{insight}</span>
                 </li>
               ))}

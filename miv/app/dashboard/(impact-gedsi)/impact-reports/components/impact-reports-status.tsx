@@ -12,7 +12,7 @@ interface ImpactReportsErrorProps {
 
 export function ImpactReportsLoading() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="space-y-6 p-4 sm:p-6">
         <div className="animate-pulse space-y-6">
           <div className="space-y-2">

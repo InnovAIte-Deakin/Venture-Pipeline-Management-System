@@ -37,7 +37,7 @@ export function AppearanceSettingsForm({
         <div className="space-y-4">
           <div className="space-y-2">
             <Label>Theme</Label>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 gap-3 min-[360px]:grid-cols-3">
               <Button
                 variant={appearanceSettings.theme === "light" ? "default" : "outline"}
                 onClick={() => onAppearanceSettingsChange({ ...appearanceSettings, theme: "light" })}
@@ -83,25 +83,27 @@ export function AppearanceSettingsForm({
             </div>
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 space-y-1">
               <Label htmlFor="compact-mode">Compact Mode</Label>
               <p className="text-sm text-gray-600 dark:text-gray-400">Use smaller spacing and components</p>
             </div>
             <Switch
               id="compact-mode"
+              className="shrink-0"
               checked={appearanceSettings.compactMode}
               onCheckedChange={(checked) => onAppearanceSettingsChange({ ...appearanceSettings, compactMode: checked })}
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <div className="space-y-1">
+          <div className="flex items-center justify-between gap-4">
+            <div className="min-w-0 space-y-1">
               <Label htmlFor="show-animations">Show Animations</Label>
               <p className="text-sm text-gray-600 dark:text-gray-400">Enable smooth transitions and animations</p>
             </div>
             <Switch
               id="show-animations"
+              className="shrink-0"
               checked={appearanceSettings.showAnimations}
               onCheckedChange={(checked) =>
                 onAppearanceSettingsChange({ ...appearanceSettings, showAnimations: checked })
@@ -113,7 +115,7 @@ export function AppearanceSettingsForm({
         <Button
           onClick={onAppearanceUpdate}
           disabled={appearanceSaveStatus === "saving"}
-          className="bg-teal-600 hover:bg-teal-700"
+          className="bg-primary hover:bg-primary"
         >
           <SaveStatusContent
             status={appearanceSaveStatus}

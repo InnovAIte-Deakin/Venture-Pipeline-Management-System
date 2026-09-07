@@ -72,7 +72,7 @@ export function MobileVentureCard({ venture, onViewDetails }: MobileVentureCardP
                 <div className="flex items-center gap-1 min-w-0">
                   <div className={`w-2 h-2 rounded-full shrink-0 ${
                     category === "Financial" ? "bg-green-500" :
-                    category === "Legal" ? "bg-blue-500" :
+                    category === "Legal" ? "bg-primary" :
                     category === "Technical" ? "bg-purple-500" :
                     "bg-orange-500"
                   }`} />

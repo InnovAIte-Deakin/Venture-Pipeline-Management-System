@@ -420,7 +420,7 @@ export default function CustomDashboardsPage() {
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-linear-to-br from-blue-500 to-purple-600">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-background ">
             <Grid3X3 className="h-5 w-5 text-white" />
           </div>
           <div>

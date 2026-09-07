@@ -45,7 +45,7 @@ export function ImpactDocumentFilters({
               placeholder="Filename, uploader, or venture"
               value={searchQuery}
               onChange={(event) => onSearchQueryChange(event.target.value)}
-              className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded-lg border border-gray-300 py-2 pl-10 pr-4 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-ring"
             />
           </div>
         </div>
@@ -58,7 +58,7 @@ export function ImpactDocumentFilters({
             id="impact-document-type"
             value={selectedType}
             onChange={(event) => onSelectedTypeChange(event.target.value as ImpactDocumentTypeFilter)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-ring"
           >
             {DOCUMENT_TYPES.map((type) => (
               <option key={type} value={type}>
@@ -76,7 +76,7 @@ export function ImpactDocumentFilters({
             id="impact-document-status"
             value={selectedStatus}
             onChange={(event) => onSelectedStatusChange(event.target.value as ImpactDocumentStatusFilter)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-transparent focus:outline-none focus:ring-2 focus:ring-ring"
           >
             {STATUS_OPTIONS.map((status) => (
               <option key={status} value={status}>

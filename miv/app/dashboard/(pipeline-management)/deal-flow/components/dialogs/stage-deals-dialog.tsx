@@ -37,7 +37,7 @@ export function StageDealsDialog({ state, onOpenChange, onViewDeal, onEditDeal, 
 
         <div className="space-y-4">
           <div className="grid gap-4 rounded-lg bg-muted/50 p-4 md:grid-cols-4">
-            <Summary label="Total Deals" value={state.deals.length} color="text-blue-600" />
+            <Summary label="Total Deals" value={state.deals.length} color="text-primary" />
             <Summary label="Total Value" value={`$${totalValue.toFixed(1)}M`} color="text-green-600" />
             <Summary label="Avg GEDSI Score" value={`${averageGedsi}%`} color="text-purple-600" />
             <Summary label="Women-Led" value={womenLed} color="text-orange-600" />
@@ -72,7 +72,7 @@ export function StageDealsDialog({ state, onOpenChange, onViewDeal, onEditDeal, 
                   <div className="mb-3 grid gap-4 md:grid-cols-4">
                     <Score icon={<Heart className="h-3 w-3 text-pink-500" />} label="GEDSI Score" value={deal.gedsiScore} />
                     <Score icon={<Globe className="h-3 w-3 text-green-500" />} label="Impact Score" value={deal.impactScore} />
-                    <Score icon={<Target className="h-3 w-3 text-blue-500" />} label="Readiness" value={deal.readinessScore} />
+                    <Score icon={<Target className="h-3 w-3 text-primary" />} label="Readiness" value={deal.readinessScore} />
                     <div className="space-y-1">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-3 w-3 text-orange-500" aria-hidden="true" />

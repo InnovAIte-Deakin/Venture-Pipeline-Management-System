@@ -34,7 +34,7 @@ import {
 type RowAction = "status" | "delete" | "download"
 
 const ACTION_BUTTON_BASE =
-  "inline-flex min-h-8 items-center justify-center rounded px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+  "inline-flex min-h-8 items-center justify-center rounded px-2.5 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 
 function formatFileSize(bytes?: number) {
   if (!bytes || bytes <= 0) return "0 Bytes"
@@ -113,7 +113,7 @@ function DocumentActions({
         disabled={disabled}
         aria-label={`Download ${document.filename}`}
         title={`Download ${document.filename}`}
-        className={`${ACTION_BUTTON_BASE} bg-blue-50 text-blue-600 hover:bg-blue-100`}
+        className={`${ACTION_BUTTON_BASE} bg-primary/10 text-primary hover:bg-primary/10`}
       >
         {isDownloading ? (
           <Loader2 className="mr-1 h-3 w-3 animate-spin" aria-hidden="true" />
@@ -296,7 +296,7 @@ export default function ImpactDocumentsPage() {
               type="button"
               onClick={fetchDocuments}
               disabled={loading}
-              className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+              className="inline-flex min-h-10 w-full items-center justify-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             >
               <RefreshCw className={`mr-2 h-4 w-4 ${loading ? "animate-spin" : ""}`} aria-hidden="true" />
               Refresh
@@ -306,7 +306,7 @@ export default function ImpactDocumentsPage() {
 
         <section className="mb-6 grid grid-cols-1 gap-4 sm:mb-8 sm:grid-cols-2 lg:grid-cols-4" aria-label="Document statistics">
           {[
-            { label: "Total Documents", value: stats.total, icon: FileText, color: "text-blue-500" },
+            { label: "Total Documents", value: stats.total, icon: FileText, color: "text-primary" },
             { label: "Pending Review", value: stats.pending, icon: Clock, color: "text-yellow-500" },
             { label: "Approved", value: stats.approved, icon: CheckCircle, color: "text-green-500" },
             { label: "Rejected", value: stats.rejected, icon: XCircle, color: "text-red-500" },
@@ -374,7 +374,7 @@ export default function ImpactDocumentsPage() {
 
           {loading ? (
             <div className="py-12 text-center">
-              <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-500" aria-hidden="true" />
+              <Loader2 className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" aria-hidden="true" />
               <p className="text-gray-500">Loading documents...</p>
             </div>
           ) : filteredDocuments.length === 0 ? (
@@ -416,7 +416,7 @@ export default function ImpactDocumentsPage() {
                         <tr key={doc.id} className="hover:bg-gray-50">
                           <td className="px-4 py-4 align-top">
                             <div className="flex min-w-0 items-start">
-                              <File className="mr-3 mt-0.5 h-10 w-10 shrink-0 text-blue-500" aria-hidden="true" />
+                              <File className="mr-3 mt-0.5 h-10 w-10 shrink-0 text-primary" aria-hidden="true" />
                               <div className="min-w-0">
                                 <div className="wrap-break-word text-sm font-medium text-gray-900">{doc.filename}</div>
                                 <div className="mt-1 text-xs text-gray-500">
@@ -474,7 +474,7 @@ export default function ImpactDocumentsPage() {
                   return (
                     <article key={doc.id} className="px-4 py-5">
                       <div className="mb-3 flex min-w-0 items-start gap-3">
-                        <File className="mt-0.5 h-9 w-9 shrink-0 text-blue-500" aria-hidden="true" />
+                        <File className="mt-0.5 h-9 w-9 shrink-0 text-primary" aria-hidden="true" />
                         <div className="min-w-0 flex-1">
                           <h3 className="wrap-break-word text-sm font-semibold text-gray-900">{doc.filename}</h3>
                           <p className="mt-1 text-xs text-gray-500">

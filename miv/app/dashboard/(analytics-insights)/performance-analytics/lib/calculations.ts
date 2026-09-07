@@ -75,8 +75,8 @@ export function generateAIInsights(data: AnalyticsData) {
     insights.push({
       title: "Ready for Growth",
       description: "Your portfolio is performing well. Continue monitoring metrics and consider expanding outreach.",
-      icon: Zap, iconColor: "text-blue-600", textColor: "text-blue-900",
-      descriptionColor: "text-blue-700", borderColor: "border-blue-500"
+      icon: Zap, iconColor: "text-primary", textColor: "text-primary",
+      descriptionColor: "text-primary", borderColor: "border-primary"
     })
   }
   return insights

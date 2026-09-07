@@ -53,7 +53,7 @@ export function PerformanceAnalyticsMobile({
   const [activeTab, setActiveTab] = useState("overview")
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="p-4 space-y-4">
         {/* Compact header */}
         <div className="space-y-3">
@@ -198,9 +198,9 @@ export function PerformanceAnalyticsMobile({
               <CardHeader className="pb-2"><CardTitle className="text-base">User Engagement</CardTitle></CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <div className="flex items-center justify-between p-2.5 bg-blue-50 rounded-lg">
-                    <div className="flex items-center gap-2"><Eye className="h-4 w-4 text-blue-600" /><span className="text-xs font-medium">Daily Active Users</span></div>
-                    <span className="text-base font-bold text-blue-600">{data.users.length}</span>
+                  <div className="flex items-center justify-between p-2.5 bg-primary/10 rounded-lg">
+                    <div className="flex items-center gap-2"><Eye className="h-4 w-4 text-primary" /><span className="text-xs font-medium">Daily Active Users</span></div>
+                    <span className="text-base font-bold text-primary">{data.users.length}</span>
                   </div>
                   <div className="flex items-center justify-between p-2.5 bg-green-50 rounded-lg">
                     <div className="flex items-center gap-2"><Activity className="h-4 w-4 text-green-600" /><span className="text-xs font-medium">Avg Session</span></div>
@@ -220,9 +220,9 @@ export function PerformanceAnalyticsMobile({
           </TabsContent>
 
           <TabsContent value="insights" className="space-y-4 mt-3">
-            <Card className="bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+            <Card className="bg-background ">
               <CardHeader className="pb-2">
-                <CardTitle className="flex items-center gap-2 text-base"><Lightbulb className="h-4 w-4 text-blue-600" />AI-Powered Insights</CardTitle>
+                <CardTitle className="flex items-center gap-2 text-base"><Lightbulb className="h-4 w-4 text-primary" />AI-Powered Insights</CardTitle>
               </CardHeader>
               <CardContent>
                 {data.ventures.length === 0 ? (
@@ -249,7 +249,7 @@ export function PerformanceAnalyticsMobile({
               </CardContent>
             </Card>
 
-            <Card className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20">
+            <Card className="bg-background ">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center gap-2 text-base"><TrendingUp className="h-4 w-4 text-purple-600" />Predictive Analytics</CardTitle>
               </CardHeader>
@@ -291,7 +291,7 @@ export function PerformanceAnalyticsMobile({
                         <div className="space-y-1.5">
                           {generateOptimizationOpportunities(data).map((opportunity, index) => (
                             <div key={index} className="flex items-start gap-2 text-xs">
-                              <Target className="h-3 w-3 text-blue-600 mt-0.5 flex-shrink-0" />
+                              <Target className="h-3 w-3 text-primary mt-0.5 flex-shrink-0" />
                               <span>{opportunity}</span>
                             </div>
                           ))}

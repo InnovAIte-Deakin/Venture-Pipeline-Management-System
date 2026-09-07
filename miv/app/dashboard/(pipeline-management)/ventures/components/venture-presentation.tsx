@@ -15,14 +15,14 @@ import {
 
 const getStageColor = (stage: string) => {
   const colors: Record<string, string> = {
-    INTAKE: "bg-sky-100 text-sky-800",
+    INTAKE: "bg-primary/10 text-primary",
     SCREENING: "bg-amber-100 text-amber-800",
     DUE_DILIGENCE: "bg-indigo-100 text-indigo-800",
     INVESTMENT_READY: "bg-emerald-100 text-emerald-800",
     FUNDED: "bg-green-100 text-green-800",
     EXITED: "bg-gray-100 text-gray-800",
-    SEED: "bg-cyan-100 text-cyan-800",
-    SERIES_A: "bg-blue-100 text-blue-800",
+    SEED: "bg-primary/10 text-primary",
+    SERIES_A: "bg-primary/10 text-primary",
     SERIES_B: "bg-violet-100 text-violet-800",
     SERIES_C: "bg-purple-100 text-purple-800",
   }
@@ -56,8 +56,8 @@ export function VentureIdentity({ venture }: { venture: VentureRecord }) {
 
 export function VentureIcon() {
   return (
-    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100">
-      <Building2 className="h-5 w-5 text-blue-600" aria-hidden="true" />
+    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+      <Building2 className="h-5 w-5 text-primary" aria-hidden="true" />
     </div>
   )
 }

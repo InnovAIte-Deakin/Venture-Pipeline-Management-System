@@ -186,7 +186,7 @@ export function DueDiligenceItemsTable({
                           <div className="flex items-center gap-2">
                             <div className={`w-2 h-2 rounded-full ${
                               item.category === "Financial" ? "bg-green-500" :
-                              item.category === "Legal" ? "bg-blue-500" :
+                              item.category === "Legal" ? "bg-primary" :
                               item.category === "Technical" ? "bg-purple-500" :
                               "bg-orange-500"
                             }`} />
@@ -195,7 +195,7 @@ export function DueDiligenceItemsTable({
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-xs font-medium text-blue-600 dark:text-blue-300">
+                            <div className="w-7 h-7 rounded-full bg-primary/10 dark:bg-blue-900 flex items-center justify-center text-xs font-medium text-primary dark:text-primary">
                               {item.assignedTo.split(" ").map((name) => name[0]).join("")}
                             </div>
                             <div className="min-w-0">

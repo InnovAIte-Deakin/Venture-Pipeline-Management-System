@@ -78,7 +78,7 @@ export function DueDiligenceHeader({
       </div>
 
       {selectedVentureForDetails && viewMode === "items" && (
-        <Card className="border-l-4 border-l-blue-500">
+        <Card className="border-l-4 border-l-primary">
           <CardContent className="py-3">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:gap-0">
               <div className="flex flex-wrap items-center gap-2 text-sm min-w-0">
@@ -86,7 +86,7 @@ export function DueDiligenceHeader({
                   variant="ghost"
                   size="sm"
                   onClick={onBackToVentures}
-                  className="text-blue-600 hover:text-blue-800 p-0 h-auto font-normal"
+                  className="text-primary hover:text-primary p-0 h-auto font-normal"
                 >
                   â† Back to Ventures
                 </Button>

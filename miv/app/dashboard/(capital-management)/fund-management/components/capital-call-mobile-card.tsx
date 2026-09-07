@@ -61,11 +61,11 @@ export function CapitalCallMobileCard({ call }: Readonly<CapitalCallMobileCardPr
         </div>
 
         {call.investments && call.investments.length > 0 && (
-          <div className="mb-3 rounded-xl border border-sky-500/30 bg-sky-500/10 p-2">
-            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-sky-200">Target ventures</p>
+          <div className="mb-3 rounded-xl border border-primary bg-primary/10 p-2">
+            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.14em] text-primary">Target ventures</p>
             <div className="flex flex-wrap gap-1.5">
               {call.investments.slice(0, 2).map((inv) => (
-                <Badge key={inv} variant="outline" className="border-sky-500/30 bg-sky-500/10 text-[10px] text-sky-100">
+                <Badge key={inv} variant="outline" className="border-primary bg-primary/10 text-[10px] text-primary">
                   {inv}
                 </Badge>
               ))}

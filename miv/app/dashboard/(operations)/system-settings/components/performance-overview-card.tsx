@@ -33,7 +33,7 @@ export function PerformanceOverviewCard({
           />
           <PerformanceMetricCard
             icon={Memory}
-            iconClassName="text-blue-600"
+            iconClassName="text-primary"
             label="Memory Usage"
             value={systemPerformance.memoryUsage}
           />

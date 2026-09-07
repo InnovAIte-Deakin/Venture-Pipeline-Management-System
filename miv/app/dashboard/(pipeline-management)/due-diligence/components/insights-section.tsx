@@ -34,9 +34,9 @@ export function InsightsSection({ ventures }: InsightsSectionProps) {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
-              <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Portfolio Risk Assessment</h4>
-              <p className="text-sm text-blue-800 dark:text-blue-200">
+            <div className="p-4 bg-primary/10 dark:bg-blue-950 rounded-lg">
+              <h4 className="font-medium text-primary dark:text-blue-100 mb-2">Portfolio Risk Assessment</h4>
+              <p className="text-sm text-primary dark:text-blue-200">
                 Current portfolio shows <strong>medium risk</strong> with 3 overdue items requiring immediate attention.
                 Financial reviews are progressing 15% faster than legal reviews on average.
               </p>

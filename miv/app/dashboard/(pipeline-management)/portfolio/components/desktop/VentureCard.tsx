@@ -21,7 +21,7 @@ export function VentureCard({ company, onClick }: VentureCardProps) {
   })()
 
   return (
-    <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border-l-4 border-l-blue-500" onClick={onClick}>
+    <Card className="cursor-pointer hover:shadow-lg transition-all duration-200 border-l-4 border-l-primary" onClick={onClick}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
           <div>
@@ -53,7 +53,7 @@ export function VentureCard({ company, onClick }: VentureCardProps) {
             <p className="text-xs text-muted-foreground">GEDSI</p>
           </div>
           <div>
-            <div className="text-lg font-bold text-blue-600">{company.impactScore?.toFixed(0) || 'N/A'}%</div>
+            <div className="text-lg font-bold text-primary">{company.impactScore?.toFixed(0) || 'N/A'}%</div>
             <p className="text-xs text-muted-foreground">Impact</p>
           </div>
         </div>

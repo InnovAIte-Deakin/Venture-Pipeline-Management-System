@@ -64,7 +64,7 @@ export function DesktopReportsList({
                     <span>{report.name}</span>
                     <Badge variant={report.status === "published" ? "default" : "secondary"}>{report.status}</Badge>
                     {report.isScheduled && (
-                      <Badge variant="outline" className="border-blue-200 bg-blue-50 text-blue-700">
+                      <Badge variant="outline" className="border-primary bg-primary/10 text-primary">
                         <Calendar className="mr-1 h-3 w-3" aria-hidden="true" />
                         {report.scheduleFrequency}
                       </Badge>
@@ -73,7 +73,7 @@ export function DesktopReportsList({
                   <CardDescription>
                     {report.description} • Last generated {formatDate(report.lastGenerated)}
                     {report.isScheduled && report.nextRun && (
-                      <span className="mt-1 block text-xs text-blue-600">
+                      <span className="mt-1 block text-xs text-primary">
                         Next run: {formatDate(report.nextRun)}
                         {report.recipients && report.recipients.length > 0 && (
                           <span> • {report.recipients.length} recipient{report.recipients.length !== 1 ? "s" : ""}</span>

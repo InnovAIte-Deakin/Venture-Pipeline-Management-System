@@ -9,7 +9,7 @@ import { formatCurrency, type VentureSummary } from "../lib/ventures"
 export function VentureSummaryCards({ summary }: { summary: VentureSummary }) {
   return (
     <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4" aria-label="Venture statistics">
-      <StatCard icon={Building2} iconClassName="text-blue-500" label="Total Ventures" value={summary.totalVentures.toString()} />
+      <StatCard icon={Building2} iconClassName="text-primary" label="Total Ventures" value={summary.totalVentures.toString()} />
       <StatCard icon={Download} iconClassName="text-green-500" label="Total Funding" value={formatCurrency(summary.totalFunding)} />
       <StatCard icon={Users} iconClassName="text-purple-500" label="Total Team Members" value={summary.totalTeamMembers.toString()} />
       <StatCard icon={Target} iconClassName="text-orange-500" label="Avg GEDSI Score" value={`${summary.averageGedsiScore}%`} />

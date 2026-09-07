@@ -209,7 +209,7 @@ export function FileUpload({
         className={cn(
           "border-2 border-dashed transition-all duration-200 cursor-pointer",
           isDragActive || isDragOver 
-            ? "border-blue-500 bg-blue-50 dark:bg-blue-950/20" 
+            ? "border-primary bg-primary/10 dark:bg-blue-950/20" 
             : "border-gray-300 hover:border-gray-400",
           disabled && "cursor-not-allowed opacity-50"
         )}
@@ -220,13 +220,13 @@ export function FileUpload({
             <div className={cn(
               "p-3 rounded-full",
               isDragActive || isDragOver 
-                ? "bg-blue-100 dark:bg-blue-900/30" 
+                ? "bg-primary/10 dark:bg-blue-900/30" 
                 : "bg-gray-100 dark:bg-gray-800"
             )}>
               <Upload className={cn(
                 "h-6 w-6",
                 isDragActive || isDragOver 
-                  ? "text-blue-600 dark:text-blue-400" 
+                  ? "text-primary dark:text-primary" 
                   : "text-gray-400"
               )} />
             </div>
@@ -273,7 +273,7 @@ export function FileUpload({
                 <div className="flex items-center space-x-3">
                   <div className="shrink-0">
                     {file.status === 'uploading' ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-blue-500" />
+                      <Loader2 className="h-4 w-4 animate-spin text-primary" />
                     ) : file.status === 'success' ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
                     ) : file.status === 'error' ? (

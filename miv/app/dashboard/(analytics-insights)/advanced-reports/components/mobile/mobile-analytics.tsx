@@ -16,7 +16,7 @@ interface MobileAnalyticsProps {
 export function MobileAnalytics({ reports, dashboards, ventures, gedsiMetrics }: MobileAnalyticsProps) {
   return (
     <div className="space-y-6">
-      <Card className="border-2 border-purple-100 bg-linear-to-r from-purple-50 to-indigo-50">
+      <Card className="border-2 border-purple-100 bg-background ">
         <CardHeader>
           <CardTitle className="flex items-center space-x-2 text-purple-900 text-base">
             <Zap className="h-5 w-5" aria-hidden="true" />
@@ -56,7 +56,7 @@ export function MobileAnalytics({ reports, dashboards, ventures, gedsiMetrics }:
           </div>
           <div className="rounded-lg border border-purple-200 bg-white p-4">
             <div className="mb-2 flex items-center space-x-2">
-              <Target className="h-4 w-4 text-blue-500" aria-hidden="true" />
+              <Target className="h-4 w-4 text-primary" aria-hidden="true" />
               <span className="text-sm font-medium">Optimization Tip</span>
             </div>
             <p className="text-xs text-gray-600">Consider generating weekly automated reports for your top 5 performing sectors to track trends.</p>
@@ -79,7 +79,7 @@ export function MobileAnalytics({ reports, dashboards, ventures, gedsiMetrics }:
         <Card>
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center space-x-2 text-sm">
-              <BarChart3 className="h-4 w-4 text-blue-500" aria-hidden="true" />
+              <BarChart3 className="h-4 w-4 text-primary" aria-hidden="true" />
               <span>Dashboards</span>
             </CardTitle>
           </CardHeader>

@@ -68,7 +68,7 @@ export function FundMobileCard({ fund, onView }: Readonly<FundMobileCardProps>) 
           </Badge>
         </div>
 
-        <Button className="h-9 w-full rounded-xl bg-sky-500 text-xs font-medium text-white hover:bg-sky-400" onClick={() => onView?.(fund)}>
+        <Button className="h-9 w-full rounded-xl bg-primary/10 text-xs font-medium text-white hover:bg-primary/10" onClick={() => onView?.(fund)}>
           View fund details
         </Button>
       </div>

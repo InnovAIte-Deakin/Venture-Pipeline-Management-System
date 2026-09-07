@@ -209,13 +209,13 @@ export function PortfolioDashboard({
         <Card>
               <CardContent className="p-6">
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
-                    <BarChart3 className="h-6 w-6 text-blue-600" />
+                  <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                    <BarChart3 className="h-6 w-6 text-primary" />
                   </div>
                   <div>
                     <div className="text-2xl font-bold">{totalGedsiMetrics}</div>
                     <p className="text-sm text-muted-foreground">GEDSI Metrics</p>
-                    <p className="text-xs text-blue-600">Tracked metrics</p>
+                    <p className="text-xs text-primary">Tracked metrics</p>
                   </div>
                 </div>
           </CardContent>
@@ -256,7 +256,7 @@ export function PortfolioDashboard({
         <Card className="hidden md:flex">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-blue-500" />
+                <Clock className="h-5 w-5 text-primary" />
                 Today's Action Items
             </CardTitle>
               <CardDescription>

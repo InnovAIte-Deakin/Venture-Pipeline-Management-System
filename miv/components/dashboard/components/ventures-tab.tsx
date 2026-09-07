@@ -59,8 +59,8 @@ export function VenturesTab({ loading, venturesData, addToast }: VenturesTabProp
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0 flex-1">
                     <div className="flex min-w-0 items-center gap-2">
-                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-100">
-                        <Building2 className="h-4 w-4 text-blue-600" />
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                        <Building2 className="h-4 w-4 text-primary" />
                       </div>
                       <div className="min-w-0">
                         <p className="truncate font-medium text-gray-900">{venture.name}</p>

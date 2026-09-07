@@ -171,7 +171,7 @@ export default function CreateDashboardDialog({
                 onClick={() => setNewDashboard((prev) => ({ ...prev, category: "Pipeline" }))}
               >
                 <CardContent className="p-4 flex items-center gap-3">
-                  <BarChart3 className="h-8 w-8 text-blue-600" />
+                  <BarChart3 className="h-8 w-8 text-primary" />
                   <div>
                     <div className="font-medium text-sm">Pipeline Focus</div>
                     <div className="text-xs text-muted-foreground">Track deal flow & stages</div>

@@ -17,7 +17,7 @@ export function MobileScheduledList({ reports }: MobileScheduledListProps) {
     <Card>
       <CardHeader>
         <CardTitle className="flex items-center space-x-2">
-          <Calendar className="h-5 w-5 text-blue-500" aria-hidden="true" />
+          <Calendar className="h-5 w-5 text-primary" aria-hidden="true" />
           <span>Scheduled Reports</span>
           <Badge variant="outline" className="ml-auto">
             {scheduledReports.length} active
@@ -27,11 +27,11 @@ export function MobileScheduledList({ reports }: MobileScheduledListProps) {
       </CardHeader>
       <CardContent className="space-y-3">
         {scheduledReports.map((report) => (
-          <Card key={report.id} className="border-l-4 border-l-blue-500">
+          <Card key={report.id} className="border-l-4 border-l-primary">
             <CardContent className="space-y-2 pt-4">
               <div className="flex items-center gap-2">
                 <h4 className="font-semibold">{report.name}</h4>
-                <Badge variant="outline" className="bg-blue-50 text-blue-700">
+                <Badge variant="outline" className="bg-primary/10 text-primary">
                   {report.scheduleFrequency}
                 </Badge>
               </div>

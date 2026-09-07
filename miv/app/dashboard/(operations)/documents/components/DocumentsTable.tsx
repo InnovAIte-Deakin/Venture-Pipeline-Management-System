@@ -67,8 +67,8 @@ export default function DocumentsTable({
         </CardHeader>
 
         <CardContent className="py-12 text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-blue-100">
-            <FileText className="h-8 w-8 text-blue-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
+            <FileText className="h-8 w-8 text-primary" />
           </div>
 
           <h3 className="text-lg font-semibold text-slate-800">

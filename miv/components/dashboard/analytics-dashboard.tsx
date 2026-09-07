@@ -500,7 +500,7 @@ export function AnalyticsDashboard({
       {/* Header */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
-          <h1 className="break-words text-2xl font-bold bg-linear-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent sm:text-3xl">{title}</h1>
+          <h1 className="break-words text-2xl font-bold text-foreground sm:text-3xl">{title}</h1>
           <p className="text-slate-600 font-medium">Real-time insights and performance metrics</p>
         </div>
         
@@ -519,19 +519,19 @@ export function AnalyticsDashboard({
             </SelectContent>
           </Select>
           
-          <Button className="w-full bg-black px-2 text-white hover:bg-neutral-800 sm:w-auto sm:px-3" size="sm" onClick={handleOpenFilters}>
+          <Button className="w-full px-2 sm:w-auto sm:px-3" size="sm" onClick={handleOpenFilters}>
             <Filter className="h-4 w-4 mr-2" />
             Filters
           </Button>
           
-          <Button className="w-full bg-black px-2 text-white hover:bg-neutral-800 sm:w-auto sm:px-3" size="sm" onClick={handleExport}>
+          <Button className="w-full px-2 sm:w-auto sm:px-3" size="sm" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
           
           {customizable && (
             <Button 
-              className="w-full bg-black px-2 text-white hover:bg-neutral-800 sm:w-auto sm:px-3"
+              className="w-full px-2 sm:w-auto sm:px-3"
               size="sm"
               onClick={() => setIsCustomizing(!isCustomizing)}
             >
@@ -546,13 +546,13 @@ export function AnalyticsDashboard({
       {widgetConfig.keyMetrics && (
       <div className={`grid ${layoutMode === 'compact' ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} ${layoutMode === 'wide' ? 'lg:grid-cols-5' : 'lg:grid-cols-4'} gap-3 sm:gap-6`}>
         {metrics.map((metric, index) => (
-          <Card key={index} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 bg-linear-to-br from-white to-gray-50/50">
+          <Card key={index} className="border-0 shadow-sm hover:shadow-lg transition-all duration-300 hover:scale-105 bg-background ">
             <CardContent className="p-4 sm:p-6">
               <div className="flex min-w-0 items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-gray-600 mb-1">{metric.title}</p>
                   <div className="flex flex-wrap items-baseline gap-2">
-                    <p className="break-words text-2xl font-bold bg-linear-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent sm:text-3xl">{metric.value}</p>
+                    <p className="break-words text-2xl font-bold text-foreground sm:text-3xl">{metric.value}</p>
                     {metric.change !== 0 && (
                       <div className={`flex items-center space-x-1 px-2 py-1 rounded-full ${getChangeColor(metric.changeType)} ${metric.changeType === 'increase' ? 'bg-emerald-50' : 'bg-red-50'}`}>
                         {getChangeIcon(metric.changeType)}
@@ -680,23 +680,23 @@ export function AnalyticsDashboard({
                 generateRealAlerts(ventures).map((alert, index) => (
                   <div key={index} className={`flex items-start space-x-3 p-3 rounded-lg ${
                     alert.type === 'risk' ? 'bg-red-50' :
-                    alert.type === 'warning' ? 'bg-yellow-50' : 'bg-blue-50'
+                    alert.type === 'warning' ? 'bg-yellow-50' : 'bg-primary/10'
                   }`}>
                     {alert.type === 'risk' ? <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" /> :
                      alert.type === 'warning' ? <Clock className="h-5 w-5 text-yellow-500 mt-0.5" /> :
-                     <Zap className="h-5 w-5 text-blue-500 mt-0.5" />}
+                     <Zap className="h-5 w-5 text-primary mt-0.5" />}
                     <div className="flex-1">
                       <p className={`text-sm font-medium ${
                         alert.type === 'risk' ? 'text-red-900' :
-                        alert.type === 'warning' ? 'text-yellow-900' : 'text-blue-900'
+                        alert.type === 'warning' ? 'text-yellow-900' : 'text-primary'
                       }`}>{alert.title}</p>
                       <p className={`text-xs ${
                         alert.type === 'risk' ? 'text-red-700' :
-                        alert.type === 'warning' ? 'text-yellow-700' : 'text-blue-700'
+                        alert.type === 'warning' ? 'text-yellow-700' : 'text-primary'
                       }`}>{alert.message}</p>
                       <p className={`text-xs mt-1 ${
                         alert.type === 'risk' ? 'text-red-600' :
-                        alert.type === 'warning' ? 'text-yellow-600' : 'text-blue-600'
+                        alert.type === 'warning' ? 'text-yellow-600' : 'text-primary'
                       }`}>{alert.time}</p>
                     </div>
                   </div>
@@ -727,7 +727,7 @@ export function AnalyticsDashboard({
                 generateRecentActivities(ventures).map((activity, index) => (
                   <div key={index} className="flex items-start space-x-3 p-3 hover:bg-gray-50 rounded-lg transition-colors">
                     {activity.type === 'assessment' ? <CheckCircle className="h-5 w-5 text-green-500 mt-0.5" /> :
-                     activity.type === 'team' ? <Users className="h-5 w-5 text-blue-500 mt-0.5" /> :
+                     activity.type === 'team' ? <Users className="h-5 w-5 text-primary mt-0.5" /> :
                      activity.type === 'funding' ? <DollarSign className="h-5 w-5 text-green-500 mt-0.5" /> :
                      <Target className="h-5 w-5 text-purple-500 mt-0.5" />}
                     <div className="flex-1">
@@ -746,16 +746,16 @@ export function AnalyticsDashboard({
 
       {/* Customization Panel */}
       {isCustomizing && (
-        <Card className="border-2 border-blue-200 bg-blue-50">
+        <Card className="border-2 border-primary bg-primary/10">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold text-blue-900">
+            <CardTitle className="text-lg font-semibold text-primary">
               Dashboard Customization
             </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <h4 className="font-medium text-blue-900 mb-2">Widgets</h4>
+                <h4 className="font-medium text-primary mb-2">Widgets</h4>
                 <div className="space-y-2">
                   <label className="flex items-center space-x-2">
                     <input type="checkbox" className="rounded" checked={widgetConfig.keyMetrics} onChange={(e) => persistWidgets({ ...widgetConfig, keyMetrics: e.target.checked })} />
@@ -773,7 +773,7 @@ export function AnalyticsDashboard({
               </div>
               
               <div>
-                <h4 className="font-medium text-blue-900 mb-2">Layout</h4>
+                <h4 className="font-medium text-primary mb-2">Layout</h4>
                 <div className="space-y-2">
                   <label className="flex items-center space-x-2">
                     <input type="radio" name="layout" className="rounded" checked={layoutMode==='standard'} onChange={() => persistLayout('standard')} />
@@ -791,7 +791,7 @@ export function AnalyticsDashboard({
               </div>
               
               <div>
-                <h4 className="font-medium text-blue-900 mb-2">Actions</h4>
+                <h4 className="font-medium text-primary mb-2">Actions</h4>
                 <div className="space-y-2">
                   <Button size="sm" className="w-full" onClick={() => { try { localStorage.setItem('analytics.widgets', JSON.stringify(widgetConfig)); localStorage.setItem('analytics.layout', layoutMode) } catch {}; setIsCustomizing(false) }}>Save Layout</Button>
                   <Button variant="outline" size="sm" className="w-full" onClick={() => { persistWidgets({ keyMetrics: true, performanceCharts: true, alertsPanel: true }); persistLayout('standard') }}>Reset to Default</Button>

@@ -54,10 +54,10 @@ export function DueDiligenceSummary({ viewMode, venturesDDs, filteredItems }: Du
       <Card>
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
           <CardTitle className="text-sm font-medium">In Progress</CardTitle>
-          <Activity className="h-4 w-4 text-blue-600" />
+          <Activity className="h-4 w-4 text-primary" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold text-blue-600">
+          <div className="text-2xl font-bold text-primary">
             {inProgressCount}
           </div>
           <p className="text-xs text-muted-foreground">

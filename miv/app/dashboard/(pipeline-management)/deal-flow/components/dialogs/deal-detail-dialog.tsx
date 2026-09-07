@@ -60,7 +60,7 @@ export function DealDetailDialog({ deal, open, onOpenChange }: DealDetailDialogP
                 <CardContent className="space-y-3">
                   <ScoreRow icon={<Heart className="h-4 w-4 text-pink-500" />} label="GEDSI Score" value={deal.gedsiScore} />
                   <ScoreRow icon={<Globe className="h-4 w-4 text-green-500" />} label="Impact Score" value={deal.impactScore} />
-                  <ScoreRow icon={<Target className="h-4 w-4 text-blue-500" />} label="Readiness Score" value={deal.readinessScore} />
+                  <ScoreRow icon={<Target className="h-4 w-4 text-primary" />} label="Readiness Score" value={deal.readinessScore} />
                   <div className="border-t pt-2">
                     <p className="mb-2 text-sm text-muted-foreground">AI Risk Assessment:</p>
                     <RiskBadge riskLevel={deal.aiInsights.riskLevel} uppercase />
@@ -94,7 +94,7 @@ export function DealDetailDialog({ deal, open, onOpenChange }: DealDetailDialogP
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
-                  <Metric label="Jobs Created" value={deal.metrics.jobsCreated.toLocaleString()} color="text-blue-600" />
+                  <Metric label="Jobs Created" value={deal.metrics.jobsCreated.toLocaleString()} color="text-primary" />
                   <Metric label="Communities Served" value={String(deal.metrics.communitiesServed)} color="text-green-600" />
                   <Metric label="Women Leadership" value={`${deal.metrics.womenLeadership}%`} color="text-pink-600" />
                   <Metric label="Disability Inclusive" value={deal.metrics.disabilityInclusive ? "Yes" : "No"} color="text-purple-600" />
@@ -120,7 +120,7 @@ export function DealDetailDialog({ deal, open, onOpenChange }: DealDetailDialogP
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-lg">
-                  <Sparkles className="h-5 w-5 text-blue-500" aria-hidden="true" />
+                  <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
                   AI Insights & Recommendations
                 </CardTitle>
               </CardHeader>

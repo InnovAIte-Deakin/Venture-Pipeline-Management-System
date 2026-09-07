@@ -27,7 +27,7 @@ export const projectStatusClassName = (status: ProjectStatus) => {
     case 'COMPLETED':
       return 'bg-green-100 text-green-800 border-green-200'
     case 'IN_PROGRESS':
-      return 'bg-blue-100 text-blue-800 border-blue-200'
+      return 'bg-primary/10 text-primary border-primary'
     case 'NOT_STARTED':
       return 'bg-gray-100 text-gray-800 border-gray-200'
     case 'ON_HOLD':
@@ -46,7 +46,7 @@ export const priorityClassName = (priority: ProjectPriority) => {
     case 'HIGH':
       return 'bg-orange-100 text-orange-800 border-orange-200'
     case 'MEDIUM':
-      return 'bg-blue-100 text-blue-800 border-blue-200'
+      return 'bg-primary/10 text-primary border-primary'
     case 'LOW':
       return 'bg-gray-100 text-gray-800 border-gray-200'
     default:

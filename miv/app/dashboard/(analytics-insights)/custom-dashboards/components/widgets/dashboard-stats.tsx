@@ -53,8 +53,8 @@ export default function DashboardStats({
           <CardTitle className="text-sm font-medium">
             Total Dashboards
           </CardTitle>
-          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
-            <BarChart className="h-4 w-4 text-blue-600" />
+          <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10">
+            <BarChart className="h-4 w-4 text-primary" />
           </div>
         </CardHeader>
         <CardContent>

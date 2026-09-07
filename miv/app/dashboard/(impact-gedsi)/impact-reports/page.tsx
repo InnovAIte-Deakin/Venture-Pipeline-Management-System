@@ -161,8 +161,8 @@ export default function ImpactReports() {
         change: 10,
         trend: "up",
         icon: Users,
-        color: "text-blue-600",
-        bgColor: "bg-blue-50",
+        color: "text-primary",
+        bgColor: "bg-primary/10",
       },
       {
         title: "Beneficiaries Reached",
@@ -327,7 +327,7 @@ export default function ImpactReports() {
   }
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+    <div className="min-h-screen bg-background ">
       <div className="p-6 space-y-6">
        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
   <div className="min-w-0">
@@ -350,7 +350,7 @@ export default function ImpactReports() {
     </Button>
 
     <Button
-      className="w-full bg-teal-600 px-2 text-xs hover:bg-teal-700 sm:w-auto sm:px-4 sm:text-sm"
+      className="w-full bg-primary px-2 text-xs hover:bg-primary sm:w-auto sm:px-4 sm:text-sm"
       onClick={handleExportReport}
       disabled={isExporting}
     >
@@ -454,7 +454,7 @@ export default function ImpactReports() {
           </CardHeader>
           <CardContent>
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button className="flex-1 bg-teal-600 hover:bg-teal-700" onClick={handleExportReport}>
+              <Button className="flex-1 bg-primary hover:bg-primary" onClick={handleExportReport}>
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF Report
               </Button>

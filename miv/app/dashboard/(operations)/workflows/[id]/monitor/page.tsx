@@ -80,7 +80,7 @@ export default function WorkflowMonitorPage() {
       case 'FAILED':
         return <XCircle className="h-4 w-4 text-red-500" />
       case 'RUNNING':
-        return <RotateCcw className="h-4 w-4 text-blue-500 animate-spin" />
+        return <RotateCcw className="h-4 w-4 text-primary animate-spin" />
       default:
         return <Clock className="h-4 w-4 text-gray-500" />
     }
@@ -93,7 +93,7 @@ export default function WorkflowMonitorPage() {
       case 'FAILED':
         return 'text-red-600 bg-red-50'
       case 'RUNNING':
-        return 'text-blue-600 bg-blue-50'
+        return 'text-primary bg-primary/10'
       default:
         return 'text-gray-600 bg-gray-50'
     }
@@ -105,7 +105,7 @@ export default function WorkflowMonitorPage() {
 
   if (loading) return (
     <div className="flex items-center justify-center h-64">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
     </div>
   )
 
@@ -155,7 +155,7 @@ export default function WorkflowMonitorPage() {
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-blue-600" />
+              <Activity className="h-5 w-5 text-primary" />
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Runs</p>
                 <p className="text-2xl font-bold">{stats.total}</p>
@@ -239,7 +239,7 @@ export default function WorkflowMonitorPage() {
                       <div 
                         key={run.id}
                         className={`p-3 rounded-lg border cursor-pointer transition-colors ${
-                          selectedRun?.id === run.id ? 'bg-blue-50 border-blue-200' : 'hover:bg-gray-50'
+                          selectedRun?.id === run.id ? 'bg-primary/10 border-primary' : 'hover:bg-gray-50'
                         }`}
                         onClick={() => setSelectedRun(run)}
                       >

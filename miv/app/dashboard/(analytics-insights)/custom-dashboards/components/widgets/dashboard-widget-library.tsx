@@ -39,8 +39,8 @@ const widgetLibrary: WidgetLibraryItem[] = [
     description: "Line, bar, or pie charts",
     icon: BarChart,
     borderClass: "border-t-blue-400",
-    iconBackgroundClass: "bg-blue-100",
-    iconClass: "text-blue-600",
+    iconBackgroundClass: "bg-primary/10",
+    iconClass: "text-primary",
   },
   {
     type: "metric",

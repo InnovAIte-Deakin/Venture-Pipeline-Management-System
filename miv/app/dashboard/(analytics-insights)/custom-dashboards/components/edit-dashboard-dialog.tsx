@@ -137,7 +137,7 @@ export default function EditDashboardDialog({
             {selectedDashboard && (
               <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                 <div className="flex items-center gap-2 mb-2">
-                  <Layout className="h-4 w-4 text-blue-600" />
+                  <Layout className="h-4 w-4 text-primary" />
                   <span className="font-medium text-sm">Current Dashboard Info</span>
                 </div>
                 <div className="text-sm text-muted-foreground space-y-1">

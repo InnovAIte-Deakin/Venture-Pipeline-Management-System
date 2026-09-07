@@ -30,7 +30,7 @@ export function DealScoreStack({ deal, compact = false }: DealScoreStackProps) {
       {!compact && <Progress value={deal.impactScore} className="h-2" />}
       <div className={rowClassName}>
         <span className="flex items-center gap-2">
-          <Target className="h-3 w-3 text-blue-500" aria-hidden="true" />
+          <Target className="h-3 w-3 text-primary" aria-hidden="true" />
           Ready
         </span>
         <span>{deal.readinessScore}%</span>

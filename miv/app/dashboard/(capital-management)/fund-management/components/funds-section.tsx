@@ -47,7 +47,7 @@ export function FundsSection({ funds, loading = false }: Readonly<FundsSectionPr
       case "active":
         return "bg-green-100 text-green-800"
       case "fundraising":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "closed":
         return "bg-gray-100 text-gray-800"
       case "winding_down":

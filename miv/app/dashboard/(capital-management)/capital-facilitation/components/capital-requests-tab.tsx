@@ -101,11 +101,11 @@ function RequestList({
                 key={request.id}
                 type="button"
                 onClick={() => onSelect(request)}
-                className={`w-full rounded-lg border p-4 text-left transition-colors ${selectedId === request.id ? "border-blue-500 bg-blue-50 dark:bg-blue-950/20" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
+                className={`w-full rounded-lg border p-4 text-left transition-colors ${selectedId === request.id ? "border-primary bg-primary/10 dark:bg-blue-950/20" : "hover:bg-gray-50 dark:hover:bg-gray-800"}`}
               >
                 <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex min-w-0 items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-sm font-semibold text-blue-700">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-sm font-semibold text-primary">
                       {request.venture.substring(0, 2).toUpperCase()}
                     </div>
                     <div className="min-w-0">
@@ -167,7 +167,7 @@ function RequestDetails({ request }: { request: CapitalRequest }) {
       <CardContent>
         <div className="space-y-4">
           <div className="text-center">
-            <div className="text-3xl font-bold text-blue-600">
+            <div className="text-3xl font-bold text-primary">
               {formatCurrency(request.amount)}
             </div>
             <p className="text-sm text-muted-foreground">Requested Amount</p>
@@ -188,7 +188,7 @@ function RequestDetails({ request }: { request: CapitalRequest }) {
             <ol className="relative ml-2 border-l border-gray-200 dark:border-gray-700">
               {request.timeline.map((item) => (
                 <li key={`${item.date}-${item.event}`} className="mb-4 ml-4">
-                  <div className="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white bg-blue-500 dark:border-gray-800" />
+                  <div className="absolute -left-1.5 mt-1.5 h-3 w-3 rounded-full border border-white bg-primary dark:border-gray-800" />
                   <time className="mb-1 text-xs font-normal leading-none text-gray-400 dark:text-gray-500">
                     {item.date}
                   </time>

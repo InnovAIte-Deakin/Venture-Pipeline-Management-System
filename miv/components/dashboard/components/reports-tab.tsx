@@ -91,7 +91,7 @@ export function ReportsTab({
         >
           <CardHeader>
             <CardTitle className="flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2 text-blue-600" />
+              <TrendingUp className="h-5 w-5 mr-2 text-primary" />
               Portfolio Performance
             </CardTitle>
           </CardHeader>
@@ -106,7 +106,7 @@ export function ReportsTab({
               </div>
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium">Success Rate:</span>
-                <span className="text-sm font-medium text-blue-600">{successRate}</span>
+                <span className="text-sm font-medium text-primary">{successRate}</span>
               </div>
               <Button variant="outline" size="sm" className="w-full">
                 Generate Report

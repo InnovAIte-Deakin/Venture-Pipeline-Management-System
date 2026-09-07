@@ -16,7 +16,7 @@ export function MobileDashboardNavigation() {
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 h-14 border-b border-slate-200 bg-white/95 px-4 backdrop-blur lg:hidden">
+      <header className="fixed inset-x-0 top-0 z-40 h-14 border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
         <div className="flex h-full items-center gap-3">
           <Button
             type="button"
@@ -25,7 +25,7 @@ export function MobileDashboardNavigation() {
             aria-label="Open mobile sidebar"
             aria-expanded={sidebarOpen}
             onClick={() => setSidebarOpen(true)}
-            className="h-9 w-9 border-slate-300 p-0"
+            className="h-9 w-9 p-0"
           >
             <Menu className="h-5 w-5" aria-hidden="true" />
           </Button>
@@ -39,7 +39,7 @@ export function MobileDashboardNavigation() {
           </Link>
 
           <div
-            className="ml-auto flex h-8 overflow-hidden rounded-md border border-slate-300 bg-slate-100 text-xs font-semibold text-slate-600"
+            className="ml-auto flex h-8 overflow-hidden rounded-md border border-border bg-muted text-xs font-semibold text-muted-foreground"
             aria-label="Language selector"
           >
             {(["EN", "KH"] as const).map((option) => (
@@ -50,8 +50,8 @@ export function MobileDashboardNavigation() {
                 aria-pressed={language === option}
                 className={
                   language === option
-                    ? "min-w-9 bg-slate-900 px-2 text-white transition-colors"
-                    : "min-w-9 px-2 transition-colors hover:bg-white hover:text-slate-900"
+                    ? "min-w-9 bg-primary px-2 text-primary-foreground transition-colors"
+                    : "min-w-9 px-2 transition-colors hover:bg-background hover:text-foreground"
                 }
               >
                 {option}
@@ -65,7 +65,7 @@ export function MobileDashboardNavigation() {
             size="sm"
             aria-label="Search dashboard"
             onClick={globalSearch.open}
-            className="h-9 w-9 p-0 text-slate-700"
+            className="h-9 w-9 p-0 text-foreground"
           >
             <Search className="h-5 w-5" aria-hidden="true" />
           </Button>
@@ -77,7 +77,7 @@ export function MobileDashboardNavigation() {
         onOpenChange={setSidebarOpen}
       />
       <GlobalSearch isOpen={globalSearch.isOpen} onClose={globalSearch.close} />
-      <MobileBottomNavigation />
+      <MobileBottomNavigation onMoreClick={() => setSidebarOpen(true)} />
     </>
   );
 }

@@ -14,7 +14,7 @@ export function Step6GedsiGoals({ register, setValue, watchedValues, errors }: V
   <div className="space-y-8">
 
     {/* GEDSI Goals */}
-    <Card className="p-6 bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 border-emerald-200">
+    <Card className="p-6 bg-background border-emerald-200">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
           <Target aria-hidden="true" className="h-5 w-5 text-emerald-500" />
@@ -66,14 +66,14 @@ export function Step6GedsiGoals({ register, setValue, watchedValues, errors }: V
     </Card>
 
     {/* AI Analysis Info */}
-    <Card className="p-6 bg-linear-to-r from-blue-50 to-indigo-50 dark:from-blue-950 dark:to-indigo-950 border-blue-200">
+    <Card className="p-6 bg-background border-primary">
       <div className="flex items-start space-x-3">
-        <div className="p-2 bg-blue-500 rounded-full">
+        <div className="p-2 bg-primary rounded-full">
           <Sparkles aria-hidden="true" className="h-4 w-4 text-white" />
         </div>
         <div className="flex-1">
-          <h4 className="font-semibold text-blue-900 dark:text-blue-100">AI-Powered Impact Analysis</h4>
-          <p className="text-sm text-blue-700 dark:text-blue-200 mt-1">
+          <h4 className="font-semibold text-primary dark:text-blue-100">AI-Powered Impact Analysis</h4>
+          <p className="text-sm text-primary dark:text-blue-200 mt-1">
             After submitting your form, our AI system will analyze your venture and suggest additional relevant IRIS+ metrics based on your sector, business model, and GEDSI goals.
           </p>
         </div>
@@ -81,7 +81,7 @@ export function Step6GedsiGoals({ register, setValue, watchedValues, errors }: V
     </Card>
 
     {/* Supporting Documents */}
-    <Card className="p-6 bg-linear-to-r from-slate-50 to-gray-50 dark:from-slate-950 dark:to-gray-950 border-slate-200">
+    <Card className="p-6 bg-background border-slate-200">
       <div className="space-y-4">
         <div className="flex items-center space-x-2 mb-4">
           <Upload aria-hidden="true" className="h-5 w-5 text-slate-500" />
@@ -126,7 +126,7 @@ export function Step6GedsiGoals({ register, setValue, watchedValues, errors }: V
     </Alert>
 
     {/* Progress indicator */}
-    <div className="bg-linear-to-r from-emerald-50 to-green-50 dark:from-emerald-950 dark:to-green-950 p-4 rounded-lg border border-emerald-200">
+    <div className="bg-background p-4 rounded-lg border border-emerald-200">
       <div className="flex flex-col gap-1 text-sm text-emerald-800 dark:text-emerald-200 sm:flex-row sm:items-center sm:justify-between">
         <span>✅ GEDSI Goals & Impact</span>
         <span>Ready to Submit & Analyze!</span>

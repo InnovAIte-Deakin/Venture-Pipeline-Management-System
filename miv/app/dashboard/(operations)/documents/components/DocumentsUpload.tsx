@@ -44,7 +44,7 @@ export default function DocumentsUpload({
         <div
           className={`rounded-lg border-2 border-dashed px-6 py-8 text-center transition-colors ${
             dragActive
-              ? "border-blue-500 bg-blue-50"
+              ? "border-primary bg-primary/10"
               : "border-slate-300 hover:border-emerald-400"
           }`}
           onDragEnter={handleDrag}

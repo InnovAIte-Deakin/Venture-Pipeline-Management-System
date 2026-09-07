@@ -25,8 +25,8 @@ export default function MobileDocumentCard({
         <div className="flex items-start gap-4">
 
           {/* File Icon */}
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-blue-100">
-            <FileText className="h-6 w-6 text-blue-600" />
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+            <FileText className="h-6 w-6 text-primary" />
           </div>
 
           {/* Document Details */}

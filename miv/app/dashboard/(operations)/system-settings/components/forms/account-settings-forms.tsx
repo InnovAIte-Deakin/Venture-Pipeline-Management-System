@@ -56,7 +56,7 @@ export function AccountSettingsForms({
           <Button
             onClick={onProfileUpdate}
             disabled={profileSaveStatus === "saving"}
-            className="bg-teal-600 hover:bg-teal-700"
+            className="bg-primary hover:bg-primary"
           >
             <SaveStatusContent
               status={profileSaveStatus}
@@ -110,7 +110,7 @@ export function AccountSettingsForms({
           <Button
             onClick={onPasswordUpdate}
             disabled={passwordSaveStatus === "saving"}
-            className="bg-teal-600 hover:bg-teal-700"
+            className="bg-primary hover:bg-primary"
           >
             <SaveStatusContent
               status={passwordSaveStatus}
@@ -125,10 +125,13 @@ export function AccountSettingsForms({
             savedMessage="Password update completed successfully."
             errorMessage="Enter matching new passwords before saving."
           />
-          <div className="flex items-center justify-between pt-4 border-t border-gray-200 dark:border-gray-700">
-            <Label htmlFor="two-factor">Two-Factor Authentication</Label>
+          <div className="flex items-center justify-between gap-4 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <Label htmlFor="two-factor" className="min-w-0 leading-snug">
+              Two-Factor Authentication
+            </Label>
             <Switch
               id="two-factor"
+              className="shrink-0"
               checked={userProfile.twoFactorEnabled}
               onCheckedChange={(checked) => onUserProfileChange({ ...userProfile, twoFactorEnabled: checked })}
             />

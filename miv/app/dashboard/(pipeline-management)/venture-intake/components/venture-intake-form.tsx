@@ -216,7 +216,7 @@ export function VentureIntakeForm() {
         <Card>
           <CardHeader role="status">
             <div className="flex items-center space-x-2">
-              <Sparkles aria-hidden="true" className="h-5 w-5 text-blue-500" />
+              <Sparkles aria-hidden="true" className="h-5 w-5 text-primary" />
               <CardTitle>AI Analysis Complete!</CardTitle>
             </div>
             <CardDescription>
@@ -229,9 +229,9 @@ export function VentureIntakeForm() {
                 <h4 className="font-semibold text-green-800">Readiness Score</h4>
                 <p className="text-2xl font-bold text-green-600">{aiAnalysis.readinessScore}%</p>
               </div>
-              <div className="p-4 bg-blue-50 rounded-lg">
-                <h4 className="font-semibold text-blue-800">GEDSI Alignment</h4>
-                <p className="text-2xl font-bold text-blue-600">{aiAnalysis.gedsiAlignment}%</p>
+              <div className="p-4 bg-primary/10 rounded-lg">
+                <h4 className="font-semibold text-primary">GEDSI Alignment</h4>
+                <p className="text-2xl font-bold text-primary">{aiAnalysis.gedsiAlignment}%</p>
               </div>
               <div className="p-4 bg-purple-50 rounded-lg">
                 <h4 className="font-semibold text-purple-800">Suggested Metrics</h4>
@@ -340,7 +340,7 @@ export function VentureIntakeForm() {
           className="w-full"
         />
         <div className="flex items-center space-x-2" aria-live="polite" aria-atomic="true">
-          <Building2 aria-hidden="true" className="h-4 w-4 text-blue-500" />
+          <Building2 aria-hidden="true" className="h-4 w-4 text-primary" />
           <span className="text-sm text-gray-600">
             {steps[currentStep - 1].title} - {steps[currentStep - 1].description}
           </span>
@@ -352,7 +352,7 @@ export function VentureIntakeForm() {
         <CardHeader>
           <CardTitle className="flex items-center space-x-2">
             <h3 ref={stepHeadingRef} tabIndex={-1}>{steps[currentStep - 1].title}</h3>
-            {currentStep === steps.length && <Sparkles aria-hidden="true" className="h-4 w-4 text-blue-500" />}
+            {currentStep === steps.length && <Sparkles aria-hidden="true" className="h-4 w-4 text-primary" />}
           </CardTitle>
           <CardDescription>
             {steps[currentStep - 1].description}
@@ -401,7 +401,7 @@ export function VentureIntakeForm() {
                 <Button
                   type="submit"
                   disabled={isSubmitting}
-                  className="min-h-11 bg-blue-600 text-white hover:bg-blue-700 disabled:bg-blue-800 disabled:text-white disabled:opacity-80"
+                  className="min-h-11 disabled:bg-primary/70 disabled:text-primary-foreground disabled:opacity-80"
                 >
                   {isSubmitting ? (
                     <>

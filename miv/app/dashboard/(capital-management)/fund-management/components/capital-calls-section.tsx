@@ -35,7 +35,7 @@ export function CapitalCallsSection({ capitalCalls, loading = false }: Readonly<
       case "pending":
         return "bg-yellow-100 text-yellow-800"
       case "in_progress":
-        return "bg-blue-100 text-blue-800"
+        return "bg-primary/10 text-primary"
       case "completed":
         return "bg-green-100 text-green-800"
       case "overdue":
@@ -52,7 +52,7 @@ export function CapitalCallsSection({ capitalCalls, loading = false }: Readonly<
       case "overdue":
         return <AlertTriangle className="h-4 w-4 text-red-600" />
       case "in_progress":
-        return <Clock className="h-4 w-4 text-blue-600" />
+        return <Clock className="h-4 w-4 text-primary" />
       default:
         return <Clock className="h-4 w-4 text-yellow-600" />
     }

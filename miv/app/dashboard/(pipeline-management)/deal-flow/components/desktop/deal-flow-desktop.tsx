@@ -149,7 +149,7 @@ function InsightsView({ state }: { state: DealFlowState }) {
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-blue-500" aria-hidden="true" />
+            <Sparkles className="h-5 w-5 text-primary" aria-hidden="true" />
             AI Recommendations
           </CardTitle>
           <CardDescription>AI-powered insights and recommendations for each venture</CardDescription>

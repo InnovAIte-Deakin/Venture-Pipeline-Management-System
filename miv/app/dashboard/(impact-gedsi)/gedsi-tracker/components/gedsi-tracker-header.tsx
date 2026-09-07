@@ -45,7 +45,7 @@ export function GedsiTrackerHeader({
         </Button>
         <Dialog open={showAddMetric} onOpenChange={setShowAddMetric}>
           <DialogTrigger asChild>
-            <Button size="sm" className="bg-black px-2 text-xs text-white hover:bg-neutral-800 md:px-3 md:text-sm">
+            <Button size="sm" className="px-2 text-xs md:px-3 md:text-sm">
               <Plus className="mr-1 h-4 w-4 md:mr-2" />
               Add Metric
             </Button>

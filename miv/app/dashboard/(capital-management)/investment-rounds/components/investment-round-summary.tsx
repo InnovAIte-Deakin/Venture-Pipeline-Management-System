@@ -9,7 +9,7 @@ export function InvestmentRoundKpis({ summary: s }: { summary: InvestmentRoundSu
   const cards = [
     ["Total Rounds", s.totalRounds, `${s.openRounds} open, ${s.closedRounds} closed`, TrendingUp, ""],
     ["GEDSI Score", s.avgGedsiScore.toFixed(0), "Average across all rounds", Heart, gedsiScoreClass(s.avgGedsiScore)],
-    ["Impact Score", s.avgImpactScore.toFixed(0), "Social impact rating", Globe, "text-blue-600"],
+    ["Impact Score", s.avgImpactScore.toFixed(0), "Social impact rating", Globe, "text-primary"],
     ["Jobs Created", s.totalJobsCreated, `Across ${s.totalCommunitiesServed} communities`, Users, "text-green-600"],
     ["Women-Led", s.womenLedRounds, `${s.womenLedPercentage.toFixed(0)}% of rounds`, Star, "text-purple-600"],
     ["Raised Amount", `$${s.totalRaisedAmount.toFixed(1)}M`, `${s.raisedPercentage.toFixed(1)}% of $${s.totalTargetAmount.toFixed(1)}M target`, DollarSign, ""],

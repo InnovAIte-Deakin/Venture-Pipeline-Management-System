@@ -17,7 +17,7 @@ export function Step3MarketBusiness({ register, setValue, watchedValues, errors 
       <Card className="p-4 hover:shadow-md transition-shadow">
         <div className="space-y-2">
           <div className="flex items-center space-x-2">
-            <Target aria-hidden="true" className="h-4 w-4 text-blue-500" />
+            <Target aria-hidden="true" className="h-4 w-4 text-primary" />
             <Label htmlFor="targetMarket" className="font-medium">Target Market <span aria-hidden="true">*</span><span className="sr-only"> (required)</span></Label>
           </div>
           <Input
@@ -27,7 +27,7 @@ export function Step3MarketBusiness({ register, setValue, watchedValues, errors 
             aria-describedby={errors.targetMarket ? 'target-market-error' : undefined}
             {...register('targetMarket')}
             placeholder="Rural farmers in Vietnam"
-            className="border-0 focus:ring-2 focus:ring-blue-500"
+            className="border-0 focus:ring-2 focus:ring-ring"
           />
           {errors.targetMarket && <FieldError id="target-market-error" message={errors.targetMarket.message} />}
         </div>
@@ -64,7 +64,7 @@ export function Step3MarketBusiness({ register, setValue, watchedValues, errors 
     </div>
 
     {/* Challenges */}
-    <Card className="p-6 bg-linear-to-r from-orange-50 to-red-50 dark:from-orange-950 dark:to-red-950 border-orange-200">
+    <Card className="p-6 bg-background border-orange-200">
       <div className="space-y-2">
         <div className="flex items-center space-x-2">
           <AlertCircle aria-hidden="true" className="h-4 w-4 text-orange-500" />

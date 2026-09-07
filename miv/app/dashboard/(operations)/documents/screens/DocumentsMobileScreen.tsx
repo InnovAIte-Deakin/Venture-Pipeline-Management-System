@@ -85,7 +85,7 @@ export default function DocumentsMobileScreen(
   Documents
 </h2>
 
-<span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+<span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
   {props.filteredDocuments.length}
 </span>
 
@@ -95,8 +95,8 @@ export default function DocumentsMobileScreen(
         {props.filteredDocuments.length === 0 ? (
           <div className="rounded-lg border border-slate-200 bg-white p-8 text-center shadow-sm">
 
-<div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-blue-50">
-              <FileText className="h-8 w-8 text-blue-600" />
+<div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+              <FileText className="h-8 w-8 text-primary" />
             </div>
 
             <h2 className="mt-2 text-xl font-semibold">

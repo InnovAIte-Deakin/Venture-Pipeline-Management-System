@@ -102,7 +102,7 @@ export function ItemViewDialog({
                 </CardHeader>
                 <CardContent className="space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-sm font-medium text-blue-600">
+                    <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium text-primary">
                       {selectedItem.assignedTo.split(" ").map((name) => name[0]).join("")}
                     </div>
                     <div>

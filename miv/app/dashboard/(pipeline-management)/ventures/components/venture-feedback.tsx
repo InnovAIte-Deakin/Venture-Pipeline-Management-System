@@ -10,7 +10,7 @@ export function VenturesLoading() {
   return (
     <main className="flex min-h-screen items-center justify-center p-6">
       <div className="text-center">
-        <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-blue-600" aria-hidden="true" />
+        <RefreshCw className="mx-auto mb-4 h-8 w-8 animate-spin text-primary" aria-hidden="true" />
         <p className="text-gray-600">Loading ventures...</p>
       </div>
     </main>
