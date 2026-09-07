@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { calculateReadinessProgress } from "@/components/diagnostics/readiness-utils";
+import { calculateReadinessProgress } from "../app/dashboard/(pipeline-management)/diagnostics/components/readiness-utils";
 
 describe("calculateReadinessProgress", () => {
 	it("calculates partial completion correctly", () => {
