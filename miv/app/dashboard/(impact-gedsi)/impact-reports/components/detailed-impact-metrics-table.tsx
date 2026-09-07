@@ -27,7 +27,7 @@ export function DetailedImpactMetricsTable({
       <CardContent>
         {/* Desktop and tablet table */}
         <div className="hidden overflow-x-auto md:block">
-          <table className="w-full min-w-[600px] border-collapse">
+          <table className="w-full min-w-150 border-collapse">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50 text-left text-xs font-medium uppercase tracking-wider text-gray-600 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300">
                 <th className="px-4 py-3">Metric</th>

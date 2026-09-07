@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Search, ChevronRight, ChevronDown } from "lucide-react"
+import { ChevronRight, ChevronDown } from "lucide-react"
 
 interface FaqItem {
   id: string
@@ -23,7 +22,7 @@ const faqItems: FaqItem[] = [
   },
   {
     id: "2",
-    category: "Account",
+    category: "GEDSI",
     question: "What are GEDSI metrics and how are they calculated?",
     answer:
       "GEDSI (Gender, Equality, Disability, and Social Inclusion) metrics are automatically calculated based on venture data and IRIS+ standards.",
@@ -37,23 +36,56 @@ const faqItems: FaqItem[] = [
   },
   {
     id: "4",
-    category: "Billing",
+    category: "Security",
     question: "Is my data secure and compliant?",
     answer:
       "Yes, the platform follows enterprise-grade security standards and is compliant with GDPR, SOC 2, and other relevant regulations.",
   },
+  {
+    id: "5",
+    category: "Workflows",
+    question: "Why can't I move a venture to the next workflow stage?",
+    answer:
+      "Check that all required due diligence tasks are complete, assigned approvals are resolved, and the venture has no blocking validation errors.",
+  },
+  {
+    id: "6",
+    category: "Documents",
+    question: "What should I do if a document upload fails?",
+    answer:
+      "Confirm the file type and size are supported, rename files with special characters, then retry. If the issue continues, contact support with the venture name and document type.",
+  },
+  {
+    id: "7",
+    category: "Reports",
+    question: "Where can I download portfolio and impact reports?",
+    answer:
+      "Use Advanced Reports for portfolio exports and Impact Reports for GEDSI and IRIS reporting. Exports are available in the reporting sections after filters are applied.",
+  },
+  {
+    id: "8",
+    category: "Account",
+    question: "How do I manage team permissions?",
+    answer:
+      "Go to Team Management to add members, update roles, and review access. Admin permissions are required for role and membership changes.",
+  },
 ]
 
-const categories = ["All", "Account", "Ventures", "Billing"]
+const categories = ["All", "Account", "Ventures", "Workflows", "Documents", "GEDSI", "Reports", "Security"]
 
-export default function FaqSection() {
-  const [search, setSearch] = useState("")
+interface FaqSectionProps {
+  searchValue?: string
+}
+
+export default function FaqSection({ searchValue = "" }: FaqSectionProps) {
   const [activeCategory, setActiveCategory] = useState("All")
   const [openId, setOpenId] = useState<string | null>(null)
+  const normalizedSearch = searchValue.trim().toLowerCase()
 
   const filteredItems = faqItems.filter((item) => {
     const matchesCategory = activeCategory === "All" || item.category === activeCategory
-    const matchesSearch = item.question.toLowerCase().includes(search.toLowerCase())
+    const searchableText = `${item.category} ${item.question} ${item.answer}`.toLowerCase()
+    const matchesSearch = !normalizedSearch || searchableText.includes(normalizedSearch)
     return matchesCategory && matchesSearch
   })
 
@@ -63,16 +95,6 @@ export default function FaqSection() {
         <CardTitle>Help Centre</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search FAQs"
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="pl-9"
-          />
-        </div>
-
         <div className="flex gap-2 flex-wrap">
           {categories.map((category) => (
             <Button

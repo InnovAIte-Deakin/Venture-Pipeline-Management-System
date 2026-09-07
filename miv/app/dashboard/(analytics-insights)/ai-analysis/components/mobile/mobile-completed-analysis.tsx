@@ -18,7 +18,7 @@ export function MobileCompletedAnalysis({
     <Card className="overflow-hidden rounded-2xl border-[#138075]/15 bg-white shadow-sm">
       <div className="h-1 bg-[#138075]" />
       <CardHeader className="p-4">
-        <CardTitle className="break-words text-base leading-6">
+        <CardTitle className="wrap-break-word text-base leading-6">
           {analysis.ventureName} - {analysis.analysisType}
         </CardTitle>
         <CardDescription>

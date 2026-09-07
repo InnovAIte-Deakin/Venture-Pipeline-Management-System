@@ -54,7 +54,7 @@ export function ImpactOverTimeChart({
       <CardContent>
         <ChartContainer
           config={impactOverTimeChartConfig}
-          className="h-[300px] w-full"
+          className="h-75 w-full"
         >
           <AreaChart
             data={data}

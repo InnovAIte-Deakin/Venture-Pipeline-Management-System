@@ -13,12 +13,17 @@ type ActiveSection = "faq" | "tutorials" | "contact"
 
 export default function HelpSupportMobileScreen() {
   const [activeSection, setActiveSection] = useState<ActiveSection>("faq")
+  const [search, setSearch] = useState("")
 
   return (
     <div className="space-y-4 px-4">
-      <HelpHeader />
-      <HelpSearchBar />
-      <QuickActionsGrid />
+      <HelpHeader onContactSupport={() => setActiveSection("contact")} />
+      <HelpSearchBar value={search} onChange={setSearch} />
+      <QuickActionsGrid
+        onOpenFaq={() => setActiveSection("faq")}
+        onOpenTutorials={() => setActiveSection("tutorials")}
+        onOpenContact={() => setActiveSection("contact")}
+      />
 
       <div className="flex gap-2 overflow-x-auto pb-2">
         <Button
@@ -45,8 +50,8 @@ export default function HelpSupportMobileScreen() {
       </div>
 
       <div className="space-y-4">
-        {activeSection === "faq" && <FaqSection />}
-        {activeSection === "tutorials" && <TutorialsSection />}
+        {activeSection === "faq" && <FaqSection searchValue={search} />}
+        {activeSection === "tutorials" && <TutorialsSection searchValue={search} />}
         {activeSection === "contact" && <ContactForm />}
       </div>
     </div>
