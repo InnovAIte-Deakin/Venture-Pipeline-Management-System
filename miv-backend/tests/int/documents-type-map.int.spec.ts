@@ -1,39 +1,12 @@
 import { describe, it, expect } from 'vitest'
-
-// Helper function matching the route implementations
-function getDisplayDocumentType(backendType: string): string {
-  const typeMap: Record<string, string> = {
-    'pitch_deck': 'Pitch Deck',
-    'financial_statements': 'Financial Statements',
-    'legal_documents': 'Legal Documents',
-    'gedsi_reports': 'GEDSI Reports',
-    'impact_reports': 'Impact Reports',
-    'other': 'Other',
-  }
-  return typeMap[backendType] || backendType
-}
-
-// Helper mapping display names to canonical backend enum
-function resolveBackendDocumentType(rawType: string): string {
-  const documentTypeMap: Record<string, string> = {
-    'Pitch Deck': 'pitch_deck',
-    'Financial Statements': 'financial_statements',
-    'Legal Documents': 'legal_documents',
-    'GEDSI Reports': 'gedsi_reports',
-    'Impact Reports': 'impact_reports',
-    'Other': 'other',
-  }
-  return documentTypeMap[rawType] || rawType.toLowerCase().replace(/\s+/g, '_')
-}
-
-const validBackendTypes = [
-  'pitch_deck',
-  'financial_statements',
-  'legal_documents',
-  'gedsi_reports',
-  'impact_reports',
-  'other',
-]
+import {
+  getDisplayDocumentType,
+  resolveBackendDocumentType,
+  validDocumentTypes,
+} from '@/app/api/documents/route'
+import {
+  getDisplayDocumentType as getDisplayDocumentTypeFromSingleRoute,
+} from '@/app/api/documents/[id]/route'
 
 const validReviewStatuses = [
   'pending_review',
@@ -42,16 +15,25 @@ const validReviewStatuses = [
   'needs_revision',
 ]
 
-describe('API Contract v1 - Document Endpoints Verification Suite', () => {
+describe('API Contract v1 - Document Type-Map & Schema Tests', () => {
 
-  describe('§6.1 GET /api/documents (List Documents)', () => {
-    it('formats raw database documentType values to contract display names', () => {
+  describe('§6.1 GET /api/documents (Type Mapping & List Schema)', () => {
+    it('formats raw database documentType values to contract display names in list route', () => {
       expect(getDisplayDocumentType('pitch_deck')).toBe('Pitch Deck')
       expect(getDisplayDocumentType('financial_statements')).toBe('Financial Statements')
       expect(getDisplayDocumentType('legal_documents')).toBe('Legal Documents')
       expect(getDisplayDocumentType('gedsi_reports')).toBe('GEDSI Reports')
       expect(getDisplayDocumentType('impact_reports')).toBe('Impact Reports')
       expect(getDisplayDocumentType('other')).toBe('Other')
+      // Fallback for unmapped types
+      expect(getDisplayDocumentType('custom_type')).toBe('custom_type')
+    })
+
+    it('returns consistent display name mapping across both route files', () => {
+      const testTypes = ['pitch_deck', 'financial_statements', 'legal_documents', 'gedsi_reports', 'impact_reports', 'other']
+      for (const t of testTypes) {
+        expect(getDisplayDocumentType(t)).toBe(getDisplayDocumentTypeFromSingleRoute(t))
+      }
     })
 
     it('returns a document list item matching the contract required schema', () => {
@@ -69,8 +51,8 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
         venture: { id: 'ven_1', name: 'CleanTech' },
         reviewedBy: null,
         reviewedAt: null,
-        createdAt: '2026-08-05T10:00:00.000Z',
-        updatedAt: '2026-08-05T10:00:00.000Z',
+        createdAt: '2026-09-05T10:00:00.000Z',
+        updatedAt: '2026-09-05T10:00:00.000Z',
       }
 
       const listItem = {
@@ -110,22 +92,27 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
     })
   })
 
-  describe('§6.2 POST /api/documents (Upload Document)', () => {
-    it('accepts both user-facing display names and backend keys', () => {
+  describe('§6.2 POST /api/documents (Upload Type Resolution & Schema)', () => {
+    it('resolves both user-facing display names and backend keys into canonical enum values', () => {
       const displayInput = 'Financial Statements'
       const backendInput = 'financial_statements'
 
-      expect(validBackendTypes.includes(resolveBackendDocumentType(displayInput))).toBe(true)
-      expect(validBackendTypes.includes(resolveBackendDocumentType(backendInput))).toBe(true)
+      expect(validDocumentTypes.includes(resolveBackendDocumentType(displayInput))).toBe(true)
+      expect(validDocumentTypes.includes(resolveBackendDocumentType(backendInput))).toBe(true)
       expect(resolveBackendDocumentType(displayInput)).toBe('financial_statements')
       expect(resolveBackendDocumentType(backendInput)).toBe('financial_statements')
+      expect(resolveBackendDocumentType('Pitch Deck')).toBe('pitch_deck')
+      expect(resolveBackendDocumentType('Legal Documents')).toBe('legal_documents')
+      expect(resolveBackendDocumentType('GEDSI Reports')).toBe('gedsi_reports')
+      expect(resolveBackendDocumentType('Impact Reports')).toBe('impact_reports')
+      expect(resolveBackendDocumentType('Other')).toBe('other')
     })
 
     it('rejects invalid document types not defined in the contract', () => {
       const invalidTypes = ['executable_file', 'malicious_script', 'unsupported_type', 'random_string']
       for (const invalidType of invalidTypes) {
         const resolved = resolveBackendDocumentType(invalidType)
-        const isValid = validBackendTypes.includes(resolved)
+        const isValid = validDocumentTypes.includes(resolved)
         expect(isValid).toBe(false)
       }
     })
@@ -179,20 +166,8 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
     })
   })
 
-  describe('§6.3 DELETE /api/documents?id={id} (Canonical Delete)', () => {
-    it('returns the exact contract response body: { success: true, message: "Document deleted" }', () => {
-      const deleteResponse = {
-        success: true,
-        message: 'Document deleted',
-      }
-
-      expect(deleteResponse.success).toBe(true)
-      expect(deleteResponse.message).toBe('Document deleted')
-    })
-  })
-
-  describe('§6.4 GET /api/documents/[id] (Metadata & Download)', () => {
-    it('ensures documentType in single document metadata returns display name', () => {
+  describe('§6.4 GET /api/documents/[id] (Single Document Metadata Mapping)', () => {
+    it('ensures documentType in single document metadata returns display name via route helper', () => {
       const rawDbDocument = {
         id: 'doc_xyz',
         filename: 'gedsi_plan.pdf',
@@ -202,7 +177,7 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
 
       const returnedMetadata = {
         ...rawDbDocument,
-        documentType: getDisplayDocumentType(rawDbDocument.documentType),
+        documentType: getDisplayDocumentTypeFromSingleRoute(rawDbDocument.documentType),
       }
 
       expect(returnedMetadata.documentType).toBe('GEDSI Reports')
@@ -210,7 +185,7 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
     })
   })
 
-  describe('§6.5 PATCH /api/documents/[id] (Review Document)', () => {
+  describe('§6.5 PATCH /api/documents/[id] (Review Status Validation & Schema)', () => {
     it('validates status against the allowed review status list', () => {
       expect(validReviewStatuses.includes('pending_review')).toBe(true)
       expect(validReviewStatuses.includes('approved')).toBe(true)
@@ -222,7 +197,7 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
       expect(validReviewStatuses.includes('invalid_status')).toBe(false)
     })
 
-    it('returns the full updated document shape with reviewedBy and reviewedAt stamped', () => {
+    it('returns the full updated document shape with reviewedBy, reviewedAt, and mapped documentType', () => {
       const reviewerUserId = 'usr_analyst_1'
       const reviewDate = new Date().toISOString()
 
@@ -240,7 +215,7 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
         venture: { id: 'ven_1' },
         reviewedBy: reviewerUserId,
         reviewedAt: reviewDate,
-        createdAt: '2026-08-01T00:00:00.000Z',
+        createdAt: '2026-09-01T00:00:00.000Z',
         updatedAt: reviewDate,
       }
 
@@ -250,7 +225,7 @@ describe('API Contract v1 - Document Endpoints Verification Suite', () => {
         document: {
           id: reviewedDoc.id,
           filename: reviewedDoc.filename,
-          documentType: getDisplayDocumentType(reviewedDoc.documentType),
+          documentType: getDisplayDocumentTypeFromSingleRoute(reviewedDoc.documentType),
           status: reviewedDoc.status,
           version: reviewedDoc.version,
           filesize: reviewedDoc.filesize,

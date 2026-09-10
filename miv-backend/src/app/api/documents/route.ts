@@ -10,7 +10,7 @@ const dirname = path.dirname(filename)
 const uploadsDir = path.resolve(dirname, '../../../../uploads/documents')
 
 // Helper function to convert backend document type to display name
-function getDisplayDocumentType(backendType: string): string {
+export function getDisplayDocumentType(backendType: string): string {
   const typeMap: Record<string, string> = {
     'pitch_deck': 'Pitch Deck',
     'financial_statements': 'Financial Statements',
@@ -20,6 +20,29 @@ function getDisplayDocumentType(backendType: string): string {
     'other': 'Other'
   }
   return typeMap[backendType] || backendType
+}
+
+// Convert display name to backend value
+export const documentTypeMap: Record<string, string> = {
+  'Pitch Deck': 'pitch_deck',
+  'Financial Statements': 'financial_statements',
+  'Legal Documents': 'legal_documents',
+  'GEDSI Reports': 'gedsi_reports',
+  'Impact Reports': 'impact_reports',
+  'Other': 'other',
+}
+
+export const validDocumentTypes = [
+  'pitch_deck',
+  'financial_statements',
+  'legal_documents',
+  'gedsi_reports',
+  'impact_reports',
+  'other',
+]
+
+export function resolveBackendDocumentType(rawType: string): string {
+  return documentTypeMap[rawType] || rawType.toLowerCase().replace(/\s+/g, '_')
 }
 
 // GET /api/documents - Get all documents for the current user
@@ -164,26 +187,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Convert display name to backend value
-    const documentTypeMap: Record<string, string> = {
-      'Pitch Deck': 'pitch_deck',
-      'Financial Statements': 'financial_statements',
-      'Legal Documents': 'legal_documents',
-      'GEDSI Reports': 'gedsi_reports',
-      'Impact Reports': 'impact_reports',
-      'Other': 'other',
-    }
-
-    const documentType = documentTypeMap[documentTypeRaw] || documentTypeRaw.toLowerCase().replace(/\s+/g, '_')
-
-    const validDocumentTypes = [
-      'pitch_deck',
-      'financial_statements',
-      'legal_documents',
-      'gedsi_reports',
-      'impact_reports',
-      'other',
-    ]
+    const documentType = resolveBackendDocumentType(documentTypeRaw)
 
     if (!validDocumentTypes.includes(documentType)) {
       return NextResponse.json(

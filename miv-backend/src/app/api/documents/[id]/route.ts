@@ -10,7 +10,7 @@ const dirname = path.dirname(filename)
 const uploadsDir = path.resolve(dirname, '../../../../../uploads/documents')
 
 // Helper function to convert backend document type to display name
-function getDisplayDocumentType(backendType: string): string {
+export function getDisplayDocumentType(backendType: string): string {
   const typeMap: Record<string, string> = {
     'pitch_deck': 'Pitch Deck',
     'financial_statements': 'Financial Statements',
@@ -239,7 +239,8 @@ export async function PATCH(
       id,
       data: updateData,
       depth: 1,
-      overrideAccess: true,
+      overrideAccess: false,
+      user,
     })
 
     return NextResponse.json({
@@ -263,14 +264,13 @@ export async function PATCH(
         updatedAt: document.updatedAt,
       },
     })
-  } catch (error: any) {
+  } catch (error) {
     console.error('Update document error:', error)
     return NextResponse.json(
       {
         success: false,
         error: 'Failed to update document',
-        message: error?.message || 'An error occurred while updating the document.',
-        details: error?.errors || error?.data || undefined,
+        message: 'An error occurred while updating the document.',
       },
       { status: 500 }
     )
