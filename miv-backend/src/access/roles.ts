@@ -12,6 +12,7 @@ export const isFounder = ({ req }: { req: any }) =>
 export const adminOnly: Access = (args) => isAdmin(args)
 export const adminOnlyBool = ({ req }: { req: any }) => isAdmin({ req })
 export const adminOrAnalyst: Access = (args) => isAdmin(args) || isAnalyst(args)
+export const adminOrAnalystBool = ({ req }: { req: any }) => isAdmin({ req }) || isAnalyst({ req })
 
 // NOTE: `selfOrAdminAccess` and `founderOfVenture` were removed (review cleanup).
 // `founderOfVenture` was broken — it resolved a user's ventures through

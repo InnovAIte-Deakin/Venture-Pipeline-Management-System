@@ -44,7 +44,16 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const totals = ventures.reduce((acc, venture) => ({
+    const totals = ventures.reduce((acc: {
+      totalBeneficiaries: number
+      totalJobsCreated: number
+      totalWomenEmpowered: number
+      totalDisabilityInclusive: number
+      totalYouthEngaged: number
+      gedsiScoreSum: number
+      socialImpactScoreSum: number
+      complianceRateSum: number
+    }, venture: any) => ({
       totalBeneficiaries: acc.totalBeneficiaries + (venture.totalBeneficiaries || 0),
       totalJobsCreated: acc.totalJobsCreated + (venture.jobsCreated || 0),
       totalWomenEmpowered: acc.totalWomenEmpowered + (venture.womenEmpowered || 0),
