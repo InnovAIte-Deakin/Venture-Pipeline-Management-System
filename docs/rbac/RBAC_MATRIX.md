@@ -32,10 +32,10 @@ So: §2 = admin-panel/REST surface. §3 = the real app surface. #35 ("every coll
 
 **Two "—" cells in `roles.json` are blockers, not adoption wiring:**
 - **`founder` has no Prisma `UserRole` value at all**, and it is release #1. Shipping it needs a scheduled **schema + data migration**, not just wiring.
-- **`user` is not free to delete.** `miv/app/auth/login/page.tsx` still branches on `role === 'user'` to choose the landing page. #57 fixed the target (both `user` and `founder` → `/user-dashboard`), but the branch still reads the value, so the mapping decision **changes routing for real users** — settle the redirect rule with the mapping.
+- **`user` retired from the backend.** Removed from the Payload `users.role` select + regenerated types (0 rows held it). One reference remains: `miv/app/auth/login/page.tsx` still branches on `role === 'user'` to choose the landing page — being fixed on Kent's branch. Until that lands, `user` is gone backend-side but still read on login.
 
 **Legacy roles are load-bearing, not decorative** (decision required at review — map or delete, with data migration):
-- Backend Payload select: `user`.
+- Backend Payload select: `user` — **retired** (removed from the select + types; 0 rows held it).
 - Frontend Prisma enum: `MANAGER`, `USER`, `VENTURE_MANAGER`, `GEDSI_ANALYST`, `CAPITAL_FACILITATOR`, `EXTERNAL_STAKEHOLDER`. Seeded users hold `MANAGER` and `VENTURE_MANAGER`.
 - `VENTURE_MANAGER` / `GEDSI_ANALYST` / `CAPITAL_FACILITATOR` gate email body content (~10 conditionals in `emails/stg-reminder` + `weekly-update`), and `team/members` hardcodes all 8 values in a Zod enum with an assignment UI. **Renaming to snake_case is a behaviour change in those routes, not a cleanup.**
 
