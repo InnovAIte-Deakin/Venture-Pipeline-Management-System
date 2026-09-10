@@ -2,7 +2,7 @@
 import config from '@payload-config'
 import { getPayload } from 'payload'
 
-export async function GET(_req: Request, { params }: { params: any }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const payload = await getPayload({ config })
   try {
     // 1. Authenticate user
@@ -32,7 +32,7 @@ export async function GET(_req: Request, { params }: { params: any }) {
 
     // 3. Clone and apply visibility filtering for non-staff (founder owners)
     const resVenture = { ...venture }
-    let resIntake = intake ? { ...intake } : null
+    const resIntake = intake ? { ...intake } : null
 
     if (!isStaff) {
       // Redact triage track and rationale
@@ -50,4 +50,3 @@ export async function GET(_req: Request, { params }: { params: any }) {
     return Response.json({ error: e.message }, { status: 404 })
   }
 }
-

@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
         name: item.name,
         description: item.description || undefined,
         unit: item.unit || undefined,
-        categories: Array.isArray(item.categories as any) ? (item.categories as any) : [],
+        categories: item.category ? [item.category] : [],
         tags: Array.isArray(item.tags as any) ? (item.tags as any) : [],
       }
       return NextResponse.json({
@@ -112,4 +112,3 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
-
