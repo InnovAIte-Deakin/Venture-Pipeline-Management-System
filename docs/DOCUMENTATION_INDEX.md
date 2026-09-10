@@ -25,7 +25,13 @@ This folder contains the consolidated and finalised documentation for the VPMS p
 - **[Internal Developer Guide](./INTERNAL_DEV_GUIDE.md)**  
   Setup, configuration, authentication, and development notes.
 
-### 6. Security & Access Control
+### 6. Architecture Decision Records
+- **[ADR-001: Dual Database and Authentication Assessment](./adr/ADR-001-Dual-Database-and-Authentication-Assessment.md)**
+  Assessment of the dual PostgreSQL/MongoDB and authentication setup.
+- **[ADR-002: Next.js Version Split](./adr/ADR-002-Nextjs-Version-Split.md)**
+  Decision to keep miv on Next.js 16 and bump miv-backend to Next.js 15.4.11, rather than matching major versions across both apps.
+
+### 7. Security & Access Control
 - **[RBAC Matrix](./rbac/RBAC_MATRIX.md)**  
   Canonical roles × collections × fields × routes, anomaly register, and adoption sequence. Audited against #57.
 - **[Canonical Role List](./rbac/roles.json)**  
