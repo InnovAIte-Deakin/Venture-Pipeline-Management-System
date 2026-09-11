@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 import { useIrisMetrics } from "./hooks/use-iris-metrics"
 import { QUICK_FILTERS, RESULT_LIMIT_OPTIONS } from "./lib/iris-metrics.constants"
+import { formatMetricUnit } from "./lib/iris-metrics.formatters"
 
 
 
@@ -125,7 +126,7 @@ export default function IRISMetricsPage() {
       <div className="mt-4 border-t pt-3 text-xs text-muted-foreground">
         <span>Unit: </span>
         <span className="font-medium text-foreground">
-          {item.unit || "-"}
+          {formatMetricUnit(item.unit)}
         </span>
       </div>
     </div>
@@ -155,7 +156,7 @@ export default function IRISMetricsPage() {
                     <TableCell>
                       {item.gedsiSuggestion && <Badge variant="outline">{item.gedsiSuggestion}</Badge>}
                     </TableCell>
-                    <TableCell>{item.unit || '-'}</TableCell>
+                    <TableCell>{formatMetricUnit(item.unit)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
