@@ -1,50 +1,29 @@
 "use client"
 
-import { useEffect, useState } from 'react'
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
+import { useIrisMetrics } from "./hooks/use-iris-metrics"
+import { QUICK_FILTERS, RESULT_LIMIT_OPTIONS } from "./lib/iris-metrics.constants"
+import { formatMetricUnit } from "./lib/iris-metrics.formatters"
 
-type CatalogItem = {
-  code: string
-  name: string
-  description?: string
-  unit?: string
-  gedsiSuggestion?: string
-}
+
 
 export default function IRISMetricsPage() {
-  const [query, setQuery] = useState("")
-  const [items, setItems] = useState<CatalogItem[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(50)
+  const {
+  query,
+  setQuery,
+  items,
+  total,
+  loading,
+  limit,
+  setLimit,
+} = useIrisMetrics()
 
-  useEffect(() => {
-    const controller = new AbortController()
-    async function search() {
-      setLoading(true)
-      try {
-        const url = query.trim().length > 0
-          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}`
-          : `/api/iris/metrics?limit=${limit}`
-        const res = await fetch(url, { signal: controller.signal })
-        if (res.ok) {
-          const json = await res.json()
-          setItems(json.results || [])
-          setTotal(json.total || (json.results?.length ?? 0))
-        }
-      } catch {}
-      finally {
-        setLoading(false)
-      }
-    }
-    const t = setTimeout(search, 250)
-    return () => { controller.abort(); clearTimeout(t) }
-  }, [query, limit])
 
   return (
     <div className="space-y-6">
@@ -67,15 +46,21 @@ export default function IRISMetricsPage() {
                 />
               </div>
               <div>
-                <Select value={limit.toString()} onValueChange={(value) => setLimit(parseInt(value))}>
-                  <SelectTrigger>
+               <Select
+  value={limit.toString()}
+  onValueChange={(value) => {
+    setLimit(parseInt(value))
+  }}
+>
+  <SelectTrigger>
                     <SelectValue placeholder="Results per page" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="20">20 results</SelectItem>
-                    <SelectItem value="50">50 results</SelectItem>
-                    <SelectItem value="100">100 results</SelectItem>
-                    <SelectItem value="200">200 results</SelectItem>
+                   {RESULT_LIMIT_OPTIONS.map((option) => (
+  <SelectItem key={option} value={option.toString()}>
+    {option} results
+  </SelectItem>
+))}
                   </SelectContent>
                 </Select>
               </div>
@@ -86,45 +71,69 @@ export default function IRISMetricsPage() {
             
             {/* Quick filter buttons */}
             <div className="flex flex-wrap gap-2">
+              {QUICK_FILTERS.map((filter) => (
+                <Button
+                  key={filter.value}
+                  variant="outline"
+                  size="sm"
+                 onClick={() => setQuery(filter.value)}
+                >
+                  {filter.label}
+                </Button>
+              ))}
+              
               <Button 
                 variant="outline" 
                 size="sm"
-                onClick={() => setQuery("women")}
-              >
-                Women/Gender
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("disability")}
-              >
-                Disability
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("marginalized")}
-              >
-                Marginalized Groups
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("youth")}
-              >
-                Youth
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("")}
+               onClick={() => setQuery("")}
               >
                 Clear
               </Button>
             </div>
           </div>
 
-          <div className="rounded-md border overflow-hidden">
+          {/* Mobile metric cards */}
+<div className="space-y-3 md:hidden">
+  {items.map((item) => (
+    <div
+      key={item.code}
+      className="rounded-md border bg-background p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-xs font-medium text-muted-foreground">
+            {item.code}
+          </div>
+
+          <div className="mt-1 font-medium leading-tight">
+            {item.name}
+          </div>
+        </div>
+
+        {item.gedsiSuggestion && (
+          <Badge variant="outline" className="shrink-0">
+            {item.gedsiSuggestion}
+          </Badge>
+        )}
+      </div>
+
+      {item.description && (
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          {item.description}
+        </p>
+      )}
+
+      <div className="mt-4 border-t pt-3 text-xs text-muted-foreground">
+        <span>Unit: </span>
+        <span className="font-medium text-foreground">
+          {formatMetricUnit(item.unit)}
+        </span>
+      </div>
+    </div>
+  ))}
+</div>
+        
+          <div className="hidden md:block rounded-md border overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -147,7 +156,7 @@ export default function IRISMetricsPage() {
                     <TableCell>
                       {item.gedsiSuggestion && <Badge variant="outline">{item.gedsiSuggestion}</Badge>}
                     </TableCell>
-                    <TableCell>{item.unit || '-'}</TableCell>
+                    <TableCell>{formatMetricUnit(item.unit)}</TableCell>
                   </TableRow>
                 ))}
               </TableBody>
