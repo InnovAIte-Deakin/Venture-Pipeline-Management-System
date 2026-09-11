@@ -743,7 +743,9 @@ Errors: 400 for a wrong content type or an oversized file.
 
 ### 6.7 Frontend internal document routes
 
-The miv app also has its own Prisma backed document routes (documents, documents/{id}, documents/upload, documents/analytics). The user facing document flows already go through the backend routes described above, so these internal ones overlap. Our proposal is to either retire them or scope them strictly to staff analytics. To be decided by the team.
+The four Prisma-backed document routes previously provided by the miv app have been retired: `/api/documents`, `/api/documents/{id}`, `/api/documents/upload`, and `/api/documents/analytics`. The authenticated Payload-based routes in miv-backend described in Sections 6.1 to 6.5 are now canonical for document listing, uploading, retrieval and download, updating, and deletion.
+
+The staff Document Management page now uses these routes through the frontend `/backend` proxy. Total and recent document counts are derived client-side from the document list response, while the legacy storage and growth analytics have been removed. The Prisma `Document` model and its migrations remain unchanged pending a separate cleanup decision.
 
 ## 7. Duplicate and mismatch inventory
 
@@ -758,7 +760,11 @@ This is the cleanup list. Each row names the problem, the path we are keeping, t
 | Dead disabled routes | Dot prefixed copies of assign-track and send-signature sit next to the live versions | Delete the files | none | Backend |
 | Copy pasted PATCH on the reports route | PATCH /api/reports/impact-users duplicates PATCH /api/users | Remove the handler, profile updates go through /api/users only | none found | Backend |
 | Misspelled settings path | /api/sytem-settings | Rename to /api/system-settings and keep the old path as a redirect for one sprint | any settings callers in the frontend | Backend and frontend |
-| Broken delete call | The impact documents page deletes via the path form which returns 405 | Switch to the query string form | miv/app/dashboard/impact-documents/page.tsx line 157 | Frontend |
+| Broken delete call | Resolved: document deletion now uses the canonical query-string format | Use `DELETE /backend/api/documents?id={id}` in frontend callers | miv/app/dashboard/(g2-founder-documents)/documents/page.tsx and miv/app/dashboard/(g3-admin-review-readiness)/impact-documents/page.tsx | Frontend |
+| Legacy document list route | Removed: unauthenticated Prisma-backed route duplicated the canonical Payload implementation | Use the authenticated miv-backend document routes through `/backend/api/documents` | miv/app/api/(g2-founder-documents)/documents/route.ts | Backend |
+| Legacy document upload route | Removed: wrote uploads locally and bypassed the canonical Payload document flow | Use `POST /backend/api/documents` | miv/app/api/(g2-founder-documents)/documents/upload/route.ts | Backend |
+| Legacy document-by-ID route | Removed: duplicated document retrieval, update and deletion operations | Use `/backend/api/documents/{id}` for retrieval and updates, and `/backend/api/documents?id={id}` for deletion | miv/app/api/(g2-founder-documents)/documents/[id]/route.ts | Backend |
+| Legacy document analytics route | Removed: provided staff-only figures through the legacy Prisma implementation | Derive total and recent counts client-side from the document list; storage and growth figures are no longer displayed | miv/app/api/(g2-founder-documents)/documents/analytics/route.ts | Backend |
 | Ventures live in two databases | Prisma in the frontend and Payload in the backend, nothing syncs them | Documented as is for v1, single source of truth to be decided for v2 | not applicable yet | Whole team |
 | Page auth guard silently disabled | The restructure renamed middleware.ts to proxy.ts, but Next.js only runs a file named middleware.ts, and nothing imports proxy.ts, so the login gate on dashboard pages no longer executes at all | Rename the file back to middleware.ts with the exported function named middleware, or wire it up explicitly | miv/proxy.ts | Frontend, urgent |
 | Identity lookup that cannot work | /api/users/ventures fetches /api/users/me without forwarding cookies, so the session is invisible to it | Call getServerSession directly, like the gedsi route does | miv/app/api/users/ventures/route.ts | Frontend |

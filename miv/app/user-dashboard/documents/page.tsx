@@ -46,14 +46,19 @@ export default function DocumentUploadPage() {
   const fetchDocuments = useCallback(async () => {
     try {
       setLoading(true);
+      setError('');
+
       const res = await fetch('/backend/api/documents', {
         credentials: 'include',
       });
 
       if (res.ok) {
         const data = await res.json();
+
         if (data.success && data.documents) {
           setDocuments(data.documents);
+        } else {
+          setError(data.message || 'Failed to fetch documents');
         }
       } else {
         console.error('Failed to fetch documents:', res.status);

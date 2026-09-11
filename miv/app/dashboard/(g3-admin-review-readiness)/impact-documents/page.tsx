@@ -111,6 +111,8 @@ export default function ImpactDocumentsPage() {
           }, { total: 0, pending: 0, approved: 0, rejected: 0 });
           
           setStats(stats);
+        } else {
+          setError(data.message || 'Failed to fetch documents');
         }
       } else {
         const errorData = await res.json();
