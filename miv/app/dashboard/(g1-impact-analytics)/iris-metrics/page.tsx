@@ -91,8 +91,48 @@ export default function IRISMetricsPage() {
             </div>
           </div>
 
+          {/* Mobile metric cards */}
+<div className="space-y-3 md:hidden">
+  {items.map((item) => (
+    <div
+      key={item.code}
+      className="rounded-md border bg-background p-4"
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-xs font-medium text-muted-foreground">
+            {item.code}
+          </div>
+
+          <div className="mt-1 font-medium leading-tight">
+            {item.name}
+          </div>
+        </div>
+
+        {item.gedsiSuggestion && (
+          <Badge variant="outline" className="shrink-0">
+            {item.gedsiSuggestion}
+          </Badge>
+        )}
+      </div>
+
+      {item.description && (
+        <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+          {item.description}
+        </p>
+      )}
+
+      <div className="mt-4 border-t pt-3 text-xs text-muted-foreground">
+        <span>Unit: </span>
+        <span className="font-medium text-foreground">
+          {item.unit || "-"}
+        </span>
+      </div>
+    </div>
+  ))}
+</div>
         
-          <div className="rounded-md border overflow-hidden">
+          <div className="hidden md:block rounded-md border overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
