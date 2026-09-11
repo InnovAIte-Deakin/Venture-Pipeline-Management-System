@@ -49,7 +49,7 @@
   ],
   "unresolvedLegacyRoles": {
     "$comment": "Roles that exist in code today but have no canonical mapping. DECISION REQUIRED at June/PO review. These are NOT decorative — migrating or deleting them is a BEHAVIOUR CHANGE, not a cleanup. See load-bearing usages below.",
-    "backend_payload_users_role_select": ["user"],
+    "backend_payload_users_role_select": [],
     "frontend_prisma_UserRole_enum": [
       "MANAGER",
       "USER",
@@ -59,9 +59,9 @@
       "EXTERNAL_STAKEHOLDER"
     ],
     "loadBearingUsages": {
-      "user_cannot_be_deleted": "miv/app/auth/login/page.tsx branches on `role === 'user'` to pick the landing page. #57 fixed the target (user + founder both go to /user-dashboard) but the branch still reads the value, so deleting `user` breaks login routing.",
-      "enum_drives_email_content": "VENTURE_MANAGER / GEDSI_ANALYST / CAPITAL_FACILITATOR gate email body content across ~10 conditionals in miv/app/api/(operations)/emails/stg-reminder and weekly-update.",
-      "enum_drives_team_management": "miv/app/api/(operations)/team/members/route.ts hardcodes all 8 enum values in a Zod enum and writes the selected role; miv/app/dashboard/(operations)/team-management/page.tsx is the assignment UI. Renaming to snake_case changes behaviour in these routes."
+      "user_retired_backend": "Removed `user` from the Payload users.role select + regenerated payload-types (0 rows held it). One reference remains frontend-side: miv/app/auth/login/page.tsx still branches on `role === 'user'` to pick the landing page (fixed on Kent's branch). Until that lands, `user` is gone backend-side but still read on login.",
+      "enum_drives_email_content": "VENTURE_MANAGER / GEDSI_ANALYST / CAPITAL_FACILITATOR gate email body content across ~10 conditionals in miv/app/api/(g2-founder-documents)/emails/stg-reminder and weekly-update.",
+      "enum_drives_team_management": "miv/app/api/(g5-platform-operations)/team/members/route.ts hardcodes all 8 enum values in a Zod enum and writes the selected role; miv/app/dashboard/(g5-platform-operations)/team-management/page.tsx is the assignment UI. Renaming to snake_case changes behaviour in these routes."
     }
   },
   "adoption": {

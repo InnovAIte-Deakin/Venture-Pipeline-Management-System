@@ -3,9 +3,23 @@ import { prisma } from '@/lib/prisma'
 import { CalculationService } from '@/lib/calculation-service'
 import { getMobileFlag } from '@/lib/mobile-detect'
 import { createCachedResponse, CACHE_CONFIGS } from '@/lib/cache-headers'
+import { getSessionUser } from '@/lib/auth'
+import { mapRole } from '@/lib/utils'
 
 export async function GET(request: NextRequest) {
   try {
+    // Enforce authentication & role check
+    const user = await getSessionUser()
+    if (!user) {
+      return NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 })
+    }
+
+    const role = mapRole(user.role)
+    const isStaff = ['admin', 'miv_analyst'].includes(role)
+    if (!isStaff) {
+      return NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 })
+    }
+
     // Detect mobile user agent
     const { isMobile } = getMobileFlag(request)
     console.log(`Mobile request: ${isMobile}`)
@@ -160,13 +174,48 @@ export async function GET(request: NextRequest) {
           }
         }
       })
-      
+
+      // Query average gedsiScore up to this date
+      const gedsiAgg = await prisma.venture.aggregate({
+        where: {
+          createdAt: { lt: date },
+          gedsiScore: { not: null }
+        },
+        _avg: {
+          gedsiScore: true
+        }
+      })
+      const avgGedsi = gedsiAgg._avg.gedsiScore ? Math.round(gedsiAgg._avg.gedsiScore) : 75
+
+      // Query cumulative users registered up to this date
+      const cumulativeUsers = await prisma.user.count({
+        where: {
+          createdAt: { lt: date }
+        }
+      })
+
+      // Query conversion rate (funded ventures / total ventures up to this date)
+      const totalVenturesUpToDate = await prisma.venture.count({
+        where: {
+          createdAt: { lt: date }
+        }
+      })
+      const fundedVenturesUpToDate = await prisma.venture.count({
+        where: {
+          stage: 'FUNDED',
+          createdAt: { lt: date }
+        }
+      })
+      const conversionRate = totalVenturesUpToDate > 0 
+        ? Math.round((fundedVenturesUpToDate / totalVenturesUpToDate) * 100) 
+        : 15 // Fallback to baseline conversion rate
+
       performanceTrends.push({
         week: `Week ${trendWeeks - i}`,
         ventures: weeklyVentures,
-        gedsiScore: Math.floor(Math.random() * 20) + 70,
-        users: Math.floor(Math.random() * 50) + 300,
-        conversionRate: Math.floor(Math.random() * 10) + 15
+        gedsiScore: avgGedsi,
+        users: cumulativeUsers,
+        conversionRate: conversionRate
       })
     }
 

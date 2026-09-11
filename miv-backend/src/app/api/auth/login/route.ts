@@ -3,12 +3,24 @@ import { getPayload } from 'payload'
 import config from '@payload-config'
 import { z } from 'zod'
 
+import { rateLimit } from '@/lib/rate-limit'
+
 const LoginSchema = z.object({
   email: z.string().email('Valid email is required'),
   password: z.string().min(1, 'Password is required'),
 })
 
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = rateLimit(request, {
+    key: 'login',
+    limit: 10,
+    windowMs: 60_000,
+  })
+
+  if (rateLimitResponse) {
+    return rateLimitResponse
+  }
+
   try {
     const payload = await getPayload({ config })
     const body = await request.json()
@@ -97,10 +109,27 @@ export async function POST(request: NextRequest) {
     } catch (authError: unknown) {
       console.error('Authentication error:', authError)
 
+      const authMessage = authError instanceof Error ? authError.message.toLowerCase() : ''
+
+      if (
+        authMessage.includes('locked') ||
+        authMessage.includes('too many failed login attempts')
+      ) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: 'Account locked',
+            message: 'Too many failed attempts. Try again in 10 minutes.',
+          },
+          { status: 429 },
+        )
+      }
+
       // Check if it's an invalid credentials error
       if (
-        authError.message?.includes('Invalid login attempt') ||
-        authError.message?.includes('Incorrect password')
+        authMessage.includes('invalid login attempt') ||
+        authMessage.includes('incorrect password') ||
+        authMessage.includes('email or password provided is incorrect')
       ) {
         return NextResponse.json(
           {

@@ -7,8 +7,7 @@ const RegisterSchema = z.object({
   firstName: z.string().min(1, "First name is required"),
   lastName: z.string().min(1, "Last name is required"),
   email: z.string().email("Valid email is required"),
-  // password: z.string().min(4, "Password must be at least 4 characters"),
-  password: z.string(),
+  password: z.string().min(8, "Password must be at least 8 characters"),
 
   ventureName: z.string().optional(),
   positionInVenture: z.string().optional(),
@@ -91,16 +90,11 @@ export async function POST(req: NextRequest) {
     const user = await payload.create({
       collection: "users",
       data: {
-        firstName,
-        lastName,
+        first_name: firstName,
+        last_name: lastName,
         email: email.toLowerCase(),
         password,
-        role: "user",
-      
-        ventureName,
-        positionInVenture,
-        phone,
-        countryCode,
+        role: "founder",
       },
     });
 
@@ -132,8 +126,8 @@ export async function POST(req: NextRequest) {
         user: {
           id: (user as any).id,
           email: (user as any).email,
-          firstName: (user as any).firstName,
-          lastName: (user as any).lastName,
+          firstName: (user as any).first_name,
+          lastName: (user as any).last_name,
           role: (user as any).role,
         },
       },

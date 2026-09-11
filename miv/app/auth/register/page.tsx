@@ -40,7 +40,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const url = `/backend/api/register`;
+      const url = `/backend/api/auth/register`;
       console.log("Submitting to URL:", url);
       console.log("Form Data:", formData);
       // Simulate registration process

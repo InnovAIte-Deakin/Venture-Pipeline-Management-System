@@ -1,5 +1,25 @@
-﻿# Dependencies
+# Root .gitignore — repo-wide safety net for secrets and common junk.
+# Per-app rules also live in miv/.gitignore and miv-backend/.gitignore.
+
+# Environment files (secrets) — never commit. Templates are kept.
+.env
+.env.*
+**/.env
+**/.env.*
+!.env.example
+!**/.env.example
+
+# Dependencies / build output
 node_modules/
+**/node_modules/
+.next/
+**/.next/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
 
 # Logs
 *.log
@@ -7,16 +27,3 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-
-# Local environment files
-.env
-.env.*
-!.env.example
-
-# IDE files
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db

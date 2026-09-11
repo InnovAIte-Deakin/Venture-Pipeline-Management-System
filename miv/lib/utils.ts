@@ -27,3 +27,11 @@ export function formatTimeAgo(date: Date | string): string {
   const years = Math.floor(days / 365)
   return `${years} year${years === 1 ? "" : "s"} ago`
 }
+
+export function mapRole(prismaRole: string | null | undefined): string {
+  const r = (prismaRole || "").toUpperCase()
+  if (r === "USER") return "founder"
+  if (r === "ANALYST" || r === "GEDSI_ANALYST") return "miv_analyst"
+  if (r === "ADMIN") return "admin"
+  return r.toLowerCase()
+}

@@ -32,10 +32,10 @@ So: §2 = admin-panel/REST surface. §3 = the real app surface. #35 ("every coll
 
 **Two "—" cells in `roles.json` are blockers, not adoption wiring:**
 - **`founder` has no Prisma `UserRole` value at all**, and it is release #1. Shipping it needs a scheduled **schema + data migration**, not just wiring.
-- **`user` is not free to delete.** `miv/app/auth/login/page.tsx` still branches on `role === 'user'` to choose the landing page. #57 fixed the target (both `user` and `founder` → `/user-dashboard`), but the branch still reads the value, so the mapping decision **changes routing for real users** — settle the redirect rule with the mapping.
+- **`user` retired from the backend.** Removed from the Payload `users.role` select + regenerated types (0 rows held it). One reference remains: `miv/app/auth/login/page.tsx` still branches on `role === 'user'` to choose the landing page — being fixed on Kent's branch. Until that lands, `user` is gone backend-side but still read on login.
 
 **Legacy roles are load-bearing, not decorative** (decision required at review — map or delete, with data migration):
-- Backend Payload select: `user`.
+- Backend Payload select: `user` — **retired** (removed from the select + types; 0 rows held it).
 - Frontend Prisma enum: `MANAGER`, `USER`, `VENTURE_MANAGER`, `GEDSI_ANALYST`, `CAPITAL_FACILITATOR`, `EXTERNAL_STAKEHOLDER`. Seeded users hold `MANAGER` and `VENTURE_MANAGER`.
 - `VENTURE_MANAGER` / `GEDSI_ANALYST` / `CAPITAL_FACILITATOR` gate email body content (~10 conditionals in `emails/stg-reminder` + `weekly-update`), and `team/members` hardcodes all 8 values in a Zod enum with an assignment UI. **Renaming to snake_case is a behaviour change in those routes, not a cleanup.**
 
@@ -134,7 +134,7 @@ Update rule is `role !== 'founder'` — **any non-founder, including legacy `use
 | update | ❌ | ❌ | ✅ | DEF | DEF | ❌ |
 | delete | ❌ | ❌ | ✅ | DEF | DEF | ❌ |
 
-Cleanest access model. (activityLogs / user-settings unchanged from prior draft: activityLogs immutable, admin-deletable — A7; user-settings editable by any user for any user — A5.)
+Cleanest access model. (activityLogs: **fully immutable** — no update/delete via API, admin included; `actor` forced by hook; erasure is a DB-level procedure (§6.1) — A7. user-settings now owner-scoped — A5.)
 
 ### GLOBALS (were missing — `payload.config.ts` registers two)
 | Global | read | update | create/delete | Flag |
@@ -150,12 +150,15 @@ Because of §0, this table is where app authorization actually lives. **Current 
 
 | Route group (miv frontend) | Example routes | Current enforcement | Target |
 |---|---|---|---|
-| pipeline-management | add-venture-details, ventures(+/{id}/gedsi) | none | TBD |
-| analytics-insights | ai/analyze-venture, ai/gedsi-insights, custom-dashboards | none | TBD |
-| capital-management | fund-management | none | TBD |
-| impact-gedsi | analytics, calculations, gedsi-metrics, iris/metrics | none | TBD |
-| operations | auth/{id}, calendar, documents(+/{id}/upload/analytics), emails/stg-reminder, emails/weekly-update, notifications, search, session/login, team/members(+announcements/events/projects), users, users/me, users/ventures, workflows | none; emails branch on legacy enum and team/members writes role via Zod enum(8) | TBD |
-| **Backend (miv-backend)** | auth/*, users, users/change-password, documents(+/{id}), intake/submit, reports/impact-users, sytem-settings/* | change-password verifies cookie; rest via Local API | TBD |
+| g1-impact-analytics | analytics, calculations, gedsi-metrics, iris/metrics | none | TBD |
+| g1-portfolio-funding | fund-management | none | TBD |
+| g2-founder-documents | documents(+/{id}/upload/analytics), emails/stg-reminder, emails/weekly-update | none; emails branch on legacy enum | TBD |
+| g2-founder-submission | add-venture-details | none | TBD |
+| g3-venture-pipeline | ventures(+/{id}/gedsi) | none | TBD |
+| g4-reporting-insights | ai/analyze-venture, ai/gedsi-insights, custom-dashboards | none | TBD |
+| g5-platform-operations | team/members(+announcements/events/projects), calendar, workflows | none; team/members writes role via Zod enum(8) | TBD |
+| g5-user-support-settings | users, users/me, users/ventures, session/login, notifications, search, auth/{id} | none | TBD |
+| **Backend (miv-backend)** | auth/*, users, users/change-password, documents(+/{id}), intake/submit, reports/impact-users, system-settings/* | change-password verifies cookie; rest via Local API | TBD |
 
 **Frontend route gate:** #57 **deleted `miv/middleware.ts`** and replaced it with `lib/dashboard-navigation.ts` (nav config, no auth). There is now **no middleware anywhere in `miv`** — nothing checks a cookie or role before a dashboard route renders (**A10**).
 
@@ -173,8 +176,8 @@ Rows the field-level tickets need. `w` = writable, `r` = readable, `—` = no ac
 | `documents.reviewedAt` | Workflow | r | w | w | Set by reviewer, not uploader |
 | `ventures.triageTrack` | Internal | — | w | w | Staff assessment; hide from founder |
 | `ventures.triageRationale` | Internal | — | w | w | Staff assessment; hide from founder |
-| `onboardingIntakes.wss.*` | **Disability** | w (own, create) | r | r/w | WSS block — tightest control; admin (+ gedsi-scoped analyst) only |
-| `onboardingIntakes.disabilityFlag` | **Disability** | — | r | r/w | Derived; never founder-writable |
+| `onboardingIntakes.wss.*` | **Disability** | w (create, via intake) | **—** | r/w | **Admin-only at row level** (decided round 2). Nothing consumes these at row level today; easier to widen later than claw back. Analyst access to be served by **aggregate reporting (counts/%), not field read** |
+| `onboardingIntakes.disabilityFlag` | **Disability** | — | **—** | r/w | Derived; **admin-only at row level** — same rationale as `wss.*` |
 
 ---
 
@@ -196,10 +199,22 @@ Rows the field-level tickets need. `w` = writable, `r` = readable, `—` = no ac
 | A4 | High | Founder reads **all** records (ventures, founders, dataRoomFiles, agreements, intakes, activityLogs) — cross-venture leakage incl. financials + disability data. `founderOfVenture` would fix it but is unused **and broken** (§5) | Add venture `user` relationship, then apply `documents`-style scoped `Where` |
 | A5 | High | Any authenticated user can update dataRoomFiles, agreements, any user's user-settings | Restrict to analyst/admin; 🔒 owner for user-settings |
 | A6 | **High** (was Low) | Prisma 8-role enum is **not decorative** — drives email content (~10 conditionals) and the `team/members` Zod enum + assignment UI. Snake_case migration is a behaviour change in those routes | Migrate data first, then codegen; audit email + team routes in the same PR (§7) |
-| A7 | Low | `activityLogs` admin-deletable | Consider immutable for all |
+| A7 | Resolved | `activityLogs` chosen **fully immutable** — no update/delete via the API, admin included; `actor` forced by hook | Erasure is a documented DB-level procedure (§6.1), not an admin button. Rule: **no personal data in `metadata`** |
 | A8 | High | Global `settings`: `read` is **public (no login)**; `update` is any role `!== 'founder'` → legacy `user` flips `enableESign`/`enableSlack` | Gate read to auth; restrict update to admin |
 | A9 | Medium | `media` founder read is **broken/too-restrictive** (reads `args.doc`, not passed in 3.49.1) → founders see no media incl. own | Use the `documents` `Where`-constraint pattern |
 | A10 | High | **No frontend route gate** — #57 deleted `miv/middleware.ts`; nothing checks cookie/role before dashboards render | Re-introduce route protection as part of frontend adoption |
+
+### 6.1 Audit-log erasure procedure (`activityLogs`)
+
+`activityLogs` is **immutable through the API** — no update or delete, admin included. This is deliberate: an audit trail an admin can quietly alter or remove is not an audit trail, and the actor-forcing hook only has value if entries can't be edited after the fact.
+
+Erasure is therefore a **manual, database-level procedure**, not a feature — used only for a lawful right-to-erasure request that touches data captured in a log:
+
+- **Who:** a named database administrator (currently the platform owner), never through the running app.
+- **Basis:** a documented request (e.g. GDPR/right-to-erasure) referencing the specific subject and records. No ad-hoc deletion.
+- **How recorded:** the operation is logged out-of-band (ticket + change record: who ran it, when, which records, on what basis) so the erasure itself is auditable.
+
+**Preventive rule (cheaper than erasure):** do **not** put personal data in `activityLogs.metadata`. It's unbounded/unschema'd and lives in a never-deleted collection, so a logged request body or error payload would strand PII — in a system that also stores disability data. Keep `metadata` to ids, enums and counts. Enforced by convention + the field comment; give it an explicit shape if that proves insufficient.
 
 ---
 

@@ -30,8 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# env files (secrets — do not commit; keep the template)
 .env*
+!.env.example
 !.env.test.example
 
 # vercel
@@ -43,6 +44,8 @@ next-env.d.ts
 
 # prisma
 /lib/generated/prisma
+prisma/*.db
+prisma/*.db-journal
 
 # IDE and editor files
 .vscode/

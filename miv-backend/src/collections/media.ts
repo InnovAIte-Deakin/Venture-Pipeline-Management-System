@@ -6,6 +6,8 @@ import {
 } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import { isAuthenticated, adminOrAnalyst } from '@/access/roles'
+import { ownerScoped } from '@/access/scoping'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -15,33 +17,15 @@ export const Media: CollectionConfig = {
 
   access: {
     // Only logged-in users can upload
-    create: ({ req }) => Boolean(req.user),
+    create: isAuthenticated,
 
-    read: (args) => {
-      const { req } = args
-      const doc = (args as any).doc
+    // Fixed (matrix A9): the previous rule read `args.doc`, which Payload 3.x does not
+    // pass to `read`, so String(undefined) !== userId denied founders ALL media, incl.
+    // their own. Now returns a Where scoped to the uploader — staff still see everything.
+    read: ownerScoped('uploader'),
 
-      if (!req.user) return false
-
-      const role = req.user.role
-
-      // Admin + MIV analyst can see all uploads
-      if (role === 'admin' || role === 'miv_analyst') return true
-
-      // Others can only see their own uploads
-      const uploader = doc?.uploader
-      const uploaderId = typeof uploader === 'string' ? uploader : uploader?.id
-
-      return String(uploaderId) === String(req.user.id)
-    },
-
-    // Only admin or MIV analyst can update
-    update: ({ req }) =>
-      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
-
-    // Only admin or MIV analyst can delete
-    delete: ({ req }) =>
-      req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
+    update: adminOrAnalyst,
+    delete: adminOrAnalyst,
   },
 
   fields: [

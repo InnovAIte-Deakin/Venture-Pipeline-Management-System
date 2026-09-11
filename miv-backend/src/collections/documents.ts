@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import { authenticated } from '../access/authenticated'
+import { fieldAdminOrAnalyst } from '@/access/scoping'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -66,6 +67,13 @@ export const Documents: CollectionConfig = {
       label: 'Status',
       type: 'select',
       defaultValue: 'pending_review',
+      // Review workflow — only staff may set status (matrix §4). A founder must not
+      // approve their own document, at create or update. The upload route sets the
+      // safe default 'pending_review'; a founder-denied field just falls back to it.
+      access: {
+        create: fieldAdminOrAnalyst,
+        update: fieldAdminOrAnalyst,
+      },
       options: [
         { label: 'Pending Review', value: 'pending_review' },
         { label: 'Approved', value: 'approved' },
@@ -112,6 +120,10 @@ export const Documents: CollectionConfig = {
       label: 'Reviewed By',
       type: 'relationship',
       relationTo: 'users',
+      access: {
+        create: fieldAdminOrAnalyst,
+        update: fieldAdminOrAnalyst,
+      },
       admin: {
         position: 'sidebar',
       },
@@ -120,6 +132,10 @@ export const Documents: CollectionConfig = {
       name: 'reviewedAt',
       label: 'Reviewed At',
       type: 'date',
+      access: {
+        create: fieldAdminOrAnalyst,
+        update: fieldAdminOrAnalyst,
+      },
       admin: {
         position: 'sidebar',
       },

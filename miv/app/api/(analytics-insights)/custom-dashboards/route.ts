@@ -1,6 +1,7 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { formatTimeAgo } from '@/lib/utils';
+import { getSessionUser } from '@/lib/auth';
+import { formatTimeAgo, mapRole } from '@/lib/utils';
 
 function serializeDashboard(dashboard: any) {
   const widgets = Array.isArray(dashboard.widgets) ? dashboard.widgets : [];
@@ -17,8 +18,31 @@ function serializeDashboard(dashboard: any) {
   };
 }
 
+async function requireStaffUser() {
+  const user = await getSessionUser();
+  if (!user) {
+    return {
+      user: null,
+      response: NextResponse.json({ success: false, error: 'UNAUTHORIZED' }, { status: 401 }),
+    };
+  }
+
+  const role = mapRole(user.role);
+  const isStaff = ['admin', 'miv_analyst'].includes(role);
+  if (!isStaff) {
+    return {
+      user: null,
+      response: NextResponse.json({ success: false, error: 'FORBIDDEN' }, { status: 403 }),
+    };
+  }
+
+  return { user, response: null };
+}
+
 export async function GET(request: NextRequest) {
   try {
+    const { response } = await requireStaffUser();
+    if (response) return response;
     const userId = request.nextUrl.searchParams.get('userId');
     const dashboards = await prisma.customDashboard.findMany({
       where: userId
@@ -53,6 +77,8 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    const { response } = await requireStaffUser();
+    if (response) return response;
     const body = await request.json();
     if (!body.name || typeof body.name !== 'string' || !body.name.trim()) {
       return NextResponse.json({ error: 'Dashboard name is required' }, { status: 400 });
@@ -83,6 +109,8 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    const { response } = await requireStaffUser();
+    if (response) return response;
     const body = await request.json();
     if (!body.id) {
       return NextResponse.json({ error: 'Dashboard id is required' }, { status: 400 });
@@ -110,6 +138,8 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    const { response } = await requireStaffUser();
+    if (response) return response;
     const id = request.nextUrl.searchParams.get('id');
     if (!id) {
       return NextResponse.json({ error: 'Dashboard id is required' }, { status: 400 });

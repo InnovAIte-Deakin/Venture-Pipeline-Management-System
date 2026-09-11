@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
+import { getSessionUser } from "@/lib/auth";
 
 interface User {
   email: string;
@@ -17,32 +18,28 @@ interface User {
  */
 export async function GET(request: NextRequest) {
   try {
-    // Step 1: Fetch user data from /api/users/me with full URL
-    const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
-    const meResponse = await fetch(`${baseUrl}/api/users/me`);
+    const userRecord = await getSessionUser();
 
-    if (!meResponse.ok) {
+    if (!userRecord) {
       return NextResponse.json(
         {
           success: false,
           error: "Unauthorized",
           message: "Failed to fetch user data. Please log in.",
         },
-        { status: meResponse.status }
+        { status: 401 }
       );
     }
 
-    const meData = await meResponse.json();
-
     // Step 2: Format user data
     const user: User = {
-      email: meData.email,
-      id: meData.id,
-      role: meData.role,
-      name: meData.name || null,
-      organization: meData.organization || null,
-      createdAt: new Date(meData.createdAt),
-      updatedAt: new Date(meData.updatedAt),
+      email: userRecord.email,
+      id: userRecord.id,
+      role: userRecord.role,
+      name: userRecord.name || null,
+      organization: userRecord.organization || null,
+      createdAt: new Date(userRecord.createdAt),
+      updatedAt: new Date(userRecord.updatedAt),
     };
 
     // Step 3: Query Prisma for ventures
