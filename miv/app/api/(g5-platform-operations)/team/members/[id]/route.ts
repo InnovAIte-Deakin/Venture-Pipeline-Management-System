@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import { getSessionUser } from '@/lib/auth';
 
 // Validation schema
 const updateMemberSchema = z.object({
@@ -18,6 +19,8 @@ export async function GET(
 ) {
   const { id } = await params;
   try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const member = await prisma.user.findUnique({
       where: { id },
       select: {
@@ -206,6 +209,9 @@ export async function PUT(
 ) {
   const { id } = await params;
   try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const body = await request.json();
     const validatedData = updateMemberSchema.parse(body);
 
@@ -273,6 +279,9 @@ export async function DELETE(
 ) {
   const { id } = await params;
   try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     // Check if user exists
     const existingMember = await prisma.user.findUnique({
       where: { id },
