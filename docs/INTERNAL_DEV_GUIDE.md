@@ -54,6 +54,19 @@ Authentication is implemented using **NextAuth** with:
 * JWT-based sessions
 * Prisma adapter for persistence in PostgreSQL
 
+### Authentication Rate Limits and Account Lockout
+
+To reduce repeated authentication attempts, the backend applies per-IP rate limiting to authentication endpoints:
+
+* Login: 10 requests per minute per IP
+* Forgot password: 5 requests per minute per IP
+
+When the request limit is exceeded, the API returns HTTP 429 (Too Many Requests).
+
+Payload CMS also applies its default account lockout behaviour after 5 failed login attempts. The account remains locked for 10 minutes. Locked-account login attempts are mapped to HTTP 429 instead of returning a generic 500 error.
+
+The current rate limiter uses in-memory per instance storage. On Vercel, the stored request history may reset on cold starts and is not shared across multiple application instances.
+
 ### Development Test Accounts
 
 **VPMS Application:**
