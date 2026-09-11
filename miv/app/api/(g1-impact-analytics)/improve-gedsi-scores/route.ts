@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server'
 import { PrismaClient } from '@prisma/client'
 
+import { requireAdminDevAccess } from '@/lib/guards/requireAdminDevAccess'
+
 const prisma = new PrismaClient()
 
 export async function POST() {
+  const accessDenied = await requireAdminDevAccess()
+
+  if (accessDenied) {
+    return accessDenied
+  }
+  
   try {
     console.log('🎯 Starting GEDSI score improvements for portfolio companies...')
 
