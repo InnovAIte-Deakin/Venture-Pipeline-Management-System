@@ -9,7 +9,5 @@ export type CatalogItem = {
 export type IrisMetricsResponse = {
   results: CatalogItem[]
   total: number
-  page: number
   limit: number
-  totalPages: number
 }
