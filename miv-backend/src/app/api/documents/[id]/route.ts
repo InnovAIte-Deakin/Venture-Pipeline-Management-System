@@ -46,12 +46,34 @@ export async function GET(
       )
     }
 
-    // Get the document
-    const document = await payload.findByID({
-      collection: 'documents',
-      id,
-      depth: 1,
-    })
+    // Get the document, enforcing collection access (overrideAccess:false + user).
+    // documents.read already encodes the authz (staff see all; a founder is scoped to
+    // uploadedBy == their id, matrix §2), so we no longer hand-roll the owner check —
+    // a founder requesting a doc they don't own is filtered out and findByID throws
+    // NotFound, which we map to 404 (and Forbidden to 403) below.
+    let document
+    try {
+      document = await payload.findByID({
+        collection: 'documents',
+        id,
+        depth: 1,
+        overrideAccess: false,
+        user,
+      })
+    } catch (err: any) {
+      const status = err?.status === 403 ? 403 : 404
+      return NextResponse.json(
+        {
+          success: false,
+          error: status === 403 ? 'Forbidden' : 'Document not found',
+          message:
+            status === 403
+              ? 'You do not have permission to access this document.'
+              : 'The requested document does not exist.',
+        },
+        { status }
+      )
+    }
 
     if (!document) {
       return NextResponse.json(
@@ -61,24 +83,6 @@ export async function GET(
           message: 'The requested document does not exist.',
         },
         { status: 404 }
-      )
-    }
-
-    // Check permission
-    const isAdmin = user.role === 'admin' || user.role === 'miv_analyst'
-    const uploadedById = typeof document.uploadedBy === 'object' 
-      ? (document.uploadedBy as any)?.id 
-      : document.uploadedBy
-    const isOwner = uploadedById === user.id
-
-    if (!isAdmin && !isOwner) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Forbidden',
-          message: 'You do not have permission to access this document.',
-        },
-        { status: 403 }
       )
     }
 
@@ -221,9 +225,14 @@ export async function PATCH(
       updateData.notes = notes
     }
 
+    // Enforce via the collection rule too (documents.update = staff-only): the explicit
+    // role check above stays for a clean 403, and overrideAccess:false is defence-in-depth
+    // so a non-staff caller can't write even if that check is ever removed.
     const document = await payload.update({
       collection: 'documents',
       id,
+      overrideAccess: false,
+      user,
       data: updateData,
     })
 
@@ -241,15 +250,19 @@ export async function PATCH(
         updatedAt: document.updatedAt,
       },
     })
-  } catch (error) {
+  } catch (error: any) {
     console.error('Update document error:', error)
+    const forbidden =
+      error?.status === 403 || /forbidden/i.test(error?.message ?? '')
     return NextResponse.json(
       {
         success: false,
-        error: 'Failed to update document',
-        message: 'An error occurred while updating the document.',
+        error: forbidden ? 'Forbidden' : 'Failed to update document',
+        message: forbidden
+          ? 'You do not have permission to update this document.'
+          : 'An error occurred while updating the document.',
       },
-      { status: 500 }
+      { status: forbidden ? 403 : 500 }
     )
   }
 }
