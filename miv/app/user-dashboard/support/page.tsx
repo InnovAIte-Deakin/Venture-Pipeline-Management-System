@@ -36,22 +36,22 @@ const resources = [
     icon: FileText,
     title: 'Documentation',
     description: 'User guides & manuals',
-    color: 'text-teal-600',
-    bgColor: 'bg-teal-50',
+    color: 'text-primary',
+    bgColor: 'bg-primary/10',
   },
   {
     icon: Video,
     title: 'Video Tutorials',
     description: 'Step-by-step guides',
-    color: 'text-green-600',
-    bgColor: 'bg-green-50',
+    color: 'text-success',
+    bgColor: 'bg-success/10',
   },
   {
     icon: MessageCircle,
     title: 'Live Chat',
     description: 'Get instant help',
-    color: 'text-purple-600',
-    bgColor: 'bg-purple-50',
+    color: 'text-accent',
+    bgColor: 'bg-accent/10',
   },
 ];
 
@@ -70,30 +70,30 @@ export default function SupportPage() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
           {/* FAQ Section */}
           <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-8">FAQ</h2>
+            <h2 className="text-4xl font-bold text-foreground mb-8">FAQ</h2>
             <div className="space-y-3">
               {faqs.map((faq, index) => (
                 <div
                   key={index}
-                  className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+                  className="bg-card rounded-xl shadow-sm border border-border overflow-hidden"
                 >
                   <button
                     onClick={() => toggleFAQ(index)}
-                    className="w-full flex items-center justify-between p-5 text-left hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center justify-between p-5 text-left hover:bg-muted/50 transition-colors"
                     aria-expanded={openIndex === index}
                   >
-                    <span className="font-semibold text-gray-900 pr-4">
+                    <span className="font-semibold text-foreground pr-4">
                       {faq.question}
                     </span>
                     <ChevronDown
-                      className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform duration-200 ${
+                      className={`w-5 h-5 text-muted-foreground shrink-0 transition-transform duration-200 ${
                         openIndex === index ? 'rotate-180' : ''
                       }`}
                     />
                   </button>
                   {openIndex === index && (
                     <div className="px-5 pb-5">
-                      <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                      <p className="text-muted-foreground leading-relaxed">{faq.answer}</p>
                     </div>
                   )}
                 </div>
@@ -103,7 +103,7 @@ export default function SupportPage() {
 
           {/* Get In Touch Section */}
           <div>
-            <h2 className="text-4xl font-bold text-gray-900 mb-8">
+            <h2 className="text-4xl font-bold text-foreground mb-8">
               Get In
               <br />
               Touch
@@ -112,8 +112,8 @@ export default function SupportPage() {
             {/* Contact Cards */}
             <div className="space-y-4 mb-8">
               {/* Address */}
-              <div className="flex items-center gap-4 bg-teal-600 text-white rounded-xl px-5 py-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl px-5 py-4">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <MapPin className="w-5 h-5" />
                 </div>
                 <div>
@@ -123,8 +123,8 @@ export default function SupportPage() {
               </div>
 
               {/* Email */}
-              <div className="flex items-center gap-4 bg-teal-600 text-white rounded-xl px-5 py-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl px-5 py-4">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <Mail className="w-5 h-5" />
                 </div>
                 <a href="mailto:support@miv.com" className="font-medium hover:underline">
@@ -133,8 +133,8 @@ export default function SupportPage() {
               </div>
 
               {/* Phone */}
-              <div className="flex items-center gap-4 bg-teal-600 text-white rounded-xl px-5 py-4">
-                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="flex items-center gap-4 bg-primary text-primary-foreground rounded-xl px-5 py-4">
+                <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center shrink-0">
                   <Phone className="w-5 h-5" />
                 </div>
                 <a href="tel:+85517350544" className="font-medium hover:underline">
@@ -145,8 +145,8 @@ export default function SupportPage() {
 
             {/* Support Hours */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-3">Support Hours</h3>
-              <div className="text-gray-600 space-y-1">
+              <h3 className="text-lg font-semibold text-foreground mb-3">Support Hours</h3>
+              <div className="text-muted-foreground space-y-1">
                 <p>Monday - Friday: 9:00 AM - 6:00 PM EST</p>
                 <p>Saturday: 10:00 AM - 4:00 PM EST</p>
                 <p>Sunday: Closed</p>
@@ -162,16 +162,16 @@ export default function SupportPage() {
             return (
               <button
                 key={index}
-                className="flex items-center gap-4 bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-5 hover:shadow-md transition-shadow text-left"
+                className="flex items-center gap-4 bg-card rounded-2xl shadow-sm border border-border px-6 py-5 hover:shadow-md transition-shadow text-left"
               >
                 <div
-                  className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center flex-shrink-0`}
+                  className={`w-12 h-12 ${resource.bgColor} rounded-xl flex items-center justify-center shrink-0`}
                 >
                   <Icon className={`w-6 h-6 ${resource.color}`} />
                 </div>
                 <div>
-                  <h4 className="font-semibold text-gray-900">{resource.title}</h4>
-                  <p className="text-sm text-gray-500">{resource.description}</p>
+                  <h4 className="font-semibold text-foreground">{resource.title}</h4>
+                  <p className="text-sm text-muted-foreground">{resource.description}</p>
                 </div>
               </button>
             );

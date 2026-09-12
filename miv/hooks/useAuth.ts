@@ -17,6 +17,15 @@ interface ApiUser {
   role?: string | null
 }
 
+interface ApiUserResponse {
+  success?: boolean
+  user?: ApiUser
+}
+
+function hasWrappedUser(data: ApiUser | ApiUserResponse): data is ApiUserResponse {
+  return 'user' in data
+}
+
 function normalizeUser(user: ApiUser): User {
   const nameParts = (user.name || '').trim().split(/\s+/).filter(Boolean)
   const firstName = user.firstName || nameParts[0] || 'User'
@@ -55,8 +64,8 @@ export function useAuth() {
       })
 
       if (response.ok) {
-        const data: ApiUser | { success?: boolean; user?: ApiUser } = await response.json()
-        const user = 'user' in data ? data.user : data
+        const data: ApiUser | ApiUserResponse = await response.json()
+        const user = hasWrappedUser(data) ? data.user : data
 
         if (user?.id && user.email) {
           setAuthState({

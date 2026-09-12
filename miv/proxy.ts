@@ -20,7 +20,16 @@ const PUBLIC_PATHS = [
   '/public',
 ]
 
+const PUBLIC_FILE_PATTERN = /\.(?:avif|css|gif|ico|jpg|jpeg|js|json|map|png|svg|txt|webp|woff|woff2)$/i
+
 function isPublicPath(pathname: string): boolean {
+  if (pathname.startsWith('/api/')) return true // never block Next API routes
+  if (pathname.startsWith('/_next')) return true // Next.js internals
+  if (pathname.startsWith('/static')) return true
+  if (pathname.startsWith('/assets')) return true
+  if (pathname.startsWith('/images')) return true
+  if (pathname.startsWith('/public')) return true
+  if (PUBLIC_FILE_PATTERN.test(pathname)) return true
   return PUBLIC_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))
 }
 
@@ -105,6 +114,7 @@ export async function proxy(req: NextRequest) {
 // Limit middleware to all routes except static assets and API routes by matcher
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|assets|images|public|api|backend).*)',
+    // Run on all paths except static files and API routes
+    '/((?!_next/static|_next/image|favicon.ico|assets|images|public|api|backend|.*\\.(?:avif|css|gif|ico|jpg|jpeg|js|json|map|png|svg|txt|webp|woff|woff2)$).*)',
   ],
 }

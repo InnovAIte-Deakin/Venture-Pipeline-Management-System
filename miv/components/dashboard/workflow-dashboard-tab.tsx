@@ -68,7 +68,7 @@ const WORKFLOW_TEMPLATES = [
     name: "Venture Onboarding",
     description: "Automate new venture intake and initial assessment",
     icon: <Building2 className="h-5 w-5" />,
-    color: "bg-blue-100 text-blue-700",
+    color: "bg-primary/10 text-primary",
     category: "Venture Management",
     estimatedTime: "5 min setup",
     triggers: ["Venture Created"],
@@ -225,7 +225,7 @@ export function WorkflowDashboardTab({ loading, addToast }: WorkflowDashboardTab
       case 'FAILED':
         return <XCircle className="h-3 w-3 text-red-500" />
       case 'RUNNING':
-        return <RotateCcw className="h-3 w-3 text-blue-500 animate-spin" />
+        return <RotateCcw className="h-3 w-3 text-primary animate-spin" />
       default:
         return <Clock className="h-3 w-3 text-gray-500" />
     }
@@ -275,8 +275,8 @@ export function WorkflowDashboardTab({ loading, addToast }: WorkflowDashboardTab
         <Card>
           <CardContent className="p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Zap className="h-5 w-5 text-blue-600" />
+              <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                <Zap className="h-5 w-5 text-primary" />
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600">Total Workflows</p>
@@ -494,7 +494,7 @@ export function WorkflowDashboardTab({ loading, addToast }: WorkflowDashboardTab
                       className={`text-xs ${
                         run.status === 'SUCCEEDED' ? 'text-green-600 bg-green-50' :
                         run.status === 'FAILED' ? 'text-red-600 bg-red-50' :
-                        run.status === 'RUNNING' ? 'text-blue-600 bg-blue-50' :
+                        run.status === 'RUNNING' ? 'text-primary bg-primary/10' :
                         'text-gray-600 bg-gray-50'
                       }`}
                     >
@@ -646,7 +646,7 @@ export function WorkflowDashboardTab({ loading, addToast }: WorkflowDashboardTab
               {workflows.slice(0, 3).map((workflow, index) => (
                 <div key={workflow.id} className="flex items-center justify-between p-3 border rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-6 h-6 bg-blue-100 rounded flex items-center justify-center text-xs font-bold text-blue-600">
+                    <div className="w-6 h-6 bg-primary/10 rounded flex items-center justify-center text-xs font-bold text-primary">
                       {index + 1}
                     </div>
                     <div>

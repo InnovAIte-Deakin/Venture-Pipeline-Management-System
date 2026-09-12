@@ -4,7 +4,7 @@ const nextConfig: NextConfig = {
   images: {
     unoptimized: true,
   },
-  allowedDevOrigins: ["10.0.2.2", "192.168.56.1"],
+  allowedDevOrigins: ["10.0.2.2", "192.168.56.1", "192.168.0.19"],
   async rewrites() {
     const backend =
       process.env.NEXT_PUBLIC_BACKEND_URL ||
