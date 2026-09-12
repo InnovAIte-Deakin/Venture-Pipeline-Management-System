@@ -15,7 +15,7 @@ export function Logo({ size = "md", className = "" }: LogoProps) {
   }
 
   return (
-    <div className={`${sizeClasses[size]} ${className} shrink-0 overflow-hidden rounded-md bg-white`}>
+    <div className={`${sizeClasses[size]} ${className} shrink-0 overflow-hidden rounded-md`}>
       <Image
         src="/logo.png"
         alt="MIV Logo"
