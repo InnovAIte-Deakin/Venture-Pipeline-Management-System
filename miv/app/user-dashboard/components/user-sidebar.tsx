@@ -52,7 +52,7 @@ export default function UserSidebar() {
   async function handleLogout() {
     try {
       setIsLoggingOut(true);
-      const res = await fetch('/backend/api/auth/login', {
+      const res = await fetch('/api/session/login', {
         method: 'DELETE',
         credentials: 'include',
       })
