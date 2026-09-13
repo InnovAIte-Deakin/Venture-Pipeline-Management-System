@@ -10,7 +10,10 @@ const TestIntakeEmailSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
-    console.log('TEST INTAKE EMAIL API CALLED')
+  if (process.env.NODE_ENV !== 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+  
   try {
     const body = await request.json()
 
