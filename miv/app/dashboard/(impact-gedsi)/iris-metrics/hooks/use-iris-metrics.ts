@@ -13,6 +13,8 @@ export function useIrisMetrics() {
   const [total, setTotal] = useState(0)
   const [loading, setLoading] = useState(false)
   const [limit, setLimitState] = useState(DEFAULT_RESULT_LIMIT)
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
   const [error, setError] = useState("")
   const [retryKey, setRetryKey] = useState(0)
 
@@ -39,16 +41,19 @@ export function useIrisMetrics() {
         const data = await fetchIrisMetrics({
           query,
           limit,
+          page,
           signal: controller.signal,
         })
 
         setItems(data.results || [])
         setTotal(data.total || data.results?.length || 0)
+        setTotalPages(data.totalPages || 1)
       
       } catch (error) {
         if ((error as Error).name !== "AbortError") {
           setItems([])
           setTotal(0)
+          setTotalPages(1)
           setError("Unable to load IRIS metrics. Please try again.")
         }
       } finally {
@@ -64,7 +69,10 @@ export function useIrisMetrics() {
       controller.abort()
       window.clearTimeout(timeoutId)
     }
-}, [query, limit, retryKey])
+}, [query, limit, page, retryKey])
+useEffect(() => {
+  setPage(1)
+}, [query, limit])
 
   return {
     query,
@@ -73,6 +81,9 @@ export function useIrisMetrics() {
     total,
     loading,
     limit,
+    page,
+    setPage,
+    totalPages,
     setLimit,
     error,
     retry,
