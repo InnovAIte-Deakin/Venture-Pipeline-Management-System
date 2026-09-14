@@ -323,6 +323,41 @@ Common npm scripts (root or workspace):
 
 ---
 
+## Troubleshooting / Known Bugs
+
+### Missing `@eslint/eslintrc` dependency
+
+Lint passed locally by accident but failed on a clean install in CI, because `@eslint/eslintrc` wasn't properly declared as a dependency.
+
+**Fix:** Add `@eslint/eslintrc` as a proper dependency.
+
+### Old `require()` import in email test route
+
+The rest of the codebase uses `import`, but the email test route still used `require()`. This masked the `createTransporter()` typo bug below, since the file wasn't being linted properly.
+
+**Fix:** Swap to standard `import` syntax.
+
+### `nodemailer.createTransporter()` typo
+
+`createTransporter()` isn't a real method on `nodemailer` — it should be `createTransport()`. Went unnoticed because of the `require()` issue above breaking proper linting on that file.
+
+**Fix:** Use `createTransport()`.
+
+### pnpm lockfile drift + stray `package-lock.json`
+
+The pnpm lockfile was out of sync, and a leftover `package-lock.json` was sitting in what's supposed to be a pnpm-only project. Mixing package managers causes lockfile drift.
+
+**Fix:** Regenerate `pnpm-lock.yaml`, delete the npm lockfile.
+
+### Duplicate variable declaration in `impact-users/route.ts`
+
+A `const validation = ...` was declared twice in the same scope, which broke the build outright.
+
+**Fix:** Remove the duplicate declaration.
+
+---
+
+
 ## Contributing
 
 1. Create a feature branch: `git checkout -b feat/short-name`

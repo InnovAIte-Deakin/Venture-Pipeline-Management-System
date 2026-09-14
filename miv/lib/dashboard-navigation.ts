@@ -14,7 +14,9 @@ import {
   FileText,
   Globe,
   Heart,
+  HelpCircle,
   House,
+  Menu,
   Plus,
   Rocket,
   Settings,
@@ -72,10 +74,16 @@ export const dashboardNavigationItems: DashboardNavItem[] = [
         icon: Plus,
       },
       { title: "Deal Flow", href: "/dashboard/deal-flow", icon: Activity },
+      { title: "Ventures", href: "/dashboard/ventures", icon: Building2 },
       {
         title: "Due Diligence",
         href: "/dashboard/due-diligence",
         icon: Shield,
+      },
+      {
+        title: "Diagnostics",
+        href: "/dashboard/diagnostics",
+        icon: BookOpenCheck,
       },
       { title: "Portfolio", href: "/dashboard/portfolio", icon: Building2 },
     ],
@@ -182,9 +190,19 @@ export const dashboardNavigationItems: DashboardNavItem[] = [
       },
       { title: "Workflows", href: "/dashboard/workflows", icon: Activity },
       {
+        title: "Workflow Wizard",
+        href: "/dashboard/workflows/wizard",
+        icon: Plus,
+      },
+      {
         title: "Document Management",
         href: "/dashboard/documents",
         icon: FileText,
+      },
+      {
+        title: "Help & Support",
+        href: "/dashboard/help-support",
+        icon: HelpCircle,
       },
     ],
   },
@@ -194,9 +212,32 @@ export const dashboardDesktopNavigationItems = dashboardNavigationItems.filter(
   (item) => !item.desktopHidden,
 );
 
-export const dashboardMobileBottomItems = dashboardNavigationItems.filter(
-  (item) => item.mobileBottom && item.href,
-);
+export const dashboardMobileBottomItems: DashboardNavItem[] = [
+  {
+    title: "Home",
+    href: "/dashboard",
+    icon: House,
+  },
+  {
+    title: "Ventures",
+    href: "/dashboard/ventures",
+    icon: Building2,
+  },
+  {
+    title: "Reports",
+    href: "/dashboard/advanced-reports",
+    icon: FileText,
+  },
+  {
+    title: "Notification",
+    href: "/dashboard/notifications",
+    icon: Bell,
+  },
+  {
+    title: "More",
+    icon: Menu,
+  },
+];
 
 export const dashboardMobileDrawerItems = dashboardNavigationItems.filter(
   (item) => !item.mobileBottom,

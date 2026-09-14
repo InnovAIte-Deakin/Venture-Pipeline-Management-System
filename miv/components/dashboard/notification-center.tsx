@@ -73,7 +73,7 @@ export function NotificationCenter({
       case 'error':
         return <AlertTriangle className="h-5 w-5 text-red-500" />
       default:
-        return <Info className="h-5 w-5 text-blue-500" />
+        return <Info className="h-5 w-5 text-primary" />
     }
   }
 
@@ -189,11 +189,11 @@ export function NotificationCenter({
                     <div
                       key={notification.id}
                       className={`p-4 hover:bg-gray-50 transition-colors ${
-                        !notification.read ? 'bg-blue-50 border-l-4 border-l-blue-500' : ''
+                        !notification.read ? 'bg-primary/10 border-l-4 border-l-primary' : ''
                       }`}
                     >
                       <div className="flex items-start space-x-3">
-                        <div className="flex-shrink-0 mt-1">
+                        <div className="shrink-0 mt-1">
                           {getNotificationIcon(notification.type)}
                         </div>
                         
@@ -206,7 +206,7 @@ export function NotificationCenter({
                                   {notification.title}
                                 </p>
                                 {!notification.read && (
-                                  <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                                  <div className="w-2 h-2 bg-primary rounded-full"></div>
                                 )}
                               </div>
                               <p className="text-sm text-gray-600 mb-2">

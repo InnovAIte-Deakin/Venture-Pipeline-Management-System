@@ -1,10 +1,12 @@
 import type { GlobalConfig } from 'payload'
+import { isAuthenticated, adminOnly } from '@/access/roles'
 
 export const Lookups: GlobalConfig = {
   slug: 'lookups',
   access: {
-    read: () => true,
-    update: ({ req }) => Boolean(req.user && req.user.role === 'admin'),
+    // Reference data — was public read; now auth-only. Admin-only write (unchanged).
+    read: isAuthenticated,
+    update: adminOnly,
   },
   fields: [
     { name: 'sectors', type: 'array', fields: [{ name: 'value', type: 'text', required: true }] },

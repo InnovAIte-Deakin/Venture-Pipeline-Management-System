@@ -25,11 +25,23 @@ This folder contains the consolidated and finalised documentation for the VPMS p
 - **[Internal Developer Guide](./INTERNAL_DEV_GUIDE.md)**  
   Setup, configuration, authentication, and development notes.
 
-### 6. Security & Access Control
+### 6. Architecture Decision Records
+- **[ADR-001: Dual Database and Authentication Assessment](./adr/ADR-001-Dual-Database-and-Authentication-Assessment.md)**
+  Assessment of the dual PostgreSQL/MongoDB and authentication setup.
+- **[ADR-002: Next.js Version Split](./adr/ADR-002-Nextjs-Version-Split.md)**
+  Decision to keep miv on Next.js 16 and bump miv-backend to Next.js 15.4.11, rather than matching major versions across both apps.
+
+### 7. Security & Access Control
 - **[RBAC Matrix](./rbac/RBAC_MATRIX.md)**  
   Canonical roles × collections × fields × routes, anomaly register, and adoption sequence. Audited against #57.
 - **[Canonical Role List](./rbac/roles.json)**  
   Single source of truth for role names both apps must reference (founder, admin, miv_analyst; mentor/investor deferred).
+
+### 7. Governance & Decisions
+- **[ADR-0001: Documents/DataRoomFiles Consolidation](./adr/ADR-0001-documents-dataroomfiles-consolidation.md)**  
+  Architecture decision record for consolidating the `documents` and `dataRoomFiles` collections. Currently unsigned/proposed.
+- **[Phase 0 Consolidation Plan](./planning/phase-0-consolidation-plan.md)**  
+  Decision log, field inventory, enum reconciliation, computed-status analysis, and migration/rollback plan for the consolidation above.
 
 ## 📌 Notes
 - This documentation reflects the **current MVP implementation**.
