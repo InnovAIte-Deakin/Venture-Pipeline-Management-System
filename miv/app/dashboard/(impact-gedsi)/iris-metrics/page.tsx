@@ -1,6 +1,6 @@
 "use client"
 import { useIrisMetrics } from "./hooks/use-iris-metrics
-import { QUICK_FILTERS } from "./lib/iris-metrics.constants"
+import { QUICK_FILTERS, RESULT_LIMIT_OPTIONS } from "./lib/iris-metrics.constants"
 import { formatMetricUnit } from "./lib/iris-metrics.formatters"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -51,10 +51,11 @@ const {
                     <SelectValue placeholder="Results per page" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="20">20 results</SelectItem>
-                    <SelectItem value="50">50 results</SelectItem>
-                    <SelectItem value="100">100 results</SelectItem>
-                    <SelectItem value="200">200 results</SelectItem>
+                   {RESULT_LIMIT_OPTIONS.map((option) => (
+  <SelectItem key={option} value={option.toString()}>
+    {option} results
+  </SelectItem>
+))}
                   </SelectContent>
                 </Select>
               </div>
