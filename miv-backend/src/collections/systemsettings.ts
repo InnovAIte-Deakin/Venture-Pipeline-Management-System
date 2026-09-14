@@ -5,23 +5,22 @@ export const SystemSettings: CollectionConfig = {
   admin: {
     useAsTitle: 'appName',
     description: 'Global system settings (single record)',
-
   },
   hooks: {
-  beforeChange: [
-    async ({ req, operation }) => {
-      if (operation === 'create') {
-        const existing = await req.payload.find({
-          collection: 'system-settings',
-          limit: 1,
-        })
-        if (existing.totalDocs > 0) {
-          throw new Error('System settings already exists. Only one record allowed.')
+    beforeChange: [
+      async ({ req, operation }) => {
+        if (operation === 'create') {
+          const existing = await req.payload.find({
+            collection: 'system-settings',
+            limit: 1,
+          })
+          if (existing.totalDocs > 0) {
+            throw new Error('System settings already exists. Only one record allowed.')
+          }
         }
-      }
-    },
-  ],
-},
+      },
+    ],
+  },
   access: {
     // Any logged-in user can read settings
     read: ({ req }) => Boolean(req.user),
@@ -33,7 +32,6 @@ export const SystemSettings: CollectionConfig = {
   },
 
   fields: [
-   
     {
       name: 'appName',
       type: 'text',
@@ -98,11 +96,7 @@ export const SystemSettings: CollectionConfig = {
           required: true,
         },
       ],
-      defaultValue: [
-        { mime: 'image/png' },
-        { mime: 'image/jpeg' },
-        { mime: 'application/pdf' },
-      ],
+      defaultValue: [{ mime: 'image/png' }, { mime: 'image/jpeg' }, { mime: 'application/pdf' }],
     },
 
     // --- Feature toggles ---

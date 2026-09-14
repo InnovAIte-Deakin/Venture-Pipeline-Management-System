@@ -232,3 +232,71 @@ Phase 2 is complete.
 The migration should keep the real active business data, archive old email delivery history, and drop empty or short-lived auth/session data.
 
 No data was moved, no Prisma files were deleted, and no Phase 3 collection work was started.
+
+## Phase 3: Build missing Payload collections
+
+Goal: make `miv-backend` ready to hold the old Prisma data later.
+
+Status: complete.
+
+What I did:
+
+1. Expanded the existing Payload `users` collection with migration-friendly fields:
+   - `organization`
+   - `image`
+   - `permissions`
+   - `notificationPreferences`
+   - `legacyPrismaId`
+2. Expanded the existing Payload `ventures` collection so it can hold the larger old Prisma venture records later.
+   - Added contact fields, venture status/stage, score fields, date fields, readiness JSON fields, capital/GEDSI JSON fields, and staff ownership fields.
+3. Expanded the existing Payload `documents` collection so old document metadata can be preserved.
+   - Added legacy document name, old URL, old size, old MIME type, old upload date, and `legacyPrismaId`.
+   - Added old document type options such as business plan, market research, and team profile.
+4. Expanded the existing Payload `activityLogs` collection so old Prisma activities can be transformed later.
+   - Added old activity type, old title, and `legacyPrismaId`.
+5. Added `legacyPrismaId` to `founders` for future relationship mapping.
+6. Added the missing core migration collections:
+   - `gedsiMetrics`
+   - `irisMetricCatalog`
+7. Added the missing operational collections:
+   - `notifications`
+   - `emailLogs`
+   - `projects`
+   - `tasks`
+   - `teamEvents`
+   - `announcements`
+   - `workflows`
+   - `workflowRuns`
+8. Added the missing capital/fund/report/dashboard collections:
+   - `capitalActivities`
+   - `funds`
+   - `limitedPartners`
+   - `capitalCalls`
+   - `distributions`
+   - `fundInvestments`
+   - `fundWorkflows`
+   - `fundLifecyclePhases`
+   - `fundOperationTasks`
+   - `reports`
+   - `customDashboards`
+9. Registered all new collections in `miv-backend/src/payload.config.ts`.
+10. Regenerated Payload TypeScript types in `miv-backend/src/payload-types.ts`.
+11. Fixed two backend type issues found during verification:
+    - Changed the `users` admin access check to return a plain boolean.
+    - Stored password reset expiration as an ISO string instead of a raw `Date`.
+12. Ran backend verification:
+    - `npm.cmd run generate:types`
+    - `npm.cmd exec tsc -- --noEmit`
+
+Important note:
+
+- I did not migrate any real data.
+- I did not delete Prisma.
+- I did not change frontend API calls.
+- I did not start Phase 4.
+
+## Phase 3 summary
+
+Phase 3 is complete.
+
+`miv-backend` now has Payload collection definitions for the models listed in the migration plan. The backend can now move on to Phase 4 later, which is adding backend API endpoints that match what the frontend currently expects.
