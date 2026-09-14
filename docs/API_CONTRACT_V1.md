@@ -1,11 +1,11 @@
-# API Contract v1
+# API Contract v1.2
 
 Venture Pipeline Management System
 Backend and API Integration Team
 Status: Draft, pre publication
-Last updated: 7 September 2026
+Last updated: 14 September 2026
 Canonical location: docs/API_CONTRACT_V1.md on the main repository. If you are reading a copy anywhere else, treat the repo version as authoritative.
-Re-verified against frozen origin/main at commit c3e2a4b. Group folder names like (g3-venture-pipeline) do not appear in URLs, so paths remain independent of those on-disk route-group locations.
+Post-freeze re-verified against frozen origin/main at commit e4e8b75. Group folder names like (g3-venture-pipeline) do not appear in URLs, so paths remain independent of those on-disk route-group locations.
 
 This document describes the agreed API between the miv frontend and the miv-backend service, plus the frontend's own internal API routes. It covers every endpoint we use for integration work: the method, the path, what goes in the request, what comes back in the response, and what each role is allowed to see. This is the single source of truth. If the code and this document disagree, one of them needs a pull request. Nothing should quietly drift apart.
 
@@ -37,9 +37,9 @@ The backend role values are the canonical set for this contract:
 |---|---|
 | admin | Full access to everything, including settings |
 | miv_analyst | Staff analyst. Can read and review across all ventures and documents, but cannot change global settings |
-| founder (also stored as USER for impact applicants) | External user. Limited to their own records |
+| founder | External user. Limited to their own records |
 
-Known problem, now blocking: the frontend Prisma schema defines a different role list (ADMIN, MANAGER, ANALYST, USER, VENTURE_MANAGER, GEDSI_ANALYST, CAPITAL_FACILITATOR, EXTERNAL_STAKEHOLDER). Self-registration creates the Payload role `founder`, while the frontend maps that backend role to Prisma USER. The broader mapping is no longer just a tidiness issue: staff-role alignment is still absent from the RBAC matrix. Suggested mapping to discuss: the backend list is canonical, founder maps to USER, ANALYST and GEDSI_ANALYST map to miv_analyst, ADMIN and MANAGER map to admin. This remains Decision 1 in section 9.
+The former backend `user` role was retired in #141/#142; it is not a current backend role. The frontend Prisma schema still defines a different role list (ADMIN, MANAGER, ANALYST, USER, VENTURE_MANAGER, GEDSI_ANALYST, CAPITAL_FACILITATOR, EXTERNAL_STAKEHOLDER). Self-registration creates the Payload role `founder`, while the frontend maps that backend role to Prisma USER. The broader mapping is no longer just a tidiness issue: staff-role alignment is still absent from the RBAC matrix. Suggested mapping to discuss: the backend list is canonical, founder maps to USER, ANALYST and GEDSI_ANALYST map to miv_analyst, ADMIN and MANAGER map to admin. This remains Decision 1 in section 9.
 
 ### 1.4 Standard response shape
 
@@ -57,7 +57,7 @@ The details field only appears on validation errors and contains the individual 
 
 Status codes we use: 200 for success, 201 for created, 400 for validation problems, 401 for not logged in, 403 for logged in but not allowed, 404 for not found, 409 for conflicts like a taken email, 429 for rate limiting, 500 for server errors.
 
-A few older endpoints (ventures summary, lookups, signed url) return bare objects without this wrapper. We will leave them as they are for v1 and bring them in line in v1.1.
+A few older endpoints (ventures summary, lookups, signed url) return bare objects without this wrapper. We will leave them as they are for v1 and bring them in line in a future minor version.
 
 ### 1.5 Field naming
 
@@ -249,7 +249,7 @@ Response 200: `{ "success": true, "message": "..." }`
 
 Errors: 400 for validation problems or a wrong current password, 401, 500.
 
-### Existing Team Members APIs — not approved for public v1.1 use
+### Existing Team Members APIs — not approved for public v1.2 use
 
 GET and POST /api/team/members, plus GET, PUT and DELETE /api/team/members/{id}, currently exist as Prisma-backed team-user CRUD APIs.
 
@@ -487,7 +487,7 @@ Errors: 400 if the id is missing, 401 unauthenticated, 403 unauthorized, 404 not
 
 The full venture summary for detail pages: the venture itself, the latest intake, agreements and financials.
 
-Auth: required. The handler requires a Payload user, permits staff (`admin` and `miv_analyst`) or the venture owner, and returns 401 or 403 when access is not permitted. Triage track and rationale are redacted for founders.
+Auth: required. The handler authenticates a Payload user, then passes that user to every Local API read with `overrideAccess: false`; Payload collection and field rules therefore enforce staff/owner access. Staff (`admin` and `miv_analyst`) can access permitted records, founders are scoped to their own venture, and founders do not receive triage track/rationale or staff-only disability fields. It returns 401 when unauthenticated and 403 when access is denied.
 
 Response 200 (no wrapper on this one):
 
@@ -761,7 +761,7 @@ This is the cleanup list. Each row names the problem, the path we are keeping, t
 | Intake submit duplicate | Resolved in #73: the retained Payload-backed route-group handler serves POST and GET /api/intake/submit; the former app/api duplicate was removed | Retain the current handler, including its per-IP POST rate limit and authenticated GET access rules | miv-backend/src/app/(payload)/api/intake/submit/route.ts | Backend |
 | Login URL mismatch | Resolved on main at f3297d1. The login page and useAuth now go through the new /api/session/login proxy, which calls the canonical /api/auth/login | Done, with a follow up: two login patterns now exist (session proxy versus direct /backend calls), pick one in section 9 | remaining direct /backend/api/auth/login callers once the decision lands | Frontend |
 | Logout route mismatch | Resolved: the dashboard calls DELETE /backend/api/auth/login, which the backend implements | Keep the current canonical logout path unless Decision 3 chooses a dedicated endpoint | miv/app/dashboard/page.tsx | Frontend |
-| Dead disabled routes | Dot prefixed copies of assign-track and send-signature sit next to the live versions | Delete the files | none | Backend |
+| Dead disabled routes | **Open:** dot-prefixed copies of assign-track and send-signature still sit next to the live versions | Delete the files | none | Backend |
 | Copy pasted PATCH on the reports route | PATCH /api/reports/impact-users duplicates PATCH /api/users | Remove the handler, profile updates go through /api/users only | none found | Backend |
 | Misspelled settings path | Canonical routes now use /api/system-settings | Decide separately whether a legacy redirect is required; no old route is present | miv-backend/src/app/api/system-settings | Backend and frontend |
 | Broken delete call | Resolved: the impact documents page uses the query-string delete form | Keep the current DELETE /api/documents?id={documentId} call | miv/app/dashboard/(g3-admin-review-readiness)/impact-documents/page.tsx | Frontend |
@@ -780,13 +780,17 @@ Page-level authentication uses the Next.js 16 `proxy.ts` convention. `miv/proxy.
 | Frontend internal /api/notifications | Resolved: GET, POST and PUT call getSessionUser() |
 | Frontend internal /api/custom-dashboards | Resolved: GET and POST call getSessionUser() |
 | GET /api/intake/submit?id= | Resolved: payload.auth enforces authentication and staff/non-staff access rules with 401/403 responses |
-| GET /api/ventures/{id}/summary | Resolved: requires a Payload user, applies staff/owner access, and redacts triage fields for founders |
+| GET /api/ventures/{id}/summary | Resolved: authenticates a Payload user and performs its Local API reads with `overrideAccess: false` plus that user, so Payload access rules enforce staff/owner scoping and strip founder-inaccessible fields |
 | POST /api/uploads/signed-url | Resolved: requires Payload authentication. The upload URL remains a mock and is not production storage |
 | Users collection update access | Resolved: role field create/update access is protected with fieldAdminOnly |
 | Users collection create access | Resolved: collection create access is adminOnly |
-| All auth routes | No rate limiting on login, register, forgot password or reset password, leaving them open to brute force and enumeration by volume |
+| Auth rate limiting (login and forgot password) | Resolved: `lib/rate-limit.ts` enforces per-IP limits on login (10/minute) and forgot-password (5/minute); limiter and account-lockout responses use HTTP 429. This verification does not establish rate limiting for register or reset-password. |
 | Team Members APIs | GET/POST /api/team/members and GET/PUT/DELETE /api/team/members/{id} have no authentication or role checks and expose team-user CRUD and role-management capability |
-| Repository hygiene | Repository templates and environment documentation were scrubbed in c3e2a4b. External credential rotation is not verifiable from this repository |
+| Credential rotation | `POST /api/email/send-email` and `NEXT_EMAIL_TOKEN` are absent at e4e8b75. Repository templates and environment documentation were scrubbed in c3e2a4b; the remaining concern is rotation of any credentials previously exposed, which cannot be verified from this repository. |
+| GET /api/email/test-config | Internal test utility; it reports SMTP configuration status and has no in-handler authentication at e4e8b75. Security-blocked: do not expose as a supported production API. |
+| POST /api/email/test-intake | Internal test utility that can send an intake-notification email to a caller-supplied address; it has no in-handler authentication at e4e8b75. **Open:** #129 was not merged, so required gating is not present. |
+| GET /api/email/test-smtp | Internal SMTP diagnostic that can verify the connection and send a test email; it has no in-handler authentication at e4e8b75. **Open:** its gating is supplied by #138, which is not in the frozen reference. |
+| POST /api/email/test-welcome | Internal test utility that can send a welcome email to a caller-supplied address; it has no in-handler authentication at e4e8b75. Security-blocked: do not expose as a supported production API. |
 
 One improvement to acknowledge from the same restructure: the seed, test and set password development routes were moved out of app/api into an archive folder, so they are no longer live endpoints. That closes a real attack surface.
 
@@ -794,7 +798,7 @@ One improvement to acknowledge from the same restructure: the seed, test and set
 
 A quick reference for who can do what. The per endpoint sections above are the authoritative version.
 
-| Operation | admin | miv_analyst | founder or USER | not logged in |
+| Operation | admin | miv_analyst | founder | not logged in |
 |---|---|---|---|---|
 | Login, register, forgot and reset password | yes | yes | yes | yes |
 | Read and update own profile, change password | yes | yes | yes | no |
@@ -830,3 +834,4 @@ Already decided by the contract owner and recorded above: founder venture reads 
 | 31 July 2026 | v1 draft 4 | Historical re-verification against f3297d1 after the route-group restructure. Login mismatch was recorded as resolved via /api/session/login; registration and logout callers were then still recorded as broken. The historical proxy concern is superseded by the v1.1 verification: Next.js 16 uses the active `proxy.ts` convention. Noted the archived development routes as closed attack surface. |
 | 31 July 2026 | v1 draft 3 | Pre publication amendments from review: corrected the getServerSession guidance in 5.7 to require authOptions, escalated the role mapping in 1.3 to a sprint review decision, recorded the founder read decision in 5.5, added four security items (analyst self promotion via role writes, create anyone on the Users collection, no rate limiting on auth routes, committed credentials), blocked the 3.1 rename pending the create lockdown, surfaced the register role minting difference, and added section 9 for decisions, moving the change log to section 10 |
 | 7 September 2026 | v1.1 correction pass | Re-verified against frozen origin/main c3e2a4b; corrected registration, intake ownership, Next.js 16 proxy authentication, resolved security-status claims, analytics fallback wording, and documented existing-but-security-blocked Team Members APIs. |
+| 14 September 2026 | v1.2 post-freeze verification | Re-verified against frozen origin/main e4e8b75; recorded removal of the send-email route/NEXT_EMAIL_TOKEN, login and forgot-password rate limiting with 429 responses, summary access enforcement via `overrideAccess: false`, retirement of the backend `user` role, and the four internal email test routes. |

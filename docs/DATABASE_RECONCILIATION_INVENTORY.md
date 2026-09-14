@@ -1,12 +1,18 @@
 # Database Reconciliation Inventory
 
+- **Author:** Bhavisha
+- **Date:** 14 September 2026
+- **Verified commit:** e4e8b75
+
 ## 1. Purpose
 
-This document records the current database structures and reconciliation differences between the Prisma/PostgreSQL implementation in `miv` and the Payload/MongoDB implementation in `miv-backend`.
+This document records the database structures and reconciliation differences verified at frozen commit `e4e8b75` between the Prisma/PostgreSQL implementation in `miv` and the Payload/MongoDB implementation in `miv-backend`.
 
 The purpose is to support Phase 0 database reconciliation and identify areas requiring architectural decisions before any migration, write freeze, or cut-over.
 
 This document is an inventory and assessment only. It does not establish a final database source of truth or approve a migration strategy.
+
+This reconciliation inventory is an input to issue #77 and the associated handover work; it does not indicate that either has been completed or approved.
 
 ## 2. Current Architecture
 
@@ -370,7 +376,7 @@ The following decisions remain unresolved:
 | Migration/cutover ownership | OPEN |
 | Migration rollback plan | OPEN |
 | Production write-freeze policy | BLOCKED |
-| Sprint 3 cut-over window | BLOCKED |
+| T3 cut-over roadmap | BLOCKED |
 
 These items must not be treated as approved architectural decisions.
 
@@ -384,10 +390,10 @@ These items must not be treated as approved architectural decisions.
 | Stored vs computed status decision | **ANALYSIS COMPLETE; DECISION PENDING** |
 | Migration plan with rollback | **BLOCKED** pending target architecture/source-of-truth decision |
 | Freeze writes to losing store | **BLOCKED** because no losing store has been designated |
-| Sprint 3 cut-over with named owners | **BLOCKED** because no approved cut-over window or owners exist |
+| T3 cut-over roadmap with named owners | **BLOCKED** because no approved cut-over window or owners exist |
 
 ### Current Phase 0 conclusion
 
 The current inventory and reconciliation analysis can proceed as preparatory work.
 
-However, database consolidation, write freezing, migration execution and Sprint 3 cut-over cannot be finalised until the outstanding architectural decisions are formally resolved.
+However, database consolidation, write freezing, migration execution and T3 roadmap/cut-over planning cannot be finalised until the outstanding architectural decisions are formally resolved.

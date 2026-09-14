@@ -1,29 +1,29 @@
 # Phase 0 Plan — `documents` / `dataRoomFiles` Consolidation
 
-**Companion document:** [`docs/adr/ADR-0001-documents-dataroomfiles-consolidation.md`](../adr/ADR-0001-documents-dataroomfiles-consolidation.md) — **currently unsigned**. See that document for the sign-off blocker.
+**Companion document:** [`docs/adr/ADR-003-documents-dataroomfiles-consolidation.md`](../adr/ADR-003-documents-dataroomfiles-consolidation.md) — **currently unsigned**. See that document for the sign-off blocker.
 
 **See also:** [`docs/rbac/RBAC_MATRIX.md`](../rbac/RBAC_MATRIX.md) — a separate, already-in-flight access-control audit that independently covers both `documents` and `dataRoomFiles` (anomalies A4, A5). This plan cross-references it rather than re-deciding access control from scratch; see §2 below.
 
 Task tracking, deadlines, and owner/backup assignment for this effort live in MS Planner — deliberately not duplicated here.
 
-> ⚠️ **Every section below is pending ADR-0001 sign-off.** It is prepared in advance so Phase 1 (execution/cutover) can start immediately on approval — it is **not** authorization to begin schema changes, migration scripts, or cutover activity now. Phase 0 = documentation and governance only.
+> ⚠️ **Every section below is pending ADR-003 sign-off.** It is prepared in advance so Phase 1 (execution/cutover) can start immediately on approval — it is **not** authorization to begin schema changes, migration scripts, or cutover activity now. Phase 0 = documentation and governance only.
 
 ## Decision log
 
 | Date | Decision | Made by | Notes |
 |---|---|---|---|
-| 2026-09-04 | Opened ADR-0001 as `Proposed`; drafted this Phase 0 plan | Claude (Fable 5), at user request | No prior ADR/plan existed for this consolidation anywhere in the repo |
+| 2026-09-04 | Opened ADR-003 as `Proposed`; drafted this Phase 0 plan | Claude (Fable 5), at user request | No prior ADR/plan existed for this consolidation anywhere in the repo |
 | 2026-09-04 | Scoped this effort to `documents` vs `dataRoomFiles` only, excluding the separate `miv` Next.js app's Prisma `Document` model | User (satyadilsched077@gmail.com) | The Prisma system is a third, unrelated vocabulary and a different database entirely (Postgres vs MongoDB) |
 | 2026-09-04 | Used role-based placeholders instead of named individuals for the ADR approvers | User (satyadilsched077@gmail.com) | Real names to be filled in by the team before this plan is considered frozen |
-| 2026-09-04 | Rebased this plan onto latest `origin/main` before drafting the PR | User (satyadilsched077@gmail.com) | Surfaced that `dataRoomFiles`'s access model had already been tightened by a separate, in-flight RBAC audit (anomalies A4/A5) since the plan's first draft — §2 below reflects the corrected, current state |
+| 2026-09-04 | Rebased this plan onto latest `origin/main` before drafting the PR | User (satyadilsched077@gmail.com) | Surfaced that `dataRoomFiles`'s access model had already been tightened by a separate, in-flight RBAC audit since the plan's first draft — §2 below reflects the corrected, current state |
 | 2026-09-04 | Kept task tracking (deadlines, owners) in MS Planner, out of this document | User (satyadilsched077@gmail.com) | This is a capstone project, not an org with a governance/PM tool stack living in the repo |
-| — | Which collection survives; unified enum values; status stored vs. computed; final access-control model | **Pending — blocked on ADR-0001 sign-off** | See §3/§4 below for the analysis feeding this decision |
+| — | Which collection survives; unified enum values; status stored vs. computed; final access-control model | **Pending — blocked on ADR-003 sign-off** | See §3/§4 below for the analysis feeding this decision |
 
 ---
 
 ## §1 ADR status
 
-**Not signed.** See [ADR-0001](../adr/ADR-0001-documents-dataroomfiles-consolidation.md) for the full context and required approvers. Nothing in §2–§6 below should be read as a final decision — it is preparatory analysis so that once the ADR is signed, Phase 1 can begin without re-deriving this work.
+**Not signed.** See [ADR-003](../adr/ADR-003-documents-dataroomfiles-consolidation.md) for the full context and required approvers. Nothing in §2–§6 below should be read as a final decision — it is preparatory analysis so that once the ADR is signed, Phase 1 can begin without re-deriving this work.
 
 ---
 
@@ -64,7 +64,7 @@ Access control (collection-level, **corrected as of this pass** — see below): 
 
 An earlier pass of this plan (drafted before pulling latest `origin/main`) found `dataRoomFiles` open to **any authenticated user for read and update**, and flagged that as a business decision this ADR would need to resolve. Between that draft and this one, a **separate, already-in-flight RBAC audit** (`docs/rbac/RBAC_MATRIX.md`, anomalies A4 and A5) landed exactly that fix: `dataRoomFiles.read` is now scoped to a founder's own venture (resolved via the `founders` collection's email match — a different, working mechanism from the `founderOfVenture` helper the matrix separately flags as broken), and `dataRoomFiles.update` is now staff-only. **`create` remains open to any authenticated user on both collections — that part is unchanged and symmetric, not a gap.**
 
-Net effect on the ADR's access-control question (see ADR-0001, "Decision needed," item 4): the two collections' access models have converged substantially through unrelated work. What's left to decide is narrower than originally scoped — not *whether* to restrict `dataRoomFiles`, but *which scoping mechanism* (`documents`' per-record `uploadedBy` ownership vs. `dataRoomFiles`' per-founder venture-membership) the merged collection should use, given `dataRoomFiles` has no uploader field to reconstruct ownership from.
+Net effect on the ADR's access-control question (see ADR-003, "Decision needed," item 4): the two collections' access models have converged substantially through unrelated work. What's left to decide is narrower than originally scoped — not *whether* to restrict `dataRoomFiles`, but *which scoping mechanism* (`documents`' per-record `uploadedBy` ownership vs. `dataRoomFiles`' per-founder venture-membership) the merged collection should use, given `dataRoomFiles` has no uploader field to reconstruct ownership from.
 
 ### One-side-only fields
 
@@ -74,7 +74,7 @@ Net effect on the ADR's access-control question (see ADR-0001, "Decision needed,
 
 ## §3 Document-type enum reconciliation
 
-Presented symmetrically — the source/target direction is itself one of the things ADR-0001 needs to decide (see §2 above), so this table does not presume which collection survives.
+Presented symmetrically — the source/target direction is itself one of the things ADR-003 needs to decide (see §2 above), so this table does not presume which collection survives.
 
 | `documents.documentType` | `dataRoomFiles.category` | Notes / semantic difference |
 |---|---|---|
@@ -100,6 +100,7 @@ Presented symmetrically — the source/target direction is itself one of the thi
 - **Keep stored (current `documents` behavior):**
   - *Pros:* Payload's query/filter/sort layer works natively and efficiently against real fields — the admin UI already sorts/filters by `status` (`defaultColumns` includes it). No new derivation logic to write or maintain. Matches current, already-working behavior.
   - *Cons:* stored value can drift from whatever it's nominally derived from if writes to those underlying fields aren't kept in lockstep — though today there's no such underlying field to drift from, since `status` isn't derived from anything.
+
 - **Compute at read time (e.g., derive from `reviewedBy`/`reviewedAt` presence plus an explicit rejection flag):**
   - *Pros:* single source of truth if the underlying fields are the real signal.
   - *Cons:* Payload's admin UI and API query/filter/sort layer favor stored fields over virtual/derived ones — filtering the documents list by status would get materially slower or more complex. Recomputation logic would need to be written and kept in sync in two places during any transition/shadow window (§5), which is precisely the kind of duplicated-logic risk this phase exists to avoid.
@@ -110,7 +111,7 @@ Presented symmetrically — the source/target direction is itself one of the thi
 
 ## §5 Migration plan with rollback
 
-**Not authorized to run until ADR-0001 is signed.** Sequenced as follows, each step with an explicit rollback so nobody is improvising rollback logic mid-incident.
+**Not authorized to run until ADR-003 is signed.** Sequenced as follows, each step with an explicit rollback so nobody is improvising rollback logic mid-incident.
 
 | # | Step | Rollback path |
 |---|---|---|
@@ -128,10 +129,12 @@ Presented symmetrically — the source/target direction is itself one of the thi
 
 ## §6 Freeze policy (draft — announcement + enforcement not yet actioned)
 
-Once ADR-0001 names the losing collection, no new code should write to it. This needs to be a formal, communicated freeze — not an assumption — with enforcement beyond a verbal agreement:
+Once ADR-003 names the losing collection, no new code should write to it. This needs to be a formal, communicated freeze — not an assumption — with enforcement beyond a verbal agreement:
 
 1. **PR review checklist item**: any diff touching the losing collection's `src/collections/*.ts` file or its API routes gets flagged for review against the freeze.
+
 2. **Automated check**: a CI/lint rule (or pre-commit hook) flagging `payload.create`/`payload.update` calls targeting the losing collection's slug outside an explicitly allowlisted migration-script path. Note: `docs/rbac/RBAC_MATRIX.md` records that the team is deliberately holding off adding a role-lint CI check until the real pipeline (`#56`) is green — the same constraint likely applies here.
+
 3. Once cutover (§5 step 6) begins, the losing collection's `create` access-control function itself can be hardened to reject writes from anything but a migration service account — a hard technical control beyond code review, applied only after the freeze has been socialized (not as the first line of defense, to avoid surprising in-flight work).
 
 The announcement text, effective date, and communication channel are tracked in MS Planner alongside the rest of the task breakdown for this effort, not duplicated here.
@@ -140,4 +143,4 @@ The announcement text, effective date, and communication channel are tracked in 
 
 ## Before Phase 1 may begin
 
-ADR-0001 must be signed, the §3 enum reconciliation's four flagged business-decision values resolved, and the §4 status decision ratified. Scheduling, ownership, and sign-off tracking for getting there live in MS Planner.
+ADR-003 must be signed, the §3 enum reconciliation's four flagged business-decision values resolved, and the §4 status decision ratified. Scheduling, ownership, and sign-off tracking for getting there live in MS Planner.
