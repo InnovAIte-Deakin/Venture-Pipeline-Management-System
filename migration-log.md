@@ -300,3 +300,58 @@ Important note:
 Phase 3 is complete.
 
 `miv-backend` now has Payload collection definitions for the models listed in the migration plan. The backend can now move on to Phase 4 later, which is adding backend API endpoints that match what the frontend currently expects.
+
+## Phase 4: Add backend API endpoints
+
+Goal: give `miv-backend` API routes that match the old frontend routes, so the frontend can later change from `/api/...` to `/backend/api/...`.
+
+Status: complete.
+
+What I did:
+
+1. Added a small shared helper for Payload API routes:
+   - `miv-backend/src/app/api/_lib/payload-api.ts`
+2. Added a Payload-backed ventures endpoint:
+   - `miv-backend/src/app/api/ventures/route.ts`
+   - Supports listing ventures with filters and creating a venture.
+   - Returns `ventures`, `pagination`, and `isMobile` like the old Prisma route.
+3. Added a Payload-backed GEDSI metrics endpoint:
+   - `miv-backend/src/app/api/gedsi-metrics/route.ts`
+   - Supports listing GEDSI metrics with filters and creating a metric.
+   - Returns `metrics` and `pagination` like the old Prisma route.
+4. Added a Payload-backed IRIS metrics endpoint:
+   - `miv-backend/src/app/api/iris/metrics/route.ts`
+   - Supports searching by text, looking up by code, and returns `results`, `total`, `page`, `limit`, and `totalPages`.
+5. Added a Payload-backed notifications endpoint:
+   - `miv-backend/src/app/api/notifications/route.ts`
+   - Supports listing, creating, and updating notifications.
+   - Returns `notifications` and `pagination` like the old Prisma route.
+6. Added a Payload-backed workflows endpoint:
+   - `miv-backend/src/app/api/workflows/route.ts`
+   - Supports listing and creating workflows.
+   - Returns `results`, `total`, `page`, and `limit` like the old Prisma route.
+7. Added Payload-backed team endpoints:
+   - `miv-backend/src/app/api/team/projects/route.ts`
+   - `miv-backend/src/app/api/team/events/route.ts`
+   - Supports listing and creating projects/events.
+8. Added a Payload-backed fund management endpoint:
+   - `miv-backend/src/app/api/fund-management/route.ts`
+   - Returns `funds`, `capitalCalls`, `distributions`, `limitedPartners`, `workflows`, `lifecyclePhases`, `operationTasks`, `reports`, `ventures`, and `summary`.
+9. Reused the existing backend documents endpoint:
+   - `miv-backend/src/app/api/documents/route.ts`
+   - I did not duplicate it because it already exists and already reads/writes Payload documents.
+10. Ran backend verification:
+   - `npm.cmd exec tsc -- --noEmit`
+
+Important note:
+
+- I did not migrate any real data.
+- I did not delete Prisma.
+- I did not change frontend API calls.
+- I did not start Phase 5.
+
+## Phase 4 summary
+
+Phase 4 is complete.
+
+`miv-backend` now has backend API endpoints for the main routes listed in the migration plan. They use Payload collections instead of Prisma and return response shapes that are close to the old frontend expectations, so Phase 8 can later switch frontend URLs one feature at a time.
