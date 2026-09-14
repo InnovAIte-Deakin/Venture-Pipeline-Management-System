@@ -1,6 +1,6 @@
 "use client"
 
-import { Download, FileText, Loader2, Trash2 } from "lucide-react"
+import { Download, File, Loader2, Trash2 } from "lucide-react"
 import type { UserDocumentsController } from "../../hooks/use-user-documents"
 import { formatDocumentDate, formatFileSize, getDisplayFilename } from "../../lib/document-formatters"
 import type { UserDocument } from "../../types/documents.types"
@@ -15,18 +15,17 @@ export function DesktopDocumentList({ controller }: { controller: UserDocumentsC
   }
 
   return (
-    <section aria-labelledby="desktop-document-list-title">
-      <div className="mb-3 flex items-center justify-between">
-        <div>
-          <h2 id="desktop-document-list-title" className="text-xl font-bold text-slate-950">Your documents</h2>
-          <p className="mt-1 text-sm text-slate-500">Track review status and manage uploaded files.</p>
-        </div>
-        <span className="rounded-full bg-[#138075]/10 px-3 py-1 text-xs font-bold text-[#138075]">
-          {controller.documents.length} files
-        </span>
-      </div>
+    <section
+      className="rounded-lg border border-border bg-card p-6 shadow-sm"
+      aria-labelledby="desktop-document-list-title"
+    >
+      <h2 id="desktop-document-list-title" className="mb-4 text-xl font-semibold text-foreground">
+        Your Documents
+      </h2>
 
-      {controller.loading ? <DocumentsLoadingState /> : controller.documents.length === 0 ? (
+      {controller.loading ? (
+        <DocumentsLoadingState />
+      ) : controller.documents.length === 0 ? (
         <DocumentsEmptyState />
       ) : (
         <div className="space-y-3">
@@ -35,29 +34,40 @@ export function DesktopDocumentList({ controller }: { controller: UserDocumentsC
             const isDownloading = controller.downloadingId === document.id
 
             return (
-              <article key={document.id} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:border-[#138075]/30 hover:shadow-md">
-                <div className="flex items-center gap-4">
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#2A9D8F]/10 text-[#138075]">
-                    <FileText className="h-6 w-6" aria-hidden="true" />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <h3 className="truncate font-semibold text-slate-950" title={getDisplayFilename(document.filename)}>
-                      {getDisplayFilename(document.filename)}
-                    </h3>
-                    <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-500">
-                      <span>{document.documentType}</span><span aria-hidden="true">•</span>
-                      <span>{formatFileSize(document.filesize)}</span><span aria-hidden="true">•</span>
-                      <span>v{document.version ?? 1}</span><span aria-hidden="true">•</span>
-                      <span>{formatDocumentDate(document.createdAt)}</span>
+              <article
+                key={document.id}
+                className="rounded-lg border border-border p-4 transition-colors hover:bg-muted/50"
+              >
+                <div className="flex items-start justify-between">
+                  <div className="flex min-w-0 flex-1 items-start space-x-3">
+                    <File className="h-10 w-10 shrink-0 text-primary" aria-hidden="true" />
+                    <div className="min-w-0 flex-1">
+                      <h3 className="truncate font-medium text-foreground" title={getDisplayFilename(document.filename)}>
+                        {getDisplayFilename(document.filename)}
+                      </h3>
+                      <div className="mt-1 flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+                        <span className="rounded bg-primary/10 px-2 py-0.5 text-xs text-primary">
+                          {document.documentType}
+                        </span>
+                        <span aria-hidden="true">•</span>
+                        <span>{formatFileSize(document.filesize)}</span>
+                        <span aria-hidden="true">•</span>
+                        <span>v{document.version ?? 1}</span>
+                        <span aria-hidden="true">•</span>
+                        <span>{formatDocumentDate(document.createdAt)}</span>
+                      </div>
+                      <div className="mt-2">
+                        <DocumentStatusBadge status={document.status} />
+                      </div>
                     </div>
-                    <div className="mt-2"><DocumentStatusBadge status={document.status} /></div>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
+
+                  <div className="ml-4 flex shrink-0 items-center space-x-2">
                     <button
                       type="button"
                       onClick={() => void controller.downloadDocument(document)}
                       disabled={isDownloading || isDeleting}
-                      className="inline-flex items-center gap-2 rounded-xl border border-[#138075]/25 px-3 py-2 text-sm font-semibold text-[#138075] transition hover:bg-[#138075]/5 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex items-center gap-1 rounded bg-primary/10 px-3 py-1.5 text-sm text-primary transition-colors hover:bg-primary/20 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isDownloading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Download className="h-4 w-4" />}
                       Download
@@ -66,7 +76,7 @@ export function DesktopDocumentList({ controller }: { controller: UserDocumentsC
                       type="button"
                       onClick={() => confirmDelete(document)}
                       disabled={isDeleting || isDownloading}
-                      className="inline-flex items-center gap-2 rounded-xl border border-red-200 px-3 py-2 text-sm font-semibold text-red-700 transition hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      className="flex items-center gap-1 rounded bg-secondary/10 px-3 py-1.5 text-sm text-secondary transition-colors hover:bg-secondary/20 disabled:cursor-not-allowed disabled:opacity-50"
                     >
                       {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                       Delete

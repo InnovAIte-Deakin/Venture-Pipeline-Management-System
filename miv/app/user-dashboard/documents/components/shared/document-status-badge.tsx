@@ -1,16 +1,16 @@
 import type { DocumentStatus } from "../../types/documents.types"
 
 const statusStyles: Record<DocumentStatus, { label: string; className: string }> = {
-  pending_review: { label: "Pending review", className: "border-amber-200 bg-amber-50 text-amber-800" },
-  approved: { label: "Approved", className: "border-emerald-200 bg-emerald-50 text-emerald-800" },
-  rejected: { label: "Rejected", className: "border-red-200 bg-red-50 text-red-800" },
-  needs_revision: { label: "Needs revision", className: "border-orange-200 bg-orange-50 text-orange-800" },
+  pending_review: { label: "Pending Review", className: "bg-warning/10 text-warning" },
+  approved: { label: "Approved", className: "bg-success/10 text-success" },
+  rejected: { label: "Rejected", className: "bg-secondary/10 text-secondary" },
+  needs_revision: { label: "Needs Revision", className: "bg-secondary/10 text-secondary" },
 }
 
 export function DocumentStatusBadge({ status }: { status: DocumentStatus }) {
   const config = statusStyles[status]
   return (
-    <span className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${config.className}`}>
+    <span className={`inline-flex rounded-full px-2 py-1 text-xs font-medium ${config.className}`}>
       {config.label}
     </span>
   )

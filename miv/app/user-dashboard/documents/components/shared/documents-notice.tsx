@@ -13,14 +13,14 @@ export function DocumentsNotice({ notice, onDismiss }: DocumentsNoticeProps) {
   return (
     <div
       role={isError ? "alert" : "status"}
-      className={`flex items-start gap-3 rounded-xl border px-4 py-3 text-sm shadow-sm ${
+      className={`flex items-start gap-3 rounded-lg border p-4 ${
         isError
-          ? "border-red-200 bg-red-50 text-red-800"
-          : "border-emerald-200 bg-emerald-50 text-emerald-800"
+          ? "border-secondary/20 bg-secondary/10 text-secondary"
+          : "border-success/20 bg-success/10 text-success"
       }`}
     >
       <Icon className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-      <p className="flex-1 font-medium">{notice.message}</p>
+      <p className="flex-1">{notice.message}</p>
       <button
         type="button"
         onClick={onDismiss}

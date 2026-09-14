@@ -33,7 +33,7 @@ The backend repeats the security-sensitive size and MIME checks. Client validati
 
 ## Responsive behaviour
 
-Desktop and mobile use dedicated components at the shared `lg` breakpoint, so changes to one layout do not unexpectedly alter the other. The desktop view uses summary cards and an adaptive upload/list layout. The mobile view uses a guided two-step upload panel, compact summary cards and touch-friendly document actions.
+Desktop and mobile use dedicated components at the shared `lg` breakpoint, so changes to one layout do not unexpectedly alter the other. The desktop presentation preserves the existing upload-and-list layout. The mobile presentation uses a guided two-step upload panel, compact summary cards and touch-friendly document actions.
 
 The feature uses the VPMS palette, including primary teal `#138075`, tertiary teal `#2A9D8F` and secondary orange `#F4A261`.
 

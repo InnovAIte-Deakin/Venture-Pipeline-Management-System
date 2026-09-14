@@ -53,7 +53,7 @@ export function MobileUploadPanel({ controller }: { controller: UserDocumentsCon
             ref={inputRef}
             type="file"
             accept={DOCUMENT_INPUT_ACCEPT}
-            disabled={controller.uploading}
+            disabled={controller.uploading || !controller.selectedType}
             className="sr-only"
             onChange={(event) => {
               if (event.target.files) void controller.handleFiles(Array.from(event.target.files))
@@ -63,8 +63,8 @@ export function MobileUploadPanel({ controller }: { controller: UserDocumentsCon
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            disabled={controller.uploading}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#138075] px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300"
+            disabled={controller.uploading || !controller.selectedType}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#138075] px-4 py-3 text-sm font-semibold text-white shadow-sm transition active:scale-[0.99] disabled:cursor-not-allowed disabled:bg-slate-300 disabled:text-slate-600"
           >
             {controller.uploading ? (
               <><Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Uploading...</>
