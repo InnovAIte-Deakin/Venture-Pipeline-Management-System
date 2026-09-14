@@ -65,7 +65,7 @@ export default function DashboardCard({
   const [shareOpen, setShareOpen] = useState(false)
   const [copied, setCopied] = useState(false)
   const [widgetsOpen, setWidgetsOpen] = useState(false)
-  const [widgets, setWidgets] = useState<Widget[]>([]) // TODO: load from API, keyed by dashboard.id
+  const [widgets, setWidgets] = useState<Widget[]>([])
 
   const handleManageWidgets = (d: Dashboard) => {
     setViewOpen(false)
