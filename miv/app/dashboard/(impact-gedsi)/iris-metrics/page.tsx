@@ -1,5 +1,5 @@
 "use client"
-import { useIrisMetrics } from "./hooks/use-iris-metrics
+import { useIrisMetrics } from "./hooks/use-iris-metrics"
 import { QUICK_FILTERS, RESULT_LIMIT_OPTIONS } from "./lib/iris-metrics.constants"
 import { formatMetricUnit } from "./lib/iris-metrics.formatters"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
