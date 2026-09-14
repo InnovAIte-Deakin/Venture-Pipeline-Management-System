@@ -1,6 +1,7 @@
 "use client"
-
-import { useEffect, useState } from 'react'
+import { useIrisMetrics } from "./hooks/use-iris-metrics
+import { QUICK_FILTERS } from "./lib/iris-metrics.constants"
+import { formatMetricUnit } from "./lib/iris-metrics.formatters"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -8,59 +9,21 @@ import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table"
 
-type CatalogItem = {
-  code: string
-  name: string
-  description?: string
-  unit?: string
-  gedsiSuggestion?: string
-}
-
 export default function IRISMetricsPage() {
-  const [query, setQuery] = useState("")
-  const [items, setItems] = useState<CatalogItem[]>([])
-  const [total, setTotal] = useState(0)
-  const [loading, setLoading] = useState(false)
-  const [limit, setLimit] = useState(50)
-  const [page, setPage] = useState(1)
-  const [totalPages, setTotalPages] = useState(1)
-  const [error, setError] = useState("")
-  const [retryKey, setRetryKey] = useState(0)
-
-  useEffect(() => {
-    const controller = new AbortController()
-    async function search() {
-      setLoading(true)
-      setError("")
-      try {
-       const url = query.trim().length > 0
-          ? `/api/iris/metrics?q=${encodeURIComponent(query)}&limit=${limit}&page=${page}`
-          : `/api/iris/metrics?limit=${limit}&page=${page}`
-        const res = await fetch(url, { signal: controller.signal })
-        if (!res.ok) {
-        throw new Error(`Request failed with status ${res.status}`)
-      }
-        const json = await res.json()
-setItems(json.results || [])
-setTotal(json.total || (json.results?.length ?? 0))
-setTotalPages(json.totalPages || 1)
-      } catch (error) {
-  if ((error as Error).name !== "AbortError") {
-    setItems([])
-    setTotal(0)
-    setTotalPages(1)
-    setError("Unable to load IRIS metrics. Please try again.")
-  }
-} finally {
-        setLoading(false)
-      }
-    }
-    const t = setTimeout(search, 250)
-    return () => { controller.abort(); clearTimeout(t) }
- }, [query, limit, page, retryKey])
-  useEffect(() => {
-  setPage(1)
-}, [query, limit])
+const {
+  query,
+  setQuery,
+  items,
+  total,
+  loading,
+  limit,
+  setLimit,
+  page,
+  setPage,
+  totalPages,
+  error,
+  retry,
+} = useIrisMetrics()
 
   return (
     <div className="space-y-6">
@@ -126,44 +89,26 @@ setTotalPages(json.totalPages || 1)
 </div>
             
             {/* Quick filter buttons */}
-            <div className="flex flex-wrap gap-2">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("women")}
-              >
-                Women/Gender
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("disability")}
-              >
-                Disability
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("marginalized")}
-              >
-                Marginalized Groups
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("youth")}
-              >
-                Youth
-              </Button>
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => setQuery("")}
-              >
-                Clear
-              </Button>
-            </div>
-          </div>
+<div className="flex flex-wrap gap-2">
+  {QUICK_FILTERS.map((filter) => (
+    <Button
+      key={filter.value}
+      variant="outline"
+      size="sm"
+      onClick={() => setQuery(filter.value)}
+    >
+      {filter.label}
+    </Button>
+  ))}
+
+  <Button
+    variant="outline"
+    size="sm"
+    onClick={() => setQuery("")}
+  >
+    Clear
+  </Button>
+</div>
 
         <div className="hidden md:block rounded-md border overflow-x-auto">
             <Table className="min-w-[760px]">
@@ -199,7 +144,7 @@ setTotalPages(json.totalPages || 1)
         <Button
           variant="outline"
           size="sm"
-         onClick={() => setRetryKey((currentKey) => currentKey + 1)}
+         onClick={retry}
         >
           Try Again
         </Button>
@@ -232,7 +177,7 @@ setTotalPages(json.totalPages || 1)
             <Badge variant="outline">{item.gedsiSuggestion}</Badge>
           )}
         </TableCell>
-        <TableCell>{item.unit || "-"}</TableCell>
+        <TableCell>{formatMetricUnit(item.unit)}</TableCell>
       </TableRow>
     ))
   )}
@@ -255,7 +200,7 @@ setTotalPages(json.totalPages || 1)
         variant="outline"
         size="sm"
         className="mt-3"
-        onClick={() => setRetryKey((currentKey) => currentKey + 1)}
+        onClick={retry}
       >
         Try Again
       </Button>
@@ -296,7 +241,7 @@ setTotalPages(json.totalPages || 1)
         <div className="mt-4 flex items-center justify-between border-t pt-3 text-xs text-muted-foreground">
           <span>Unit</span>
           <span className="font-medium text-foreground">
-            {item.unit || "—"}
+            {formatMetricUnit(item.unit)}
           </span>
         </div>
       </div>
