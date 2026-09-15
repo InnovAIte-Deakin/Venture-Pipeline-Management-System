@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 
 import { systemPerformanceChartConfig } from "../constants"
-import type { HistoricalPerformance } from "../types"
+import type { HistoricalPerformance } from "../types/types"
 
 interface HistoricalPerformanceChartProps {
   historicalPerformance: HistoricalPerformance[]

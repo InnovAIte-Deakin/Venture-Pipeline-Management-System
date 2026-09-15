@@ -1,4 +1,4 @@
-import type { HistoricalPerformance, SystemInfo, SystemPerformance } from "../types"
+import type { HistoricalPerformance, SystemInfo, SystemPerformance } from "../types/types"
 import { HistoricalPerformanceChart } from "./historical-performance-chart"
 import { PerformanceOverviewCard } from "./performance-overview-card"
 import { SystemInfoCard } from "./system-info-card"

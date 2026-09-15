@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Sparkles } from "lucide-react"
-import type { PortfolioCompany } from "../../types"
+import type { PortfolioCompany } from "../../types/types"
 
 interface VentureCardProps {
   company: PortfolioCompany

@@ -1,7 +1,7 @@
 "use client"
 
 import { X } from "lucide-react"
-import type { PortfolioCompany } from "../../types"
+import type { PortfolioCompany } from "../../types/types"
 import { getStatusStyle } from "./statusStyles"
 
 interface CompanyDetailModalProps {

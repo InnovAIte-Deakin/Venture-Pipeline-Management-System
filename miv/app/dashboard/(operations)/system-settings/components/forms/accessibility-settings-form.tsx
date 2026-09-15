@@ -5,7 +5,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Accessibility } from "lucide-react"
 
-import type { AccessibilitySettings, SaveStatus } from "../../types"
+import type { AccessibilitySettings, SaveStatus } from "../../types/types"
 import { SaveStatusContent, SaveStatusMessage } from "./save-status-content"
 
 interface AccessibilitySettingsFormProps {

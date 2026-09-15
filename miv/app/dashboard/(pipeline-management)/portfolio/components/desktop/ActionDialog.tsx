@@ -14,7 +14,7 @@ import {
   X,
   Zap,
 } from "lucide-react"
-import type { PortfolioCompany } from "../../types"
+import type { PortfolioCompany } from "../../types/types"
 
 interface ActionDialogProps {
   company: PortfolioCompany

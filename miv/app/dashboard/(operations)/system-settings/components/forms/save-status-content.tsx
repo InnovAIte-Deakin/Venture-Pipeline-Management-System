@@ -1,6 +1,6 @@
 import { AlertCircle, CheckCircle, RefreshCw, Save } from "lucide-react"
 
-import type { SaveStatus } from "../../types"
+import type { SaveStatus } from "../../types/types"
 
 interface SaveStatusContentProps {
   status: SaveStatus

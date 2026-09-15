@@ -1,6 +1,6 @@
 "use client"
 
-import type { PortfolioCompany } from "../../types"
+import type { PortfolioCompany } from "../../types/types"
 import { getStatusStyle } from "./statusStyles"
 
 interface VentureCardProps {
