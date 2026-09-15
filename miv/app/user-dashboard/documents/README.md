@@ -4,7 +4,7 @@
 
 This feature lets a signed-in venture user upload, view, download and delete their own documents. It also shows the review status returned by the Payload backend.
 
-All implementation files are kept inside `app/user-dashboard/documents`. The shared user-dashboard shell, sidebar and layout are outside this feature and are not changed here.
+The Documents implementation is kept inside `app/user-dashboard/documents`. The only changes outside that folder are the shared User Dashboard sidebar and layout updates required to make mobile navigation open, close and dismiss correctly; the desktop shell remains unchanged.
 
 ## Structure
 
