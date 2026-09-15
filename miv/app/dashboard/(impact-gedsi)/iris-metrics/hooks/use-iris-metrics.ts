@@ -19,12 +19,14 @@ export function useIrisMetrics() {
   const [retryKey, setRetryKey] = useState(0)
 
   const setQuery = (value: string) => {
-    setQueryState(value)
-  }
+  setQueryState(value)
+  setPage(1)
+}
 
-  const setLimit = (value: number) => {
-    setLimitState(value)
-  }
+const setLimit = (value: number) => {
+  setLimitState(value)
+  setPage(1)
+}
 
   const retry = () => {
     setRetryKey((currentKey) => currentKey + 1)
@@ -70,9 +72,7 @@ export function useIrisMetrics() {
       window.clearTimeout(timeoutId)
     }
 }, [query, limit, page, retryKey])
-useEffect(() => {
-  setPage(1)
-}, [query, limit])
+
 
   return {
     query,
