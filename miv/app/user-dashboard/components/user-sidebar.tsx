@@ -12,9 +12,10 @@ import {
   PieChart,
   Settings,
   HelpCircle,
+  X,
 } from "lucide-react";
 import Logo from "@/components/logo";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface UserData {
   firstName: string;
@@ -22,9 +23,14 @@ interface UserData {
   email: string;
 }
 
-export default function UserSidebar() {
+interface UserSidebarProps {
+  mobile?: boolean;
+  onClose?: () => void;
+}
+
+export default function UserSidebar({ mobile = false, onClose }: UserSidebarProps) {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
 
@@ -112,14 +118,31 @@ export default function UserSidebar() {
   ];
 
   return (
-    <aside className="fixed left-0 top-0 w-64 h-screen bg-sidebar text-sidebar-foreground shadow-2xl border-r border-sidebar-border flex flex-col z-50 transition-all duration-300">
+    <aside
+      aria-label={mobile ? "Mobile user navigation" : "User navigation"}
+      className={`${
+        mobile ? "relative h-full w-72 max-w-[85vw]" : "fixed left-0 top-0 h-screen w-64"
+      } bg-sidebar text-sidebar-foreground shadow-2xl border-r border-sidebar-border flex flex-col z-50 transition-all duration-300`}
+    >
       {/* Logo Section */}
-      <div className="p-6 border-b border-sidebar-border flex items-center gap-3 hover:bg-sidebar-accent transition-colors duration-200">
-        <Logo size={"md"} />
-        <div>
-          <h1 className="text-xl font-bold text-sidebar-accent-foreground tracking-wide">MIV</h1>
-          <p className="text-sidebar-foreground/70 text-xs font-medium">Impact Dashboard</p>
+      <div className="p-6 border-b border-sidebar-border flex items-center justify-between gap-3 hover:bg-sidebar-accent transition-colors duration-200">
+        <div className="flex items-center gap-3">
+          <Logo size={"md"} />
+          <div>
+            <h1 className="text-xl font-bold text-sidebar-accent-foreground tracking-wide">MIV</h1>
+            <p className="text-sidebar-foreground/70 text-xs font-medium">Impact Dashboard</p>
+          </div>
         </div>
+        {mobile && (
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close navigation menu"
+            className="rounded-lg p-2 text-sidebar-foreground/80 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        )}
       </div>
 
       {/* Navigation Menu */}
@@ -132,14 +155,17 @@ export default function UserSidebar() {
             <ul className="space-y-1">
               {section.items.map((item, itemIdx) => {
                 const Icon = item.icon;
-                const isActive = activeItem === item.name;
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/user-dashboard" && pathname.startsWith(`${item.href}/`));
 
                 return (
                   <li key={itemIdx}>
-                    <div
+                    <button
+                      type="button"
                       onClick={() => {
                         router.push(item.href);
-                        setActiveItem(item.name);
+                        onClose?.();
                       }}
                       className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 cursor-pointer ${
                         isActive
@@ -151,7 +177,7 @@ export default function UserSidebar() {
                         className={`w-5 h-5 ${isActive ? "text-sidebar-primary-foreground" : "text-sidebar-foreground/70"}`}
                       />
                       <span className="font-medium text-xs">{item.name}</span>
-                    </div>
+                    </button>
                   </li>
                 );
               })}
