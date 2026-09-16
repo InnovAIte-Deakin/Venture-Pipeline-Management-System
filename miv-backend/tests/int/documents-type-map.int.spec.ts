@@ -3,10 +3,7 @@ import {
   getDisplayDocumentType,
   resolveBackendDocumentType,
   validDocumentTypes,
-} from '@/app/api/documents/route'
-import {
-  getDisplayDocumentType as getDisplayDocumentTypeFromSingleRoute,
-} from '@/app/api/documents/[id]/route'
+} from '@/lib/document-types'
 
 const validReviewStatuses = [
   'pending_review',
@@ -29,11 +26,12 @@ describe('API Contract v1 - Document Type-Map & Schema Tests', () => {
       expect(getDisplayDocumentType('custom_type')).toBe('custom_type')
     })
 
-    it('returns consistent display name mapping across both route files', () => {
+    it('returns consistent display name mapping for all canonical types', () => {
       const testTypes = ['pitch_deck', 'financial_statements', 'legal_documents', 'gedsi_reports', 'impact_reports', 'other']
-      for (const t of testTypes) {
-        expect(getDisplayDocumentType(t)).toBe(getDisplayDocumentTypeFromSingleRoute(t))
-      }
+      const expected = ['Pitch Deck', 'Financial Statements', 'Legal Documents', 'GEDSI Reports', 'Impact Reports', 'Other']
+      testTypes.forEach((t, i) => {
+        expect(getDisplayDocumentType(t)).toBe(expected[i])
+      })
     })
 
     it('returns a document list item matching the contract required schema', () => {
@@ -177,7 +175,7 @@ describe('API Contract v1 - Document Type-Map & Schema Tests', () => {
 
       const returnedMetadata = {
         ...rawDbDocument,
-        documentType: getDisplayDocumentTypeFromSingleRoute(rawDbDocument.documentType),
+        documentType: getDisplayDocumentType(rawDbDocument.documentType),
       }
 
       expect(returnedMetadata.documentType).toBe('GEDSI Reports')
@@ -225,7 +223,7 @@ describe('API Contract v1 - Document Type-Map & Schema Tests', () => {
         document: {
           id: reviewedDoc.id,
           filename: reviewedDoc.filename,
-          documentType: getDisplayDocumentTypeFromSingleRoute(reviewedDoc.documentType),
+          documentType: getDisplayDocumentType(reviewedDoc.documentType),
           status: reviewedDoc.status,
           version: reviewedDoc.version,
           filesize: reviewedDoc.filesize,

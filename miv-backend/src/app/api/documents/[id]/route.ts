@@ -8,19 +8,7 @@ import { fileURLToPath } from 'url'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const uploadsDir = path.resolve(dirname, '../../../../../uploads/documents')
-
-// Helper function to convert backend document type to display name
-export function getDisplayDocumentType(backendType: string): string {
-  const typeMap: Record<string, string> = {
-    'pitch_deck': 'Pitch Deck',
-    'financial_statements': 'Financial Statements',
-    'legal_documents': 'Legal Documents',
-    'gedsi_reports': 'GEDSI Reports',
-    'impact_reports': 'Impact Reports',
-    'other': 'Other',
-  }
-  return typeMap[backendType] || backendType
-}
+import { getDisplayDocumentType } from '@/lib/document-types'
 
 // GET /api/documents/[id] - Get a specific document or download it
 export async function GET(
