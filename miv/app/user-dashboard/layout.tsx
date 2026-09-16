@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Breadcrumb } from "@/components/breadcrumb";
 import { HelpCircle, Menu, Search } from "lucide-react";
 import UserSidebar from "./components/user-sidebar";
+import UserBottomNavigation from "./components/user-bottom-navigation";
 
 interface UserData {
   firstName: string;
@@ -103,7 +104,7 @@ export default function UserDashboardLayout({
 
   return (
     <div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
-      {/* Desktop sidebar */}
+      {/* Desktop Sidebar */}
       <div className="hidden lg:block">
         <UserSidebar />
       </div>
@@ -180,7 +181,7 @@ export default function UserDashboardLayout({
               </div>
             </div>
           </header>
-          <div className="p-4 lg:p-6">
+          <div className="p-4 pb-20 lg:p-6 lg:pb-6">
             <Breadcrumb />
             {children}
           </div>
@@ -191,6 +192,9 @@ export default function UserDashboardLayout({
       <div className="fixed top-4 right-4 z-50 space-y-2">
         {/* Add notification components here */}
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <UserBottomNavigation />
     </div>
   );
 }
