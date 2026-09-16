@@ -42,12 +42,16 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Count total media uploaded by this user
+    // Count total media uploaded by this user. The where already scopes to the caller;
+    // overrideAccess:false + user enforces media.read (owner-scoped, matrix A9) as
+    // defence-in-depth so this can never count another user's uploads.
     const mediaRes = await payload.find({
       collection: 'media',
       where: {
         uploader: { equals: user.id },
       },
+      overrideAccess: false,
+      user,
       limit: 1, // only need count
       depth: 0,
     })
@@ -178,6 +182,10 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
+    // Privileged self-update: caller editing their OWN users record. users.update is
+    // staff-only (matrix §2), so we intentionally do NOT pass overrideAccess:false —
+    // the target is always authUser.id, a scoped exception, not a bypass. role is
+    // preserved above and cannot be escalated here.
     const updatedUser = await payload.update({
       collection: 'users',
       id: user.id,
