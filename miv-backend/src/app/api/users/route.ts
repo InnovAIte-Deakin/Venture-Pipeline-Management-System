@@ -167,7 +167,10 @@ export async function PATCH(request: NextRequest) {
       }
     }
 
-    // Update the user (allow users to update their own profile)
+    // Privileged self-update: a user editing their OWN profile. users.update is
+    // staff-only (matrix §2), so we intentionally do NOT pass overrideAccess:false —
+    // the target is always the caller's own id (authUser.id), so this is a scoped
+    // exception, not a bypass. role is preserved above and cannot be escalated here.
     const updatedUser = (await payload.update({
       collection: 'users',
       id: user.id,
