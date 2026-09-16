@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertTriangle, Bell, Sparkles, Target, X } from "lucide-react"
-import type { PortfolioCompany } from "../../types"
+import type { PortfolioCompany } from "../../types/types"
 
 interface CompanyDetailModalProps {
   company: PortfolioCompany

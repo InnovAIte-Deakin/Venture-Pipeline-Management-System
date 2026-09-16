@@ -18,7 +18,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import Logo from "@/components/logo";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface UserData {
   firstName: string;
@@ -26,9 +26,14 @@ interface UserData {
   email: string;
 }
 
-export default function UserSidebar() {
+interface UserSidebarProps {
+  mobile?: boolean;
+  onClose?: () => void;
+}
+
+export default function UserSidebar({ mobile = false, onClose }: UserSidebarProps) {
   const router = useRouter();
-  const [activeItem, setActiveItem] = useState("Dashboard");
+  const pathname = usePathname();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [userData, setUserData] = useState<UserData | null>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -130,14 +135,17 @@ export default function UserSidebar() {
             <ul className="space-y-1">
               {section.items.map((item, itemIdx) => {
                 const Icon = item.icon;
-                const isActive = activeItem === item.name;
+                const isActive =
+                  pathname === item.href ||
+                  (item.href !== "/user-dashboard" && pathname.startsWith(`${item.href}/`));
 
                 return (
                   <li key={itemIdx}>
-                    <div
+                    <button
+                      type="button"
                       onClick={() => {
                         router.push(item.href);
-                        setActiveItem(item.name);
+                        onClose?.();
                       }}
                       className={cn(
                         "w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 cursor-pointer",

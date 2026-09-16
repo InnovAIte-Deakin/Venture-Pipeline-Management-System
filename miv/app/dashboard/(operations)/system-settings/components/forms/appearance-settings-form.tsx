@@ -6,7 +6,7 @@ import { Switch } from "@/components/ui/switch"
 import { Separator } from "../ui/separator"
 import { Laptop, Moon, Palette, Sun } from "lucide-react"
 
-import type { AppearanceSettings, SaveStatus } from "../../types"
+import type { AppearanceSettings, SaveStatus } from "../../types/types"
 import { SaveStatusContent, SaveStatusMessage } from "./save-status-content"
 
 interface AppearanceSettingsFormProps {

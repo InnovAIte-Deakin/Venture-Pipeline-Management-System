@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Separator } from "../ui/separator"
 
-import type { DataSettings, SaveStatus } from "../../types"
+import type { DataSettings, SaveStatus } from "../../types/types"
 import { SaveStatusMessage } from "./save-status-content"
 
 interface DataManagementFormProps {

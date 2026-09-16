@@ -52,17 +52,7 @@ export function Sidebar() {
       >
         {/* Header */}
         <div className="p-6 border-b border-sidebar-border flex items-center gap-3 hover:bg-sidebar-accent transition-colors duration-200">
-          <Logo size={isCollapsed ? "sm" : "md"} />
-          {!isCollapsed && (
-            <div>
-              <h1 className="text-xl font-bold text-sidebar-accent-foreground tracking-wide">
-                MIV
-              </h1>
-              <p className="text-sidebar-foreground/70 text-xs font-medium">
-                Enterprise Platform
-              </p>
-            </div>
-          )}
+          <Logo size={isCollapsed ? "sm" : "lg"} />
         </div>
 
         {/* Global Search Button */}

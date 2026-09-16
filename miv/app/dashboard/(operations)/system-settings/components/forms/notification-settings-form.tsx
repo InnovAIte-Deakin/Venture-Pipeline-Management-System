@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-import type { NotificationSettings, SaveStatus } from "../../types"
+import type { NotificationSettings, SaveStatus } from "../../types/types"
 import { SaveStatusContent, SaveStatusMessage } from "./save-status-content"
 
 interface NotificationSettingsFormProps {

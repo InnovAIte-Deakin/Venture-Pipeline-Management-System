@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Switch } from "@/components/ui/switch"
 
-import type { PasswordFields, SaveStatus, UserProfile } from "../../types"
+import type { PasswordFields, SaveStatus, UserProfile } from "../../types/types"
 import { SaveStatusContent, SaveStatusMessage } from "./save-status-content"
 
 interface AccountSettingsFormsProps {

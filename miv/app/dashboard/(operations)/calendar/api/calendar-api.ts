@@ -12,7 +12,11 @@ export async function getCalendarEvents(filters: CalendarFilters, signal?: Abort
   if (filters.priority !== "all") params.set("priority", filters.priority)
   if (filters.status !== "all") params.set("status", filters.status)
   if (filters.view !== "all") params.set("view", filters.view)
-  return parseResponse<CalendarEventsResponse>(await fetch(`/api/calendar/events?${params}`, { signal }), "Failed to fetch events")
+  const data = await parseResponse<CalendarEventsResponse>(await fetch(`/api/calendar/events?${params}`, { signal }), "Failed to fetch events")
+  if (!data || !Array.isArray(data.events)) {
+    throw new Error("Invalid calendar events response")
+  }
+  return data
 }
 
 export async function getCalendarAnalytics(signal?: AbortSignal) {
