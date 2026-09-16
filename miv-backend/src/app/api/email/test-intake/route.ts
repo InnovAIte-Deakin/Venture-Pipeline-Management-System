@@ -10,7 +10,7 @@ const TestIntakeEmailSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV === 'production') {
     return NextResponse.json({ error: 'Not found' }, { status: 404 })
   }
   
@@ -44,7 +44,7 @@ export async function POST(request: NextRequest) {
         country,
     })
 
-    if (emailSent && adminEmailSent) {
+    if (emailSent || adminEmailSent) {
       return NextResponse.json({
         success: true,
         message: `Intake notification email sent successfully to ${founderEmail} and admin notification email also sent successfully`,
