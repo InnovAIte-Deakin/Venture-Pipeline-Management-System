@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import bcrypt from 'bcryptjs';
+import { getSessionUser } from '@/lib/auth';
 
 // Validation schemas
 const createMemberSchema = z.object({
@@ -20,6 +21,8 @@ const updateMemberSchema = createMemberSchema.partial();
 // GET /api/team/members - Get all team members
 export async function GET(request: NextRequest) {
   try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const { searchParams } = new URL(request.url);
     const search = searchParams.get('search') || '';
     const role = searchParams.get('role') || '';
@@ -117,6 +120,9 @@ export async function GET(request: NextRequest) {
 // POST /api/team/members - Create new team member
 export async function POST(request: NextRequest) {
   try {
+    const user = await getSessionUser();
+    if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (user.role !== 'ADMIN') return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const body = await request.json();
     const validatedData = createMemberSchema.parse(body);
 

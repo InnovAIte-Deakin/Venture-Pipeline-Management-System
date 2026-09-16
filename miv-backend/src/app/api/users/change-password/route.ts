@@ -85,7 +85,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Update the password
+    // Privileged self-update: a user changing their OWN password after re-auth above.
+    // users.update is staff-only (matrix §2), so we intentionally do NOT pass
+    // overrideAccess:false — the target is always the caller's own id, so this is a
+    // scoped exception, not a bypass.
     await payload.update({
       collection: 'users',
       id: user.id,
