@@ -643,7 +643,7 @@ Response 200:
 ```
 
 Implementation bug worth fixing: this route learns who the caller is by making a server side fetch to /api/users/me, but it does not forward the caller's cookies on that fetch, so the identity lookup cannot actually see the session. The fix is to call getServerSession(authOptions) directly, passing the auth options in. Note that the gedsi route, while it does enforce auth, calls getServerSession() bare with no authOptions, which is why it cannot see custom session fields. Jeevan's version, which passes authOptions, is the pattern to copy.
-## 6. Document endpoints
+## 6. Document endpoints (VERIFIED - 5 September 2026)
 
 ### 6.1 GET /api/documents
 
@@ -833,5 +833,6 @@ Already decided by the contract owner and recorded above: founder venture reads 
 | 26 July 2026 | v1 draft 2 | Checkpoints 1 and 2 completed: full request and response shapes for analytics, custom dashboards, notifications, venture CRUD, GEDSI metrics and my ventures. Added new findings: random numbers in analytics trends, notifications open to everyone, and the cookie forwarding bug in /api/users/ventures |
 | 31 July 2026 | v1 draft 4 | Historical re-verification against f3297d1 after the route-group restructure. Login mismatch was recorded as resolved via /api/session/login; registration and logout callers were then still recorded as broken. The historical proxy concern is superseded by the v1.1 verification: Next.js 16 uses the active `proxy.ts` convention. Noted the archived development routes as closed attack surface. |
 | 31 July 2026 | v1 draft 3 | Pre publication amendments from review: corrected the getServerSession guidance in 5.7 to require authOptions, escalated the role mapping in 1.3 to a sprint review decision, recorded the founder read decision in 5.5, added four security items (analyst self promotion via role writes, create anyone on the Users collection, no rate limiting on auth routes, committed credentials), blocked the 3.1 rename pending the create lockdown, surfaced the register role minting difference, and added section 9 for decisions, moving the change log to section 10 |
+| 5 September 2026 | v1.1 | Document endpoints (§6.1 - §6.5) verified against backend implementation and aligned. Upload and review responses now return full document schema and mapped display documentType. Validated documentType input in upload handler. |
 | 7 September 2026 | v1.1 correction pass | Re-verified against frozen origin/main c3e2a4b; corrected registration, intake ownership, Next.js 16 proxy authentication, resolved security-status claims, analytics fallback wording, and documented existing-but-security-blocked Team Members APIs. |
 | 14 September 2026 | v1.2 post-freeze verification | Re-verified against frozen origin/main e4e8b75; recorded removal of the send-email route/NEXT_EMAIL_TOKEN, login and forgot-password rate limiting with 429 responses, summary access enforcement via `overrideAccess: false`, retirement of the backend `user` role, and the four internal email test routes. |

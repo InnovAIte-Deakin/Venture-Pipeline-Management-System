@@ -96,6 +96,7 @@ export const Documents: CollectionConfig = {
       type: 'relationship',
       relationTo: 'users',
       required: true,
+      defaultValue: ({ user }) => user?.id,
       admin: {
         readOnly: true,
         position: 'sidebar',
