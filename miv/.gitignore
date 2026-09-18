@@ -44,6 +44,8 @@ next-env.d.ts
 
 # prisma
 /lib/generated/prisma
+prisma/*.db
+prisma/*.db-journal
 
 # IDE and editor files
 .vscode/

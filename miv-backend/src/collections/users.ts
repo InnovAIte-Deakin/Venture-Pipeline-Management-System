@@ -57,7 +57,6 @@ export const Users: CollectionConfig = {
         { label: 'Founder', value: 'founder' },
         { label: 'MIV Analyst', value: 'miv_analyst' },
         { label: 'Admin', value: 'admin' },
-        { label: 'User', value: 'user' },
       ],
       defaultValue: 'founder',
       required: true,

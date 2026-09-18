@@ -143,7 +143,7 @@ export default function SystemSettings() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-teal-600" />
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     );
   }
@@ -151,10 +151,10 @@ export default function SystemSettings() {
   return (
     <div>
       {/* Header */}
-      <div className=" border-b border-gray-200">
+      <div className="border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-8">
-          <h1 className="text-3xl font-bold text-gray-900">Accounts</h1>
-          <p className="text-gray-600 mt-2">Manage your profile and password</p>
+          <h1 className="text-3xl font-bold text-foreground">Accounts</h1>
+          <p className="text-muted-foreground mt-2">Manage your profile and password</p>
         </div>
       </div>
 
@@ -162,17 +162,17 @@ export default function SystemSettings() {
         {/* Content */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Profile Information Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               Profile Information
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               Update your personal details.
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   First Name
                 </label>
                 <input
@@ -181,12 +181,12 @@ export default function SystemSettings() {
                   value={formData.firstName}
                   onChange={handleInputChange}
                   placeholder="Enter your first name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Last Name
                 </label>
                 <input
@@ -195,12 +195,12 @@ export default function SystemSettings() {
                   value={formData.lastName}
                   onChange={handleInputChange}
                   placeholder="Enter your last name"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Email
                 </label>
                 <input
@@ -209,13 +209,13 @@ export default function SystemSettings() {
                   value={formData.email}
                   onChange={handleInputChange}
                   placeholder="Enter your email"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
 
               {message && (
                 <div
-                  className={`p-3 rounded-lg text-sm ${message.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
+                  className={`p-3 rounded-lg text-sm ${message.type === "success" ? "bg-success/10 text-success" : "bg-secondary/10 text-secondary"}`}
                 >
                   {message.text}
                 </div>
@@ -224,7 +224,7 @@ export default function SystemSettings() {
               <button
                 onClick={handleSaveProfile}
                 disabled={saving}
-                className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-primary-foreground font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {saving ? (
                   <Loader2 className="w-5 h-5 animate-spin" />
@@ -237,17 +237,17 @@ export default function SystemSettings() {
           </div>
 
           {/* Password & Security Card */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-card rounded-xl shadow-sm border border-border p-6">
+            <h2 className="text-xl font-bold text-foreground mb-2">
               Password & Security
             </h2>
-            <p className="text-sm text-gray-600 mb-6">
+            <p className="text-sm text-muted-foreground mb-6">
               Manage your account security settings.
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Current Password
                 </label>
                 <input
@@ -256,12 +256,12 @@ export default function SystemSettings() {
                   value={formData.currentPassword}
                   onChange={handleInputChange}
                   placeholder="Enter current password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   New Password
                 </label>
                 <input
@@ -270,12 +270,12 @@ export default function SystemSettings() {
                   value={formData.newPassword}
                   onChange={handleInputChange}
                   placeholder="Enter new password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground mb-2">
                   Confirm New Password
                 </label>
                 <input
@@ -284,13 +284,13 @@ export default function SystemSettings() {
                   value={formData.confirmPassword}
                   onChange={handleInputChange}
                   placeholder="Confirm new password"
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-all"
+                  className="w-full px-4 py-3 bg-background border border-input rounded-lg focus:ring-2 focus:ring-ring focus:border-transparent outline-none transition-all"
                 />
               </div>
 
               {passwordMessage && (
                 <div
-                  className={`p-3 rounded-lg text-sm ${passwordMessage.type === "success" ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}
+                  className={`p-3 rounded-lg text-sm ${passwordMessage.type === "success" ? "bg-success/10 text-success" : "bg-secondary/10 text-secondary"}`}
                 >
                   {passwordMessage.text}
                 </div>
@@ -299,7 +299,7 @@ export default function SystemSettings() {
               <button
                 onClick={handleChangePassword}
                 disabled={changingPassword}
-                className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-primary-foreground font-medium py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2"
               >
                 {changingPassword ? (
                   <Loader2 className="w-5 h-5 animate-spin" />

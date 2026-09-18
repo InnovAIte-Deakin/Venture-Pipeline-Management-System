@@ -10,6 +10,10 @@ const TestIntakeEmailSchema = z.object({
 })
 
 export async function POST(request: NextRequest) {
+  if (process.env.NODE_ENV === 'production') {
+    return NextResponse.json({ error: 'Not found' }, { status: 404 })
+  }
+  
   try {
     const body = await request.json()
 
@@ -32,14 +36,22 @@ export async function POST(request: NextRequest) {
       country,
     })
 
-    if (emailSent) {
+    // send Admin notification email
+    const adminEmailSent = await emailService.sendAdminNotificationEmail({
+        ventureName,
+        founderName,
+        founderEmail,
+        country,
+    })
+
+    if (emailSent || adminEmailSent) {
       return NextResponse.json({
         success: true,
-        message: `Intake notification email sent successfully to ${founderEmail}`,
+        message: `Intake notification email sent successfully to ${founderEmail} and admin notification email also sent successfully`,
       })
     } else {
       return NextResponse.json(
-        { success: false, error: 'Failed to send intake notification email' },
+        { success: false, error: 'Failed to send intake notification email or admin notification email', founderEmailSent: emailSent, adminEmailSent: adminEmailSent },
         { status: 500 }
       )
     }
