@@ -1,4 +1,4 @@
-# ADR-0001: Consolidate the `documents` and `dataRoomFiles` Collections
+# ADR-003: Consolidate the `documents` and `dataRoomFiles` Collections
 
 **Status:** Proposed — **NOT signed off. This is the blocker for the entire Phase 0 effort.**
 
