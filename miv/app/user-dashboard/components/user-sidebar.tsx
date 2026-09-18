@@ -160,7 +160,7 @@ export default function UserSidebar({ mobile = false, onClose }: UserSidebarProp
                       {!isCollapsed && (
                         <span className="font-medium text-xs">{item.name}</span>
                       )}
-                    </div>
+                    </button>
                   </li>
                 );
               })}

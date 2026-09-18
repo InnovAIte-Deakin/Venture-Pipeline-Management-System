@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { Sidebar } from "@/components/sidebar";
 import { MobileNav } from "@/components/dashboard/navigation/mobile-nav";
+import { MobileAppLockProvider } from "@/components/dashboard/app-lock/mobile-app-lock-provider";
 import { Breadcrumb } from "@/components/breadcrumb";
 
 export default function DashboardLayout({
@@ -57,29 +58,31 @@ export default function DashboardLayout({
 	}
 
 	return (
-		<div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
-			{/* Desktop Sidebar */}
-			<div className="hidden lg:block">
-				<Sidebar />
-			</div>
+		<MobileAppLockProvider>
+			<div className="flex min-h-screen bg-background text-foreground transition-colors duration-300">
+				{/* Desktop Sidebar */}
+				<div className="hidden lg:block">
+					<Sidebar />
+				</div>
 
-			{/* Mobile Navigation */}
-			<div className="lg:hidden">
-				<MobileNav />
-			</div>
+				{/* Mobile Navigation */}
+				<div className="lg:hidden">
+					<MobileNav />
+				</div>
 
-			{/* Main Content */}
-			<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
-				<div className="p-4 pt-20 pb-20 lg:p-6 lg:pt-6 lg:pb-0">
-					<Breadcrumb />
-					{children}
+				{/* Main Content */}
+				<div className="flex-1 flex flex-col min-w-0 lg:ml-64">
+					<div className="p-4 pt-20 pb-20 lg:p-6 lg:pt-6 lg:pb-0">
+						<Breadcrumb />
+						{children}
+					</div>
+				</div>
+
+				{/* Fixed Notifications */}
+				<div className="fixed top-4 right-4 z-50 space-y-2">
+					{/* Add notification components here */}
 				</div>
 			</div>
-
-			{/* Fixed Notifications */}
-			<div className="fixed top-4 right-4 z-50 space-y-2">
-				{/* Add notification components here */}
-			</div>
-		</div>
+		</MobileAppLockProvider>
 	);
 }

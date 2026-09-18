@@ -3,8 +3,9 @@
 import { useMemo, useState } from "react";
 import type React from "react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { Lock, LogOut, Phone, Settings } from "lucide-react";
+import { useMobileAppLock } from "@/components/dashboard/app-lock/mobile-app-lock-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,8 +46,8 @@ export function MobileSidebarNavigation({
   onOpenChange: (open: boolean) => void;
 }) {
   const pathname = usePathname();
-  const router = useRouter();
   const { logout } = useAuth();
+  const { requestLock } = useMobileAppLock();
   const [showMore, setShowMore] = useState(false);
   const quickItems = useMemo(
     () =>
@@ -71,7 +72,7 @@ export function MobileSidebarNavigation({
   };
   const handleLockApp = () => {
     onOpenChange(false);
-    router.push("/auth/login");
+    requestLock();
   };
 
   return (
