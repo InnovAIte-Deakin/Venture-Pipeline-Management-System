@@ -115,7 +115,7 @@ export default function DocumentsPage() {
       
       // Load ventures and documents in parallel
       const [venturesResponse] = await Promise.all([
-        fetch('/api/ventures?limit=100'),
+        fetch('/backend/api/ventures?limit=100'),
         fetchDocuments()
       ])
       
@@ -124,7 +124,7 @@ export default function DocumentsPage() {
         const venturesData = await venturesResponse.json()
         const ventureOptions = [
           { value: "all", label: "All Ventures" },
-          ...venturesData.ventures.map((v: any) => ({
+          ...venturesData.docs.map((v: any) => ({
             value: v.id,
             label: v.name
           }))
@@ -743,7 +743,8 @@ export default function DocumentsPage() {
                           <DropdownMenuContent align="end">
                               <DropdownMenuItem onClick={() =>
                                   window.open(
-                                    `/backend/api/documents/${document.id}?download=true`,
+//                                    `/backend/api/documents/${document.id}?download=true`,
+                                    `/backend${document.url}`,
                                     '_blank'
                                   )
                                 }

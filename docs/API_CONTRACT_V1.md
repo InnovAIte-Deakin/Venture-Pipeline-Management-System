@@ -679,7 +679,7 @@ Response 200:
 
 Errors: 401, 500.
 
-Callers: the user dashboard documents page and the impact documents page both call this correctly.
+Callers: the user dashboard, staff Document Management, and impact documents pages use this route through the frontend /backend proxy.
 
 ### 6.2 POST /api/documents
 
@@ -701,9 +701,7 @@ Response 200: `{ "success": true, "message": "Document deleted" }`
 
 Errors: 400 missing id, 401, 403, 404, 500.
 
-Why the query string form: a path style DELETE /api/documents/{id} would be tidier, but that handler does not exist on the backend, and both working frontend callers already use the query string form. So v1 makes the query string form canonical. If we ever want the path form, the backend adds it first, both callers migrate, and then this one goes away. There should never be a period with two live delete routes.
-
-Caller to fix: the impact documents page has one delete call using the path form (line 157), which currently fails with a 405. It needs to switch to the query string form.
+Why the query string form: a path style DELETE /api/documents/{id} would be tidier, but that handler does not exist on the backend, and the frontend document pages already use the query string form. So v1 makes the query string form canonical. If we ever want the path form, the backend adds it first, all callers migrate, and then this one goes away. There should never be a period with two live delete routes.
 
 ### 6.4 GET /api/documents/{id} and GET /api/documents/{id}?download=true
 
@@ -723,7 +721,7 @@ Reviews a document, changing its status and notes. The server also stamps who re
 
 Auth: cookie required. Admin and miv_analyst only, everyone else gets a 403.
 
-Request: `{ "status": "string", "notes": "optional" }`. The exact status values come from the Documents collection config, for example pending, approved and rejected. Confirm against the collection before relying on specific values.
+Request: `{ "status": "string", "notes": "optional" }`. Valid status values are `pending_review`, `approved`, `rejected` and `needs_revision`.
 
 Response 200: `{ "success": true, "document": { updated document } }`
 
@@ -785,6 +783,10 @@ This is the cleanup list. Each row names the problem, the path we are keeping, t
 | All auth routes | No rate limiting on login, register, forgot password or reset password, leaving them open to brute force and enumeration by volume |
 | Repository hygiene | Live credentials are committed in both .env files. They need rotating and the files need removing from the repo and adding to gitignore |
 | Page level auth gate | Dead since the restructure: middleware.ts became proxy.ts, which Next.js never executes, so unauthenticated visitors are no longer redirected away from dashboard pages. See the inventory row |
+| Frontend internal `/api/documents` | Removed — see Section 6.7. |
+| Frontend internal `/api/documents/upload` | Removed — see Section 6.7. |
+| Frontend internal `/api/documents/{id}` | Removed — see Section 6.7. |
+| Frontend internal `/api/documents/analytics` | Removed — see Section 6.7. |
 
 One improvement to acknowledge from the same restructure: the seed, test and set password development routes were moved out of app/api into an archive folder, so they are no longer live endpoints. That closes a real attack surface.
 
