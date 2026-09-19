@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { toast } from "sonner"
-import type { PortfolioCompany } from "../types"
+import type { PortfolioCompany } from "../types/types"
 import { fetchVentures } from "../lib/portfolioApi"
 import { filterCompanies, isPortfolioVenture, mapVentureToPortfolioCompany, summarisePortfolio } from "../lib/portfolioData"
 import { downloadPortfolioCsv } from "../lib/portfolioExport"

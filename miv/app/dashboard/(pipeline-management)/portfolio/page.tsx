@@ -1,6 +1,6 @@
 "use client"
 
-import { FOUNDER_TYPES } from "./constants"
+import { FOUNDER_TYPES } from "./types/constants"
 import { useIsMobile } from "./hooks/useIsMobile"
 import { usePortfolioData } from "./hooks/usePortfolioData"
 import { PortfolioDashboard } from "./components/PortfolioDashboard"

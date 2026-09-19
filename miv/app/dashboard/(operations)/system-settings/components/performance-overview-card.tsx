@@ -3,7 +3,7 @@ import { Cpu, HardDrive, MemoryStickIcon as Memory, RefreshCw } from "lucide-rea
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-import type { SystemPerformance } from "../types"
+import type { SystemPerformance } from "../types/types"
 import { PerformanceMetricCard } from "./performance-metric-card"
 
 interface PerformanceOverviewCardProps {

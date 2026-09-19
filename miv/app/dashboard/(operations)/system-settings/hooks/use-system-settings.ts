@@ -27,7 +27,7 @@ import type {
   SystemInfo,
   SystemPerformance,
   UserProfile,
-} from "../types"
+} from "../types/types"
 
 const resetStatusDelayMs = 2000
 

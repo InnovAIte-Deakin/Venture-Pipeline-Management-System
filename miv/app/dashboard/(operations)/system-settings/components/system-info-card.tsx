@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-import type { SystemInfo } from "../types"
+import type { SystemInfo } from "../types/types"
 
 interface SystemInfoCardProps {
   systemInfo: SystemInfo

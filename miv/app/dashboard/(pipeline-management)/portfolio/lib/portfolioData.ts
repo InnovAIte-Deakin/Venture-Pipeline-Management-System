@@ -1,5 +1,5 @@
-import { PORTFOLIO_STAGES } from "../constants"
-import type { PortfolioCompany, PortfolioSummary, VentureRecord } from "../types"
+import { PORTFOLIO_STAGES } from "../types/constants"
+import type { PortfolioCompany, PortfolioSummary, VentureRecord } from "../types/types"
 import { calculateGedsiScore, calculateImpactScore, calculateReadinessScore, generateAIInsights, stringList } from "./portfolioCalculations"
 
 export const isPortfolioVenture = (venture: VentureRecord, filter: string) => filter === "all" || PORTFOLIO_STAGES.includes(venture.stage ?? "")

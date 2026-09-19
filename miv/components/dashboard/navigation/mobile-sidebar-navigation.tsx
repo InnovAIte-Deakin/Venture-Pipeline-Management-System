@@ -5,6 +5,7 @@ import type React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Lock, LogOut, Phone, Settings } from "lucide-react";
+import { useMobileAppLock } from "@/components/dashboard/app-lock/mobile-app-lock-provider";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +20,7 @@ import {
   isDashboardRouteActive,
 } from "@/lib/dashboard-navigation";
 import type { DashboardNavItem } from "@/lib/dashboard-navigation";
+import { useAuth } from "@/hooks/useAuth";
 
 const contactDetails = [
   "#1381, National Road 2, Phum Tuol Roka,",
@@ -44,6 +46,8 @@ export function MobileSidebarNavigation({
   onOpenChange: (open: boolean) => void;
 }) {
   const pathname = usePathname();
+  const { logout } = useAuth();
+  const { requestLock } = useMobileAppLock();
   const [showMore, setShowMore] = useState(false);
   const quickItems = useMemo(
     () =>
@@ -62,6 +66,14 @@ export function MobileSidebarNavigation({
   );
 
   const handleNavigate = () => onOpenChange(false);
+  const handleLogout = async () => {
+    onOpenChange(false);
+    await logout();
+  };
+  const handleLockApp = () => {
+    onOpenChange(false);
+    requestLock();
+  };
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -137,6 +149,7 @@ export function MobileSidebarNavigation({
           <div className="px-10 py-4">
             <Button
               type="button"
+              onClick={handleLogout}
               className="h-10 w-full rounded-md bg-destructive text-xs font-semibold text-destructive-foreground hover:bg-destructive/90"
             >
               <LogOut className="mr-2 h-4 w-4" aria-hidden="true" />
@@ -144,6 +157,7 @@ export function MobileSidebarNavigation({
             </Button>
             <Button
               type="button"
+              onClick={handleLockApp}
               className="mt-3 h-10 w-full rounded-md bg-primary text-xs font-semibold text-primary-foreground hover:bg-primary/90"
             >
               <Lock className="mr-2 h-4 w-4" aria-hidden="true" />

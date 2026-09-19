@@ -1,4 +1,4 @@
-import type { PortfolioInsights, VentureRecord } from "../types"
+import type { PortfolioInsights, VentureRecord } from "../types/types"
 
 const numeric = (value: string | number | null | undefined) => { const parsed = typeof value === "number" ? value : Number.parseFloat(value ?? ""); return Number.isFinite(parsed) ? parsed : 0 }
 const record = (value: VentureRecord["aiAnalysis"]): Record<string, unknown> | null => {

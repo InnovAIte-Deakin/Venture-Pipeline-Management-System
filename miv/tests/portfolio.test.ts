@@ -3,7 +3,7 @@ import test from "node:test"
 import { calculateGedsiScore, calculateImpactScore, stringList } from "../app/dashboard/(pipeline-management)/portfolio/lib/portfolioCalculations"
 import { filterCompanies, isPortfolioVenture, mapVentureToPortfolioCompany, summarisePortfolio } from "../app/dashboard/(pipeline-management)/portfolio/lib/portfolioData"
 import { portfolioCsv } from "../app/dashboard/(pipeline-management)/portfolio/lib/portfolioExport"
-import type { VentureRecord } from "../app/dashboard/(pipeline-management)/portfolio/types"
+import type { VentureRecord } from "../app/dashboard/(pipeline-management)/portfolio/types/types"
 
 const venture: VentureRecord = { id: "v1", name: "Inclusive, Inc.", stage: "FUNDED", founderTypes: '["women-led"]', gedsiGoals: '["goal-1"]', revenue: 100000, fundingRaised: 1000000, teamSize: 5, gedsiMetrics: [{ status: "VERIFIED", currentValue: 8, targetValue: 10 }], _count: { documents: 3, activities: 2, capitalActivities: 1 } }
 
