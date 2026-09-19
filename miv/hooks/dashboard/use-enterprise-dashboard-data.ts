@@ -28,15 +28,22 @@ export function useEnterpriseDashboardData({
       setLoading(true)
       setError(null)
 
+      const requestOptions: RequestInit = { credentials: "include" }
       const [venturesRes, gedsiRes, irisRes, usersRes] = await Promise.all([
-        fetch("/api/ventures?limit=100"),
-        fetch("/api/gedsi-metrics?limit=200"),
-        fetch("/api/iris/metrics?limit=100"),
-        fetch("/api/users?limit=100"),
+        fetch("/api/ventures?limit=100", requestOptions),
+        fetch("/api/gedsi-metrics?limit=200", requestOptions),
+        fetch("/api/iris/metrics?limit=100", requestOptions),
+        fetch("/api/users?limit=100", requestOptions),
       ])
 
       if (!venturesRes.ok || !gedsiRes.ok || !irisRes.ok || !usersRes.ok) {
-        throw new Error("Failed to fetch dashboard data")
+        const statuses = [
+          `ventures ${venturesRes.status}`,
+          `gedsi ${gedsiRes.status}`,
+          `iris ${irisRes.status}`,
+          `users ${usersRes.status}`,
+        ].join(", ")
+        throw new Error(`Failed to fetch dashboard data (${statuses})`)
       }
 
       const [venturesData, gedsiData, irisData, usersData] = await Promise.all([

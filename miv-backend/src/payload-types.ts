@@ -78,6 +78,27 @@ export interface Config {
     documents: Document;
     'system-settings': SystemSetting;
     'user-settings': UserSetting;
+    gedsiMetrics: GedsiMetric;
+    irisMetricCatalog: IrisMetricCatalog;
+    notifications: Notification;
+    emailLogs: EmailLog;
+    projects: Project;
+    tasks: Task;
+    teamEvents: TeamEvent;
+    announcements: Announcement;
+    workflows: Workflow;
+    workflowRuns: WorkflowRun;
+    capitalActivities: CapitalActivity;
+    funds: Fund;
+    limitedPartners: LimitedPartner;
+    capitalCalls: CapitalCall;
+    distributions: Distribution;
+    fundInvestments: FundInvestment;
+    fundWorkflows: FundWorkflow;
+    fundLifecyclePhases: FundLifecyclePhase;
+    fundOperationTasks: FundOperationTask;
+    reports: Report;
+    customDashboards: CustomDashboard;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
@@ -95,6 +116,27 @@ export interface Config {
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
     'system-settings': SystemSettingsSelect<false> | SystemSettingsSelect<true>;
     'user-settings': UserSettingsSelect<false> | UserSettingsSelect<true>;
+    gedsiMetrics: GedsiMetricsSelect<false> | GedsiMetricsSelect<true>;
+    irisMetricCatalog: IrisMetricCatalogSelect<false> | IrisMetricCatalogSelect<true>;
+    notifications: NotificationsSelect<false> | NotificationsSelect<true>;
+    emailLogs: EmailLogsSelect<false> | EmailLogsSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    tasks: TasksSelect<false> | TasksSelect<true>;
+    teamEvents: TeamEventsSelect<false> | TeamEventsSelect<true>;
+    announcements: AnnouncementsSelect<false> | AnnouncementsSelect<true>;
+    workflows: WorkflowsSelect<false> | WorkflowsSelect<true>;
+    workflowRuns: WorkflowRunsSelect<false> | WorkflowRunsSelect<true>;
+    capitalActivities: CapitalActivitiesSelect<false> | CapitalActivitiesSelect<true>;
+    funds: FundsSelect<false> | FundsSelect<true>;
+    limitedPartners: LimitedPartnersSelect<false> | LimitedPartnersSelect<true>;
+    capitalCalls: CapitalCallsSelect<false> | CapitalCallsSelect<true>;
+    distributions: DistributionsSelect<false> | DistributionsSelect<true>;
+    fundInvestments: FundInvestmentsSelect<false> | FundInvestmentsSelect<true>;
+    fundWorkflows: FundWorkflowsSelect<false> | FundWorkflowsSelect<true>;
+    fundLifecyclePhases: FundLifecyclePhasesSelect<false> | FundLifecyclePhasesSelect<true>;
+    fundOperationTasks: FundOperationTasksSelect<false> | FundOperationTasksSelect<true>;
+    reports: ReportsSelect<false> | ReportsSelect<true>;
+    customDashboards: CustomDashboardsSelect<false> | CustomDashboardsSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
@@ -146,6 +188,30 @@ export interface User {
   first_name: string;
   last_name: string;
   role: 'founder' | 'miv_analyst' | 'admin';
+  organization?: string | null;
+  /**
+   * Legacy profile image URL from the Prisma app, if present.
+   */
+  image?: string | null;
+  permissions?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  notificationPreferences?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -263,11 +329,24 @@ export interface Media {
 export interface Venture {
   id: string;
   name: string;
-  country: string;
-  city: string;
+  country?: string | null;
+  city?: string | null;
+  location?: string | null;
   sector: string;
   website?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
   description?: string | null;
+  pitchSummary?: string | null;
+  inclusionFocus?: string | null;
+  founderTypes?: string | null;
+  teamSize?: number | null;
+  foundingYear?: number | null;
+  targetMarket?: string | null;
+  revenueModel?: string | null;
+  revenue?: number | null;
+  fundingRaised?: number | null;
+  lastValuation?: number | null;
   founders?:
     | {
         email: string;
@@ -279,6 +358,142 @@ export interface Venture {
     | null;
   triageTrack?: ('unassigned' | 'fast' | 'slow') | null;
   triageRationale?: string | null;
+  status?: ('active' | 'inactive' | 'archived') | null;
+  stage?:
+    | (
+        | 'intake'
+        | 'screening'
+        | 'due_diligence'
+        | 'investment_ready'
+        | 'funded'
+        | 'exited'
+        | 'seed'
+        | 'series_a'
+        | 'series_b'
+        | 'series_c'
+      )
+    | null;
+  gedsiScore?: number | null;
+  socialImpactScore?: number | null;
+  gedsiComplianceRate?: number | null;
+  totalBeneficiaries?: number | null;
+  jobsCreated?: number | null;
+  womenEmpowered?: number | null;
+  disabilityInclusive?: number | null;
+  youthEngaged?: number | null;
+  calculatedAt?: string | null;
+  intakeDate?: string | null;
+  screeningDate?: string | null;
+  dueDiligenceStart?: string | null;
+  dueDiligenceEnd?: string | null;
+  investmentReadyAt?: string | null;
+  fundedAt?: string | null;
+  nextReviewAt?: string | null;
+  stgGoals?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  gedsiMetricsSummary?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  financials?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  documentsMetadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  operationalReadiness?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  capitalReadiness?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  gedsiGoals?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  washingtonShortSet?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  disabilityInclusion?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  aiAnalysis?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  challenges?: string | null;
+  supportNeeded?: string | null;
+  timeline?: string | null;
+  createdBy?: (string | null) | User;
+  assignedTo?: (string | null) | User;
+  legacyPrismaId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -333,6 +548,7 @@ export interface Founder {
   phone?: string | null;
   venture?: (string | null) | Venture;
   user?: (string | null) | User;
+  legacyPrismaId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -382,6 +598,8 @@ export interface ActivityLog {
   action: string;
   entity: string;
   entityId?: string | null;
+  legacyType?: string | null;
+  legacyTitle?: string | null;
   metadata?:
     | {
         [k: string]: unknown;
@@ -392,6 +610,7 @@ export interface ActivityLog {
     | boolean
     | null;
   timestamp?: string | null;
+  legacyPrismaId?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -401,10 +620,14 @@ export interface ActivityLog {
  */
 export interface Document {
   id: string;
+  name?: string | null;
   documentType:
     | 'pitch_deck'
     | 'financial_statements'
+    | 'business_plan'
     | 'legal_documents'
+    | 'market_research'
+    | 'team_profile'
     | 'gedsi_reports'
     | 'impact_reports'
     | 'other';
@@ -413,6 +636,11 @@ export interface Document {
   uploadedBy: string | User;
   venture?: (string | null) | Venture;
   notes?: string | null;
+  legacyUrl?: string | null;
+  legacySize?: number | null;
+  legacyMimeType?: string | null;
+  legacyUploadedAt?: string | null;
+  legacyPrismaId?: string | null;
   reviewedBy?: (string | null) | User;
   reviewedAt?: string | null;
   updatedAt: string;
@@ -474,6 +702,648 @@ export interface UserSetting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gedsiMetrics".
+ */
+export interface GedsiMetric {
+  id: string;
+  venture: string | Venture;
+  metricCode: string;
+  metricName: string;
+  category: 'gender' | 'disability' | 'social_inclusion' | 'cross_cutting';
+  targetValue: number;
+  currentValue: number;
+  unit: string;
+  status?: ('not_started' | 'in_progress' | 'verified' | 'completed') | null;
+  verificationDate?: string | null;
+  notes?: string | null;
+  createdBy?: (string | null) | User;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "irisMetricCatalog".
+ */
+export interface IrisMetricCatalog {
+  id: string;
+  code: string;
+  name: string;
+  description?: string | null;
+  category?: string | null;
+  subcategory?: string | null;
+  unit?: string | null;
+  definition?: string | null;
+  example?: string | null;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  isActive?: boolean | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications".
+ */
+export interface Notification {
+  id: string;
+  user: string | User;
+  type:
+    | 'welcome'
+    | 'venture_created'
+    | 'venture_updated'
+    | 'gedsi_alert'
+    | 'funding_opportunity'
+    | 'system_update'
+    | 'report_ready'
+    | 'stg_reminder'
+    | 'weekly_update';
+  title: string;
+  message: string;
+  isRead?: boolean | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailLogs".
+ */
+export interface EmailLog {
+  id: string;
+  to: string;
+  subject: string;
+  template?: string | null;
+  status?: ('pending' | 'sent' | 'failed' | 'bounced') | null;
+  sentAt?: string | null;
+  errorMessage?: string | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: string;
+  name: string;
+  description?: string | null;
+  status?: ('not_started' | 'in_progress' | 'completed' | 'on_hold' | 'cancelled') | null;
+  priority?: ('low' | 'medium' | 'high' | 'urgent') | null;
+  progress?: number | null;
+  dueDate?: string | null;
+  startDate?: string | null;
+  completedAt?: string | null;
+  budget?: number | null;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  lead: string | User;
+  venture?: (string | null) | Venture;
+  members?: (string | User)[] | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks".
+ */
+export interface Task {
+  id: string;
+  name: string;
+  description?: string | null;
+  status?: ('todo' | 'in_progress' | 'review' | 'completed' | 'cancelled') | null;
+  priority?: ('low' | 'medium' | 'high' | 'urgent') | null;
+  dueDate?: string | null;
+  completedAt?: string | null;
+  estimatedHours?: number | null;
+  actualHours?: number | null;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  notes?: string | null;
+  project: string | Project;
+  assignedTo?: (string | null) | User;
+  createdBy: string | User;
+  dependencies?: (string | Task)[] | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamEvents".
+ */
+export interface TeamEvent {
+  id: string;
+  title: string;
+  description?: string | null;
+  date: string;
+  time?: string | null;
+  location?: string | null;
+  isAllDay?: boolean | null;
+  isRecurring?: boolean | null;
+  recurrence?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  organizer: string | User;
+  attendees?: (string | User)[] | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements".
+ */
+export interface Announcement {
+  id: string;
+  title: string;
+  content: string;
+  priority?: ('low' | 'medium' | 'high' | 'urgent') | null;
+  isActive?: boolean | null;
+  expiresAt?: string | null;
+  author: string | User;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflows".
+ */
+export interface Workflow {
+  id: string;
+  name: string;
+  description?: string | null;
+  definition:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  isActive?: boolean | null;
+  createdBy: string | User;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflowRuns".
+ */
+export interface WorkflowRun {
+  id: string;
+  workflow: string | Workflow;
+  status?: ('pending' | 'running' | 'succeeded' | 'failed' | 'cancelled') | null;
+  input?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  output?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  errorMessage?: string | null;
+  startedAt?: string | null;
+  finishedAt?: string | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "capitalActivities".
+ */
+export interface CapitalActivity {
+  id: string;
+  venture: string | Venture;
+  type: 'grant' | 'debt' | 'equity' | 'convertible_note' | 'other';
+  amount?: number | null;
+  currency?: string | null;
+  status?: ('pending' | 'approved' | 'rejected' | 'completed' | 'cancelled') | null;
+  description?: string | null;
+  date?: string | null;
+  investorName?: string | null;
+  terms?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "funds".
+ */
+export interface Fund {
+  id: string;
+  name: string;
+  vintage: string;
+  size: number;
+  committedCapital: number;
+  calledCapital?: number | null;
+  distributedCapital?: number | null;
+  netAssetValue?: number | null;
+  irr?: number | null;
+  tvpi?: number | null;
+  dpi?: number | null;
+  moic?: number | null;
+  status?: ('fundraising' | 'active' | 'closed' | 'winding_down' | 'liquidated') | null;
+  fundType?: ('venture' | 'growth' | 'buyout' | 'impact' | 'debt' | 'hybrid') | null;
+  geography?: string | null;
+  sectors?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  investmentPeriod?: string | null;
+  fundTerm?: string | null;
+  managementFee?: number | null;
+  carriedInterest?: number | null;
+  hurdle?: number | null;
+  benchmark?: string | null;
+  aum?: number | null;
+  dryPowder?: number | null;
+  leverage?: number | null;
+  esg?: boolean | null;
+  regulatoryStatus?: string | null;
+  fundAdmin?: string | null;
+  auditor?: string | null;
+  legalCounsel?: string | null;
+  primeBroker?: string | null;
+  manager: string | User;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "limitedPartners".
+ */
+export interface LimitedPartner {
+  id: string;
+  name: string;
+  type: string;
+  commitment: number;
+  called?: number | null;
+  distributed?: number | null;
+  nav?: number | null;
+  irr?: number | null;
+  tvpi?: number | null;
+  dpi?: number | null;
+  country: string;
+  currency?: string | null;
+  contactPerson?: string | null;
+  email?: string | null;
+  phone?: string | null;
+  status?: string | null;
+  investmentDate?: string | null;
+  lastCapitalCall?: string | null;
+  lastDistribution?: string | null;
+  riskRating?: string | null;
+  kycStatus?: string | null;
+  accredited?: boolean | null;
+  fund: string | Fund;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "capitalCalls".
+ */
+export interface CapitalCall {
+  id: string;
+  callNumber: string;
+  amount: number;
+  dueDate: string;
+  status?: string | null;
+  purpose: string;
+  investments?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  expenses?: number | null;
+  interestRate?: number | null;
+  gracePeriod?: number | null;
+  defaultPenalty?: number | null;
+  wireInstructions?: boolean | null;
+  noticeDate?: string | null;
+  remindersSent?: number | null;
+  documentsGenerated?: boolean | null;
+  lpsResponded?: number | null;
+  totalLps: number;
+  fund: string | Fund;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributions".
+ */
+export interface Distribution {
+  id: string;
+  distributionNumber: string;
+  amount: number;
+  date: string;
+  type: string;
+  status?: string | null;
+  source?: string | null;
+  sourceVentures?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  taxImplications?: string | null;
+  withholding?: number | null;
+  currency?: string | null;
+  exchangeRate?: number | null;
+  paymentMethod?: string | null;
+  taxReporting?: boolean | null;
+  k1Generated?: boolean | null;
+  recordDate?: string | null;
+  exDate?: string | null;
+  lpsPaid?: number | null;
+  totalLps: number;
+  fund: string | Fund;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundInvestments".
+ */
+export interface FundInvestment {
+  id: string;
+  fund: string | Fund;
+  venture?: (string | null) | Venture;
+  amount: number;
+  date: string;
+  type: string;
+  status: string;
+  exitDate?: string | null;
+  exitAmount?: number | null;
+  exitMultiple?: number | null;
+  currentValue?: number | null;
+  notes?: string | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundWorkflows".
+ */
+export interface FundWorkflow {
+  id: string;
+  name: string;
+  type: string;
+  status?: string | null;
+  priority?: string | null;
+  description?: string | null;
+  dueDate?: string | null;
+  startDate?: string | null;
+  completedAt?: string | null;
+  assignee?: (string | null) | User;
+  fund?: (string | null) | Fund;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundLifecyclePhases".
+ */
+export interface FundLifecyclePhase {
+  id: string;
+  phase: string;
+  status?: string | null;
+  startDate?: string | null;
+  completedAt?: string | null;
+  duration?: string | null;
+  description?: string | null;
+  progress?: number | null;
+  milestones?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  fund: string | Fund;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundOperationTasks".
+ */
+export interface FundOperationTask {
+  id: string;
+  title: string;
+  description?: string | null;
+  type?: string | null;
+  status?: string | null;
+  priority?: string | null;
+  dueDate?: string | null;
+  completedAt?: string | null;
+  assignee?: (string | null) | User;
+  creator: string | User;
+  fund?: (string | null) | Fund;
+  workflow?: (string | null) | FundWorkflow;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  attachments?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports".
+ */
+export interface Report {
+  id: string;
+  name: string;
+  type: string;
+  status?: string | null;
+  description?: string | null;
+  filePath?: string | null;
+  fileSize?: number | null;
+  generatedAt?: string | null;
+  publishedAt?: string | null;
+  periodStart?: string | null;
+  periodEnd?: string | null;
+  creator: string | User;
+  fund?: (string | null) | Fund;
+  metadata?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customDashboards".
+ */
+export interface CustomDashboard {
+  id: string;
+  name: string;
+  description?: string | null;
+  category: string;
+  widgets:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  isPublic?: boolean | null;
+  isFavorite?: boolean | null;
+  viewCount?: number | null;
+  tags?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  createdBy: string | User;
+  sharedWith?: (string | User)[] | null;
+  legacyPrismaId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
@@ -522,6 +1392,90 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'user-settings';
         value: string | UserSetting;
+      } | null)
+    | ({
+        relationTo: 'gedsiMetrics';
+        value: string | GedsiMetric;
+      } | null)
+    | ({
+        relationTo: 'irisMetricCatalog';
+        value: string | IrisMetricCatalog;
+      } | null)
+    | ({
+        relationTo: 'notifications';
+        value: string | Notification;
+      } | null)
+    | ({
+        relationTo: 'emailLogs';
+        value: string | EmailLog;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: string | Project;
+      } | null)
+    | ({
+        relationTo: 'tasks';
+        value: string | Task;
+      } | null)
+    | ({
+        relationTo: 'teamEvents';
+        value: string | TeamEvent;
+      } | null)
+    | ({
+        relationTo: 'announcements';
+        value: string | Announcement;
+      } | null)
+    | ({
+        relationTo: 'workflows';
+        value: string | Workflow;
+      } | null)
+    | ({
+        relationTo: 'workflowRuns';
+        value: string | WorkflowRun;
+      } | null)
+    | ({
+        relationTo: 'capitalActivities';
+        value: string | CapitalActivity;
+      } | null)
+    | ({
+        relationTo: 'funds';
+        value: string | Fund;
+      } | null)
+    | ({
+        relationTo: 'limitedPartners';
+        value: string | LimitedPartner;
+      } | null)
+    | ({
+        relationTo: 'capitalCalls';
+        value: string | CapitalCall;
+      } | null)
+    | ({
+        relationTo: 'distributions';
+        value: string | Distribution;
+      } | null)
+    | ({
+        relationTo: 'fundInvestments';
+        value: string | FundInvestment;
+      } | null)
+    | ({
+        relationTo: 'fundWorkflows';
+        value: string | FundWorkflow;
+      } | null)
+    | ({
+        relationTo: 'fundLifecyclePhases';
+        value: string | FundLifecyclePhase;
+      } | null)
+    | ({
+        relationTo: 'fundOperationTasks';
+        value: string | FundOperationTask;
+      } | null)
+    | ({
+        relationTo: 'reports';
+        value: string | Report;
+      } | null)
+    | ({
+        relationTo: 'customDashboards';
+        value: string | CustomDashboard;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -573,6 +1527,11 @@ export interface UsersSelect<T extends boolean = true> {
   first_name?: T;
   last_name?: T;
   role?: T;
+  organization?: T;
+  image?: T;
+  permissions?: T;
+  notificationPreferences?: T;
+  legacyPrismaId?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -691,9 +1650,22 @@ export interface VenturesSelect<T extends boolean = true> {
   name?: T;
   country?: T;
   city?: T;
+  location?: T;
   sector?: T;
   website?: T;
+  contactEmail?: T;
+  contactPhone?: T;
   description?: T;
+  pitchSummary?: T;
+  inclusionFocus?: T;
+  founderTypes?: T;
+  teamSize?: T;
+  foundingYear?: T;
+  targetMarket?: T;
+  revenueModel?: T;
+  revenue?: T;
+  fundingRaised?: T;
+  lastValuation?: T;
   founders?:
     | T
     | {
@@ -705,6 +1677,41 @@ export interface VenturesSelect<T extends boolean = true> {
       };
   triageTrack?: T;
   triageRationale?: T;
+  status?: T;
+  stage?: T;
+  gedsiScore?: T;
+  socialImpactScore?: T;
+  gedsiComplianceRate?: T;
+  totalBeneficiaries?: T;
+  jobsCreated?: T;
+  womenEmpowered?: T;
+  disabilityInclusive?: T;
+  youthEngaged?: T;
+  calculatedAt?: T;
+  intakeDate?: T;
+  screeningDate?: T;
+  dueDiligenceStart?: T;
+  dueDiligenceEnd?: T;
+  investmentReadyAt?: T;
+  fundedAt?: T;
+  nextReviewAt?: T;
+  stgGoals?: T;
+  gedsiMetricsSummary?: T;
+  financials?: T;
+  documentsMetadata?: T;
+  tags?: T;
+  operationalReadiness?: T;
+  capitalReadiness?: T;
+  gedsiGoals?: T;
+  washingtonShortSet?: T;
+  disabilityInclusion?: T;
+  aiAnalysis?: T;
+  challenges?: T;
+  supportNeeded?: T;
+  timeline?: T;
+  createdBy?: T;
+  assignedTo?: T;
+  legacyPrismaId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -763,6 +1770,7 @@ export interface FoundersSelect<T extends boolean = true> {
   phone?: T;
   venture?: T;
   user?: T;
+  legacyPrismaId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -809,8 +1817,11 @@ export interface ActivityLogsSelect<T extends boolean = true> {
   action?: T;
   entity?: T;
   entityId?: T;
+  legacyType?: T;
+  legacyTitle?: T;
   metadata?: T;
   timestamp?: T;
+  legacyPrismaId?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -819,12 +1830,18 @@ export interface ActivityLogsSelect<T extends boolean = true> {
  * via the `definition` "documents_select".
  */
 export interface DocumentsSelect<T extends boolean = true> {
+  name?: T;
   documentType?: T;
   status?: T;
   version?: T;
   uploadedBy?: T;
   venture?: T;
   notes?: T;
+  legacyUrl?: T;
+  legacySize?: T;
+  legacyMimeType?: T;
+  legacyUploadedAt?: T;
+  legacyPrismaId?: T;
   reviewedBy?: T;
   reviewedAt?: T;
   updatedAt?: T;
@@ -881,6 +1898,450 @@ export interface UserSettingsSelect<T extends boolean = true> {
         push?: T;
         frequency?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "gedsiMetrics_select".
+ */
+export interface GedsiMetricsSelect<T extends boolean = true> {
+  venture?: T;
+  metricCode?: T;
+  metricName?: T;
+  category?: T;
+  targetValue?: T;
+  currentValue?: T;
+  unit?: T;
+  status?: T;
+  verificationDate?: T;
+  notes?: T;
+  createdBy?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "irisMetricCatalog_select".
+ */
+export interface IrisMetricCatalogSelect<T extends boolean = true> {
+  code?: T;
+  name?: T;
+  description?: T;
+  category?: T;
+  subcategory?: T;
+  unit?: T;
+  definition?: T;
+  example?: T;
+  tags?: T;
+  isActive?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "notifications_select".
+ */
+export interface NotificationsSelect<T extends boolean = true> {
+  user?: T;
+  type?: T;
+  title?: T;
+  message?: T;
+  isRead?: T;
+  metadata?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "emailLogs_select".
+ */
+export interface EmailLogsSelect<T extends boolean = true> {
+  to?: T;
+  subject?: T;
+  template?: T;
+  status?: T;
+  sentAt?: T;
+  errorMessage?: T;
+  metadata?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  status?: T;
+  priority?: T;
+  progress?: T;
+  dueDate?: T;
+  startDate?: T;
+  completedAt?: T;
+  budget?: T;
+  tags?: T;
+  metadata?: T;
+  lead?: T;
+  venture?: T;
+  members?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tasks_select".
+ */
+export interface TasksSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  status?: T;
+  priority?: T;
+  dueDate?: T;
+  completedAt?: T;
+  estimatedHours?: T;
+  actualHours?: T;
+  tags?: T;
+  notes?: T;
+  project?: T;
+  assignedTo?: T;
+  createdBy?: T;
+  dependencies?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "teamEvents_select".
+ */
+export interface TeamEventsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  date?: T;
+  time?: T;
+  location?: T;
+  isAllDay?: T;
+  isRecurring?: T;
+  recurrence?: T;
+  organizer?: T;
+  attendees?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "announcements_select".
+ */
+export interface AnnouncementsSelect<T extends boolean = true> {
+  title?: T;
+  content?: T;
+  priority?: T;
+  isActive?: T;
+  expiresAt?: T;
+  author?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflows_select".
+ */
+export interface WorkflowsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  definition?: T;
+  isActive?: T;
+  createdBy?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "workflowRuns_select".
+ */
+export interface WorkflowRunsSelect<T extends boolean = true> {
+  workflow?: T;
+  status?: T;
+  input?: T;
+  output?: T;
+  errorMessage?: T;
+  startedAt?: T;
+  finishedAt?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "capitalActivities_select".
+ */
+export interface CapitalActivitiesSelect<T extends boolean = true> {
+  venture?: T;
+  type?: T;
+  amount?: T;
+  currency?: T;
+  status?: T;
+  description?: T;
+  date?: T;
+  investorName?: T;
+  terms?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "funds_select".
+ */
+export interface FundsSelect<T extends boolean = true> {
+  name?: T;
+  vintage?: T;
+  size?: T;
+  committedCapital?: T;
+  calledCapital?: T;
+  distributedCapital?: T;
+  netAssetValue?: T;
+  irr?: T;
+  tvpi?: T;
+  dpi?: T;
+  moic?: T;
+  status?: T;
+  fundType?: T;
+  geography?: T;
+  sectors?: T;
+  investmentPeriod?: T;
+  fundTerm?: T;
+  managementFee?: T;
+  carriedInterest?: T;
+  hurdle?: T;
+  benchmark?: T;
+  aum?: T;
+  dryPowder?: T;
+  leverage?: T;
+  esg?: T;
+  regulatoryStatus?: T;
+  fundAdmin?: T;
+  auditor?: T;
+  legalCounsel?: T;
+  primeBroker?: T;
+  manager?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "limitedPartners_select".
+ */
+export interface LimitedPartnersSelect<T extends boolean = true> {
+  name?: T;
+  type?: T;
+  commitment?: T;
+  called?: T;
+  distributed?: T;
+  nav?: T;
+  irr?: T;
+  tvpi?: T;
+  dpi?: T;
+  country?: T;
+  currency?: T;
+  contactPerson?: T;
+  email?: T;
+  phone?: T;
+  status?: T;
+  investmentDate?: T;
+  lastCapitalCall?: T;
+  lastDistribution?: T;
+  riskRating?: T;
+  kycStatus?: T;
+  accredited?: T;
+  fund?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "capitalCalls_select".
+ */
+export interface CapitalCallsSelect<T extends boolean = true> {
+  callNumber?: T;
+  amount?: T;
+  dueDate?: T;
+  status?: T;
+  purpose?: T;
+  investments?: T;
+  expenses?: T;
+  interestRate?: T;
+  gracePeriod?: T;
+  defaultPenalty?: T;
+  wireInstructions?: T;
+  noticeDate?: T;
+  remindersSent?: T;
+  documentsGenerated?: T;
+  lpsResponded?: T;
+  totalLps?: T;
+  fund?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "distributions_select".
+ */
+export interface DistributionsSelect<T extends boolean = true> {
+  distributionNumber?: T;
+  amount?: T;
+  date?: T;
+  type?: T;
+  status?: T;
+  source?: T;
+  sourceVentures?: T;
+  taxImplications?: T;
+  withholding?: T;
+  currency?: T;
+  exchangeRate?: T;
+  paymentMethod?: T;
+  taxReporting?: T;
+  k1Generated?: T;
+  recordDate?: T;
+  exDate?: T;
+  lpsPaid?: T;
+  totalLps?: T;
+  fund?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundInvestments_select".
+ */
+export interface FundInvestmentsSelect<T extends boolean = true> {
+  fund?: T;
+  venture?: T;
+  amount?: T;
+  date?: T;
+  type?: T;
+  status?: T;
+  exitDate?: T;
+  exitAmount?: T;
+  exitMultiple?: T;
+  currentValue?: T;
+  notes?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundWorkflows_select".
+ */
+export interface FundWorkflowsSelect<T extends boolean = true> {
+  name?: T;
+  type?: T;
+  status?: T;
+  priority?: T;
+  description?: T;
+  dueDate?: T;
+  startDate?: T;
+  completedAt?: T;
+  assignee?: T;
+  fund?: T;
+  metadata?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundLifecyclePhases_select".
+ */
+export interface FundLifecyclePhasesSelect<T extends boolean = true> {
+  phase?: T;
+  status?: T;
+  startDate?: T;
+  completedAt?: T;
+  duration?: T;
+  description?: T;
+  progress?: T;
+  milestones?: T;
+  fund?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fundOperationTasks_select".
+ */
+export interface FundOperationTasksSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  type?: T;
+  status?: T;
+  priority?: T;
+  dueDate?: T;
+  completedAt?: T;
+  assignee?: T;
+  creator?: T;
+  fund?: T;
+  workflow?: T;
+  tags?: T;
+  attachments?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reports_select".
+ */
+export interface ReportsSelect<T extends boolean = true> {
+  name?: T;
+  type?: T;
+  status?: T;
+  description?: T;
+  filePath?: T;
+  fileSize?: T;
+  generatedAt?: T;
+  publishedAt?: T;
+  periodStart?: T;
+  periodEnd?: T;
+  creator?: T;
+  fund?: T;
+  metadata?: T;
+  legacyPrismaId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "customDashboards_select".
+ */
+export interface CustomDashboardsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  category?: T;
+  widgets?: T;
+  isPublic?: T;
+  isFavorite?: T;
+  viewCount?: T;
+  tags?: T;
+  createdBy?: T;
+  sharedWith?: T;
+  legacyPrismaId?: T;
   updatedAt?: T;
   createdAt?: T;
 }

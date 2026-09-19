@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { signOut } from 'next-auth/react'
 
 interface User {
   id: string
@@ -89,10 +90,11 @@ export function useAuth() {
 
   const logout = async () => {
     try {
-      await fetch('/backend/api/auth/login', {
+      await fetch('/api/session/login', {
         method: 'DELETE',
         credentials: 'include',
       })
+      await signOut({ redirect: false })
     } catch (error) {
       console.error('Logout error:', error)
     } finally {

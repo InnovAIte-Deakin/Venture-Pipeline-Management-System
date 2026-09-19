@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         id: user.id,
         data: {
           resetPasswordToken: hashedToken,
-          resetPasswordExpiration: new Date(Date.now() + 60 * 60 * 1000),
+          resetPasswordExpiration: new Date(Date.now() + 60 * 60 * 1000).toISOString(),
         },
       })
 

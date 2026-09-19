@@ -7,7 +7,7 @@ export const Users: CollectionConfig = {
 
   // 🔐 Admin panel + REST/Local-API access control (RBAC matrix §2)
   access: {
-    admin: adminOrAnalyst,
+    admin: ({ req }) => req.user?.role === 'admin' || req.user?.role === 'miv_analyst',
 
     // Closed: public self-signup is not allowed at the collection level.
     // The vetted /api/register route creates users through a privileged, validated
@@ -23,7 +23,7 @@ export const Users: CollectionConfig = {
   },
 
   admin: {
-    defaultColumns: ['email', 'first_name', 'last_name', 'role'],
+    defaultColumns: ['email', 'first_name', 'last_name', 'role', 'legacyPrismaId'],
     useAsTitle: 'email',
   },
 
@@ -60,6 +60,32 @@ export const Users: CollectionConfig = {
       ],
       defaultValue: 'founder',
       required: true,
+    },
+    { name: 'organization', type: 'text' },
+    {
+      name: 'image',
+      type: 'text',
+      admin: {
+        description: 'Legacy profile image URL from the Prisma app, if present.',
+      },
+    },
+    {
+      name: 'permissions',
+      type: 'json',
+      access: {
+        create: fieldAdminOnly,
+        update: fieldAdminOnly,
+      },
+    },
+    { name: 'notificationPreferences', type: 'json' },
+    {
+      name: 'legacyPrismaId',
+      type: 'text',
+      unique: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
     },
   ],
 }
