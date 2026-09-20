@@ -8,19 +8,11 @@ import { fileURLToPath } from 'url'
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const uploadsDir = path.resolve(dirname, '../../../../uploads/documents')
-
-// Helper function to convert backend document type to display name
-function getDisplayDocumentType(backendType: string): string {
-  const typeMap: Record<string, string> = {
-    'pitch_deck': 'Pitch Deck',
-    'financial_statements': 'Financial Statements',
-    'legal_documents': 'Legal Documents',
-    'gedsi_reports': 'GEDSI Reports',
-    'impact_reports': 'Impact Reports',
-    'other': 'Other'
-  }
-  return typeMap[backendType] || backendType
-}
+import {
+  getDisplayDocumentType,
+  resolveBackendDocumentType,
+  validDocumentTypes,
+} from '@/lib/document-types'
 
 // GET /api/documents - Get all documents for the current user
 export async function GET(request: NextRequest) {
@@ -164,17 +156,19 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Convert display name to backend value
-    const documentTypeMap: Record<string, string> = {
-      'Pitch Deck': 'pitch_deck',
-      'Financial Statements': 'financial_statements',
-      'Legal Documents': 'legal_documents',
-      'GEDSI Reports': 'gedsi_reports',
-      'Impact Reports': 'impact_reports',
-      'Other': 'other'
+    const documentType = resolveBackendDocumentType(documentTypeRaw)
+
+    if (!validDocumentTypes.includes(documentType)) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Invalid document type',
+          message:
+            'Document type must be one of: Pitch Deck, Financial Statements, Legal Documents, GEDSI Reports, Impact Reports, Other.',
+        },
+        { status: 400 }
+      )
     }
-    
-    const documentType = documentTypeMap[documentTypeRaw] || documentTypeRaw.toLowerCase().replace(/\s+/g, '_')
 
     // Validate file size (max 10MB)
     const maxSize = 10 * 1024 * 1024 // 10MB
@@ -245,18 +239,35 @@ export async function POST(request: NextRequest) {
       filePath,
     })
 
+    // Retrieve the created document with depth: 1 so relationships (uploadedBy, venture) are populated
+    const createdDoc = await payload.findByID({
+      collection: 'documents',
+      id: document.id,
+      depth: 1,
+      user,
+    })
+
+    const docToReturn = createdDoc || document
+
     return NextResponse.json({
       success: true,
       message: 'Document uploaded successfully',
       document: {
-        id: document.id,
-        filename: document.filename,
-        documentType: getDisplayDocumentType(document.documentType as string),
-        status: document.status,
-        version: document.version,
-        filesize: document.filesize,
-        url: document.url,
-        createdAt: document.createdAt,
+        id: docToReturn.id,
+        filename: docToReturn.filename,
+        documentType: getDisplayDocumentType(docToReturn.documentType as string),
+        status: docToReturn.status,
+        version: docToReturn.version,
+        filesize: docToReturn.filesize,
+        mimeType: docToReturn.mimeType,
+        url: docToReturn.url,
+        notes: docToReturn.notes || null,
+        uploadedBy: docToReturn.uploadedBy,
+        venture: docToReturn.venture || null,
+        reviewedBy: docToReturn.reviewedBy || null,
+        reviewedAt: docToReturn.reviewedAt || null,
+        createdAt: docToReturn.createdAt,
+        updatedAt: docToReturn.updatedAt,
       },
     })
   } catch (error) {
@@ -363,7 +374,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Document deleted successfully',
+      message: 'Document deleted',
     })
   } catch (error) {
     console.error('Delete document error:', error)
