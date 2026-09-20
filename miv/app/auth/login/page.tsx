@@ -52,7 +52,11 @@ export default function LoginPage() {
       }
 
       // Redirect on success. Honour the proxy's ?next= deep link when it's a safe
-      // same-site relative path; otherwise fall back to the role-based landing page.
+      // same-site relative path; otherwise route by STAFF role. canonical staff =
+      // admin | miv_analyst -> /dashboard (staff view); everyone else, including
+      // founders and any unrecognised role, -> /user-dashboard. Defaulting non-staff to
+      // the applicant dashboard means a founder is never shown the staff view.
+      // (Canonical roles: docs/rbac/roles.json.)
       if (responseBody?.success && responseBody?.user) {
         const nextParam = new URLSearchParams(window.location.search).get("next");
         const safeNext =
@@ -61,13 +65,10 @@ export default function LoginPage() {
             : null;
         if (safeNext) {
           window.location.href = safeNext;
-        } else if (
-          responseBody.user.role === "user" ||
-          responseBody.user.role === "founder"
-        ) {
-          window.location.href = "/user-dashboard";
         } else {
-          window.location.href = "/dashboard";
+          const role = responseBody.user.role;
+          const isStaff = role === "admin" || role === "miv_analyst";
+          window.location.href = isStaff ? "/dashboard" : "/user-dashboard";
         }
       } else {
         setError(responseBody?.message || "Invalid email or password");
