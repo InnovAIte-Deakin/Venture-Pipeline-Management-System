@@ -51,10 +51,17 @@ export default function LoginPage() {
         throw new Error(msg);
       }
 
-      // Redirect to dashboard on success
-      console.log("login response", responseBody);
+      // Redirect on success. Honour the proxy's ?next= deep link when it's a safe
+      // same-site relative path; otherwise fall back to the role-based landing page.
       if (responseBody?.success && responseBody?.user) {
-        if (
+        const nextParam = new URLSearchParams(window.location.search).get("next");
+        const safeNext =
+          nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")
+            ? nextParam
+            : null;
+        if (safeNext) {
+          window.location.href = safeNext;
+        } else if (
           responseBody.user.role === "user" ||
           responseBody.user.role === "founder"
         ) {
@@ -73,10 +80,10 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-linear-to-br from-slate-50 via-blue-50 to-slate-100 dark:from-slate-900 dark:via-slate-950 dark:to-blue-950 flex items-center justify-center p-4">
       <Card className="w-full max-w-md bg-white/90 dark:bg-slate-800/90 backdrop-blur-md border-slate-200 dark:border-slate-700 shadow-xl">
         <CardHeader className="text-center space-y-4">
-          <div className="mx-auto w-12 h-12 bg-gradient-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
+          <div className="mx-auto w-12 h-12 bg-linear-to-br from-blue-600 to-blue-500 rounded-xl flex items-center justify-center shadow-lg">
             <span className="text-2xl">🏛️</span>
           </div>
           <div>
@@ -148,7 +155,7 @@ export default function LoginPage() {
 
             <Button
               type="submit"
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3"
+              className="w-full bg-linear-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-semibold py-3"
               disabled={isLoading}
             >
               {isLoading ? (

@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { signOut } from 'next-auth/react'
 
 interface User {
   id: string
@@ -15,6 +16,15 @@ interface ApiUser {
   firstName?: string | null
   lastName?: string | null
   role?: string | null
+}
+
+interface ApiUserResponse {
+  success?: boolean
+  user?: ApiUser
+}
+
+function hasWrappedUser(data: ApiUser | ApiUserResponse): data is ApiUserResponse {
+  return 'user' in data
 }
 
 function normalizeUser(user: ApiUser): User {
@@ -55,8 +65,8 @@ export function useAuth() {
       })
 
       if (response.ok) {
-        const data: ApiUser | { success?: boolean; user?: ApiUser } = await response.json()
-        const user = 'user' in data ? data.user : data
+        const data: ApiUser | ApiUserResponse = await response.json()
+        const user = hasWrappedUser(data) ? data.user : data
 
         if (user?.id && user.email) {
           setAuthState({
@@ -84,6 +94,7 @@ export function useAuth() {
         method: 'DELETE',
         credentials: 'include',
       })
+      await signOut({ redirect: false })
     } catch (error) {
       console.error('Logout error:', error)
     } finally {

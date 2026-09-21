@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import type { CollectionBeforeChangeHook, CollectionAfterChangeHook } from 'payload'
-// EmailJS service removed - intake notifications temporarily disabled
+
+// EmailJS service added and intake notifications enabled
+import { emailService } from '@/lib/email-service'
 
 export const setDisabilityFlag: CollectionBeforeChangeHook = async ({ data }: any) => {
   if (data?.wss) {
@@ -18,13 +20,15 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
   let ventureId = (doc as any).venture
   // If no venture linked, create one
   if (!ventureId) {
-    const venture = await payload.create({ collection: 'ventures' as any, data: {
-      name_en: (doc as any).ventureName_en,
-      name_km: (doc as any).ventureName_km,
-      country: (doc as any).country,
-      triageTrack: (doc as any).triageTrack || 'unassigned',
-      triageRationale: (doc as any).triageRationale,
-    } })
+    const venture = await payload.create({
+      collection: 'ventures' as any, data: {
+        name_en: (doc as any).ventureName_en,
+        name_km: (doc as any).ventureName_km,
+        country: (doc as any).country,
+        triageTrack: (doc as any).triageTrack || 'unassigned',
+        triageRationale: (doc as any).triageRationale,
+      }
+    })
     ventureId = venture.id
     await payload.update({ collection: 'onboardingIntakes' as any, id: (doc as any).id, data: { venture: ventureId } })
   }
@@ -37,12 +41,36 @@ export const afterIntakeCreate: CollectionAfterChangeHook = async ({ doc, operat
     await payload.create({ collection: 'agreements' as any, data: { venture: ventureId, type: 'MOU', status: 'not_requested' } })
   }
   // Activity log
-  await payload.create({ collection: 'activityLogs' as any, data: {
-    action: 'intake.created', entity: 'onboardingIntakes', entityId: String((doc as any).id), timestamp: new Date().toISOString(),
-  } })
+  await payload.create({
+    collection: 'activityLogs' as any, data: {
+      action: 'intake.created', entity: 'onboardingIntakes', entityId: String((doc as any).id), timestamp: new Date().toISOString(),
+    }
+  })
 
-  // TODO: Implement intake notification emails using the new Nodemailer email service
-  // Email notifications for intake submissions have been temporarily disabled
-  // during the migration from EmailJS to Nodemailer
-  console.log('Intake created successfully. Email notifications currently disabled.')
+  // COMPLETED: Implement intake notification emails using the new Nodemailer email service
+  // Email notification for intake submissions
+  // Send an email to all available founders of the submitted venture through the email service
+  const ventureFounders = (doc as any).founders || []
+  const venture = await payload.findByID({ collection: 'ventures' as any, id: ventureId })
+
+  for (const founder of ventureFounders) {
+    if (founder?.email) {
+
+      // Send intake notification email to the founder
+      await emailService.sendIntakeNotificationEmail({
+        founderEmail: founder.email,
+        founderName: founder.fullName || 'founder',
+        ventureName: (venture as any)?.name || 'your venture',
+        country: (venture as any)?.country,
+      })
+    }
+  }
+
+  // Send Admin notification email
+  await emailService.sendAdminNotificationEmail({
+    ventureName: (venture as any)?.name || 'Unnamed venture',
+    founderName: ventureFounders[0]?.fullName || 'Unknown founder',
+    founderEmail: ventureFounders[0]?.email || 'unknown',
+    country: (venture as any)?.country,
+  })
 }

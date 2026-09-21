@@ -161,6 +161,55 @@ Password: VentureMgr@123
 ```
 
 ---
+## 🧪 Integration Tests
+
+### miv — Vitest integration tests
+
+From the `miv` folder, create the local test environment file if needed:
+
+```powershell
+Copy-Item .env.test.example .env.test
+```
+
+Run the Vitest integration tests:
+
+```bash
+npm run test:int
+```
+
+Run the tests in watch mode:
+
+```bash
+npm run test:watch
+```
+
+Vitest integration tests must be placed in:
+
+```text
+miv/tests/int/
+```
+
+Test filenames must follow this pattern:
+
+```text
+*.int.spec.ts
+```
+
+### Existing miv integration tests
+
+The existing `node:test` files inside `miv/tests/integration/` use this separate command:
+
+```bash
+npm run test:integration
+```
+
+### miv-backend
+
+From the `miv-backend` folder, run:
+
+```bash
+pnpm test:int
+```
 
 ## 📚 Documentation
 
@@ -175,6 +224,31 @@ All project documentation has been consolidated in the `/docs` directory.
 - 📄 [System Architecture](./docs/SYSTEM_ARCHITECTURE.md)
 - 📄 [User Guide](./docs/USER_GUIDE.md)
 - 📄 [Internal Developer Guide](./docs/INTERNAL_DEV_GUIDE.md)
+---
+
+
+## 🛠️ Troubleshooting
+
+### `npm i` fails on Windows (lightningcss-linux-x64-gnu)
+
+If you're on native Windows, `npm i` in `miv` can fail trying to install `lightningcss-linux-x64-gnu`, a Linux-only binary pulled in through the Tailwind/PostCSS toolchain. It shouldn't try to install on Windows at all — platform detection isn't working right in this repo currently.
+
+**Fix:**
+- Easiest: do your dev work in WSL2 — avoids this and a few other Windows-native issues.
+- If you don't want to touch WSL: delete `node_modules` and `package-lock.json`, then run `npm i --no-optional` (or `--force`).
+- Still stuck? Share your OS + Node version in the dev chat — this is a known repo issue, not something you're doing wrong.
+
+### Payload CMS admin login doesn't work
+
+The docs list `venture.manager@miv.org` / `VentureMgr@123` for the Payload admin panel. These don't work — the account isn't in the seeded database (check `mongo-express` at `localhost:8081` to confirm), even though the seed step reports success. Docs and seed data are out of sync.
+
+**Fix:** Nothing on your end. Use the frontend test accounts instead to confirm your setup works:
+- `admin@example.com` / `changeme123`
+- `founder@example.com` / `changeme123`
+- `analyst@example.com` / `changeme123`
+
+If frontend login works but Payload admin doesn't, this is why — don't assume your environment is broken.
+
 ---
 
 ## 📄 Project Status

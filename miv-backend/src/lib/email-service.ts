@@ -9,6 +9,22 @@ interface WelcomeEmailData {
   position?: string
 }
 
+// This interface defines the structure of the data required for a IntakeNotificationEmailData
+interface IntakeNotificationEmailData {
+  founderEmail: string
+  founderName: string
+  ventureName: string 
+  country?: string
+}
+
+// This interface defines the structure of the data required for a AdminNotificationEmailData
+interface AdminNotificationEmailData {
+  ventureName: string
+  founderName: string
+  founderEmail: string
+  country?: string
+}
+
 interface TestEmailData {
   userEmail: string
   userName: string
@@ -167,6 +183,146 @@ Mekong Inclusive Ventures | Building Inclusive Futures
     `.trim()
   }
 
+  // Intake notification email template: HTML and plain text
+  private generateIntakeNotificationEmailHTML(data: IntakeNotificationEmailData): string {
+    const { founderName, ventureName, country } = data
+
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Thank You for Your Submission | Mekong Inclusive Ventures</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #0ea5e9, #10b981); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; }
+        .header h1 { margin: 0; font-size: 28px; }
+        .content { padding: 0 20px; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 8px 8px; margin: 20px -20px -20px -20px; }
+        .highlight { background: #f0f9ff; padding: 15px; border-left: 4px solid #0ea5e9; margin: 20px 0; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+
+        <div class="header">
+          <h1>Thank You for Your Venture Submission </h1>
+        </div>
+
+        <div class="content">
+          <h2>Hi ${founderName},</h2>
+          <p>Thank you for submitting your venture intake to <strong>Mekong Inclusive Ventures</strong>.
+          We're pleased to let you know that we've successfully received your submission and it has been forwarded to our team for review.
+          </p>
+
+          <div class="highlight">
+            <p><strong>Venture Name:</strong> ${ventureName}</p>
+            ${country ? `<p><strong>Country:</strong> ${country}</p>` : ''}
+          </div>
+          <p> Our team will carefully review the information you've provided. If any additional details are required, or when there is an update regarding your application, we'll be in touch via email. </p>
+          <p> Best regards,<br>
+          <strong>The Mekong Inclusive Ventures Team</strong></p>
+        </div>
+
+        <div class="footer">
+          <p>This email was sent to ${data.founderEmail}</p>
+          <p>Mekong Inclusive Ventures | Building Inclusive Futures</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `
+  }
+
+  private generateIntakeNotificationEmailText(data: IntakeNotificationEmailData): string {
+    const { founderName, ventureName, country } = data
+    
+    return `
+
+Hi ${founderName},
+
+Thank you for submitting your venture intake to Mekong Inclusive Ventures. We have successfully received your submission, and it has been forwarded to our team for review.
+
+Venture: ${ventureName}
+${country ? `Country: ${country}` : ''}
+
+Our team will carefully review the information you have provided. If any additional details are required, or when there is an update regarding your application, we will be in touch via email.
+Best regards,
+The Mekong Inclusive Ventures Team
+
+---
+This email was sent to ${data.founderEmail}
+Mekong Inclusive Ventures | Building Inclusive Futures
+    `.trim()
+  }
+
+  // Admin notification email template: HTML and plain text
+  private generateAdminNotificationHTML(data: AdminNotificationEmailData): string {
+    const { ventureName, founderName, founderEmail, country } = data
+
+    return `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>New Venture Intake Submitted | Mekong Inclusive Ventures</title>
+      <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 600px; margin: 0 auto; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header { background: linear-gradient(135deg, #0ea5e9, #10b981); color: white; padding: 30px 20px; text-align: center; border-radius: 8px 8px 0 0; margin: -20px -20px 20px -20px; }
+        .header h1 { margin: 0; font-size: 26px; }
+        .content { padding: 0 20px; }
+        .highlight { background: #f0f9ff; padding: 15px; border-left: 4px solid #0ea5e9; margin: 20px 0; }
+        .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 12px; color: #666; border-radius: 0 0 8px 8px; margin: 20px -20px -20px -20px; }
+      </style>
+    </head>
+    <body>
+      <div class="container">
+        <div class="header">
+          <h1>New Intake Submitted</h1>
+        </div>
+        <div class="content">
+          <h2>A new venture intake needs review</h2>
+          <div class="highlight">
+            <p><strong>Venture:</strong> ${ventureName}</p>
+            <p><strong>Founder:</strong> ${founderName} (${founderEmail})</p>
+            ${country ? `<p><strong>Country:</strong> ${country}</p>` : ''}
+          </div>
+          <p>Please log in to review this submission at your earliest convenience.</p>
+          <p>Best regards,<br>
+          <strong>VPMS System</strong></p>
+        </div>
+        <div class="footer">
+          <p>Mekong Inclusive Ventures | Building Inclusive Futures</p>
+        </div>
+      </div>
+    </body>
+    </html>
+    `
+  }
+
+  private generateAdminNotificationText(data: AdminNotificationEmailData): string {
+    const { ventureName, founderName, founderEmail, country } = data
+    return `
+A new venture intake needs review
+
+Venture: ${ventureName}
+Founder: ${founderName} (${founderEmail})
+${country ? `Country: ${country}` : ''}
+
+Please log in to review this submission at your earliest convenience.
+
+Best regards,
+VPMS System
+
+---
+Mekong Inclusive Ventures | Building Inclusive Futures
+    `.trim()
+  }
+
   async sendWelcomeEmail(data: WelcomeEmailData): Promise<boolean> {
     if (!this.isConfigured()) {
       console.warn('Email service not configured - skipping welcome email')
@@ -189,6 +345,66 @@ Mekong Inclusive Ventures | Building Inclusive Futures
       return true
     } catch (error) {
       console.error('Failed to send welcome email:', error)
+      return false
+    }
+  }
+
+  // Intake notification email sending method
+  async sendIntakeNotificationEmail(data: IntakeNotificationEmailData): Promise<boolean> {
+    if (!this.isConfigured()) {
+      console.warn('Email service not configured...skipping intake notification email')
+      return false
+    }
+
+    try {
+      console.log(`Sending intake notification email to ${data.founderEmail}`)
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: data.founderEmail,
+        subject: `Successful Submission, ${data.founderName}!`,
+        text: this.generateIntakeNotificationEmailText(data),
+        html: this.generateIntakeNotificationEmailHTML(data),
+      }
+
+      const result = await this.transporter!.sendMail(mailOptions)
+      console.log('Intake notification email sent successfully:', result.messageId)
+      return true
+    } catch (error) {
+      console.error('Failed to send intake notification email:', error)
+      return false
+    }
+  }
+
+  // Admin notification email sending method
+   async sendAdminNotificationEmail(data: AdminNotificationEmailData): Promise<boolean> {
+    if (!this.isConfigured()) {
+      console.warn('Email service not configured...skipping admin notification email')
+      return false
+    }
+
+    const adminEmail = process.env.ADMIN_NOTIFICATION_EMAIL
+    if (!adminEmail) {
+      console.warn('ADMIN_NOTIFICATION_EMAIL not set...skipping admin notification email')
+      return false
+    }
+
+    try {
+      console.log(`Sending admin notification email to ${adminEmail}`)
+
+      const mailOptions = {
+        from: `"${this.fromName}" <${this.fromEmail}>`,
+        to: adminEmail,
+        subject: `New Intake Submitted, ${data.ventureName}`,
+        text: this.generateAdminNotificationText(data),
+        html: this.generateAdminNotificationHTML(data),
+      }
+
+      const result = await this.transporter!.sendMail(mailOptions)
+      console.log('Admin notification email sent successfully:', result.messageId)
+      return true
+    } catch (error) {
+      console.error('Failed to send admin notification email:', error)
       return false
     }
   }
@@ -288,4 +504,4 @@ Mekong Inclusive Ventures | Building Inclusive Futures
 export const emailService = new EmailService()
 
 // Export types
-export type { WelcomeEmailData, TestEmailData }
+export type { WelcomeEmailData, IntakeNotificationEmailData, AdminNotificationEmailData, TestEmailData }

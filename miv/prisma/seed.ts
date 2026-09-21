@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { Prisma, PrismaClient } from '@prisma/client'
 import fs from 'fs'
 import path from 'path'
 import bcrypt from 'bcryptjs'
@@ -423,7 +423,7 @@ async function main() {
 
   // Seed IRIS metric catalog from JSON
   try {
-    const catalogPath = path.join(process.cwd(), 'lib', 'iris-catalog.json')
+    const catalogPath = path.join(process.cwd(), 'app', 'api', '(impact-gedsi)', 'iris', 'data', 'iris-catalog.json')
     if (fs.existsSync(catalogPath)) {
       const raw = fs.readFileSync(catalogPath, 'utf-8')
       const parsed = JSON.parse(raw)
@@ -441,6 +441,7 @@ async function main() {
           const name = item.name || item.MetricName || item.metricName || item.title
           const description = item.description || item.MetricDefinition || item.definition || item.desc
           const unit = item.unit || item.Unit || item.measure || item.measurementUnit
+          const categories = item.categories || item.Categories || []
           const tags = item.tags || item.Tags || []
 
           if (!code || !name) return null
@@ -449,7 +450,8 @@ async function main() {
             name: String(name),
             description: description ? String(description) : null,
             unit: unit ? String(unit) : null,
-            tags: tags ? JSON.parse(JSON.stringify(tags)) : undefined,
+            category: Array.isArray(categories) && categories.length > 0 ? String(categories[0]) : null,
+            tags: tags ? JSON.parse(JSON.stringify(tags)) as Prisma.InputJsonValue : undefined,
           }
         })
         .filter(Boolean) as Array<{
@@ -457,8 +459,8 @@ async function main() {
         name: string
         description?: string | null
         unit?: string | null
-        categories?: unknown
-        tags?: unknown
+        category?: string | null
+        tags?: Prisma.InputJsonValue
       }>
 
       if (records.length > 0) {
@@ -482,7 +484,7 @@ async function main() {
         console.warn('⚠️ IRIS catalog JSON parsed but produced 0 records.')
       }
     } else {
-      console.warn('⚠️ IRIS catalog JSON not found at lib/iris-catalog.json')
+      console.warn('⚠️ IRIS catalog JSON not found at app/api/(impact-gedsi)/iris/data/iris-catalog.json')
     }
   } catch (err) {
     console.error('❌ Failed to seed IRIS catalog:', err)
@@ -496,4 +498,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect()
-  }) 
+  })

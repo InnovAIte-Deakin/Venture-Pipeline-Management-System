@@ -1,10 +1,10 @@
 import { getServerSession } from 'next-auth'
 import { NextResponse } from 'next/server'
+import { authOptions } from '@/lib/auth-options'
 
 import { prisma } from '@/lib/prisma'
 
 export async function requireAdminDevAccess() {
-    
   //check whether developer endpoints are enabled
   if (process.env.ENABLE_DEV_ENDPOINTS !== 'true') {
     return NextResponse.json(
@@ -14,7 +14,7 @@ export async function requireAdminDevAccess() {
   }
 
   //check whether someone is logged in
-  const session = await getServerSession().catch(() => null)
+  const session = await getServerSession(authOptions).catch(() => null)
 
   //get their email from the session
   const email = session?.user?.email

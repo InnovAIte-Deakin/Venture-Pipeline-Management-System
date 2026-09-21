@@ -55,12 +55,13 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Build query based on user role
-    const isAdmin = user.role === 'admin' || user.role === 'miv_analyst'
-    
+    // Enforce the collection's access rules at the route level: pass the authenticated
+    // user and stop overriding access, so Documents.read scoping governs the result
+    // instead of a hand-rolled where. (RBAC enforcement — matrix §3.)
     const documents = await payload.find({
       collection: 'documents',
-      where: isAdmin ? undefined : { uploadedBy: { equals: user.id } },
+      overrideAccess: false,
+      user,
       sort: '-createdAt',
       depth: 1, // Include related user/venture data
     })
@@ -224,9 +225,11 @@ export async function POST(request: NextRequest) {
     const buffer = Buffer.from(bytes)
     await writeFile(filePath, buffer)
 
-    // Create document record in Payload
+    // Create through the collection's access rules (create = authenticated).
     const document = await payload.create({
       collection: 'documents',
+      overrideAccess: false,
+      user,
       data: {
         filename: uniqueFilename,
         documentType,
@@ -348,7 +351,11 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    // Delete the document
+    // NOTE (RBAC review item): this route keeps its own explicit guard and stays
+    // privileged. The matrix (§2) says only staff delete documents, but this route
+    // currently also allows a founder to delete their OWN document. Left as-is to avoid
+    // silently changing self-service behaviour — flip to `overrideAccess: false` once
+    // the review confirms whether founders may delete their own uploads.
     await payload.delete({
       collection: 'documents',
       id: documentId,
