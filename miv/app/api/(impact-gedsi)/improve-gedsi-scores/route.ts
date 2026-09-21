@@ -1,12 +1,20 @@
 import { NextResponse } from 'next/server'
 import { ActivityType, MetricStatus, Prisma, PrismaClient, VentureStage } from '@prisma/client'
 
+import { requireAdminDevAccess } from '@/lib/guards/requireAdminDevAccess'
+
 const prisma = new PrismaClient()
 type VentureWithGEDSIMetrics = Prisma.VentureGetPayload<{
   include: { gedsiMetrics: true; createdBy: true }
 }>
 
 export async function POST() {
+  const accessDenied = await requireAdminDevAccess()
+
+  if (accessDenied) {
+    return accessDenied
+  }
+
   try {
     console.log('🎯 Starting GEDSI score improvements for portfolio companies...')
 

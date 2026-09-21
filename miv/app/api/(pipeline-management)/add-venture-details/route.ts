@@ -1,9 +1,22 @@
 import { NextResponse } from 'next/server'
-import { CapitalActivityType, CapitalStatus, DocumentType, Prisma, PrismaClient } from '@prisma/client'
+import {
+  CapitalActivityType,
+  CapitalStatus,
+  DocumentType,
+  Prisma,
+  PrismaClient,
+} from '@prisma/client'
+import { requireAdminDevAccess } from '@/lib/guards/requireAdminDevAccess'
 
 const prisma = new PrismaClient()
 
 export async function POST() {
+  const accessDenied = await requireAdminDevAccess()
+
+  if (accessDenied) {
+    return accessDenied
+  }
+
   try {
     console.log('📋 Adding detailed capital activities and documents to ventures...')
 
