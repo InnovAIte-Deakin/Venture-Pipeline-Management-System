@@ -685,7 +685,7 @@ Response 200:
 
 Errors: 401, 500.
 
-Callers: the user dashboard documents page and the impact documents page both call this correctly.
+Callers: the user dashboard, staff Document Management, and impact documents pages use this route through the frontend /backend proxy.
 
 ### 6.2 POST /api/documents
 
@@ -707,9 +707,7 @@ Response 200: `{ "success": true, "message": "Document deleted" }`
 
 Errors: 400 missing id, 401, 403, 404, 500.
 
-Why the query string form: a path style DELETE /api/documents/{id} would be tidier, but that handler does not exist on the backend, and both working frontend callers already use the query string form. So v1 makes the query string form canonical. If we ever want the path form, the backend adds it first, both callers migrate, and then this one goes away. There should never be a period with two live delete routes.
-
-Caller to fix: the impact documents page has one delete call using the path form (line 157), which currently fails with a 405. It needs to switch to the query string form.
+Why the query string form: a path style DELETE /api/documents/{id} would be tidier, but that handler does not exist on the backend, and the frontend document pages already use the query string form. So v1 makes the query string form canonical. If we ever want the path form, the backend adds it first, all callers migrate, and then this one goes away. There should never be a period with two live delete routes.
 
 ### 6.4 GET /api/documents/{id} and GET /api/documents/{id}?download=true
 
@@ -729,7 +727,7 @@ Reviews a document, changing its status and notes. The server also stamps who re
 
 Auth: cookie required. Admin and miv_analyst only, everyone else gets a 403.
 
-Request: `{ "status": "string", "notes": "optional" }`. The exact status values come from the Documents collection config, for example pending, approved and rejected. Confirm against the collection before relying on specific values.
+Request: `{ "status": "string", "notes": "optional" }`. Valid status values are `pending_review`, `approved`, `rejected` and `needs_revision`.
 
 Response 200: `{ "success": true, "document": { updated document } }`
 
@@ -749,7 +747,9 @@ Errors: 400 for a wrong content type or an oversized file.
 
 ### 6.7 Frontend internal document routes
 
-The miv app also has its own Prisma backed document routes (documents, documents/{id}, documents/upload, documents/analytics). The user facing document flows already go through the backend routes described above, so these internal ones overlap. Our proposal is to either retire them or scope them strictly to staff analytics. To be decided by the team.
+The four Prisma-backed document routes previously provided by the miv app have been retired: `/api/documents`, `/api/documents/{id}`, `/api/documents/upload`, and `/api/documents/analytics`. The authenticated Payload-based routes in miv-backend described in Sections 6.1 to 6.5 are now canonical for document listing, uploading, retrieval and download, updating, and deletion.
+
+The staff Document Management page now uses these routes through the frontend `/backend` proxy. Total and recent document counts are derived client-side from the document list response, while the legacy storage and growth analytics have been removed. The Prisma `Document` model and its migrations remain unchanged pending a separate cleanup decision.
 
 ## 7. Duplicate and mismatch inventory
 
@@ -764,7 +764,7 @@ This is the cleanup list. Each row names the problem, the path we are keeping, t
 | Dead disabled routes | **Open:** dot-prefixed copies of assign-track and send-signature still sit next to the live versions | Delete the files | none | Backend |
 | Copy pasted PATCH on the reports route | PATCH /api/reports/impact-users duplicates PATCH /api/users | Remove the handler, profile updates go through /api/users only | none found | Backend |
 | Misspelled settings path | Canonical routes now use /api/system-settings | Decide separately whether a legacy redirect is required; no old route is present | miv-backend/src/app/api/system-settings | Backend and frontend |
-| Broken delete call | Resolved: the impact documents page uses the query-string delete form | Keep the current DELETE /api/documents?id={documentId} call | miv/app/dashboard/(g3-admin-review-readiness)/impact-documents/page.tsx | Frontend |
+| Broken delete call | Resolved: document deletion uses the canonical backend query-string form | Keep `DELETE /backend/api/documents?id={documentId}` in frontend callers | miv/app/dashboard/(operations)/documents/hooks/useDocuments.ts and miv/app/user-dashboard/documents/lib/documents-api.ts | Frontend |
 | Ventures live in two databases | Prisma in the frontend and Payload in the backend, nothing syncs them | Documented as is for v1, single source of truth to be decided for v2 | not applicable yet | Whole team |
 | Page-level authentication | Resolved: Next.js 16 uses the active proxy.ts convention | See current page-level authentication statement below | miv/proxy.ts | Frontend |
 | Identity lookup that cannot work | Resolved: /api/users/ventures calls getSessionUser() directly | Keep the direct session lookup | miv/app/api/(g5-user-support-settings)/users/ventures/route.ts | Frontend |

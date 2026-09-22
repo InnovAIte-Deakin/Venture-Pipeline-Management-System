@@ -7,7 +7,20 @@ import type {
   DocumentRecord,
   DocumentsAnalytics,
   VentureOption,
-} from "../types";
+} from "../types/types";
+
+import { documentTypes } from "../types/constants";
+
+function formatFileSize(bytes: number): string {
+  if (bytes === 0) return "0 Bytes";
+
+  const units = ["Bytes", "KB", "MB", "GB"];
+  const index = Math.floor(Math.log(bytes) / Math.log(1024));
+
+  return `${parseFloat(
+    (bytes / Math.pow(1024, index)).toFixed(1),
+  )} ${units[index]}`;
+}
 
 export function useDocuments() {
   const [documents, setDocuments] = useState<DocumentRecord[]>([]);
@@ -25,29 +38,108 @@ export function useDocuments() {
 
   const fetchDocuments = useCallback(async () => {
     try {
-      const params = new URLSearchParams();
-      if (searchQuery) params.append("search", searchQuery);
-      if (selectedType !== "all") params.append("type", selectedType);
-      if (selectedVenture !== "all") {
-        params.append("ventureId", selectedVenture);
-      }
-      params.append("limit", "50");
-      params.append("sortBy", "uploadedAt");
-      params.append("sortOrder", "desc");
+      setError(null);
 
-      const response = await fetch(`/api/documents?${params}`);
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch documents: ${response.status} ${response.statusText}`,
-        );
-      }
+      const response = await fetch("/backend/api/documents", {
+        credentials: "include",
+      });
 
       const data = await response.json();
-      setDocuments(data.documents || []);
-      return data;
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.message || "Failed to fetch documents");
+      }
+
+      const allDocuments = (data.documents || []).map(
+        (doc: any): DocumentRecord => {
+          const venture =
+            typeof doc.venture === "object" ? doc.venture : null;
+
+          const ventureId = String(
+            venture?.id || doc.venture || "",
+          );
+
+          return {
+            id: String(doc.id),
+            name: doc.filename,
+            type: doc.documentType,
+            size: doc.filesize,
+            sizeFormatted: formatFileSize(doc.filesize || 0),
+            ventureId,
+            venture: {
+              id: ventureId,
+              name: venture?.name || "No venture",
+              sector: venture?.sector || "",
+              stage: venture?.stage || "",
+            },
+            uploadedBy:
+              typeof doc.uploadedBy === "object"
+                ? `${doc.uploadedBy?.firstName || ""} ${
+                    doc.uploadedBy?.lastName || ""
+                  }`.trim() ||
+                  doc.uploadedBy?.email ||
+                  "Unknown"
+                : "Unknown",
+            uploadedAt: doc.createdAt,
+            status: doc.status,
+            url:
+              doc.url && doc.url.startsWith("/api/")
+                ? `/backend${doc.url}`
+                : doc.url || "",
+            mimeType: doc.mimeType,
+            description: doc.notes,
+            tags: [],
+          };
+        },
+      );
+
+      const normaliseType = (value: string) =>
+        value.toLowerCase().replace(/[^a-z0-9]/g, "");
+
+      const filteredDocuments = allDocuments.filter(
+        (document: DocumentRecord) => {
+          const search = searchQuery.toLowerCase();
+
+          const matchesSearch =
+            !search ||
+            document.name.toLowerCase().includes(search) ||
+            document.venture.name.toLowerCase().includes(search) ||
+            document.uploadedBy.toLowerCase().includes(search);
+
+          const matchesType =
+            selectedType === "all" ||
+            normaliseType(document.type) === normaliseType(selectedType);
+
+          const matchesVenture =
+            selectedVenture === "all" ||
+            document.ventureId === selectedVenture;
+
+          return matchesSearch && matchesType && matchesVenture;
+        },
+      );
+
+      const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+      const recentDocuments = allDocuments.filter(
+        (document: DocumentRecord) =>
+          new Date(document.uploadedAt).getTime() >= thirtyDaysAgo,
+      ).length;
+
+      setDocuments(filteredDocuments);
+      setAnalytics({
+        summary: {
+          totalDocuments: allDocuments.length,
+          recentDocuments,
+        },
+      });
+
+      return { ...data, documents: filteredDocuments };
     } catch (error) {
       console.error("Error fetching documents:", error);
-      setError(error instanceof Error ? error.message : "Failed to fetch documents");
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch documents",
+      );
       setDocuments([]);
       return { documents: [] };
     }
@@ -58,30 +150,31 @@ export function useDocuments() {
       setLoading(true);
       setError(null);
 
-      const [venturesResponse, , analyticsResponse] = await Promise.all([
-        fetch("/api/ventures?limit=100"),
+      const [venturesResponse] = await Promise.all([
+        fetch("/backend/api/ventures?limit=100", {
+          credentials: "include",
+        }),
         fetchDocuments(),
-        fetch("/api/documents/analytics?period=30"),
       ]);
 
       if (venturesResponse.ok) {
         const venturesData = await venturesResponse.json();
+
         setVentures([
           { value: "all", label: "All Ventures" },
-          ...venturesData.ventures.map((venture: { id: string; name: string }) => ({
-            value: venture.id,
-            label: venture.name,
-          })),
+          ...(venturesData.ventures || venturesData.docs || []).map(
+            (venture: { id: string; name: string }) => ({
+              value: String(venture.id),
+              label: venture.name,
+            }),
+          ),
         ]);
-      }
-
-      if (analyticsResponse.ok) {
-        const analyticsData = await analyticsResponse.json();
-        setAnalytics(analyticsData);
       }
     } catch (error) {
       console.error("Error loading initial data:", error);
-      setError(error instanceof Error ? error.message : "Failed to load data");
+      setError(
+        error instanceof Error ? error.message : "Failed to load data",
+      );
     } finally {
       setLoading(false);
     }
@@ -111,33 +204,42 @@ export function useDocuments() {
     setError(null);
 
     try {
-      const formData = new FormData();
+      const uploadErrors: string[] = [];
 
-      Array.from(files).forEach((file) => {
-        formData.append("files", file);
-      });
+      for (const file of Array.from(files)) {
+        const formData = new FormData();
 
-      formData.append("ventureId", selectedVenture);
-      formData.append("type", selectedType !== "all" ? selectedType : "OTHER");
+        const documentType =
+          documentTypes.find(
+            (option) => option.value === selectedType,
+          )?.label || "Other";
 
-      const response = await fetch("/api/documents/upload", {
-        method: "POST",
-        body: formData,
-      });
+        formData.append("file", file);
+        formData.append("ventureId", selectedVenture);
+        formData.append("documentType", documentType);
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Upload failed");
+        const response = await fetch("/backend/api/documents", {
+          method: "POST",
+          credentials: "include",
+          body: formData,
+        });
+
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          uploadErrors.push(
+            result.message ||
+              result.error ||
+              `Failed to upload ${file.name}`,
+          );
+        }
       }
 
-      const result = await response.json();
       await fetchDocuments();
 
-      if (result.errors?.length > 0) {
+      if (uploadErrors.length > 0) {
         setError(
-          `Some files failed to upload: ${result.errors
-            .map((uploadError: { error: string }) => uploadError.error)
-            .join(", ")}`,
+          `Some files failed to upload: ${uploadErrors.join(", ")}`,
         );
       }
     } catch (error) {
@@ -154,13 +256,20 @@ export function useDocuments() {
     }
 
     try {
-      const response = await fetch(`/api/documents/${documentId}`, {
-        method: "DELETE",
-      });
+      const response = await fetch(
+        `/backend/api/documents?id=${encodeURIComponent(documentId)}`,
+        {
+          method: "DELETE",
+          credentials: "include",
+        },
+      );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Delete failed");
+      const result = await response.json();
+
+      if (!response.ok || !result.success) {
+        throw new Error(
+          result.message || result.error || "Delete failed",
+        );
       }
 
       await fetchDocuments();

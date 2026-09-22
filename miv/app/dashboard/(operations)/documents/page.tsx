@@ -5,7 +5,7 @@ import { AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { documentTypes } from "./constants";
+import { documentTypes } from "./types/constants";
 import { useDocuments } from "./hooks/useDocuments";
 import { useViewport } from "./hooks/use-viewport";
 import {
