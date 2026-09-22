@@ -31,7 +31,7 @@ interface TestEmailData {
   ventureName: string
 }
 
-class EmailService {
+export class EmailService {
   private transporter: Transporter | null = null
   private fromEmail: string
   private fromName: string
