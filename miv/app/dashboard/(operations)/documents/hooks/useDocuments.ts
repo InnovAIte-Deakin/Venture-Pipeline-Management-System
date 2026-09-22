@@ -82,7 +82,10 @@ export function useDocuments() {
                 : "Unknown",
             uploadedAt: doc.createdAt,
             status: doc.status,
-            url: doc.url || "",
+            url:
+              doc.url && doc.url.startsWith("/api/")
+                ? `/backend${doc.url}`
+                : doc.url || "",
             mimeType: doc.mimeType,
             description: doc.notes,
             tags: [],
@@ -159,7 +162,7 @@ export function useDocuments() {
 
         setVentures([
           { value: "all", label: "All Ventures" },
-          ...(venturesData.docs || []).map(
+          ...(venturesData.ventures || venturesData.docs || []).map(
             (venture: { id: string; name: string }) => ({
               value: String(venture.id),
               label: venture.name,
