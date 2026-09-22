@@ -37,11 +37,22 @@ export const ActivityLogs: CollectionConfig = {
     { name: 'action', type: 'text', required: true },
     { name: 'entity', type: 'text', required: true },
     { name: 'entityId', type: 'text' },
+    { name: 'legacyType', type: 'text' },
+    { name: 'legacyTitle', type: 'text' },
     // RULE: NO personal data in `metadata`. This collection is immutable (never deleted via
     // the API), so anything logged here has no erasure route. Do not log request bodies,
     // error payloads, or anything that could carry PII / disability data. Keep it to ids,
     // enums, and counts. (Documented in docs/rbac/RBAC_MATRIX.md.)
     { name: 'metadata', type: 'json' },
     { name: 'timestamp', type: 'date', defaultValue: () => new Date().toISOString() },
+    {
+      name: 'legacyPrismaId',
+      type: 'text',
+      unique: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
   ],
 }

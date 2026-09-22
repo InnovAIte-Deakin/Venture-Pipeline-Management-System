@@ -35,5 +35,14 @@ export const Founders: CollectionConfig = {
     { name: 'venture', type: 'relationship', relationTo: 'ventures' as any },
     // Kept for display only — NO LONGER decides access (see access/scoping.ts).
     { name: 'user', type: 'relationship', relationTo: 'users' },
+    {
+      name: 'legacyPrismaId',
+      type: 'text',
+      unique: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
+    },
   ],
 }

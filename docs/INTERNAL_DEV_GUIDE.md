@@ -10,6 +10,8 @@ This guide explains how to set up, run, and maintain the Venture Pipeline Manage
 
 All instructions reflect the **current, official implementation provided by the development team** and are aligned with the project README.
 
+> **Prerequisite — read this first:** VPMS's backend depends on Docker (running MongoDB and PostgreSQL as containers) and will not work without it. Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) and make sure it's running before attempting any setup steps below. Skipping this is the single most common cause of "nothing works" for new contributors.
+
 ---
 
 ## 2. Repository Structure
@@ -53,6 +55,19 @@ Authentication is implemented using **NextAuth** with:
 * Credentials-based login (email and password)
 * JWT-based sessions
 * Prisma adapter for persistence in PostgreSQL
+
+### Authentication Rate Limits and Account Lockout
+
+To reduce repeated authentication attempts, the backend applies per-IP rate limiting to authentication endpoints:
+
+* Login: 10 requests per minute per IP
+* Forgot password: 5 requests per minute per IP
+
+When the request limit is exceeded, the API returns HTTP 429 (Too Many Requests).
+
+Payload CMS also applies its default account lockout behaviour after 5 failed login attempts. The account remains locked for 10 minutes. Locked-account login attempts are mapped to HTTP 429 instead of returning a generic 500 error.
+
+The current rate limiter uses in-memory per instance storage. On Vercel, the stored request history may reset on cold starts and is not shared across multiple application instances.
 
 ### Development Test Accounts
 
@@ -168,18 +183,33 @@ SMTP_FROM_EMAIL =
 
 > End-to-end testing through the actual intake submission form is currently not possible because of a separate issue with venture creation, which is explained in the Common Issues section.
 
-## 9. Common Issues
+## 9. Admin Notification Email Configuration
+* In addition to the founder confirmation email, an internal notification is sent to the admin email address whenever a new intake is submitted. 
+* This uses the same email service.
+
+### Environment Variables
+ADMIN_NOTIFICATION_EMAIL=
+
+* If the admin email is not set, the admin notification is skipped and the founder confirmation email is still sent. A warning is logged instead.
+* For local development, use the same test inbox address already configured for SMTP testing, such as Mailtrap or Ethereal Email.
+
+### To Test Locally
+* The existing test route at src/app/api/email/test-intake/route.ts also triggers this email.
+* Sending a POST request to this route should result in two separate emails arriving in the configured test inbox such as the founder confirmation email and the admin notification.
+
+## 10. Common Issues
 
 * Frontend not loading → ensure `npm run dev` is running in `miv`
 * Backend unavailable → ensure Docker containers are running
 * Login issues → verify NextAuth environment variables
 * Document upload errors → check file size/type restrictions
-* Intake email not working → check that the required SMTP settings are correctly added in the .env file.
-The full intake submission is currently affected by a separate venture creation issue, which is not related to the email setup.
+* `npm i` fails on Windows with a `lightningcss-linux-x64-gnu` error → rebase onto main after #57.
+* Payload CMS admin login (`venture.manager@miv.org`) doesn't work → this account isn't actually seeded, despite docs/seed output suggesting otherwise. Use the VPMS test accounts above to confirm your setup instead.
+* Intake email not working → check that the required SMTP settings are correctly added in the .env file. The full intake submission is currently affected by a separate venture creation issue, which is not related to the email setup.
 
 ---
 
-## 10. Troubleshooting
+## 11. Troubleshooting
 ### Prisma P1000 Authentication Failed
 #### Issue
 
@@ -224,9 +254,8 @@ npm run db:seed
 ```
 
 If successful, the database schema will be synchronised and the development data will be seeded successfully.
-## 11. Maintenance Notes
+## 12. Maintenance Notes
 
 * Payload CMS collections and access rules are defined in backend config
 * Prisma schema changes require migrations
 * Update documentation when system behaviour changes
-

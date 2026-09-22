@@ -49,3 +49,9 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 .pnpm-store/*
+
+uploads/documents/*
+!uploads/documents/.gitkeep
+uploads/dataroom/*
+!uploads/dataroom/.gitkeep
+

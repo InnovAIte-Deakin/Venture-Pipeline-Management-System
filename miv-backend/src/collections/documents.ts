@@ -43,11 +43,16 @@ export const Documents: CollectionConfig = {
   },
 
   admin: {
-    defaultColumns: ['filename', 'documentType', 'status', 'uploadedBy', 'createdAt'],
+    defaultColumns: ['filename', 'name', 'documentType', 'status', 'uploadedBy', 'createdAt'],
     useAsTitle: 'filename',
   },
 
   fields: [
+    {
+      name: 'name',
+      label: 'Legacy Document Name',
+      type: 'text',
+    },
     {
       name: 'documentType',
       label: 'Document Type',
@@ -56,7 +61,10 @@ export const Documents: CollectionConfig = {
       options: [
         { label: 'Pitch Deck', value: 'pitch_deck' },
         { label: 'Financial Statements', value: 'financial_statements' },
+        { label: 'Business Plan', value: 'business_plan' },
         { label: 'Legal Documents', value: 'legal_documents' },
+        { label: 'Market Research', value: 'market_research' },
+        { label: 'Team Profile', value: 'team_profile' },
         { label: 'GEDSI Reports', value: 'gedsi_reports' },
         { label: 'Impact Reports', value: 'impact_reports' },
         { label: 'Other', value: 'other' },
@@ -114,6 +122,19 @@ export const Documents: CollectionConfig = {
       name: 'notes',
       label: 'Notes',
       type: 'textarea',
+    },
+    { name: 'legacyUrl', type: 'text' },
+    { name: 'legacySize', type: 'number' },
+    { name: 'legacyMimeType', type: 'text' },
+    { name: 'legacyUploadedAt', type: 'date' },
+    {
+      name: 'legacyPrismaId',
+      type: 'text',
+      unique: true,
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+      },
     },
     {
       name: 'reviewedBy',
