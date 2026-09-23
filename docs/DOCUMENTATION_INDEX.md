@@ -60,6 +60,14 @@ This folder contains the consolidated and finalised documentation for the VPMS p
 - **[Phase 0 Consolidation Plan](./planning/phase-0-consolidation-plan.md)**
   Decision log, field inventory, enum reconciliation, computed-status analysis, and migration/rollback plan for the consolidation above.
 
+### 9. Team Progress
+
+- **[Frontend Progress](./progress/FRONTEND_PROGRESS.md)**
+  Week-by-week record of completed Frontend work, updated at the end of every week.
+
+- **[Backend Progress](./progress/BACKEND_PROGRESS.md)**
+  Week-by-week record of completed Backend work, updated at the end of every week.
+
 ## 📌 Notes
 
 - This documentation reflects the **current MVP implementation**.
